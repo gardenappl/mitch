@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_updates">Обновления приложений</string>
+    <string name="notification_channel_install">Установка приложений</string>
+    <string name="notification_install_title">Готово к установке</string>
+    <string name="notification_download_complete_title">Загрузка завершена</string>
+</resources>
