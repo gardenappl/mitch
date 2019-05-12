@@ -1,15 +1,12 @@
 <resources>
-    <string name="app_name" translatable="false">itchAnd</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
+    <string name="app_name" translatable="false">Mitch</string>
     <string name="notification_channel_updates">App updates</string>
     <string name="notification_channel_install">App install</string>
     <string name="notification_channel_install_desc">Notify when an itch.io app is ready for installation.</string>
     <string name="notification_channel_updates_desc">Notify when an itch.io app receives an update.</string>
     <string name="notification_install_title">Ready to install</string>
     <string name="notification_download_complete_title">Download complete</string>
+    <string name="nav_website_view">Browse</string>
+    <string name="nav_installed">Installed</string>
+    <string name="nav_settings">Settings</string>
 </resources>

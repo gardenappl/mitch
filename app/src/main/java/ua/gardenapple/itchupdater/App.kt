@@ -1,10 +1,14 @@
 package ua.gardenapple.itchupdater
 
 import android.app.Application
+import android.app.DownloadManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
+import android.support.v4.app.ActivityCompat
+import ua.gardenapple.itchupdater.client.web.DownloadRequester
 
 const val LOGGING_TAG: String = "ItchAnd"
 
@@ -14,7 +18,9 @@ const val NOTIFICATION_CHANNEL_ID_UPDATES = "updates"
 
 const val NOTIFICATION_ID_DOWNLOAD = 20000
 
-class App : Application() {
+class App : Application(),
+        ActivityCompat.OnRequestPermissionsResultCallback {
+
     override fun onCreate() {
         super.onCreate()
 
@@ -31,5 +37,15 @@ class App : Application() {
             notificationManager.createNotificationChannel(channel)
         }
 
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSION_REQUEST_CODE_DOWNLOAD -> {
+                if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    DownloadRequester.resumeDownload(getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager)
+                }
+            }
+        }
     }
 }

@@ -79,7 +79,7 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
         val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
 
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_UPDATES).apply {
-            setSmallIcon(R.drawable.ic_menu_send)
+            setSmallIcon(R.drawable.ic_file_download_black_24dp)
             if(isApk)
                 setContentTitle(context.resources.getString(R.string.notification_install_title))
             else

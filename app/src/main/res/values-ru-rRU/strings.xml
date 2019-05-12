@@ -4,4 +4,10 @@
     <string name="notification_channel_install">Установка приложений</string>
     <string name="notification_install_title">Готово к установке</string>
     <string name="notification_download_complete_title">Загрузка завершена</string>
+    <string name="notification_channel_install_desc">Уведомлять, когда приложение из itch.io готово к установке</string>
+    <string name="notification_channel_updates_desc">Уведомлять, когда для приложения из itch.io доступно обновление
+    </string>
+    <string name="nav_website_view">Главная</string>
+    <string name="nav_installed">Установленное</string>
+    <string name="nav_settings">Настройки</string>
 </resources>
