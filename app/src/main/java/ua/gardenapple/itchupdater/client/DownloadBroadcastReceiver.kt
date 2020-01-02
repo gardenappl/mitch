@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.provider.MediaStore
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
 import android.support.v4.content.FileProvider
@@ -28,13 +29,13 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
         val cursor = downloadManager.query(query)
         if (cursor.moveToFirst()) {
             val downloadStatus = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
-            val downloadLocalUri = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))
+            val downloadLocalUriString = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))
+            val downloadLocalUri = Uri.parse(downloadLocalUriString)
             val downloadMimeType = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE))
 
-            if (downloadStatus == DownloadManager.STATUS_SUCCESSFUL &&
-                    downloadLocalUri != null) {
+            if (downloadStatus == DownloadManager.STATUS_SUCCESSFUL && downloadLocalUri != null) {
                 val isApk = downloadMimeType == "application/vnd.android.package-archive" ||
-                        downloadLocalUri.endsWith(".apk")
+                        downloadLocalUri.path.endsWith(".apk")
                 createNotification(context, downloadLocalUri, downloadID.toInt(), isApk)
             }
             Log.d(LOGGING_TAG, downloadMimeType)
@@ -42,19 +43,18 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
         cursor.close()
     }
 
-    private fun createNotification(context: Context, downloadLocalUri: String, id: Int, isApk: Boolean) {
+    private fun createNotification(context: Context, downloadLocalUri: Uri, id: Int, isApk: Boolean) {
         var intent: Intent?
         if(isApk) {
-            var uri = downloadLocalUri
-            if (uri.substring(0, 7) == "file://") {
-                uri = uri.substring(7)
-            }
+            val downloadPath = downloadLocalUri.path
+            Log.d(LOGGING_TAG, downloadPath)
 
-            val fileUri = FileProvider.getUriForFile(context, "ua.gardenapple.itchupdater.fileprovider", File(uri))
-            Log.d(LOGGING_TAG, fileUri.toString())
+            val providerUri = FileProvider.getUriForFile(context,
+                "ua.gardenapple.itchupdater.fileprovider", File(downloadPath))
+            Log.d(LOGGING_TAG, providerUri.toString())
 
             intent = Intent(Intent.ACTION_INSTALL_PACKAGE).apply {
-                setData(fileUri)
+                setData(providerUri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
             }
@@ -84,7 +84,7 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
                 setContentTitle(context.resources.getString(R.string.notification_install_title))
             else
                 setContentTitle(context.resources.getString(R.string.notification_download_complete_title))
-            setContentText(Uri.parse(downloadLocalUri).lastPathSegment)
+            setContentText(downloadLocalUri.lastPathSegment)
             setPriority(NotificationCompat.PRIORITY_HIGH)
 
             setContentIntent(pendingIntent)

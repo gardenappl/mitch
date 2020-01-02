@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {
                 //TODO: maybe not neccessary to do on every page load?
                 CookieManager.getInstance().flush()
 
+
                 //TODO: filter only store pages
                 webView.evaluateJavascript("""
                     var elements = document.getElementsByClassName("download_btn");
@@ -77,6 +78,10 @@ class MainActivity : AppCompatActivity() {
             webView.goBack()
         else
             super.onBackPressed()
+    }
+
+    fun getWebView(): WebView {
+        return webView;
     }
 
     private class ItchJavaScriptInterface {

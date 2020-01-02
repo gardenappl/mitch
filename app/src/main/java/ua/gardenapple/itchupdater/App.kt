@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.support.v4.app.ActivityCompat
 import ua.gardenapple.itchupdater.client.web.DownloadRequester
+import ua.gardenapple.itchupdater.client.web.UpdateCheckWebTask
 
 const val LOGGING_TAG: String = "ItchAnd"
 
@@ -23,7 +24,6 @@ class App : Application(),
 
     override fun onCreate() {
         super.onCreate()
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.notification_channel_install)
             val descriptionText = getString(R.string.notification_channel_install_desc)

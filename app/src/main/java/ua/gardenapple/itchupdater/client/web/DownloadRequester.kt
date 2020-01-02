@@ -8,7 +8,10 @@ import android.net.Uri
 import android.os.Environment
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import android.webkit.URLUtil
+import ua.gardenapple.itchupdater.LOGGING_TAG
+import ua.gardenapple.itchupdater.MainActivity
 import ua.gardenapple.itchupdater.PERMISSION_REQUEST_CODE_DOWNLOAD
 
 class DownloadRequester {
@@ -17,8 +20,9 @@ class DownloadRequester {
         lateinit var currentContent: String
         lateinit var currentMimeType: String
 
-        fun requestDownload(activity: Activity, url: String, contentDisposition: String, mimeType: String) {
+        fun requestDownload(activity: MainActivity, url: String, contentDisposition: String, mimeType: String) {
             if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                Log.d(LOGGING_TAG, activity.getWebView().originalUrl);
                 ActivityCompat.requestPermissions(
                     activity,
                     arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
@@ -39,12 +43,13 @@ class DownloadRequester {
 
         private fun doDownload(downloadManager: DownloadManager, url: String, contentDisposition: String, mimeType: String) {
             val downloadRequest = DownloadManager.Request(Uri.parse(url)).apply {
-                setDescription("Testy test")
+                //setDescription("Testy test")
 
                 val fileName = URLUtil.guessFileName(url, contentDisposition, mimeType)
                 setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,"itchAnd/" + fileName)
                 setMimeType(mimeType)
                 setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+                allowScanningByMediaScanner()
             }
 
             val id = downloadManager.enqueue(downloadRequest)
