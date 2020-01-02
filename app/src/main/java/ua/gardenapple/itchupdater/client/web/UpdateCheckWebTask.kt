@@ -25,11 +25,7 @@ class UpdateCheckWebTask : UpdateCheckTask() {
 //    }
 
     private fun checkDownloadPage(url: String): GameVersionInfo {
-        val MAX_DOCUMENT_SIZE = 30000 //size in bytes
-
-        Log.d("Test", "Cookie print now!")
-        Log.d("Test", "Cookie is " + CookieManager.getInstance().getCookie("https://itch.io"))
-        val doc = Jsoup.connect(url).header("Cookie", CookieManager.getInstance().getCookie("https://itch.io")).maxBodySize(MAX_DOCUMENT_SIZE).get()
+        val doc = Jsoup.connect(url).header("Cookie", CookieManager.getInstance().getCookie("https://itch.io")).get()
 
         val maxLogSize = 1000
         val result = doc.html()
@@ -52,8 +48,8 @@ class UpdateCheckWebTask : UpdateCheckTask() {
             for(icon in icons) {
                 val apkName = icon.parent().parent().getElementsByClass("name").attr("title")
                 val fileSize = icon.parent().parent().getElementsByClass("file_size")[0].child(0).text()
-                val timestamp = icon.parent().parent().parent().parent().nextElementSibling()
-                        .getElementsByClass("version_date")[0].child(0).attr("title")
+                val timestamp = icon.parent().parent().nextElementSibling()
+                        .getElementsByClass("upload_date")[0].child(0).attr("title")
                 val uploadID = icon.parent().parent().parent().previousElementSibling().attr("data-upload_id").toInt()
 
                 versionsMap[GamePlatform.Android]!!.add(GameVersion(apkName, timestamp, true, fileSize, uploadID))
@@ -64,11 +60,7 @@ class UpdateCheckWebTask : UpdateCheckTask() {
 
 
     private fun checkStorePage(url: String): GameVersionInfo {
-        val MAX_DOCUMENT_SIZE = 50000 //size in bytes
-
-        //TODO: Remove before release! HTML/COOKIES CONTAIN PRIVATE INFORMATION
-        Log.d("Test", "Cookie is " + CookieManager.getInstance().getCookie("https://itch.io"))
-        val doc = Jsoup.connect(url).header("Cookie", CookieManager.getInstance().getCookie("https://itch.io")).maxBodySize(MAX_DOCUMENT_SIZE).get()
+        val doc = Jsoup.connect(url).header("Cookie", CookieManager.getInstance().getCookie("https://itch.io")).get()
         //val doc = Jsoup.connect(url).maxBodySize(MAX_DOCUMENT_SIZE).get()
 
         val maxLogSize = 1000
