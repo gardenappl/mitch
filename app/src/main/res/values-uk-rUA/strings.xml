@@ -1,2 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="nav_installed">Моя колекція</string>
+    <string name="nav_settings">Налаштування</string>
+    <string name="nav_website_view">Головна</string>
+    <string name="notification_channel_install">Встановлення додатків</string>
+    <string name="notification_channel_install_desc">Сповіщати коли додаток з itch.io готовий до встановлення</string>
+    <string name="notification_channel_updates">Оновлення додатків</string>
+    <string name="notification_channel_updates_desc">Сповіщати коли для додатка з itch.io доступне оновлення</string>
+    <string name="notification_download_complete_title">Завантаження завершено</string>
+    <string name="notification_install_title">Можна встановлювати</string>
+</resources>

@@ -7,6 +7,6 @@
     <string name="notification_install_title">Ready to install</string>
     <string name="notification_download_complete_title">Download complete</string>
     <string name="nav_website_view">Browse</string>
-    <string name="nav_installed">Installed</string>
+    <string name="nav_installed">My Library</string>
     <string name="nav_settings">Settings</string>
 </resources>

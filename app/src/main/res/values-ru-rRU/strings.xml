@@ -8,6 +8,6 @@
     <string name="notification_channel_updates_desc">Уведомлять, когда для приложения из itch.io доступно обновление
     </string>
     <string name="nav_website_view">Главная</string>
-    <string name="nav_installed">Установленное</string>
     <string name="nav_settings">Настройки</string>
+    <string name="nav_installed">Моя коллекция</string>
 </resources>
