@@ -7,11 +7,16 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import android.support.v4.app.ActivityCompat
+import androidx.core.app.ActivityCompat
 import ua.gardenapple.itchupdater.client.web.DownloadRequester
 import ua.gardenapple.itchupdater.client.web.UpdateCheckWebTask
+import android.content.IntentFilter
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 
-const val LOGGING_TAG: String = "ItchAnd"
+
+
+const val LOGGING_TAG: String = "Mitch"
 
 const val PERMISSION_REQUEST_CODE_DOWNLOAD = 1
 
@@ -36,7 +41,6 @@ class App : Application(),
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
-
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

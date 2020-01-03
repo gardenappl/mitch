@@ -6,8 +6,8 @@ import android.app.DownloadManager
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import android.util.Log
 import android.webkit.URLUtil
 import ua.gardenapple.itchupdater.LOGGING_TAG
@@ -49,7 +49,6 @@ class DownloadRequester {
                 setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,"itchAnd/" + fileName)
                 setMimeType(mimeType)
                 setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
-                allowScanningByMediaScanner()
             }
 
             val id = downloadManager.enqueue(downloadRequest)

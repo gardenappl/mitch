@@ -7,9 +7,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
-import android.support.v4.app.NotificationCompat
-import android.support.v4.app.NotificationManagerCompat
-import android.support.v4.content.FileProvider
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.FileProvider
 import android.util.Log
 import ua.gardenapple.itchupdater.LOGGING_TAG
 import ua.gardenapple.itchupdater.NOTIFICATION_CHANNEL_ID_UPDATES
@@ -33,9 +33,9 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
             val downloadLocalUri = Uri.parse(downloadLocalUriString)
             val downloadMimeType = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE))
 
-            if (downloadStatus == DownloadManager.STATUS_SUCCESSFUL && downloadLocalUri != null) {
+            if (downloadStatus == DownloadManager.STATUS_SUCCESSFUL) {
                 val isApk = downloadMimeType == "application/vnd.android.package-archive" ||
-                        downloadLocalUri.path.endsWith(".apk")
+                        downloadLocalUri!!.path!!.endsWith(".apk")
                 createNotification(context, downloadLocalUri, downloadID.toInt(), isApk)
             }
             Log.d(LOGGING_TAG, downloadMimeType)
@@ -44,7 +44,7 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun createNotification(context: Context, downloadLocalUri: Uri, id: Int, isApk: Boolean) {
-        var intent: Intent?
+        val intent: Intent?
         if(isApk) {
             val downloadPath = downloadLocalUri.path
             Log.d(LOGGING_TAG, downloadPath)
@@ -86,7 +86,6 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
                 setContentTitle(context.resources.getString(R.string.notification_download_complete_title))
             setContentText(downloadLocalUri.lastPathSegment)
             setPriority(NotificationCompat.PRIORITY_HIGH)
-
             setContentIntent(pendingIntent)
             setAutoCancel(true)
         }

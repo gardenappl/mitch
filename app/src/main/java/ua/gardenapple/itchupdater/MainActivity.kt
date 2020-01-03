@@ -2,7 +2,7 @@ package ua.gardenapple.itchupdater
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.webkit.*
 import ua.gardenapple.itchupdater.client.web.DownloadRequester
@@ -27,9 +27,9 @@ class MainActivity : AppCompatActivity() {
                 val uri = request.url
                 Log.d(LOGGING_TAG, uri.toString())
                 if (uri.host == "itch.io" ||
-                        uri.host.endsWith(".itch.io") ||
-                        uri.host.endsWith(".itch.zone") ||
-                        uri.host.endsWith(".hwcdn.net"))
+                        uri.host!!.endsWith(".itch.io") ||
+                        uri.host!!.endsWith(".itch.zone") ||
+                        uri.host!!.endsWith(".hwcdn.net"))
                     return false
                 else {
                     val intent = Intent(Intent.ACTION_VIEW, uri)
@@ -58,13 +58,13 @@ class MainActivity : AppCompatActivity() {
                     var elements = document.getElementsByClassName("download_btn");
                     for(var element of elements) {
                         element.addEventListener("click", function() {
-                            mitch.onDownloadLinkClick(element.getAttribute("data-upload_id"));
+                            mitchCustomJS.onDownloadLinkClick(element.getAttribute("data-upload_id"));
                         });
                     }
                 """, null)
             }
         }
-        webView.addJavascriptInterface(ItchJavaScriptInterface(), "mitch")
+        webView.addJavascriptInterface(ItchJavaScriptInterface(), "mitchCustomJS")
 
         webView.setDownloadListener { url, _, contentDisposition, mimetype, _ ->
             DownloadRequester.requestDownload(this, url, contentDisposition, mimetype)

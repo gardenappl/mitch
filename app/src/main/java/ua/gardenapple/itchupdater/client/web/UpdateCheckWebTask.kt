@@ -29,12 +29,12 @@ class UpdateCheckWebTask : UpdateCheckTask() {
 
         val maxLogSize = 1000
         val result = doc.html()
-        Log.v("ItchUpd.WebExtractor", "Printing ${result.length}-long string...")
+        Log.v(WEB_LOGGING_TAG, "Printing ${result.length}-long string...")
         for (i in 0..result.length / maxLogSize) {
             val start = i * maxLogSize
             var end = (i + 1) * maxLogSize
             end = if (end > result.length) result.length else end
-            Log.v("ItchUpd.WebExtractor", result.substring(start, end))
+            Log.v(WEB_LOGGING_TAG, result.substring(start, end))
         }
 
 
@@ -65,12 +65,12 @@ class UpdateCheckWebTask : UpdateCheckTask() {
 
         val maxLogSize = 1000
         val result = doc.html()
-        Log.v("ItchUpd.WebExtractor", "Printing ${result.length}-long string...")
+        Log.v(WEB_LOGGING_TAG, "Printing ${result.length}-long string...")
         for (i in 0..result.length / maxLogSize) {
             val start = i * maxLogSize
             var end = (i + 1) * maxLogSize
             end = if (end > result.length) result.length else end
-            Log.v("ItchUpd.WebExtractor", result.substring(start, end))
+            Log.v(WEB_LOGGING_TAG, result.substring(start, end))
         }
 
 

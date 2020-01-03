@@ -32,7 +32,7 @@
             </intent-filter>
         </receiver>
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="ua.gardenapple.itchupdater.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
