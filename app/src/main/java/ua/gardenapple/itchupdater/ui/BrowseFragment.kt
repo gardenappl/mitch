@@ -1,23 +1,31 @@
-package ua.gardenapple.itchupdater
+package ua.gardenapple.itchupdater.ui
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.webkit.*
+import androidx.fragment.app.Fragment
+import kotlinx.android.synthetic.main.browse_fragment.view.*
+import ua.gardenapple.itchupdater.LOGGING_TAG
+import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.client.web.DownloadRequester
 import java.io.ByteArrayInputStream
 
-
-class MainActivity : AppCompatActivity() {
-
+class BrowseFragment : Fragment() {
     private lateinit var webView: WebView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
 
-        webView = findViewById(R.id.main_web_view)
+        val view = inflater.inflate(R.layout.browse_fragment, container, false)
+
+        webView = view.findViewById(R.id.webView)
 
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
@@ -27,9 +35,9 @@ class MainActivity : AppCompatActivity() {
                 val uri = request.url
                 Log.d(LOGGING_TAG, uri.toString())
                 if (uri.host == "itch.io" ||
-                        uri.host!!.endsWith(".itch.io") ||
-                        uri.host!!.endsWith(".itch.zone") ||
-                        uri.host!!.endsWith(".hwcdn.net"))
+                    uri.host!!.endsWith(".itch.io") ||
+                    uri.host!!.endsWith(".itch.zone") ||
+                    uri.host!!.endsWith(".hwcdn.net"))
                     return false
                 else {
                     val intent = Intent(Intent.ACTION_VIEW, uri)
@@ -64,27 +72,33 @@ class MainActivity : AppCompatActivity() {
                 """, null)
             }
         }
-        webView.addJavascriptInterface(ItchJavaScriptInterface(this), "mitchCustomJS")
+        webView.addJavascriptInterface(ItchJavaScriptInterface(), "mitchCustomJS")
 
         webView.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
-            DownloadRequester.requestDownload(this, url, contentDisposition, mimeType)
+            activity!!.let { DownloadRequester.requestDownload(it, url, contentDisposition, mimeType) }
         }
 
         webView.loadUrl("https://itch.io/games/platform-android")
+        return view;
     }
 
-    override fun onBackPressed() {
-        if(webView.canGoBack())
+
+    /**
+     * @return true if the user can't go back in the web history
+     */
+    fun onBackPressed(): Boolean {
+        if(webView.canGoBack()) {
             webView.goBack()
-        else
-            super.onBackPressed()
+            return false
+        }
+        return true
     }
 
     fun getWebView(): WebView {
-        return webView;
+        return webView
     }
 
-    private class ItchJavaScriptInterface(val activity: MainActivity) {
+    private class ItchJavaScriptInterface() {
         @JavascriptInterface
         fun onDownloadLinkClick(uploadID: String) {
             Log.d(LOGGING_TAG, uploadID)

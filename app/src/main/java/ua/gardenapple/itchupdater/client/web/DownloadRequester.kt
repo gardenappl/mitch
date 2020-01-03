@@ -10,8 +10,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.util.Log
 import android.webkit.URLUtil
+import androidx.fragment.app.FragmentActivity
 import ua.gardenapple.itchupdater.LOGGING_TAG
-import ua.gardenapple.itchupdater.MainActivity
+import ua.gardenapple.itchupdater.ui.MainActivity
 import ua.gardenapple.itchupdater.PERMISSION_REQUEST_CODE_DOWNLOAD
 
 class DownloadRequester {
@@ -21,9 +22,8 @@ class DownloadRequester {
         lateinit var currentContent: String
         lateinit var currentMimeType: String
 
-        fun requestDownload(activity: MainActivity, url: String, contentDisposition: String, mimeType: String) {
+        fun requestDownload(activity: Activity, url: String, contentDisposition: String, mimeType: String) {
             if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                Log.d(LOGGING_TAG, activity.getWebView().originalUrl);
                 ActivityCompat.requestPermissions(
                     activity,
                     arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
