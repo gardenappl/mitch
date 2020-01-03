@@ -53,6 +53,7 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
                 "ua.gardenapple.itchupdater.fileprovider", File(downloadPath))
             Log.d(LOGGING_TAG, providerUri.toString())
 
+            //TODO: ACTION_INSTALL_PACKAGE intent is deprecated
             intent = Intent(Intent.ACTION_INSTALL_PACKAGE).apply {
                 setData(providerUri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -85,7 +86,7 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
             else
                 setContentTitle(context.resources.getString(R.string.notification_download_complete_title))
             setContentText(downloadLocalUri.lastPathSegment)
-            setPriority(NotificationCompat.PRIORITY_HIGH)
+            priority = NotificationCompat.PRIORITY_HIGH
             setContentIntent(pendingIntent)
             setAutoCancel(true)
         }

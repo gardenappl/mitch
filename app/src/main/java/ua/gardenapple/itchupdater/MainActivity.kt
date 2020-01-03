@@ -64,10 +64,10 @@ class MainActivity : AppCompatActivity() {
                 """, null)
             }
         }
-        webView.addJavascriptInterface(ItchJavaScriptInterface(), "mitchCustomJS")
+        webView.addJavascriptInterface(ItchJavaScriptInterface(this), "mitchCustomJS")
 
-        webView.setDownloadListener { url, _, contentDisposition, mimetype, _ ->
-            DownloadRequester.requestDownload(this, url, contentDisposition, mimetype)
+        webView.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
+            DownloadRequester.requestDownload(this, url, contentDisposition, mimeType)
         }
 
         webView.loadUrl("https://itch.io/games/platform-android")
@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
         return webView;
     }
 
-    private class ItchJavaScriptInterface {
+    private class ItchJavaScriptInterface(val activity: MainActivity) {
         @JavascriptInterface
         fun onDownloadLinkClick(uploadID: String) {
             Log.d(LOGGING_TAG, uploadID)

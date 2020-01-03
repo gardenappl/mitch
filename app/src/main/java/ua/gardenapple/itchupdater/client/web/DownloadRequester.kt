@@ -15,6 +15,7 @@ import ua.gardenapple.itchupdater.MainActivity
 import ua.gardenapple.itchupdater.PERMISSION_REQUEST_CODE_DOWNLOAD
 
 class DownloadRequester {
+
     companion object {
         lateinit var currentUrl: String
         lateinit var currentContent: String
@@ -43,9 +44,8 @@ class DownloadRequester {
 
         private fun doDownload(downloadManager: DownloadManager, url: String, contentDisposition: String, mimeType: String) {
             val downloadRequest = DownloadManager.Request(Uri.parse(url)).apply {
-                //setDescription("Testy test")
-
                 val fileName = URLUtil.guessFileName(url, contentDisposition, mimeType)
+
                 setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,"itchAnd/" + fileName)
                 setMimeType(mimeType)
                 setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
