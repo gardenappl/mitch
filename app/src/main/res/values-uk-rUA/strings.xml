@@ -9,4 +9,6 @@
     <string name="notification_channel_updates_desc">Сповіщати коли для додатка з itch.io доступне оновлення</string>
     <string name="notification_download_complete_title">Завантаження завершено</string>
     <string name="notification_install_title">Можна встановлювати</string>
+    <string name="settings_block_trackers">Захист від стеження</string>
+    <string name="settings_block_trackers_desc">Блокує доступ до Google Analytics. \nЗауважте, що отриманою статистикою користується не тільки itch.io, а й деякі розробники ігор.</string>
 </resources>

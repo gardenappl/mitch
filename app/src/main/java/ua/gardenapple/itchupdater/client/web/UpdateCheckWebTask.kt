@@ -42,7 +42,6 @@ class UpdateCheckWebTask : UpdateCheckTask() {
 
 
         val icons = doc.getElementsByClass("icon-android")
-//        val icons = doc.getElementsByClass("icon-windows8")
         if (icons.isNotEmpty()) {
             versionsMap[GamePlatform.Android] = ArrayList()
             for(icon in icons) {

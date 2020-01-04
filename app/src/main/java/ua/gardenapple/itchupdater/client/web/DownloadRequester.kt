@@ -44,13 +44,22 @@ class DownloadRequester {
 
         private fun doDownload(downloadManager: DownloadManager, url: String, contentDisposition: String, mimeType: String) {
             val downloadRequest = DownloadManager.Request(Uri.parse(url)).apply {
-                val fileName = URLUtil.guessFileName(url, contentDisposition, mimeType)
+                Log.d(LOGGING_TAG, "Url: $url, contentDisposition: $contentDisposition, mimeType: $mimeType")
 
-                setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,"itchAnd/" + fileName)
-                setMimeType(mimeType)
+                val fileName: String
+                //workaround for some devices which forcibly assign .bin file extension
+                if(contentDisposition == "application/octet-stream") {
+                    fileName = URLUtil.guessFileName(url, contentDisposition, null)
+                } else {
+                    fileName = URLUtil.guessFileName(url, contentDisposition, contentDisposition)
+                    setMimeType(mimeType)
+                }
+
+                setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Mitch/$fileName")
                 setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
             }
 
+            //TODO: store id and manage multiple downloads
             val id = downloadManager.enqueue(downloadRequest)
         }
     }

@@ -1,21 +1,29 @@
 package ua.gardenapple.itchupdater.ui
 
 import android.content.Intent
+import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.browse_fragment.view.*
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import org.jsoup.Jsoup
+import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.LOGGING_TAG
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.client.web.DownloadRequester
 import java.io.ByteArrayInputStream
+import android.webkit.ValueCallback
+
+
 
 class BrowseFragment : Fragment() {
-    private lateinit var webView: WebView
+    private lateinit var webView: MitchWebView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,10 +42,7 @@ class BrowseFragment : Fragment() {
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 val uri = request.url
                 Log.d(LOGGING_TAG, uri.toString())
-                if (uri.host == "itch.io" ||
-                    uri.host!!.endsWith(".itch.io") ||
-                    uri.host!!.endsWith(".itch.zone") ||
-                    uri.host!!.endsWith(".hwcdn.net"))
+                if (ItchWebsiteUtils.isItchWebPage(uri))
                     return false
                 else {
                     val intent = Intent(Intent.ACTION_VIEW, uri)
@@ -56,12 +61,15 @@ class BrowseFragment : Fragment() {
                 }
             }
 
+            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                webView.evaluateJavascript("""
+                    document.addEventListener("DOMContentLoaded", (event) => {
+                        mitchCustomJS.processHTML("<html>" + document.getElementsByTagName("html")[0].innerHTML + "</html>");
+                    });
+                """, null)
+            }
+
             override fun onPageFinished(view: WebView, url: String) {
-                //TODO: maybe not neccessary to do on every page load?
-                CookieManager.getInstance().flush()
-
-
-                //TODO: filter only store pages
                 webView.evaluateJavascript("""
                     var elements = document.getElementsByClassName("download_btn");
                     for(var element of elements) {
@@ -72,13 +80,17 @@ class BrowseFragment : Fragment() {
                 """, null)
             }
         }
-        webView.addJavascriptInterface(ItchJavaScriptInterface(), "mitchCustomJS")
+        webView.addJavascriptInterface(ItchJavaScriptInterface(this), "mitchCustomJS")
 
         webView.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
             activity!!.let { DownloadRequester.requestDownload(it, url, contentDisposition, mimeType) }
         }
 
-        webView.loadUrl("https://itch.io/games/platform-android")
+        if(savedInstanceState != null) {
+            Log.d(LOGGING_TAG, "Restoring WebView")
+            webView.restoreState(savedInstanceState)
+        } else
+            webView.loadUrl("https://itch.io/games/platform-android")
         return view;
     }
 
@@ -94,14 +106,64 @@ class BrowseFragment : Fragment() {
         return true
     }
 
-    fun getWebView(): WebView {
+    fun getWebView(): MitchWebView {
         return webView
     }
 
-    private class ItchJavaScriptInterface() {
+    override fun onPause() {
+        super.onPause()
+        CookieManager.getInstance().flush()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        Log.d(LOGGING_TAG, "Saving WebView")
+        webView.saveState(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    private class ItchJavaScriptInterface(val fragment: BrowseFragment) {
         @JavascriptInterface
         fun onDownloadLinkClick(uploadID: String) {
             Log.d(LOGGING_TAG, uploadID)
         }
+
+        @JavascriptInterface
+        fun processHTML(html: String) {
+            if(fragment.activity !is MainActivity)
+                return
+
+            Log.d(LOGGING_TAG, "HTML: " + html)
+            fragment.adjustUIBasedOnWebsite(html)
+        }
+    }
+
+    protected fun adjustUIBasedOnWebsite(html: String) {
+        if(activity == null || activity !is MainActivity)
+            return
+
+        val doc = Jsoup.parse(html)
+
+        val mainActivity = activity as MainActivity
+        val navBar = mainActivity.findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+
+        navBar.post {
+            if(ItchWebsiteUtils.shouldRemoveAppNavbar(getWebView(), doc))
+                navBar.visibility = View.GONE
+            else
+                navBar.visibility = View.VISIBLE
+        }
+    }
+
+    protected fun adjustUIBasedOnWebsite() {
+        webView.evaluateJavascript(
+        "(function() { return ('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>'); })();"
+        ) { result -> adjustUIBasedOnWebsite(result) }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+
+        adjustUIBasedOnWebsite()
     }
 }

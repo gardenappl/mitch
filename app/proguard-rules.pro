@@ -8,7 +8,7 @@
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
 # class:
--keepclassmembers class ua.gardenapple.itchupdater.ui.MainActivity.ItchJavaScriptInterface {
+-keepclassmembers class ua.gardenapple.itchupdater.ui.BrowseFragment.ItchJavaScriptInterface {
    public *;
 }
 

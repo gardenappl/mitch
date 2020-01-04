@@ -44,7 +44,7 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun createNotification(context: Context, downloadLocalUri: Uri, id: Int, isApk: Boolean) {
-        val intent: Intent?
+        val intent: Intent
         if(isApk) {
             val downloadPath = downloadLocalUri.path
             Log.d(LOGGING_TAG, downloadPath)

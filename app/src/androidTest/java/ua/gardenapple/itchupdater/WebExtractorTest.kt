@@ -13,6 +13,9 @@ import ua.gardenapple.itchupdater.client.web.UpdateCheckWebTask
  */
 @RunWith(AndroidJUnit4::class)
 class WebExtractorTest {
+    /*
+     * This test will only complete successfully if you're logged in to my itch.io account
+     */
     @Test
     fun testUpdateCheck() {
         var returnValue = UpdateCheckWebTask().execute(GameStoreInfo("https://clouddeluna.itch.io/splashyplusplus", GameMonetizationType.Free)).get()
@@ -20,6 +23,7 @@ class WebExtractorTest {
 
         assertEquals("splashy++.apk", versionInfo.versionName)
         assertEquals("21 June 2019 @ 08:40", versionInfo.timestamp)
+
 
         returnValue = UpdateCheckWebTask().execute(GameStoreInfo("https://terrycavanagh.itch.io/super-hexagon", GameMonetizationType.Paid, "https://terrycavanagh.itch.io/super-hexagon/download/nGM_T_fa5YQ4cMcMFQ4AnSn__H_1Aj670uwLHMiL")).get()
         versionInfo = returnValue.versions[GamePlatform.Android]!![0]
