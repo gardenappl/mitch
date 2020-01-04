@@ -13,13 +13,25 @@ android {
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0"
+        versionName "1.0-alpha"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+            applicationIdSuffix ".debug"
+        }
+    }
+    flavorDimensions "platform"
+    productFlavors {
+        fdroid {
+            versionNameSuffix "-fdroid"
+        }
+        other {
         }
     }
     packagingOptions {

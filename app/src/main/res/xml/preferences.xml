@@ -6,7 +6,7 @@
 
     </PreferenceCategory>
     <SwitchPreference
-            android:defaultValue="true"
+            android:defaultValue="@string/preference_value_block_trackers"
             android:key="preference_block_trackers"
             android:summary="@string/settings_block_trackers_desc"
             android:title="@string/settings_block_trackers" />
