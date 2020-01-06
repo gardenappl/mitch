@@ -19,7 +19,7 @@ import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.client.web.DownloadRequester
 import java.io.ByteArrayInputStream
 import android.webkit.ValueCallback
-
+import androidx.preference.PreferenceManager
 
 
 class BrowseFragment : Fragment() {
@@ -52,13 +52,20 @@ class BrowseFragment : Fragment() {
             }
 
             override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-                //TODO: make this optional, on by default for F-Droid
-                val blockedURLs = arrayOf("www.google-analytics.com", "adservice.google.com", "pagead2.googlesyndication.com", "googleads.g.doubleclick.net")
-                if (blockedURLs.contains(request.url.host))
-                    return WebResourceResponse("text/plain", "utf-8", ByteArrayInputStream("tracker_blocked".toByteArray()))
-                else {
-                    return null
+                val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+                val blockTrackers = sharedPreferences.getBoolean("preference_block_trackers", true)
+
+                if(blockTrackers) {
+                    val blockedURLs = arrayOf(
+                        "www.google-analytics.com",
+                        "adservice.google.com",
+                        "pagead2.googlesyndication.com",
+                        "googleads.g.doubleclick.net"
+                    )
+                    if (blockedURLs.contains(request.url.host))
+                        return WebResourceResponse("text/plain", "utf-8", ByteArrayInputStream("tracker_blocked".toByteArray()))
                 }
+                return null
             }
 
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {

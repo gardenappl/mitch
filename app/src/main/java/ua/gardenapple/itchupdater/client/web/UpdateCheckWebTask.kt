@@ -1,5 +1,6 @@
 package ua.gardenapple.itchupdater.client.web
 
+import android.os.AsyncTask
 import android.util.Log
 import android.webkit.CookieManager
 import org.jsoup.Jsoup
@@ -9,7 +10,7 @@ import ua.gardenapple.itchupdater.GameVersion
 import ua.gardenapple.itchupdater.GameVersionInfo
 import ua.gardenapple.itchupdater.client.UpdateCheckTask
 
-class UpdateCheckWebTask : UpdateCheckTask() {
+class UpdateCheckWebTask : AsyncTask<GameStoreInfo, Void, GameVersionInfo>() {
 
     override fun doInBackground(vararg params: GameStoreInfo): GameVersionInfo {
         val gameInfo = params[0]
@@ -36,6 +37,8 @@ class UpdateCheckWebTask : UpdateCheckTask() {
             end = if (end > result.length) result.length else end
             Log.v(WEB_LOGGING_TAG, result.substring(start, end))
         }
+
+
 
 
         val versionsMap = HashMap<GamePlatform, ArrayList<GameVersion>>()
