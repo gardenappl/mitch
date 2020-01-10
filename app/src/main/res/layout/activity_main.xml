@@ -13,6 +13,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
             app:itemBackground="@color/colorPrimary"
             app:itemIconTint="@drawable/bottom_navigation_selector"
             app:itemTextColor="@drawable/bottom_navigation_selector"

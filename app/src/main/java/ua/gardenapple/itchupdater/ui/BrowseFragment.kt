@@ -25,6 +25,13 @@ import java.lang.Math.max
 
 
 class BrowseFragment : Fragment() {
+
+
+    companion object {
+        const val WEB_VIEW_STATE_KEY: String = "WebView"
+    }
+
+
     private lateinit var webView: MitchWebView
 
     override fun onCreateView(
@@ -54,7 +61,7 @@ class BrowseFragment : Fragment() {
             }
 
             override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-                val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+                val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(view.context)
                 val blockTrackers = sharedPreferences.getBoolean("preference_block_trackers", true)
 
                 if(blockTrackers) {
@@ -95,11 +102,13 @@ class BrowseFragment : Fragment() {
             activity!!.let { DownloadRequester.requestDownload(it, url, contentDisposition, mimeType) }
         }
 
-        if(savedInstanceState != null) {
+        if(savedInstanceState?.getBundle(WEB_VIEW_STATE_KEY) != null) {
             Log.d(LOGGING_TAG, "Restoring WebView")
-            webView.restoreState(savedInstanceState)
-        } else
+            webView.restoreState(savedInstanceState.getBundle(WEB_VIEW_STATE_KEY))
+        } else {
             webView.loadUrl("https://itch.io/games/platform-android")
+        }
+
         return view;
     }
 
@@ -124,12 +133,6 @@ class BrowseFragment : Fragment() {
         CookieManager.getInstance().flush()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        Log.d(LOGGING_TAG, "Saving WebView")
-        webView.saveState(outState)
-        super.onSaveInstanceState(outState)
-    }
-
     @Keep //prevent this class from being removed by compiler optimizations
     private class ItchJavaScriptInterface(val fragment: BrowseFragment) {
         @JavascriptInterface
@@ -142,8 +145,8 @@ class BrowseFragment : Fragment() {
             if(fragment.activity !is MainActivity)
                 return
 
-            for(i in 0..html.length / 1000)
-                Log.d(LOGGING_TAG, "HTML: " + html.substring(i * 1000, Math.min((i + 1) * 1000, html.length)))
+//            for(i in 0..html.length / 1000)
+//                Log.d(LOGGING_TAG, "HTML: " + html.substring(i * 1000, Math.min((i + 1) * 1000, html.length)))
             fragment.adjustUIBasedOnWebsite(html)
         }
     }
@@ -178,5 +181,16 @@ class BrowseFragment : Fragment() {
 
 
         adjustUIBasedOnWebsite()
+    }
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        Log.d(LOGGING_TAG, "Saving WebView")
+
+        val webViewState = Bundle()
+        webView.saveState(webViewState)
+        outState.putBundle(WEB_VIEW_STATE_KEY, webViewState)
+
+        super.onSaveInstanceState(outState)
     }
 }
