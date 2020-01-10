@@ -19,7 +19,9 @@ import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.client.web.DownloadRequester
 import java.io.ByteArrayInputStream
 import android.webkit.ValueCallback
+import androidx.annotation.Keep
 import androidx.preference.PreferenceManager
+import java.lang.Math.max
 
 
 class BrowseFragment : Fragment() {
@@ -128,6 +130,7 @@ class BrowseFragment : Fragment() {
         super.onSaveInstanceState(outState)
     }
 
+    @Keep //prevent this class from being removed by compiler optimizations
     private class ItchJavaScriptInterface(val fragment: BrowseFragment) {
         @JavascriptInterface
         fun onDownloadLinkClick(uploadID: String) {
@@ -139,7 +142,8 @@ class BrowseFragment : Fragment() {
             if(fragment.activity !is MainActivity)
                 return
 
-            Log.d(LOGGING_TAG, "HTML: " + html)
+            for(i in 0..html.length / 1000)
+                Log.d(LOGGING_TAG, "HTML: " + html.substring(i * 1000, Math.min((i + 1) * 1000, html.length)))
             fragment.adjustUIBasedOnWebsite(html)
         }
     }
@@ -162,8 +166,10 @@ class BrowseFragment : Fragment() {
     }
 
     protected fun adjustUIBasedOnWebsite() {
-        webView.evaluateJavascript(
-        "(function() { return ('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>'); })();"
+        webView.evaluateJavascript("""
+            (function() {
+                return '<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>';
+            })();"""
         ) { result -> adjustUIBasedOnWebsite(result) }
     }
 

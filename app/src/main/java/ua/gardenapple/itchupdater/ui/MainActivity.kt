@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import ua.gardenapple.itchupdater.BuildConfig
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.LOGGING_TAG
 import ua.gardenapple.itchupdater.R
@@ -17,6 +18,7 @@ import ua.gardenapple.itchupdater.R
 class MainActivity : AppCompatActivity() {
 
     private val browseFragment: BrowseFragment = BrowseFragment()
+    private val libraryFragment: LibraryFragment = LibraryFragment()
     private val settingsFragment: SettingsFragment = SettingsFragment()
 
     private var activeFragment: Fragment = browseFragment
@@ -31,13 +33,18 @@ class MainActivity : AppCompatActivity() {
             commit()
         }
         fragmentManager.beginTransaction().apply {
+            add(R.id.fragmentContainer, libraryFragment, "library")
+            hide(libraryFragment)
+            commit()
+        }
+        fragmentManager.beginTransaction().apply {
             add(R.id.fragmentContainer, settingsFragment, "settings")
             hide(settingsFragment)
             commit()
         }
 
         val navView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        navView.setOnNavigationItemSelectedListener listener@ { item ->
+        navView.setOnNavigationItemSelectedListener { item ->
             switchToFragment(item.itemId, false)
         }
     }
@@ -51,6 +58,7 @@ class MainActivity : AppCompatActivity() {
 
         when (itemId) {
             R.id.navigation_website_view -> newFragment = browseFragment
+            R.id.navigation_library -> newFragment = libraryFragment
             R.id.navigation_settings -> newFragment = settingsFragment
             else -> return false
         }
@@ -77,6 +85,7 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
 
         Log.d(LOGGING_TAG, "Starting...")
+        Log.d(LOGGING_TAG, "Version: ${BuildConfig.VERSION_NAME}")
         Log.d(LOGGING_TAG, "Action: ${intent.action}")
         Log.d(LOGGING_TAG, "Data: ${intent.data}")
         if(intent.action == Intent.ACTION_VIEW && intent.data?.let { ItchWebsiteUtils.isItchWebPage(it) } == true) {

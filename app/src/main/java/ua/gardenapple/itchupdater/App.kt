@@ -13,7 +13,7 @@ import ua.gardenapple.itchupdater.client.web.UpdateCheckWebTask
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-
+import android.util.Log
 
 
 const val LOGGING_TAG: String = "Mitch"
@@ -23,6 +23,9 @@ const val PERMISSION_REQUEST_CODE_DOWNLOAD = 1
 const val NOTIFICATION_CHANNEL_ID_UPDATES = "updates"
 
 const val NOTIFICATION_ID_DOWNLOAD = 20000
+
+const val FLAVOR_FDROID = "fdroid"
+const val FLAVOR_ITCHIO = "itchio"
 
 class App : Application(),
         ActivityCompat.OnRequestPermissionsResultCallback {
