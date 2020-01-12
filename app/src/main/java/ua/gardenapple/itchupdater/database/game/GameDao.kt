@@ -5,13 +5,17 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import ua.gardenapple.itchupdater.database.game.GameEntity
+import ua.gardenapple.itchupdater.database.game.Game.Companion.GAME_ID
+import ua.gardenapple.itchupdater.database.game.Game.Companion.TABLE_NAME
 
 @Dao
 interface GameDao {
-    @Query("SELECT * FROM games")
-    fun getAllGames(): LiveData<List<GameEntity>>
+    @Query("SELECT * FROM $TABLE_NAME")
+    fun getAllGames(): LiveData<List<Game>>
+
+    @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId")
+    fun getGameById(gameId: Int): Game
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(game: GameEntity)
+    fun insert(vararg games: Game)
 }

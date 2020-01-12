@@ -1,4 +1,4 @@
-package ua.gardenapple.itchupdater.client.web
+package ua.gardenapple.itchupdater.installer
 
 import android.Manifest
 import android.app.Activity
@@ -10,9 +10,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.util.Log
 import android.webkit.URLUtil
-import androidx.fragment.app.FragmentActivity
 import ua.gardenapple.itchupdater.LOGGING_TAG
-import ua.gardenapple.itchupdater.ui.MainActivity
 import ua.gardenapple.itchupdater.PERMISSION_REQUEST_CODE_DOWNLOAD
 
 class DownloadRequester {
@@ -34,12 +32,22 @@ class DownloadRequester {
                 currentMimeType = mimeType
                 return
             } else {
-                doDownload(activity.getSystemService(Activity.DOWNLOAD_SERVICE) as DownloadManager, url, contentDisposition, mimeType)
+                doDownload(
+                    activity.getSystemService(Activity.DOWNLOAD_SERVICE) as DownloadManager,
+                    url,
+                    contentDisposition,
+                    mimeType
+                )
             }
         }
 
         fun resumeDownload(downloadManager: DownloadManager) {
-            doDownload(downloadManager, currentUrl, currentContent, currentMimeType)
+            doDownload(
+                downloadManager,
+                currentUrl,
+                currentContent,
+                currentMimeType
+            )
         }
 
         private fun doDownload(downloadManager: DownloadManager, url: String, contentDisposition: String, mimeType: String) {

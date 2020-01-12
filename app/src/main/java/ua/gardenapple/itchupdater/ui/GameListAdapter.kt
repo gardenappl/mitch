@@ -1,23 +1,21 @@
 package ua.gardenapple.itchupdater.ui
 
 import android.content.Context
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import ua.gardenapple.itchupdater.R
-import ua.gardenapple.itchupdater.database.game.GameEntity
+import ua.gardenapple.itchupdater.database.game.Game
 
 class GameListAdapter internal constructor(
     context: Context
 ) : RecyclerView.Adapter<GameListAdapter.GameViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private var games = emptyList<GameEntity>() // Cached copy of games
+    private var games = emptyList<Game>() // Cached copy of games
 
     inner class GameViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val thumbnailView = itemView.findViewById<ImageView>(R.id.gameThumbnail)
@@ -37,7 +35,7 @@ class GameListAdapter internal constructor(
         holder.authorName.text = currentGame.author
     }
 
-    internal fun setGames(games: List<GameEntity>) {
+    internal fun setGames(games: List<Game>) {
         this.games = games
         notifyDataSetChanged()
     }

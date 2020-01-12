@@ -8,12 +8,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
-import ua.gardenapple.itchupdater.client.web.DownloadRequester
-import ua.gardenapple.itchupdater.client.web.UpdateCheckWebTask
-import android.content.IntentFilter
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.util.Log
+import ua.gardenapple.itchupdater.installer.DownloadRequester
 
 
 const val LOGGING_TAG: String = "Mitch"

@@ -38,7 +38,7 @@
             </intent-filter>
         </activity>
         <receiver
-            android:name=".client.DownloadBroadcastReceiver" >
+            android:name=".installer.DownloadBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
             </intent-filter>

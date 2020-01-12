@@ -9,15 +9,15 @@ import ua.gardenapple.itchupdater.database.AppDatabase
 
 class GameViewModel(app: Application) : AndroidViewModel(app) {
     private val repository: GameRepository
-    val allGames: LiveData<List<GameEntity>>
+    val allGames: LiveData<List<Game>>
 
     init {
-        val gamesDao = AppDatabase.getDatabase(app, viewModelScope).gameDao()
+        val gamesDao = AppDatabase.getDatabase(app).gameDao()
         repository = GameRepository(gamesDao)
         allGames = repository.allGames
     }
 
-    fun insert(game: GameEntity) = viewModelScope.launch {
+    fun insert(game: Game) = viewModelScope.launch {
         repository.insert(game)
     }
 }

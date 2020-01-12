@@ -1,4 +1,4 @@
-package ua.gardenapple.itchupdater.client
+package ua.gardenapple.itchupdater.installer
 
 import android.app.DownloadManager
 import android.app.PendingIntent
@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.provider.MediaStore
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider

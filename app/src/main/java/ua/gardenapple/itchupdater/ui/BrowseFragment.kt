@@ -9,19 +9,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import org.jsoup.Jsoup
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.LOGGING_TAG
 import ua.gardenapple.itchupdater.R
-import ua.gardenapple.itchupdater.client.web.DownloadRequester
+import ua.gardenapple.itchupdater.installer.DownloadRequester
 import java.io.ByteArrayInputStream
-import android.webkit.ValueCallback
 import androidx.annotation.Keep
 import androidx.preference.PreferenceManager
-import java.lang.Math.max
 
 
 class BrowseFragment : Fragment() {
