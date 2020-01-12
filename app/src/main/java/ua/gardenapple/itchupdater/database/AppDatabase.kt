@@ -15,7 +15,7 @@ import ua.gardenapple.itchupdater.database.upload.Upload
 import ua.gardenapple.itchupdater.database.upload.UploadDao
 import ua.gardenapple.itchupdater.ioThread
 
-@Database(entities = [Game::class, Upload::class], version = 1, exportSchema = false)
+@Database(entities = [Game::class, Upload::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun gameDao(): GameDao
@@ -51,18 +51,19 @@ abstract class AppDatabase : RoomDatabase() {
                             if(BuildConfig.FLAVOR == FLAVOR_ITCHIO) {
 
                                 game = Game(544475, "Mitch", "gardenapple", "https://gardenapple.itch.io/mitch",
-                                    null, "")
+                                    null, "", null)
                                 gameDao.insert(game)
                             }
 
                             Log.d(LOGGING_TAG, "Populating database")
                             //TODO: remove test
                             game = Game(17705, "Tanks of Freedom", "P1X", "https://w84death.itch.io/tanks-of-freedom",
-                                null, "https://img.itch.zone/aW1hZ2UvMTc3MDUvOTE2NTkuZ2lm/315x250%23cm/ab68U4.gif")
+                                null, "https://img.itch.zone/aW1hZ2UvMTc3MDUvOTE2NTkuZ2lm/315x250%23cm/ab68U4.gif", null)
                             gameDao.insert(game)
                         }
                     }
                 })
+                .addMigrations(Migrations.Migration_1_2)
                 .build()
     }
 }

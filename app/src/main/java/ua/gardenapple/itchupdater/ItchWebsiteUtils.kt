@@ -18,15 +18,26 @@ class ItchWebsiteUtils {
         }
 
         fun isDownloadPage(htmlDoc: Document): Boolean {
-            val dataPageName = htmlDoc.body().attr("data-page_name")
-            return dataPageName == "game_download" || dataPageName == "game_purchase"
+            return htmlDoc.body().attr("data-page_name") == "game_download"
+        }
+
+        fun isPurchasePage(htmlDoc: Document): Boolean {
+            return htmlDoc.body().attr("data-page_name") == "game_purchase"
         }
 
         /**
          * @return true if the screen is small enough where itch.io starts introducing the bottom navbar
          */
         fun shouldRemoveAppNavbar(webView: MitchWebView, htmlDoc: Document): Boolean {
-            return webView.contentWidth < 650 && (isStorePage(htmlDoc) || isDownloadPage(htmlDoc))
+            return webView.contentWidth < 650 && (isStorePage(htmlDoc) || isDownloadPage(htmlDoc) || isPurchasePage(htmlDoc))
+        }
+
+        /**
+         * @return If htmlDoc is a store page or download page, will return the associated gameID. Otherwise, the behavior is undefined.
+         */
+        fun getGameId(htmlDoc: Document): Int {
+            return htmlDoc.head().getElementsByAttributeValue("name", "itch:path")[0].attr("content")
+                .substringAfter("games/").toInt()
         }
     }
 }

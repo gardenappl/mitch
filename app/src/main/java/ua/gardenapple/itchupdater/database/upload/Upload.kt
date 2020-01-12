@@ -46,7 +46,7 @@ data class Upload(
 
     constructor(uploadId: Int?, gameId: Int, uploadNum: Int, version: String?,
                 name: String, fileSize: String, uploadTimestamp: String?)
-            : this(uploadId ?: gameId * 100 + uploadNum,
+            : this(uploadId ?: -(gameId * 100 + uploadNum),
                    uploadId, gameId, version, name, fileSize, uploadTimestamp)
 
     companion object {

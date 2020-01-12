@@ -13,23 +13,38 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import org.jsoup.Jsoup
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
-import ua.gardenapple.itchupdater.LOGGING_TAG
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.installer.DownloadRequester
 import java.io.ByteArrayInputStream
 import androidx.annotation.Keep
 import androidx.preference.PreferenceManager
+import kotlinx.coroutines.*
+import org.jsoup.nodes.Document
+import ua.gardenapple.itchupdater.Utils
+import ua.gardenapple.itchupdater.client.ItchWebsiteParser
+import ua.gardenapple.itchupdater.database.AppDatabase
+import kotlin.coroutines.CoroutineContext
 
 
-class BrowseFragment : Fragment() {
-
+class BrowseFragment : Fragment(), CoroutineScope {
 
     companion object {
+        const val LOGGING_TAG = "BrowseFragment"
         const val WEB_VIEW_STATE_KEY: String = "WebView"
     }
 
+    lateinit var webView: MitchWebView
+        private set
 
-    private lateinit var webView: MitchWebView
+
+    private lateinit var job: Job
+    override val coroutineContext: CoroutineContext
+        get() = job + Dispatchers.Main
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        job = Job()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,7 +101,7 @@ class BrowseFragment : Fragment() {
                 webView.evaluateJavascript("""
                     var elements = document.getElementsByClassName("download_btn");
                     for(var element of elements) {
-                        element.addEventListener("click", function() {
+                        element.addEventListener("click", (event) => {
                             mitchCustomJS.onDownloadLinkClick(element.getAttribute("data-upload_id"));
                         });
                     }
@@ -121,13 +136,16 @@ class BrowseFragment : Fragment() {
         return true
     }
 
-    fun getWebView(): MitchWebView {
-        return webView
-    }
-
     override fun onPause() {
         super.onPause()
+
         CookieManager.getInstance().flush()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        job.cancel()
     }
 
     @Keep //prevent this class from being removed by compiler optimizations
@@ -142,42 +160,78 @@ class BrowseFragment : Fragment() {
             if(fragment.activity !is MainActivity)
                 return
 
-//            for(i in 0..html.length / 1000)
-//                Log.d(LOGGING_TAG, "HTML: " + html.substring(i * 1000, Math.min((i + 1) * 1000, html.length)))
-            fragment.adjustUIBasedOnWebsite(html)
+            fragment.processHtml(false, html)
         }
     }
 
-    protected fun adjustUIBasedOnWebsite(html: String) {
+    /**
+     * Responsible for updating the UI as well as the local game database after a page's content has been loaded.
+     * @param onlyUI true if this shouldn't update the database. The database should be updated at least once during a page visit.
+     * @param html the HTML text of the current page
+     */
+    protected fun processHtml(onlyUI: Boolean, html: String) {
+
+        //Utils.logLongD(LOGGING_TAG, html)
+
         if(activity == null || activity !is MainActivity)
             return
 
-        val doc = Jsoup.parse(html)
+        launch {
+            val doc: Document = withContext(Dispatchers.Default) {
+                Jsoup.parse(html)
+            }
 
-        val mainActivity = activity as MainActivity
-        val navBar = mainActivity.findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+            val mainActivity = activity as MainActivity
+            val navBar = mainActivity.findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
-        navBar.post {
-            if(ItchWebsiteUtils.shouldRemoveAppNavbar(getWebView(), doc))
-                navBar.visibility = View.GONE
-            else
-                navBar.visibility = View.VISIBLE
+            navBar.post {
+                if (ItchWebsiteUtils.shouldRemoveAppNavbar(webView, doc))
+                    navBar.visibility = View.GONE
+                else
+                    navBar.visibility = View.VISIBLE
+            }
+
+            if(!onlyUI) {
+                if(ItchWebsiteUtils.isDownloadPage(doc) || ItchWebsiteUtils.isStorePage(doc)) {
+                    val db = AppDatabase.getDatabase(requireContext())
+
+                    launch(Dispatchers.IO) {
+                        val gameId = ItchWebsiteUtils.getGameId(doc)
+                        val uploads = ItchWebsiteParser.getAndroidUploads(gameId, doc)
+                        for(upload in uploads) {
+                            Log.d(LOGGING_TAG, "Adding upload $upload")
+                        }
+                        //TODO: actually check if these uploads should be saved
+                        db.uploadDao().clearUploadsForGame(gameId)
+                        db.uploadDao().insert(uploads)
+                    }
+
+                    if(ItchWebsiteUtils.isStorePage(doc)) {
+                        val game = ItchWebsiteParser.getGameInfo(doc, webView.url)
+
+                        launch(Dispatchers.IO) {
+                            Log.d(LOGGING_TAG, "Adding game $game")
+                            db.gameDao().insert(game)
+                        }
+                    }
+                }
+            }
         }
     }
 
-    protected fun adjustUIBasedOnWebsite() {
-        webView.evaluateJavascript("""
-            (function() {
-                return '<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>';
-            })();"""
-        ) { result -> adjustUIBasedOnWebsite(result) }
+    /**
+     * Responsible for updating the UI as well as the local game database after a page has loaded.
+     */
+    protected fun processHtml(onlyUI: Boolean) {
+        webView.evaluateJavascript(
+            """return '<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>';"""
+        ) { result -> processHtml(onlyUI, result) }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
-
-        adjustUIBasedOnWebsite()
+        processHtml(onlyUI = true)
     }
 
 

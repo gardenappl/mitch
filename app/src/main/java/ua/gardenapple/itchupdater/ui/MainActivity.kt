@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity() {
         Log.d(LOGGING_TAG, "Data: ${intent.data}")
         if(intent.action == Intent.ACTION_VIEW && intent.data?.let { ItchWebsiteUtils.isItchWebPage(it) } == true) {
             switchToFragment(R.id.navigation_website_view)
-            browseFragment.getWebView().loadUrl(intent.data!!.toString())
+            browseFragment.webView.loadUrl(intent.data!!.toString())
         }
     }
 
