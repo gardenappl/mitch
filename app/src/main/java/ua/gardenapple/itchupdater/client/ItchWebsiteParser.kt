@@ -3,6 +3,7 @@ package ua.gardenapple.itchupdater.client
 import android.net.Uri
 import android.util.Log
 import android.webkit.CookieManager
+import android.webkit.URLUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
@@ -17,6 +18,8 @@ import ua.gardenapple.itchupdater.database.upload.Upload
 import java.io.IOException
 
 class ItchWebsiteParser {
+    data class DownloadUrl(val url: String, val isPermanent: Boolean)
+
     companion object {
         const val LOGGING_TAG = "ItchWebsiteParser"
 
@@ -100,9 +103,6 @@ class ItchWebsiteParser {
 
 
 
-
-        data class DownloadUrl(val url: String, val isPermanent: Boolean)
-
         suspend fun getDownloadUrlFromStorePage(storeUrl: String): DownloadUrl = withContext(Dispatchers.IO) {
             val request = Request.Builder().run {
                 url(storeUrl)
@@ -176,14 +176,13 @@ class ItchWebsiteParser {
                 post(form)
                 build()
             }
-            MitchApp.httpClient.newCall(request).execute().use { response ->
+            val result: String = MitchApp.httpClient.newCall(request).execute().use { response ->
                 if(!response.isSuccessful)
                     throw IOException("Unexpected code $response")
 
-                Log.d(LOGGING_TAG, response.body!!.string())
+                response.body!!.string()
             }
-
-            DownloadUrl("", false)
+            DownloadUrl(JSONObject(result).getString("url"), false)
         }
     }
 }

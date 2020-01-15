@@ -4,12 +4,12 @@ import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
-import ua.gardenapple.itchupdater.client.ItchWebsiteParser.Companion.DownloadUrl
 import ua.gardenapple.itchupdater.client.WebUpdateChecker
 import ua.gardenapple.itchupdater.database.game.Game
 
@@ -26,7 +26,7 @@ class WebParserTests {
 
     private val webChecker = WebUpdateChecker()
 
-    /*
+    /**
      * This test will only complete successfully if you're logged in to my itch.io account
      */
     @Test
@@ -43,8 +43,8 @@ class WebParserTests {
             webChecker.fetchDownloadPage(game)
         }
 
-        Log.d(LOGGING_TAG, "HTML: ")
-        Utils.logLongD(LOGGING_TAG, doc.outerHtml())
+//        Log.d(LOGGING_TAG, "HTML: ")
+//        Utils.logLongD(LOGGING_TAG, doc.outerHtml())
 
         val uploads = ItchWebsiteParser.getAndroidUploads(gameId, doc)
 
@@ -70,8 +70,8 @@ class WebParserTests {
             webChecker.fetchDownloadPage(game)
         }
 
-        Log.d(LOGGING_TAG, "HTML: ")
-        Utils.logLongD(LOGGING_TAG, doc.outerHtml())
+//        Log.d(LOGGING_TAG, "HTML: ")
+//        Utils.logLongD(LOGGING_TAG, doc.outerHtml())
 
         val uploads = ItchWebsiteParser.getAndroidUploads(gameId, doc)
 
@@ -83,22 +83,37 @@ class WebParserTests {
         assertEquals("Версия 102.3", uploads[0].version)
     }
 
-    /*
+    /**
      * This test will only complete successfully if you're logged in to my itch.io account
      */
     @Test
     fun testGetDownloadPage_paidGame() {
-        val url: DownloadUrl = runBlocking(Dispatchers.IO) {
+        val url: ItchWebsiteParser.DownloadUrl = runBlocking(Dispatchers.IO) {
             ItchWebsiteParser.getDownloadUrlFromStorePage("https://npckc.itch.io/a-tavern-for-tea")
         }
-        assertEquals(DownloadUrl("https://npckc.itch.io/a-tavern-for-tea/download/VcTYvLj_mPzph_hcLK5fuMafmTlH11SPBlJhfoRh", true), url)
+        assertEquals(ItchWebsiteParser.DownloadUrl("https://npckc.itch.io/a-tavern-for-tea/download/VcTYvLj_mPzph_hcLK5fuMafmTlH11SPBlJhfoRh", true), url)
     }
 
     @Test
     fun testGetDownloadPage_freeGame() {
-        val url: DownloadUrl = runBlocking(Dispatchers.IO) {
+        val url: ItchWebsiteParser.DownloadUrl = runBlocking(Dispatchers.IO) {
             ItchWebsiteParser.getDownloadUrlFromStorePage("https://clouddeluna.itch.io/splashyplusplus")
         }
-        assertEquals(DownloadUrl("https://clouddeluna.itch.io/splashyplusplus", true), url)
+        assertEquals(ItchWebsiteParser.DownloadUrl("https://clouddeluna.itch.io/splashyplusplus", true), url)
+    }
+
+    @Test
+    fun testGetDownloadPage_donationGame() {
+        val url: ItchWebsiteParser.DownloadUrl = runBlocking(Dispatchers.IO) {
+            ItchWebsiteParser.getDownloadUrlFromStorePage("https://anuke.itch.io/mindustry")
+        }
+        Log.d(LOGGING_TAG, url.url)
+        assertEquals(false, url.isPermanent)
+        val doc = Jsoup.connect(url.url).get()
+
+//        Log.d(LOGGING_TAG, "HTML: ")
+//        Utils.logLongD(LOGGING_TAG, doc.outerHtml())
+
+        assertEquals(true, doc.getElementsByClass("download_btn").isNotEmpty())
     }
 }
