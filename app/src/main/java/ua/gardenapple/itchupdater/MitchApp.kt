@@ -8,6 +8,8 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
+import okhttp3.Cache
+import okhttp3.OkHttpClient
 import ua.gardenapple.itchupdater.installer.DownloadRequester
 
 
@@ -22,8 +24,13 @@ const val NOTIFICATION_ID_DOWNLOAD = 20000
 const val FLAVOR_FDROID = "fdroid"
 const val FLAVOR_ITCHIO = "itchio"
 
-class App : Application(),
+class MitchApp : Application(),
         ActivityCompat.OnRequestPermissionsResultCallback {
+
+    companion object {
+        lateinit var httpClient: OkHttpClient
+            private set
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -38,6 +45,13 @@ class App : Application(),
             val notificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
+        }
+        httpClient = OkHttpClient.Builder().run {
+            cache(Cache(
+                directory = cacheDir,
+                maxSize = 50 * 1024 * 1024 //50 MB
+            ))
+            build()
         }
     }
 

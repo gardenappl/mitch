@@ -37,4 +37,5 @@ ext {
     materialVersion = '1.0.0'
     glideVersion = '4.11.0'
     workVersion = '2.2.0'
+    okHttpVersion = '4.3.1'
 }

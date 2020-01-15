@@ -1,5 +1,6 @@
 package ua.gardenapple.itchupdater.ui
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -21,12 +22,13 @@ import androidx.preference.PreferenceManager
 import kotlinx.coroutines.*
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.Utils
+import ua.gardenapple.itchupdater.client.ItchBrowseHandler
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.database.AppDatabase
 import kotlin.coroutines.CoroutineContext
 
 
-class BrowseFragment : Fragment(), CoroutineScope {
+class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     companion object {
         const val LOGGING_TAG = "BrowseFragment"
@@ -36,14 +38,17 @@ class BrowseFragment : Fragment(), CoroutineScope {
     lateinit var webView: MitchWebView
         private set
 
+    var browseHandler: ItchBrowseHandler? = null
 
-    private lateinit var job: Job
-    override val coroutineContext: CoroutineContext
-        get() = job + Dispatchers.Main
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        job = Job()
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        browseHandler = ItchBrowseHandler(context)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        browseHandler = null
     }
 
     override fun onCreateView(
@@ -92,7 +97,8 @@ class BrowseFragment : Fragment(), CoroutineScope {
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 webView.evaluateJavascript("""
                     document.addEventListener("DOMContentLoaded", (event) => {
-                        mitchCustomJS.processHTML("<html>" + document.getElementsByTagName("html")[0].innerHTML + "</html>");
+                        mitchCustomJS.onHtmlLoaded("<html>" + document.getElementsByTagName("html")[0].innerHTML + "</html>",
+                                                   window.location.href);
                     });
                 """, null)
             }
@@ -145,7 +151,7 @@ class BrowseFragment : Fragment(), CoroutineScope {
     override fun onDestroy() {
         super.onDestroy()
 
-        job.cancel()
+        cancel()
     }
 
     @Keep //prevent this class from being removed by compiler optimizations
@@ -156,82 +162,47 @@ class BrowseFragment : Fragment(), CoroutineScope {
         }
 
         @JavascriptInterface
-        fun processHTML(html: String) {
+        fun onHtmlLoaded(html: String, url: String) {
             if(fragment.activity !is MainActivity)
                 return
 
-            fragment.processHtml(false, html)
-        }
-    }
-
-    /**
-     * Responsible for updating the UI as well as the local game database after a page's content has been loaded.
-     * @param onlyUI true if this shouldn't update the database. The database should be updated at least once during a page visit.
-     * @param html the HTML text of the current page
-     */
-    protected fun processHtml(onlyUI: Boolean, html: String) {
-
-        //Utils.logLongD(LOGGING_TAG, html)
-
-        if(activity == null || activity !is MainActivity)
-            return
-
-        launch {
-            val doc: Document = withContext(Dispatchers.Default) {
-                Jsoup.parse(html)
-            }
-
-            val mainActivity = activity as MainActivity
-            val navBar = mainActivity.findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-
-            navBar.post {
-                if (ItchWebsiteUtils.shouldRemoveAppNavbar(webView, doc))
-                    navBar.visibility = View.GONE
-                else
-                    navBar.visibility = View.VISIBLE
-            }
-
-            if(!onlyUI) {
-                if(ItchWebsiteUtils.isDownloadPage(doc) || ItchWebsiteUtils.isStorePage(doc)) {
-                    val db = AppDatabase.getDatabase(requireContext())
-
-                    launch(Dispatchers.IO) {
-                        val gameId = ItchWebsiteUtils.getGameId(doc)
-                        val uploads = ItchWebsiteParser.getAndroidUploads(gameId, doc)
-                        for(upload in uploads) {
-                            Log.d(LOGGING_TAG, "Adding upload $upload")
-                        }
-                        //TODO: actually check if these uploads should be saved
-                        db.uploadDao().clearUploadsForGame(gameId)
-                        db.uploadDao().insert(uploads)
-                    }
-
-                    if(ItchWebsiteUtils.isStorePage(doc)) {
-                        val game = ItchWebsiteParser.getGameInfo(doc, webView.url)
-
-                        launch(Dispatchers.IO) {
-                            Log.d(LOGGING_TAG, "Adding game $game")
-                            db.gameDao().insert(game)
-                        }
-                    }
-                }
+            fragment.launch(Dispatchers.Default) {
+                val doc = Jsoup.parse(html)
+                fragment.browseHandler?.processItchData(doc, url)
+                fragment.processUI(doc)
             }
         }
     }
 
+    fun processUI(doc: Document) {
+        val mainActivity = activity as MainActivity
+        val navBar = mainActivity.findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+
+        navBar.post {
+            if (ItchWebsiteUtils.shouldRemoveAppNavbar(webView, doc))
+                navBar.visibility = View.GONE
+            else
+                navBar.visibility = View.VISIBLE
+        }
+    }
     /**
      * Responsible for updating the UI as well as the local game database after a page has loaded.
      */
-    protected fun processHtml(onlyUI: Boolean) {
+    protected fun processUI() {
         webView.evaluateJavascript(
             """return '<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>';"""
-        ) { result -> processHtml(onlyUI, result) }
+        ) { result ->
+            launch(Dispatchers.Default) {
+                val doc = Jsoup.parse(result)
+                processUI(doc)
+            }
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
-        processHtml(onlyUI = true)
+        processUI()
     }
 
 

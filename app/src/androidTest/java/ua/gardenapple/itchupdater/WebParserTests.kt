@@ -9,6 +9,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
+import ua.gardenapple.itchupdater.client.ItchWebsiteParser.Companion.DownloadUrl
 import ua.gardenapple.itchupdater.client.WebUpdateChecker
 import ua.gardenapple.itchupdater.database.game.Game
 
@@ -29,7 +30,7 @@ class WebParserTests {
      * This test will only complete successfully if you're logged in to my itch.io account
      */
     @Test
-    fun testUpdateCheck_paidGame_noVersioning() {
+    fun testGetAndroidUploads_paidGame_noVersioning() {
         val gameId = 276085
         val game = Game(gameId, name = "Super Hexagon", author = "Terry Cavanagh",
             downloadPageUrl = "https://terrycavanagh.itch.io/super-hexagon/download/nGM_T_fa5YQ4cMcMFQ4AnSn__H_1Aj670uwLHMiL",
@@ -56,7 +57,7 @@ class WebParserTests {
     }
 
     @Test
-    fun testUpdateCheck_donationGame_withVersioning() {
+    fun testGetAndroidUploads_donationGame_withVersioning() {
         val gameId = 140169
         val game = Game(gameId, name = "Mindustry", author = "Anuke",
             downloadPageUrl = null,
@@ -80,5 +81,24 @@ class WebParserTests {
         assertEquals("34 MB", uploads[0].fileSize)
         assertEquals(null, uploads[0].uploadId)
         assertEquals("Версия 102.3", uploads[0].version)
+    }
+
+    /*
+     * This test will only complete successfully if you're logged in to my itch.io account
+     */
+    @Test
+    fun testGetDownloadPage_paidGame() {
+        val url: DownloadUrl = runBlocking(Dispatchers.IO) {
+            ItchWebsiteParser.getDownloadUrlFromStorePage("https://npckc.itch.io/a-tavern-for-tea")
+        }
+        assertEquals(DownloadUrl("https://npckc.itch.io/a-tavern-for-tea/download/VcTYvLj_mPzph_hcLK5fuMafmTlH11SPBlJhfoRh", true), url)
+    }
+
+    @Test
+    fun testGetDownloadPage_freeGame() {
+        val url: DownloadUrl = runBlocking(Dispatchers.IO) {
+            ItchWebsiteParser.getDownloadUrlFromStorePage("https://clouddeluna.itch.io/splashyplusplus")
+        }
+        assertEquals(DownloadUrl("https://clouddeluna.itch.io/splashyplusplus", true), url)
     }
 }

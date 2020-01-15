@@ -2,11 +2,19 @@ package ua.gardenapple.itchupdater.client
 
 import android.net.Uri
 import android.util.Log
+import android.webkit.CookieManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import okhttp3.FormBody
+import okhttp3.Request
 import org.json.JSONObject
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
+import ua.gardenapple.itchupdater.MitchApp
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.upload.Upload
+import java.io.IOException
 
 class ItchWebsiteParser {
     companion object {
@@ -83,6 +91,99 @@ class ItchWebsiteParser {
                 }
             }
             return uploadsList
+        }
+
+        fun getStoreUrlFromDownloadPage(downloadUrl: String): String {
+            val uri = Uri.parse(downloadUrl)
+            return "${uri.scheme}://${uri.host}/${uri.pathSegments[0]}"
+        }
+
+
+
+
+        data class DownloadUrl(val url: String, val isPermanent: Boolean)
+
+        suspend fun getDownloadUrlFromStorePage(storeUrl: String): DownloadUrl = withContext(Dispatchers.IO) {
+            val request = Request.Builder().run {
+                url(storeUrl)
+                addHeader("Cookie", CookieManager.getInstance().getCookie(storeUrl))
+                build()
+            }
+            var html: String = ""
+            MitchApp.httpClient.newCall(request).execute().use { response ->
+                if(!response.isSuccessful)
+                    throw IOException("Unexpected response $response")
+                html = response.body!!.string()
+            }
+
+            val doc = withContext(Dispatchers.Default) {
+                Jsoup.parse(html)
+            }
+
+            return@withContext getDownloadUrlFromStorePage(doc, storeUrl)
+        }
+
+        suspend fun getDownloadUrlFromStorePage(doc: Document, storeUrl: String): DownloadUrl = withContext(Dispatchers.IO) {
+            //The game is free and the store page provides download links
+            if(doc.getElementsByClass("download_btn").isNotEmpty())
+                return@withContext DownloadUrl(storeUrl, true)
+
+            //The game has been bought and the store page provides download links
+            var elements = doc.getElementsByClass("purchase_banner_inner")
+            if(elements.isNotEmpty()) {
+                Log.d(LOGGING_TAG, "Purchased game")
+                val downloadButtonRows = elements[0].getElementsByClass("key_row").sortedBy {
+                    elements = it.getElementsByClass("purchase_price")
+
+                    return@sortedBy if(elements.isNotEmpty()) {
+                        Log.d(LOGGING_TAG, "Paid: ${elements[0].html().removePrefix("$").replace(".", "")}")
+                        elements[0].html().removePrefix("$").replace(".", "").toInt()
+                    } else 0
+                }
+                return@withContext DownloadUrl(downloadButtonRows.last()!!.child(0).attr("href"), true)
+            }
+
+            //The game is free and hasn't been bought but accepts donations (the tricky part)
+            val storeUriParsed = Uri.parse(storeUrl)
+            var uriBuilder = storeUriParsed.buildUpon()
+            uriBuilder.appendPath("purchase")
+
+            val purchaseUri = uriBuilder.build()
+
+            var request = Request.Builder().run {
+                url(purchaseUri.toString())
+                build()
+            }
+//            MitchApp.httpClient.newCall(request).execute().use { response ->
+//                if(!response.isSuccessful)
+//                    throw IOException("Unexpected code $response")
+//
+//                val purchaseDoc = Jsoup.parse(response.body!!.string())
+//            }
+
+            uriBuilder = storeUriParsed.buildUpon()
+            uriBuilder.appendPath("download_url")
+
+            val getDownloadPathUri = uriBuilder.build()
+
+            var form = FormBody.Builder().run {
+                add("csrf_token", "0")
+                build()
+            }
+            request = Request.Builder().run {
+                url(getDownloadPathUri.toString())
+                addHeader("Cookie", CookieManager.getInstance().getCookie(storeUrl))
+                post(form)
+                build()
+            }
+            MitchApp.httpClient.newCall(request).execute().use { response ->
+                if(!response.isSuccessful)
+                    throw IOException("Unexpected code $response")
+
+                Log.d(LOGGING_TAG, response.body!!.string())
+            }
+
+            DownloadUrl("", false)
         }
     }
 }
