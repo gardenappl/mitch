@@ -34,7 +34,7 @@ data class Installation(
      * Mitch has a hardcoded upload ID. (see [MITCH_UPLOAD_ID])
      */
     @ColumnInfo(name = UPLOAD_ID_INTERNAL)
-    val uploadIdInternal: Int,
+    val uploadIdInternal: Long,
 
     /**
      * Affects timestamps and version strings.

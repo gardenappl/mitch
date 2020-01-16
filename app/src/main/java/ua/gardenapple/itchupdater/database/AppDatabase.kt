@@ -8,8 +8,6 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import ua.gardenapple.itchupdater.BuildConfig
 import ua.gardenapple.itchupdater.FLAVOR_ITCHIO
-import ua.gardenapple.itchupdater.LOGGING_TAG
-import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.database.game.GameDao
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
@@ -18,12 +16,17 @@ import ua.gardenapple.itchupdater.database.upload.Upload
 import ua.gardenapple.itchupdater.database.upload.UploadDao
 import ua.gardenapple.itchupdater.ioThread
 
-@Database(entities = [Game::class, Upload::class, Installation::class], version = 1, exportSchema = false)
+@Database(
+    entities = [Game::class, Upload::class, Installation::class],
+    version = 1,
+    exportSchema = false
+)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract val gameDao: GameDao
     abstract val uploadDao: UploadDao
-    abstract val installationDao: InstallationDao
+    abstract val installDao: InstallationDao
+
 
     /**
      * Singleton database
@@ -40,61 +43,69 @@ abstract class AppDatabase : RoomDatabase() {
             }
 
 
-
         private fun buildDatabase(context: Context): AppDatabase =
-            Room.databaseBuilder(context.applicationContext,
-                AppDatabase::class.java, "app_database")
+            Room.databaseBuilder(
+                context.applicationContext,
+                AppDatabase::class.java, "app_database"
+            )
                 .addCallback(object : Callback() {
 
                     override fun onOpen(db: SupportSQLiteDatabase) {
                         Log.d(LOGGING_TAG, "Opening database...")
+
                         ioThread {
                             val appDb = getDatabase(context)
-                            val locale = Game.MITCH_LOCALE
-
-                            if(BuildConfig.FLAVOR == FLAVOR_ITCHIO) {
-                                val game = Game(
-                                    gameId = Game.MITCH_GAME_ID,
-                                    name = "Mitch",
-                                    author = "gardenapple",
-                                    storeUrl = "https://gardenapple.itch.io/mitch",
-                                    thumbnailUrl = "",  //TODO: thumbnail URL
-                                    locale = locale
-                                )
-                                Log.d(LOGGING_TAG, "Adding game $game")
-                                appDb.gameDao.insert(game)
-
-                                val upload = Upload(
-                                    uploadId = null,
-                                    gameId = Game.MITCH_GAME_ID,
-                                    uploadNum = 0,
-                                    version = BuildConfig.VERSION_NAME,
-                                    locale = locale,
-                                    name = "[Mitch release name]",
-                                    fileSize = "[Mitch file size]"
-                                )
-                                appDb.uploadDao.clearUploadsForGame(Game.MITCH_GAME_ID)
-                                Log.d(LOGGING_TAG, "Adding upload $upload")
-                                appDb.uploadDao.insert(upload)
-
-                                val installation = Installation(
-                                    gameId = Game.MITCH_GAME_ID,
-                                    uploadIdInternal = Installation.MITCH_UPLOAD_ID,
-                                    packageName = context.packageName,
-                                    downloadFinished = true,
-                                    locale = locale
-                                )
-                                appDb.installationDao.insert(installation)
+                            if (BuildConfig.FLAVOR == FLAVOR_ITCHIO) {
+                                appDb.addMitchToDatabase(context)
                             } else {
                                 Log.d(LOGGING_TAG, "Deleting info on Mitch")
                                 appDb.uploadDao.clearUploadsForGame(Game.MITCH_GAME_ID)
                             }
 
-                            val mitchInstall = appDb.installationDao.findInstallation(Game.MITCH_GAME_ID)
+                            val mitchInstall = appDb.installDao.findInstallation(Game.MITCH_GAME_ID)
                             Log.d(LOGGING_TAG, "Mitch installation: $mitchInstall")
                         }
                     }
                 })
                 .build()
+
+    }
+
+
+    fun addMitchToDatabase(context: Context) {
+        val locale = Game.MITCH_LOCALE
+        val game = Game(
+            gameId = Game.MITCH_GAME_ID,
+            name = "Mitch",
+            author = "gardenapple",
+            storeUrl = "https://gardenapple.itch.io/mitch",
+            thumbnailUrl = "",  //TODO: thumbnail URL
+            locale = locale
+        )
+        Log.d(LOGGING_TAG, "Adding game $game")
+        gameDao.insert(game)
+
+        val upload = Upload(
+            uploadId = null,
+            gameId = Game.MITCH_GAME_ID,
+            uploadNum = 0,
+            version = BuildConfig.VERSION_NAME,
+            locale = locale,
+            name = Upload.MITCH_RELEASE_NAME,
+            fileSize = Upload.MITCH_FILE_SIZE
+        )
+        uploadDao.clearUploadsForGame(Game.MITCH_GAME_ID)
+        Log.d(LOGGING_TAG, "Adding upload $upload")
+        uploadDao.insert(upload)
+
+        val installation = Installation(
+            gameId = Game.MITCH_GAME_ID,
+            uploadIdInternal = Installation.MITCH_UPLOAD_ID,
+            packageName = context.packageName,
+            downloadFinished = true,
+            locale = locale
+        )
+        Log.d(LOGGING_TAG, "Adding install $installation")
+        installDao.insert(installation)
     }
 }

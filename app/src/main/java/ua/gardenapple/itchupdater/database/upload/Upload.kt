@@ -25,11 +25,11 @@ data class Upload(
     /**
      * Since we don't always have an uploadId, and we need to have a primary key, we use this workaround.
      * If there's an uploadId, we use that as the primary key (and it's always >0)
-     * If there's no uploadId, we set internalId to a negative integer, derived from the gameId and uploadNum.
+     * If there's no uploadId, we set internalId to a big integer, derived from the gameId and uploadNum.
      */
     @PrimaryKey
     @ColumnInfo(name = INTERNAL_ID)
-    val internalId: Int,
+    val internalId: Long,
 
     /**
      * Nullable because the upload ID is not always visible when browsing.
@@ -81,6 +81,8 @@ data class Upload(
 
     companion object {
         const val TABLE_NAME = "uploads"
+        const val MITCH_RELEASE_NAME = "[Mitch release name]"
+        const val MITCH_FILE_SIZE = "[Mitch file size]"
 
         const val INTERNAL_ID = "internalId"
         const val UPLOAD_ID = "upload_id"
@@ -91,8 +93,8 @@ data class Upload(
         const val TIMESTAMP = "timestamp"
         const val LOCALE = "locale"
 
-        fun calculateInternalId(uploadId: Int?, gameId: Int, uploadNum: Int): Int {
-            return uploadId ?: -(gameId * 100 + uploadNum)
+        fun calculateInternalId(uploadId: Int?, gameId: Int, uploadNum: Int): Long {
+            return uploadId?.toLong() ?: (gameId * 1_000_000_000L + uploadNum)
         }
     }
 }

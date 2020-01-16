@@ -28,10 +28,12 @@ class ItchWebsiteParser {
 
         fun getGameInfo(gamePageDoc: Document, gamePageUrl: String): Game {
             val thumbnails = gamePageDoc.head().getElementsByAttributeValue("property", "og:image")
-            val thumbnailUrl = if(thumbnails.isNotEmpty())
-                thumbnails[0].attr("href")
-            else
-                ""
+            var thumbnailUrl = ""
+            if(thumbnails.isNotEmpty()) {
+                thumbnailUrl = thumbnails[0].attr("content")
+            } else {
+                Log.d(LOGGING_TAG, "No thumbnail!")
+            }
 
             val productJsonString: String = gamePageDoc.head().getElementsByAttributeValue("type", "application/ld+json")[1].html()
             val jsonObject = JSONObject(productJsonString)
@@ -198,7 +200,7 @@ class ItchWebsiteParser {
         }
 
         fun getLocale(doc: Document): String {
-            val scripts = doc.body().getElementsByTag("script")
+            val scripts = doc.head().getElementsByTag("script")
             for(script in scripts) {
                 val html = script.html()
                 if(html.startsWith("window.itchio_locale"))

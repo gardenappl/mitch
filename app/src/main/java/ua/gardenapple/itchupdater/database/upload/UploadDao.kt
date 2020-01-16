@@ -17,7 +17,7 @@ interface UploadDao {
     fun clearUploadsForGame(gameId: Int)
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $INTERNAL_ID = :uploadIdInternal LIMIT 1")
-    fun getUploadByInternalId(uploadIdInternal: Int): Upload
+    fun getUploadByInternalId(uploadIdInternal: Long): Upload
 
     @Insert
     fun insert(vararg uploads: Upload)

@@ -1,10 +1,7 @@
 package ua.gardenapple.itchupdater.database.game
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import ua.gardenapple.itchupdater.database.game.Game.Companion.GAME_ID
 import ua.gardenapple.itchupdater.database.game.Game.Companion.TABLE_NAME
 
@@ -18,4 +15,7 @@ interface GameDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(vararg games: Game)
+
+    @Update
+    fun update(vararg games: Game)
 }

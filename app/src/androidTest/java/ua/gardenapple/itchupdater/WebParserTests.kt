@@ -1,6 +1,9 @@
 package ua.gardenapple.itchupdater
 
 import android.util.Log
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.Dispatchers
@@ -11,12 +14,16 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.client.UpdateCheckResult
 import ua.gardenapple.itchupdater.client.WebUpdateChecker
+import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
+import ua.gardenapple.itchupdater.database.installation.Installation
+import ua.gardenapple.itchupdater.database.upload.Upload
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -27,13 +34,17 @@ import ua.gardenapple.itchupdater.database.game.Game
 class WebParserTests {
     companion object {
         const val LOGGING_TAG: String = "Test"
-    }
 
-    private lateinit var updateChecker: WebUpdateChecker
+        private lateinit var updateChecker: WebUpdateChecker
 
-    @Before
-    fun setup() {
-        updateChecker = WebUpdateChecker(InstrumentationRegistry.getInstrumentation().targetContext)
+        @BeforeClass @JvmStatic fun setup() {
+            val context = InstrumentationRegistry.getInstrumentation().context
+            val db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+
+            db.addMitchToDatabase(context)
+
+            updateChecker = WebUpdateChecker(db)
+        }
     }
 
 
