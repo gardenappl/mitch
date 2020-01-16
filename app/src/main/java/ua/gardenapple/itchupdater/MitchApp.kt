@@ -11,6 +11,7 @@ import androidx.core.app.ActivityCompat
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import ua.gardenapple.itchupdater.installer.DownloadRequester
+import java.io.File
 
 
 const val LOGGING_TAG: String = "Mitch"
@@ -46,9 +47,11 @@ class MitchApp : Application(),
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
+        val okHttpCacheDir = File(cacheDir, "OkHttp")
+        okHttpCacheDir.mkdirs()
         httpClient = OkHttpClient.Builder().run {
             cache(Cache(
-                directory = cacheDir,
+                directory = okHttpCacheDir,
                 maxSize = 50 * 1024 * 1024 //50 MB
             ))
             build()

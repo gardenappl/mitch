@@ -78,18 +78,18 @@ class ItchWebsiteParser {
                             versionDate = elements[0].child(0).attr("title")
                     }
 
-
-                    uploadsList.add(
-                        Upload(
-                            gameId = gameId,
-                            uploadNum = iconNum,
-                            uploadId = uploadId,
-                            name = name,
-                            fileSize = fileSize,
-                            version = versionName,
-                            uploadTimestamp = versionDate
-                        )
+                    val upload = Upload(
+                        gameId = gameId,
+                        uploadNum = iconNum,
+                        uploadId = uploadId,
+                        name = name,
+                        fileSize = fileSize,
+                        version = versionName,
+                        uploadTimestamp = versionDate
                     )
+                    Log.d(LOGGING_TAG, "Found upload: $upload")
+
+                    uploadsList.add(upload)
                     iconNum++
                 }
             }
@@ -103,7 +103,7 @@ class ItchWebsiteParser {
 
 
 
-        suspend fun getDownloadUrlFromStorePage(storeUrl: String): DownloadUrl = withContext(Dispatchers.IO) {
+        suspend fun getDownloadUrlFromStorePage(storeUrl: String): DownloadUrl? = withContext(Dispatchers.IO) {
             val request = Request.Builder().run {
                 url(storeUrl)
                 addHeader("Cookie", CookieManager.getInstance().getCookie(storeUrl))
@@ -123,7 +123,7 @@ class ItchWebsiteParser {
             return@withContext getDownloadUrlFromStorePage(doc, storeUrl)
         }
 
-        suspend fun getDownloadUrlFromStorePage(doc: Document, storeUrl: String): DownloadUrl = withContext(Dispatchers.IO) {
+        suspend fun getDownloadUrlFromStorePage(doc: Document, storeUrl: String): DownloadUrl? = withContext(Dispatchers.IO) {
             //The game is free and the store page provides download links
             if(doc.getElementsByClass("download_btn").isNotEmpty())
                 return@withContext DownloadUrl(storeUrl, true)
@@ -180,9 +180,14 @@ class ItchWebsiteParser {
                 if(!response.isSuccessful)
                     throw IOException("Unexpected code $response")
 
+                //Log.d(LOGGING_TAG, "Response: ${response.body!!.string()}")
                 response.body!!.string()
             }
-            DownloadUrl(JSONObject(result).getString("url"), false)
+            val jsonObject = JSONObject(result)
+            return@withContext if(jsonObject.has("url"))
+                 DownloadUrl(JSONObject(result).getString("url"), false)
+            else
+                null
         }
     }
 }

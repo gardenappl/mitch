@@ -10,9 +10,9 @@
 # and specify the fully qualified class name to the JavaScript interface
 # class:
 
-#-keepclassmembers class ua.gardenapple.itchupdater.ui.BrowseFragment.ItchJavaScriptInterface {
-#   public *;
-#}
+-keepclassmembers class ua.gardenapple.itchupdater.ui.BrowseFragment.ItchJavaScriptInterface {
+   public *;
+}
 
 -keep public class * implements com.bumptech.glide.module.GlideModule
 -keep public class * extends com.bumptech.glide.module.AppGlideModule
@@ -20,6 +20,7 @@
   **[] $VALUES;
   public *;
 }
+
 
 
 # Uncomment this to preserve the line number information for

@@ -3,6 +3,7 @@ package ua.gardenapple.itchupdater.installer
 import android.Manifest
 import android.app.Activity
 import android.app.DownloadManager
+import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
@@ -20,20 +21,25 @@ class DownloadRequester {
         lateinit var currentContent: String
         lateinit var currentMimeType: String
 
-        fun requestDownload(activity: Activity, url: String, contentDisposition: String, mimeType: String) {
-            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(
-                    activity,
-                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                    PERMISSION_REQUEST_CODE_DOWNLOAD
-                )
-                currentUrl = url
-                currentContent = contentDisposition
-                currentMimeType = mimeType
+        fun requestDownload(context: Context, activity: Activity?, url: String, contentDisposition: String, mimeType: String) {
+            if (context.packageManager.checkPermission(context.packageName, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                if(activity != null) {
+                    currentUrl = url
+                    currentContent = contentDisposition
+                    currentMimeType = mimeType
+                    ActivityCompat.requestPermissions(
+                        activity,
+                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                        PERMISSION_REQUEST_CODE_DOWNLOAD
+                    )
+                } else {
+                    //TODO: PermissionRequestActivity
+                }
                 return
             } else {
                 doDownload(
-                    activity.getSystemService(Activity.DOWNLOAD_SERVICE) as DownloadManager,
+                    context.getSystemService(Activity.DOWNLOAD_SERVICE) as DownloadManager,
                     url,
                     contentDisposition,
                     mimeType
@@ -42,6 +48,7 @@ class DownloadRequester {
         }
 
         fun resumeDownload(downloadManager: DownloadManager) {
+            Log.d(LOGGING_TAG, "Resuming download")
             doDownload(
                 downloadManager,
                 currentUrl,

@@ -23,5 +23,9 @@ class Utils {
         fun logLongD(tag: String, string: String) {
             logPrintLong(Log.DEBUG, tag, string)
         }
+
+        fun getCurrentUnixTime(): Long {
+            return System.currentTimeMillis() / 1000
+        }
     }
 }

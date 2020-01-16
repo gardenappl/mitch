@@ -7,6 +7,8 @@ import kotlinx.coroutines.runBlocking
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
@@ -88,7 +90,7 @@ class WebParserTests {
      */
     @Test
     fun testGetDownloadPage_paidGame() {
-        val url: ItchWebsiteParser.DownloadUrl = runBlocking(Dispatchers.IO) {
+        val url: ItchWebsiteParser.DownloadUrl? = runBlocking(Dispatchers.IO) {
             ItchWebsiteParser.getDownloadUrlFromStorePage("https://npckc.itch.io/a-tavern-for-tea")
         }
         assertEquals(ItchWebsiteParser.DownloadUrl("https://npckc.itch.io/a-tavern-for-tea/download/VcTYvLj_mPzph_hcLK5fuMafmTlH11SPBlJhfoRh", true), url)
@@ -96,7 +98,7 @@ class WebParserTests {
 
     @Test
     fun testGetDownloadPage_freeGame() {
-        val url: ItchWebsiteParser.DownloadUrl = runBlocking(Dispatchers.IO) {
+        val url: ItchWebsiteParser.DownloadUrl? = runBlocking(Dispatchers.IO) {
             ItchWebsiteParser.getDownloadUrlFromStorePage("https://clouddeluna.itch.io/splashyplusplus")
         }
         assertEquals(ItchWebsiteParser.DownloadUrl("https://clouddeluna.itch.io/splashyplusplus", true), url)
@@ -104,10 +106,11 @@ class WebParserTests {
 
     @Test
     fun testGetDownloadPage_donationGame() {
-        val url: ItchWebsiteParser.DownloadUrl = runBlocking(Dispatchers.IO) {
+        val url: ItchWebsiteParser.DownloadUrl? = runBlocking(Dispatchers.IO) {
             ItchWebsiteParser.getDownloadUrlFromStorePage("https://anuke.itch.io/mindustry")
         }
-        Log.d(LOGGING_TAG, url.url)
+        assertNotNull(url)
+        Log.d(LOGGING_TAG, url!!.url)
         assertEquals(false, url.isPermanent)
         val doc = Jsoup.connect(url.url).get()
 
@@ -115,5 +118,16 @@ class WebParserTests {
 //        Utils.logLongD(LOGGING_TAG, doc.outerHtml())
 
         assertEquals(true, doc.getElementsByClass("download_btn").isNotEmpty())
+    }
+
+    /**
+     * This test will only complete successfully if you're not logged in to an account that owns VA-11 HALL-A
+     */
+    @Test
+    fun testGetDownloadPage_inaccessibleGame() {
+        val url: ItchWebsiteParser.DownloadUrl? = runBlocking(Dispatchers.IO) {
+            ItchWebsiteParser.getDownloadUrlFromStorePage("https://sukebangames.itch.io/valhalla-bar")
+        }
+        assertNull(url)
     }
 }
