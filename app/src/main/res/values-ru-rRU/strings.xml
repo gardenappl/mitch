@@ -12,4 +12,7 @@
     <string name="nav_installed">Моя коллекция</string>
     <string name="settings_block_trackers">Защита от слежения</string>
     <string name="settings_block_trackers_desc">Блокирует доступ к Google Analytics.\nУчтите, что некоторые разработчики игр могут полагаться на эту статистику.</string>
+    <string name="settings_category_browse">Браузер</string>
+    <string name="settings_category_updater">Установка и обновления</string>
+    <string name="settings_update_check_mode">Режим проверки обновлений</string>
 </resources>

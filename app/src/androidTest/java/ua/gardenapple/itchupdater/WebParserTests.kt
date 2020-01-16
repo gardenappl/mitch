@@ -2,6 +2,7 @@ package ua.gardenapple.itchupdater
 
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.jsoup.Jsoup
@@ -9,9 +10,11 @@ import org.jsoup.nodes.Document
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
+import ua.gardenapple.itchupdater.client.UpdateCheckResult
 import ua.gardenapple.itchupdater.client.WebUpdateChecker
 import ua.gardenapple.itchupdater.database.game.Game
 
@@ -26,7 +29,13 @@ class WebParserTests {
         const val LOGGING_TAG: String = "Test"
     }
 
-    private val webChecker = WebUpdateChecker()
+    private lateinit var updateChecker: WebUpdateChecker
+
+    @Before
+    fun setup() {
+        updateChecker = WebUpdateChecker(InstrumentationRegistry.getInstrumentation().targetContext)
+    }
+
 
     /**
      * This test will only complete successfully if you're logged in to my itch.io account
@@ -42,7 +51,7 @@ class WebParserTests {
         )
 
         val doc: Document = runBlocking(Dispatchers.IO) {
-            webChecker.fetchDownloadPage(game)
+            ItchWebsiteUtils.fetchAndParseDocument(game.downloadPageUrl ?: game.storeUrl)
         }
 
 //        Log.d(LOGGING_TAG, "HTML: ")
@@ -69,7 +78,7 @@ class WebParserTests {
         )
 
         val doc: Document = runBlocking(Dispatchers.IO) {
-            webChecker.fetchDownloadPage(game)
+            ItchWebsiteUtils.fetchAndParseDocument(game.storeUrl)
         }
 
 //        Log.d(LOGGING_TAG, "HTML: ")
@@ -91,23 +100,23 @@ class WebParserTests {
     @Test
     fun testGetDownloadPage_paidGame() {
         val url: ItchWebsiteParser.DownloadUrl? = runBlocking(Dispatchers.IO) {
-            ItchWebsiteParser.getDownloadUrlFromStorePage("https://npckc.itch.io/a-tavern-for-tea")
+            getDownloadPage("https://npckc.itch.io/a-tavern-for-tea")
         }
-        assertEquals(ItchWebsiteParser.DownloadUrl("https://npckc.itch.io/a-tavern-for-tea/download/VcTYvLj_mPzph_hcLK5fuMafmTlH11SPBlJhfoRh", true), url)
+        assertEquals(ItchWebsiteParser.DownloadUrl("https://npckc.itch.io/a-tavern-for-tea/download/VcTYvLj_mPzph_hcLK5fuMafmTlH11SPBlJhfoRh", true, false), url)
     }
 
     @Test
     fun testGetDownloadPage_freeGame() {
         val url: ItchWebsiteParser.DownloadUrl? = runBlocking(Dispatchers.IO) {
-            ItchWebsiteParser.getDownloadUrlFromStorePage("https://clouddeluna.itch.io/splashyplusplus")
+            getDownloadPage("https://clouddeluna.itch.io/splashyplusplus")
         }
-        assertEquals(ItchWebsiteParser.DownloadUrl("https://clouddeluna.itch.io/splashyplusplus", true), url)
+        assertEquals(ItchWebsiteParser.DownloadUrl("https://clouddeluna.itch.io/splashyplusplus", true, true), url)
     }
 
     @Test
     fun testGetDownloadPage_donationGame() {
         val url: ItchWebsiteParser.DownloadUrl? = runBlocking(Dispatchers.IO) {
-            ItchWebsiteParser.getDownloadUrlFromStorePage("https://anuke.itch.io/mindustry")
+            getDownloadPage("https://anuke.itch.io/mindustry")
         }
         assertNotNull(url)
         Log.d(LOGGING_TAG, url!!.url)
@@ -126,8 +135,22 @@ class WebParserTests {
     @Test
     fun testGetDownloadPage_inaccessibleGame() {
         val url: ItchWebsiteParser.DownloadUrl? = runBlocking(Dispatchers.IO) {
-            ItchWebsiteParser.getDownloadUrlFromStorePage("https://sukebangames.itch.io/valhalla-bar")
+            getDownloadPage("https://sukebangames.itch.io/valhalla-bar")
         }
         assertNull(url)
+    }
+
+    suspend fun getDownloadPage(url: String): ItchWebsiteParser.DownloadUrl? {
+        val doc = ItchWebsiteUtils.fetchAndParseDocument(url)
+        return ItchWebsiteParser.getDownloadUrlFromStorePage(doc, url, true)
+    }
+
+
+    @Test
+    fun testUpdateCheck_mitch() {
+        val result: UpdateCheckResult = runBlocking(Dispatchers.IO) {
+            updateChecker.checkUpdates(Game.MITCH_GAME_ID)
+        }
+        assertEquals(UpdateCheckResult.UP_TO_DATE, result.code)
     }
 }

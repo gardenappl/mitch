@@ -1,11 +1,12 @@
 package ua.gardenapple.itchupdater.database.upload
 
 import androidx.room.*
+import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.database.game.Game
 
 /**
  * Represents info about available uploads for any given Game, at the time of installation.
- * Should be written to the database after downloading a file.
+ * Should be written to the database after downloading a file. The Upload data will then be compared with the server to check for updates.
  */
 @Entity(tableName = Upload.TABLE_NAME,
     foreignKeys = [
@@ -41,6 +42,12 @@ data class Upload(
     val gameId: Int,
 
     /**
+     * Affects timestamps and version strings.
+     */
+    @ColumnInfo(name = LOCALE)
+    val locale: String = ItchWebsiteParser.UNKNOWN_LOCALE,
+
+    /**
      * Nullable because the version string is not available for some projects.
      */
     @ColumnInfo(name = VERSION)
@@ -63,13 +70,14 @@ data class Upload(
         uploadId: Int?,
         gameId: Int,
         uploadNum: Int,
+        locale: String,
         version: String?,
         name: String,
         fileSize: String,
         uploadTimestamp: String? = null
     )
-            : this(calculateInternalId(uploadId, gameId, uploadNum), uploadId, gameId, version,
-                   name, fileSize, uploadTimestamp)
+            : this(calculateInternalId(uploadId, gameId, uploadNum), uploadId, gameId, locale,
+                   version, name, fileSize, uploadTimestamp)
 
     companion object {
         const val TABLE_NAME = "uploads"
@@ -81,6 +89,7 @@ data class Upload(
         const val VERSION = "version"
         const val FILE_SIZE = "file_size"
         const val TIMESTAMP = "timestamp"
+        const val LOCALE = "locale"
 
         fun calculateInternalId(uploadId: Int?, gameId: Int, uploadNum: Int): Int {
             return uploadId ?: -(gameId * 100 + uploadNum)

@@ -2,8 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="Preference category">
-
+    <PreferenceCategory android:title="@string/settings_category_browse">
         <SwitchPreference
                 android:defaultValue="@string/preference_value_block_trackers"
                 android:key="preference_block_trackers"

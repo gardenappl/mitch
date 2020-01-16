@@ -4,10 +4,12 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 
 /**
  * Cached information about an itch.io project (could be a game, a tool, a comic book, etc.)
  * Should be written to the database on every page visit.
+ * All this data should be accessible by parsing the game's store page.
  */
 @Entity(tableName = Game.TABLE_NAME,
     indices = [
@@ -39,9 +41,15 @@ data class Game(
     val thumbnailUrl: String,
 
     /**
+     * Affects timestamps and version strings.
+     */
+    @ColumnInfo(name = LOCALE)
+    val locale: String = ItchWebsiteParser.UNKNOWN_LOCALE,
+
+    /**
      * Set to null for projects where the timestamp is not available.
      */
-    @ColumnInfo(name = LAST_SEEN_TIMESTAMP)
+    @ColumnInfo(name = LAST_UPDATED_TIMESTAMP)
     val lastDownloadTimestamp: String? = null,
 
     /**
@@ -53,6 +61,7 @@ data class Game(
 ) {
     companion object {
         const val MITCH_GAME_ID = 544475
+        const val MITCH_LOCALE = "[Mitch locale]"
 
         const val TABLE_NAME = "games"
 
@@ -61,8 +70,9 @@ data class Game(
         const val AUTHOR = "author"
         const val STORE_URL = "store_url"
         const val DOWNLOAD_PAGE_URL = "download_page_url"
+        const val LOCALE = "locale"
         const val THUMBNAIL_URL = "thumbnail_url"
-        const val LAST_SEEN_TIMESTAMP = "last_timestamp"
+        const val LAST_UPDATED_TIMESTAMP = "last_timestamp"
         const val STORE_LAST_VISITED = "store_last_visited"
     }
 }

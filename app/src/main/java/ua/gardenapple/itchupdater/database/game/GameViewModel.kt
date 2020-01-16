@@ -12,7 +12,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     val allGames: LiveData<List<Game>>
 
     init {
-        val gamesDao = AppDatabase.getDatabase(app).gameDao()
+        val gamesDao = AppDatabase.getDatabase(app).gameDao
         repository = GameRepository(gamesDao)
         allGames = repository.allGames
     }

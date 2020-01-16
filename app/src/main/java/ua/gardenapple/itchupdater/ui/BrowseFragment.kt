@@ -13,19 +13,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
-import android.widget.FrameLayout
 import androidx.annotation.Keep
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.R
-import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.client.ItchBrowseHandler
 import ua.gardenapple.itchupdater.installer.DownloadRequester
 import java.io.ByteArrayInputStream
@@ -181,8 +177,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     @Keep //prevent this class from being removed by compiler optimizations
     private class ItchJavaScriptInterface(val fragment: BrowseFragment) {
         @JavascriptInterface
-        fun onDownloadLinkClick(uploadID: String) {
-            Log.d(LOGGING_TAG, uploadID)
+        fun onDownloadLinkClick(uploadId: String) {
+            Log.d(LOGGING_TAG, "Selected upload ID: $uploadId")
+            fragment.launch(Dispatchers.IO) {
+                fragment.browseHandler?.onGameDownloadStarted(uploadId.toInt())
+            }
         }
 
         @JavascriptInterface
@@ -195,7 +194,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
             fragment.launch(Dispatchers.Default) {
                 val doc = Jsoup.parse(html)
-                fragment.browseHandler?.processItchData(doc, url)
+                fragment.browseHandler?.onPageVisited(doc, url)
                 fragment.processUI(doc)
             }
         }

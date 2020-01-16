@@ -13,7 +13,7 @@ interface GameDao {
     @Query("SELECT * FROM $TABLE_NAME")
     fun getAllGames(): LiveData<List<Game>>
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId")
+    @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId LIMIT 1")
     fun getGameById(gameId: Int): Game
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

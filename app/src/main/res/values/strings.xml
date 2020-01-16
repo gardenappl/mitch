@@ -11,4 +11,7 @@
     <string name="nav_settings">Settings</string>
     <string name="settings_block_trackers">Block trackers</string>
     <string name="settings_block_trackers_desc">Prevents access to Google Analytics.\nNote that some game developers might actually rely on those statistics.</string>
+    <string name="settings_category_browse">Browsing</string>
+    <string name="settings_category_updater">Installation and Updates</string>
+    <string name="settings_update_check_mode">Update check mode</string>
 </resources>

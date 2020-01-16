@@ -17,36 +17,37 @@ class ItchBrowseHandler(val context: Context) {
         const val LOGGING_TAG = "ItchBrowseHandler"
     }
 
-    suspend fun processItchData(doc: Document, url: String) {
-        if(ItchWebsiteUtils.isDownloadPage(doc) || ItchWebsiteUtils.isStorePage(doc)) {
+    private lateinit var lastDownloadDoc: Document
+    private var lastDownloadGameId: Int = -1
+
+    suspend fun onPageVisited(doc: Document, url: String) {
+        if(ItchWebsiteUtils.isStorePage(doc)) {
 
             val db = AppDatabase.getDatabase(context)
 
             withContext(Dispatchers.IO) {
-                val job1 = async {
-                    val gameId = ItchWebsiteUtils.getGameId(doc)
-                    val uploads = ItchWebsiteParser.getAndroidUploads(gameId, doc)
-                    for (upload in uploads) {
-                        Log.d(LOGGING_TAG, "Adding upload $upload")
-                    }
-                    //TODO: actually check if these uploads should be saved
-                    db.uploadDao().clearUploadsForGame(gameId)
-                    db.uploadDao().insert(uploads)
-                }
-
-                val job2 = async {
+                val job1 =  async {
                     if (ItchWebsiteUtils.isStorePage(doc)) {
                         val game = ItchWebsiteParser.getGameInfo(doc, url)
 
                         withContext(Dispatchers.IO) {
                             Log.d(LOGGING_TAG, "Adding game $game")
-                            db.gameDao().insert(game)
+                            db.gameDao.insert(game)
                         }
                     }
                 }
                 job1.await()
-                job2.await()
             }
         }
+        else if(ItchWebsiteUtils.isDownloadPage(doc)) {
+            lastDownloadDoc = doc
+            lastDownloadGameId = ItchWebsiteUtils.getGameId(doc)
+        }
+    }
+
+    suspend fun onGameDownloadStarted(uploadId: Int) {
+        val uploads = ItchWebsiteParser.getAndroidUploads(lastDownloadGameId, lastDownloadDoc)
+
+        //TODO: PendingUpload
     }
 }
