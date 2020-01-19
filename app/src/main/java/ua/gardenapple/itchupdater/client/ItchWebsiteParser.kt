@@ -3,13 +3,11 @@ package ua.gardenapple.itchupdater.client
 import android.net.Uri
 import android.util.Log
 import android.webkit.CookieManager
-import android.webkit.URLUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
 import okhttp3.Request
 import org.json.JSONObject
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
@@ -54,13 +52,12 @@ class ItchWebsiteParser {
                 author = authorName,
                 storeUrl = gamePageUrl,
                 thumbnailUrl = thumbnailUrl,
-                lastDownloadTimestamp = lastDownloadTimestamp,
-                storeLastVisited = Utils.getCurrentUnixTime(),
+                lastUpdatedTimestamp = lastDownloadTimestamp,
                 locale = getLocale(gamePageDoc)
             )
         }
 
-        fun getAndroidUploads(gameId: Int, doc: Document): ArrayList<Upload> {
+        fun getAndroidUploads(gameId: Int, doc: Document, setPending: Boolean = false): ArrayList<Upload> {
             val uploadsList = ArrayList<Upload>()
 
             val icons = doc.getElementsByClass("icon-android")
@@ -95,13 +92,13 @@ class ItchWebsiteParser {
 
                     val upload = Upload(
                         gameId = gameId,
-                        uploadNum = iconNum,
                         uploadId = uploadId,
                         name = name,
                         fileSize = fileSize,
                         locale = getLocale(doc),
                         version = versionName,
-                        uploadTimestamp = versionDate
+                        uploadTimestamp = versionDate,
+                        isPending = setPending
                     )
                     Log.d(LOGGING_TAG, "Found upload: $upload")
 
@@ -143,7 +140,7 @@ class ItchWebsiteParser {
         suspend fun getDownloadUrlFromStorePage(doc: Document, storeUrl: String, doExtraFetches: Boolean): DownloadUrl? = withContext(Dispatchers.IO) {
             //The game is free and the store page provides download links
             if(doc.getElementsByClass("download_btn").isNotEmpty())
-                return@withContext DownloadUrl(storeUrl, true, true)
+                return@withContext DownloadUrl(storeUrl, isPermanent = true, isStorePage = true)
 
             //The game has been bought and the store page provides download links
             var elements = doc.getElementsByClass("purchase_banner_inner")
@@ -157,7 +154,8 @@ class ItchWebsiteParser {
                         elements[0].html().removePrefix("$").replace(".", "").toInt()
                     } else 0
                 }
-                return@withContext DownloadUrl(downloadButtonRows.last()!!.child(0).attr("href"), true, false)
+                return@withContext DownloadUrl(downloadButtonRows.last()!!.child(0).attr("href"),
+                    isPermanent = true, isStorePage = false)
             }
 
             //The game is free and hasn't been bought but accepts donations (the tricky part)
@@ -202,7 +200,7 @@ class ItchWebsiteParser {
         fun getLocale(doc: Document): String {
             val scripts = doc.head().getElementsByTag("script")
             for(script in scripts) {
-                val html = script.html()
+                val html = script.html().trimStart()
                 if(html.startsWith("window.itchio_locale"))
                     return html.substring(24, 26)
             }

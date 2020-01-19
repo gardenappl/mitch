@@ -16,8 +16,4 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         repository = GameRepository(gamesDao)
         allGames = repository.allGames
     }
-
-    fun insert(game: Game) = viewModelScope.launch {
-        repository.insert(game)
-    }
 }

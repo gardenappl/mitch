@@ -6,12 +6,20 @@ import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.upload.Upload
 
 
+/**
+ * Represents info about a downloaded or installed game.
+ *
+ * Can also represent a "pending" installation.
+ * When a user clicks the download button, the data from the page is saved as a "pending" Installation.
+ * It may be stored alongside the old Installation.
+ * Then, once the download/installation is complete, the pending Installation becomes a regular Installation.
+ */
 @Entity(tableName = Installation.TABLE_NAME,
     foreignKeys = [
         ForeignKey(
             entity = Upload::class,
-            parentColumns = [Upload.INTERNAL_ID],
-            childColumns = [Installation.UPLOAD_ID_INTERNAL],
+            parentColumns = [Upload.UPLOAD_ID],
+            childColumns = [Installation.UPLOAD_ID],
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
@@ -22,10 +30,14 @@ import ua.gardenapple.itchupdater.database.upload.Upload
         )
     ],
     indices = [
-        Index(value = [Installation.UPLOAD_ID_INTERNAL])
+        Index(value = [Installation.GAME_ID]),
+        Index(value = [Installation.UPLOAD_ID])
     ])
 data class Installation(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = INTERNAL_ID)
+    var internalId: Int = 0,
+
     @ColumnInfo(name = GAME_ID)
     val gameId: Int,
 
@@ -33,20 +45,8 @@ data class Installation(
      * Corresponds to an Upload's uploadId (which should always non-null for files which have actually been downloaded).
      * Mitch has a hardcoded upload ID. (see [MITCH_UPLOAD_ID])
      */
-    @ColumnInfo(name = UPLOAD_ID_INTERNAL)
-    val uploadIdInternal: Long,
-
-    /**
-     * Affects timestamps and version strings.
-     */
-    @ColumnInfo(name = LOCALE)
-    val locale: String = ItchWebsiteParser.UNKNOWN_LOCALE,
-
-    /**
-     * Set to null for games where the timestamp is not available.
-     */
-    @ColumnInfo(name = TIMESTAMP)
-    val storeVisitTimestamp: String? = null,
+    @ColumnInfo(name = UPLOAD_ID)
+    val uploadId: Int,
 
     /**
      * Set to null for downloads which are not installable.
@@ -54,22 +54,20 @@ data class Installation(
     @ColumnInfo(name = PACKAGE_NAME)
     val packageName: String? = null,
 
-    /**
-     * Set to true for games which have been downloaded (and installed, if possible)
-     */
-    @ColumnInfo(name = DOWNLOAD_FINISHED)
-    val downloadFinished: Boolean = false
+    @ColumnInfo(name = IS_PENDING)
+    var isPending: Boolean = false,
+
+    @ColumnInfo(name = DOWNLOAD_ID)
+    var downloadId: Long? = null
 ) {
     companion object {
         const val TABLE_NAME = "installations"
 
+        const val INTERNAL_ID = "internal_id"
         const val GAME_ID = "game_id"
-        const val UPLOAD_ID_INTERNAL = "upload_id"
-        const val PACKAGE_NAME = "name"
-        const val LOCALE = "locale"
-        const val TIMESTAMP = "timestamp"
-        const val DOWNLOAD_FINISHED = "download_finished"
-
-        val MITCH_UPLOAD_ID = Upload.calculateInternalId(null, Game.MITCH_GAME_ID, 0)
+        const val UPLOAD_ID = "upload_id"
+        const val PACKAGE_NAME = "package_name"
+        const val DOWNLOAD_ID = "download_id"
+        const val IS_PENDING = "is_pending"
     }
 }

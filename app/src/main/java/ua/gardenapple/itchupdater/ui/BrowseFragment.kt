@@ -24,7 +24,9 @@ import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.client.ItchBrowseHandler
 import ua.gardenapple.itchupdater.installer.DownloadRequester
+import ua.gardenapple.itchupdater.installer.InstallerEvents
 import java.io.ByteArrayInputStream
+import java.io.File
 import java.io.StringReader
 
 
@@ -44,7 +46,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        browseHandler = ItchBrowseHandler(context)
+        val browseHandler = ItchBrowseHandler(context, this)
+        this.browseHandler = browseHandler
+        InstallerEvents.addListener(browseHandler)
     }
 
     override fun onDetach() {
@@ -66,6 +70,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         @SuppressLint("SetJavaScriptEnabled")
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
+        webView.settings.setAppCacheEnabled(true)
+        webView.settings.setAppCachePath(File(requireContext().filesDir, "html5-app-cache").path)
+        webView.settings.databaseEnabled = true
 
         webView.settings.mediaPlaybackRequiresUserGesture = false
         webView.webViewClient = MitchWebViewClient()
@@ -74,6 +81,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         webView.addJavascriptInterface(ItchJavaScriptInterface(this), "mitchCustomJS")
 
         webView.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
+            Log.d(LOGGING_TAG, "Requesting download...")
             context!!.let { DownloadRequester.requestDownload(it, activity, url, contentDisposition, mimeType) }
         }
 
@@ -95,6 +103,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         if(chromeClient.customViewCallback != null) {
             Log.d(LOGGING_TAG, "Hiding custom view")
             chromeClient.customViewCallback?.onCustomViewHidden()
+            return false
         } else {
             Log.d(LOGGING_TAG, "Custom view callback is null")
         }
@@ -180,12 +189,13 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         fun onDownloadLinkClick(uploadId: String) {
             Log.d(LOGGING_TAG, "Selected upload ID: $uploadId")
             fragment.launch(Dispatchers.IO) {
-                fragment.browseHandler?.onGameDownloadStarted(uploadId.toInt())
+                fragment.browseHandler?.setClickedUploadId(uploadId.toInt())
             }
         }
 
         @JavascriptInterface
         fun onHtmlLoaded(html: String, url: String) {
+            Log.d(LOGGING_TAG, url)
             if(fragment.activity !is MainActivity)
                 return
 
@@ -206,7 +216,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     inner class MitchWebViewClient : WebViewClient() {
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
             val uri = request.url
-            Log.d(LOGGING_TAG, uri.toString())
             if (ItchWebsiteUtils.isItchWebPage(uri))
                 return false
             else {
@@ -253,7 +262,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         override fun onPageFinished(view: WebView, url: String) {
             view.evaluateJavascript("""
                     var elements = document.getElementsByClassName("download_btn");
-                    for(var element of elements) {
+                    for(let element of elements) {
                         element.addEventListener("click", (event) => {
                             mitchCustomJS.onDownloadLinkClick(element.getAttribute("data-upload_id"));
                         });

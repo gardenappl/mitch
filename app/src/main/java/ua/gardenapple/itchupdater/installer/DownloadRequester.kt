@@ -17,13 +17,14 @@ import ua.gardenapple.itchupdater.PERMISSION_REQUEST_CODE_DOWNLOAD
 class DownloadRequester {
 
     companion object {
-        lateinit var currentUrl: String
-        lateinit var currentContent: String
-        lateinit var currentMimeType: String
+        private lateinit var currentUrl: String
+        private lateinit var currentContent: String
+        private lateinit var currentMimeType: String
 
         fun requestDownload(context: Context, activity: Activity?, url: String, contentDisposition: String, mimeType: String) {
-            if (context.packageManager.checkPermission(context.packageName, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
+                Log.d(LOGGING_TAG, "Don't have permission")
                 if(activity != null) {
                     currentUrl = url
                     currentContent = contentDisposition
@@ -38,6 +39,7 @@ class DownloadRequester {
                 }
                 return
             } else {
+                Log.d(LOGGING_TAG, "Have permission")
                 doDownload(
                     context.getSystemService(Activity.DOWNLOAD_SERVICE) as DownloadManager,
                     url,
@@ -74,8 +76,8 @@ class DownloadRequester {
                 setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
             }
 
-            //TODO: store id and manage multiple downloads
             val id = downloadManager.enqueue(downloadRequest)
+            InstallerEvents.notifyDownloadStart(id)
         }
     }
 }

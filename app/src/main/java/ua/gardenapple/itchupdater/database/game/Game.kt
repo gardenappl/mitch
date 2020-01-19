@@ -11,12 +11,7 @@ import ua.gardenapple.itchupdater.client.ItchWebsiteParser
  * Should be written to the database on every page visit.
  * All this data should be accessible by parsing the game's store page.
  */
-@Entity(tableName = Game.TABLE_NAME,
-    indices = [
-        Index(value = [
-            Game.STORE_URL
-        ])
-    ])
+@Entity(tableName = Game.TABLE_NAME)
 data class Game(
     @PrimaryKey
     @ColumnInfo(name = GAME_ID)
@@ -50,14 +45,7 @@ data class Game(
      * Set to null for projects where the timestamp is not available.
      */
     @ColumnInfo(name = LAST_UPDATED_TIMESTAMP)
-    val lastDownloadTimestamp: String? = null,
-
-    /**
-     * Set to null for games if we haven't visited the store page yet, and don't have complete info.
-     * Otherwise, set to UNIX time of last store page visit.
-     */
-    @ColumnInfo(name = STORE_LAST_VISITED)
-    val storeLastVisited: Long? = null
+    val lastUpdatedTimestamp: String? = null
 ) {
     companion object {
         const val MITCH_GAME_ID = 544475
@@ -73,6 +61,5 @@ data class Game(
         const val LOCALE = "locale"
         const val THUMBNAIL_URL = "thumbnail_url"
         const val LAST_UPDATED_TIMESTAMP = "last_timestamp"
-        const val STORE_LAST_VISITED = "store_last_visited"
     }
 }

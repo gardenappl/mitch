@@ -36,6 +36,8 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
                 val isApk = downloadMimeType == "application/vnd.android.package-archive" ||
                         downloadLocalUri!!.path!!.endsWith(".apk")
                 createNotification(context, downloadLocalUri, downloadID.toInt(), isApk)
+
+                InstallerEvents.notifyDownloadComplete(downloadID, isApk)
             }
             Log.d(LOGGING_TAG, downloadMimeType)
         }

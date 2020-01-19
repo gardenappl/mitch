@@ -1,11 +1,7 @@
 package ua.gardenapple.itchupdater
 
 import android.util.Log
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.jsoup.Jsoup
@@ -13,17 +9,10 @@ import org.jsoup.nodes.Document
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
-import org.junit.Before
-import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
-import ua.gardenapple.itchupdater.client.UpdateCheckResult
-import ua.gardenapple.itchupdater.client.WebUpdateChecker
-import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
-import ua.gardenapple.itchupdater.database.installation.Installation
-import ua.gardenapple.itchupdater.database.upload.Upload
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -34,19 +23,7 @@ import ua.gardenapple.itchupdater.database.upload.Upload
 class WebParserTests {
     companion object {
         const val LOGGING_TAG: String = "Test"
-
-        private lateinit var updateChecker: WebUpdateChecker
-
-        @BeforeClass @JvmStatic fun setup() {
-            val context = InstrumentationRegistry.getInstrumentation().context
-            val db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
-
-            db.addMitchToDatabase(context)
-
-            updateChecker = WebUpdateChecker(db)
-        }
     }
-
 
     /**
      * This test will only complete successfully if you're logged in to my itch.io account
@@ -58,7 +35,7 @@ class WebParserTests {
             downloadPageUrl = "https://terrycavanagh.itch.io/super-hexagon/download/nGM_T_fa5YQ4cMcMFQ4AnSn__H_1Aj670uwLHMiL",
             storeUrl = "https://terrycavanagh.itch.io/super-hexagon",
             thumbnailUrl = "",
-            lastDownloadTimestamp = null
+            lastUpdatedTimestamp = null
         )
 
         val doc: Document = runBlocking(Dispatchers.IO) {
@@ -85,7 +62,7 @@ class WebParserTests {
             downloadPageUrl = null,
             storeUrl = "https://anuke.itch.io/mindustry",
             thumbnailUrl = "",
-            lastDownloadTimestamp = null
+            lastUpdatedTimestamp = null
         )
 
         val doc: Document = runBlocking(Dispatchers.IO) {
@@ -132,6 +109,7 @@ class WebParserTests {
         assertNotNull(url)
         Log.d(LOGGING_TAG, url!!.url)
         assertEquals(false, url.isPermanent)
+        assertEquals(false, url.isStorePage)
         val doc = Jsoup.connect(url.url).get()
 
 //        Log.d(LOGGING_TAG, "HTML: ")
@@ -154,14 +132,5 @@ class WebParserTests {
     suspend fun getDownloadPage(url: String): ItchWebsiteParser.DownloadUrl? {
         val doc = ItchWebsiteUtils.fetchAndParseDocument(url)
         return ItchWebsiteParser.getDownloadUrlFromStorePage(doc, url, true)
-    }
-
-
-    @Test
-    fun testUpdateCheck_mitch() {
-        val result: UpdateCheckResult = runBlocking(Dispatchers.IO) {
-            updateChecker.checkUpdates(Game.MITCH_GAME_ID)
-        }
-        assertEquals(UpdateCheckResult.UP_TO_DATE, result.code)
     }
 }

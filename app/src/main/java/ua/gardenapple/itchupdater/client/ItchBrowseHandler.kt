@@ -1,24 +1,27 @@
 package ua.gardenapple.itchupdater.client
 
+import android.app.Activity
+import android.app.DownloadManager
 import android.content.Context
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.database.AppDatabase
-import ua.gardenapple.itchupdater.ui.BrowseFragment
+import ua.gardenapple.itchupdater.database.installation.Installation
+import ua.gardenapple.itchupdater.installer.DownloadStartListener
 
-class ItchBrowseHandler(val context: Context) {
+class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope): DownloadStartListener {
 
     companion object {
         const val LOGGING_TAG = "ItchBrowseHandler"
     }
 
-    private lateinit var lastDownloadDoc: Document
-    private var lastDownloadGameId: Int = -1
+    private var lastDownloadDoc: Document? = null
+    private var lastDownloadGameId: Int? = null
+    private var lastDownloadPageUrl: String? = null
+    private var clickedUploadId: Int? = null
+    private var currentDownloadId: Long? = null
 
     suspend fun onPageVisited(doc: Document, url: String) {
         if(ItchWebsiteUtils.isStorePage(doc)) {
@@ -32,7 +35,7 @@ class ItchBrowseHandler(val context: Context) {
 
                         withContext(Dispatchers.IO) {
                             Log.d(LOGGING_TAG, "Adding game $game")
-                            db.gameDao.insert(game)
+                            db.gameDao.upsert(game)
                         }
                     }
                 }
@@ -42,12 +45,69 @@ class ItchBrowseHandler(val context: Context) {
         else if(ItchWebsiteUtils.isDownloadPage(doc)) {
             lastDownloadDoc = doc
             lastDownloadGameId = ItchWebsiteUtils.getGameId(doc)
+            lastDownloadPageUrl = url
+            tryStartDownload()
         }
     }
 
-    suspend fun onGameDownloadStarted(uploadId: Int) {
-        val uploads = ItchWebsiteParser.getAndroidUploads(lastDownloadGameId, lastDownloadDoc)
+    fun setClickedUploadId(uploadId: Int) {
+        clickedUploadId = uploadId
+        tryStartDownload()
+    }
 
-        //TODO: PendingUpload
+    override suspend fun onDownloadStarted(downloadId: Long) {
+        currentDownloadId = downloadId
+        tryStartDownload()
+    }
+
+    private fun tryStartDownload() {
+        Log.d(LOGGING_TAG, "Game ID: $lastDownloadGameId")
+        Log.d(LOGGING_TAG, "Upload ID: $clickedUploadId")
+        Log.d(LOGGING_TAG, "Download ID: $currentDownloadId")
+        Log.d(LOGGING_TAG, "Download page URL: $lastDownloadPageUrl")
+
+        val doc = lastDownloadDoc ?: return
+        val gameId = lastDownloadGameId ?: return
+        val uploadId = clickedUploadId ?: return
+        val downloadId = currentDownloadId ?: return
+        val downloadPageUrl = lastDownloadPageUrl ?: return
+
+        lastDownloadDoc = null
+        lastDownloadGameId = null
+        clickedUploadId = null
+        currentDownloadId = null
+        lastDownloadPageUrl = null
+
+        coroutineScope.launch(Dispatchers.IO) {
+            Log.d(LOGGING_TAG, "Handling download...")
+
+            val db = AppDatabase.getDatabase(context)
+            val downloadManager = context.getSystemService(Activity.DOWNLOAD_SERVICE) as DownloadManager
+
+            var game = db.gameDao.getGameById(gameId)
+            if(game == null) {
+                val storeUrl = ItchWebsiteParser.getStoreUrlFromDownloadPage(downloadPageUrl)
+                Log.d(LOGGING_TAG, "Game is null! Fetching $storeUrl...")
+                val doc = ItchWebsiteUtils.fetchAndParseDocument(storeUrl)
+                game = ItchWebsiteParser.getGameInfo(doc, storeUrl)
+                db.gameDao.upsert(game)
+            }
+
+            val uploads = ItchWebsiteParser.getAndroidUploads(gameId, doc, setPending = true)
+            var installation = db.installDao.findPendingInstallation(gameId)
+            if(installation != null) {
+                installation.downloadId?.let { downloadManager.remove(it) }
+                db.installDao.delete(installation.internalId)
+            }
+            installation = Installation(
+                uploadId = uploadId,
+                gameId = gameId,
+                downloadId = downloadId,
+                isPending = true
+            )
+            db.uploadDao.clearPendingUploadsForGame(gameId)
+            db.uploadDao.insert(uploads)
+            db.installDao.insert(installation)
+        }
     }
 }

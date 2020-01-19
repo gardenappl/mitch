@@ -44,10 +44,10 @@ abstract class AppDatabase : RoomDatabase() {
 
 
         private fun buildDatabase(context: Context): AppDatabase =
-            Room.databaseBuilder(
-                context.applicationContext,
-                AppDatabase::class.java, "app_database"
-            )
+                Room.databaseBuilder(
+                    context.applicationContext,
+                    AppDatabase::class.java, "app_database"
+                )
                 .addCallback(object : Callback() {
 
                     override fun onOpen(db: SupportSQLiteDatabase) {
@@ -59,7 +59,7 @@ abstract class AppDatabase : RoomDatabase() {
                                 appDb.addMitchToDatabase(context)
                             } else {
                                 Log.d(LOGGING_TAG, "Deleting info on Mitch")
-                                appDb.uploadDao.clearUploadsForGame(Game.MITCH_GAME_ID)
+                                appDb.uploadDao.clearAllUploadsForGame(Game.MITCH_GAME_ID)
                             }
 
                             val mitchInstall = appDb.installDao.findInstallation(Game.MITCH_GAME_ID)
@@ -67,43 +67,40 @@ abstract class AppDatabase : RoomDatabase() {
                         }
                     }
                 })
+//                .addMigrations(Migrations.Migration_1_2)
                 .build()
 
     }
 
 
     fun addMitchToDatabase(context: Context) {
-        val locale = Game.MITCH_LOCALE
         val game = Game(
             gameId = Game.MITCH_GAME_ID,
             name = "Mitch",
             author = "gardenapple",
             storeUrl = "https://gardenapple.itch.io/mitch",
             thumbnailUrl = "",  //TODO: thumbnail URL
-            locale = locale
+            locale = Game.MITCH_LOCALE
         )
         Log.d(LOGGING_TAG, "Adding game $game")
-        gameDao.insert(game)
+        gameDao.upsert(game)
 
         val upload = Upload(
-            uploadId = null,
+            uploadId = Upload.MITCH_UPLOAD_ID,
             gameId = Game.MITCH_GAME_ID,
-            uploadNum = 0,
             version = BuildConfig.VERSION_NAME,
-            locale = locale,
+            locale = Game.MITCH_LOCALE,
             name = Upload.MITCH_RELEASE_NAME,
             fileSize = Upload.MITCH_FILE_SIZE
         )
-        uploadDao.clearUploadsForGame(Game.MITCH_GAME_ID)
+        uploadDao.clearAllUploadsForGame(Game.MITCH_GAME_ID)
         Log.d(LOGGING_TAG, "Adding upload $upload")
         uploadDao.insert(upload)
 
         val installation = Installation(
             gameId = Game.MITCH_GAME_ID,
-            uploadIdInternal = Installation.MITCH_UPLOAD_ID,
-            packageName = context.packageName,
-            downloadFinished = true,
-            locale = locale
+            uploadId = Upload.MITCH_UPLOAD_ID,
+            packageName = context.packageName
         )
         Log.d(LOGGING_TAG, "Adding install $installation")
         installDao.insert(installation)

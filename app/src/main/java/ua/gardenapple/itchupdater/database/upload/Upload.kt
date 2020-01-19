@@ -6,7 +6,12 @@ import ua.gardenapple.itchupdater.database.game.Game
 
 /**
  * Represents info about available uploads for any given Game, at the time of installation.
- * Should be written to the database after downloading a file. The Upload data will then be compared with the server to check for updates.
+ * The Upload data will then be compared with the server to check for updates.
+ *
+ * Can also represent a "pending" upload.
+ * When a user clicks the download button, the data from the page is saved as "pending" uploads.
+ * These may be stored alongside old uploads.
+ * Then, once the download/installation is complete, pending uploads become regular uploads.
  */
 @Entity(tableName = Upload.TABLE_NAME,
     foreignKeys = [
@@ -18,25 +23,23 @@ import ua.gardenapple.itchupdater.database.game.Game
         )
     ],
     indices = [
-        Index(value = [Upload.UPLOAD_ID]),
+        Index(value = [Upload.UPLOAD_ID], unique = true),
         Index(value = [Upload.GAME_ID])
     ])
 data class Upload(
-    /**
-     * Since we don't always have an uploadId, and we need to have a primary key, we use this workaround.
-     * If there's an uploadId, we use that as the primary key (and it's always >0)
-     * If there's no uploadId, we set internalId to a big integer, derived from the gameId and uploadNum.
-     */
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = INTERNAL_ID)
-    val internalId: Long,
+    var internalId: Int = 0,
 
     /**
      * Nullable because the upload ID is not always visible when browsing.
-     * (however, it will always be non-null for installed games)
+     * Will always be non-null for installed games (with the exception of Mitch).
      */
     @ColumnInfo(name = UPLOAD_ID)
     val uploadId: Int?,
+
+    @ColumnInfo(name = IS_PENDING)
+    var isPending: Boolean = false,
 
     @ColumnInfo(name = GAME_ID)
     val gameId: Int,
@@ -65,36 +68,21 @@ data class Upload(
     @ColumnInfo(name = TIMESTAMP)
     val uploadTimestamp: String? = null
 ) {
-
-    constructor(
-        uploadId: Int?,
-        gameId: Int,
-        uploadNum: Int,
-        locale: String,
-        version: String?,
-        name: String,
-        fileSize: String,
-        uploadTimestamp: String? = null
-    )
-            : this(calculateInternalId(uploadId, gameId, uploadNum), uploadId, gameId, locale,
-                   version, name, fileSize, uploadTimestamp)
-
     companion object {
         const val TABLE_NAME = "uploads"
+
         const val MITCH_RELEASE_NAME = "[Mitch release name]"
         const val MITCH_FILE_SIZE = "[Mitch file size]"
+        const val MITCH_UPLOAD_ID = 1_000_000_000
 
-        const val INTERNAL_ID = "internalId"
+        const val INTERNAL_ID = "internal_id"
         const val UPLOAD_ID = "upload_id"
+        const val IS_PENDING = "is_pending"
         const val NAME = "name"
         const val GAME_ID = "game_id"
         const val VERSION = "version"
         const val FILE_SIZE = "file_size"
         const val TIMESTAMP = "timestamp"
         const val LOCALE = "locale"
-
-        fun calculateInternalId(uploadId: Int?, gameId: Int, uploadNum: Int): Long {
-            return uploadId?.toLong() ?: (gameId * 1_000_000_000L + uploadNum)
-        }
     }
 }

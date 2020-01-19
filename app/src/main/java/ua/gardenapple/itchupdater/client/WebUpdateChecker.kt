@@ -17,11 +17,14 @@ class WebUpdateChecker(val db: AppDatabase) {
         withContext(Dispatchers.IO) {
 
             var game = db.gameDao.getGameById(gameId)
-            Log.d(LOGGING_TAG, "Checking updates for ${game.name}")
+            if (game == null)
+                throw IllegalStateException("Checking update for game ID $gameId with no Game info available")
 
             val currentInstall = db.installDao.findInstallation(gameId)
-            if (currentInstall == null || !currentInstall.downloadFinished)
+            if (currentInstall == null || currentInstall.isPending)
                 throw IllegalStateException("Checking update for game ${game.name} (ID $gameId) which is not installed")
+
+            Log.d(LOGGING_TAG, "Checking updates for ${game.name}")
 
             Log.d(LOGGING_TAG, "Current install: $currentInstall")
 
@@ -86,8 +89,9 @@ class WebUpdateChecker(val db: AppDatabase) {
         currentInstall: Installation,
         gameId: Int
     ): UpdateCheckResult {
-        Log.d(LOGGING_TAG, "Looking for local upload info ${currentInstall.uploadIdInternal}")
-        val installedUpload = db.uploadDao.getUploadByInternalId(currentInstall.uploadIdInternal)
+
+        Log.d(LOGGING_TAG, "Looking for local upload info ${currentInstall.uploadId}")
+        val installedUpload = db.uploadDao.getUploadById(currentInstall.uploadId)!!
         Log.d(LOGGING_TAG, "Found $installedUpload")
         var suggestedUpload: Upload? = null
 
@@ -111,9 +115,23 @@ class WebUpdateChecker(val db: AppDatabase) {
         if(fetchedUploads[0].uploadId != null && currentInstall.gameId != Game.MITCH_GAME_ID) {
             Log.d(LOGGING_TAG, "Checking upload IDs...")
             for (upload in fetchedUploads) {
-                if (upload.internalId == currentInstall.uploadIdInternal) {
+                if (upload.internalId == currentInstall.uploadId) {
                     Log.d(LOGGING_TAG, "Found same upload ID")
                     allVersionsDifferent = false
+
+                    if(upload.locale == installedUpload.locale && upload.version != installedUpload.version) {
+                        Log.d(LOGGING_TAG, "Version tag changed")
+                        return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId)
+                    }
+                    if(upload.fileSize != installedUpload.fileSize) {
+                        Log.d(LOGGING_TAG, "File size changed")
+                        return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId)
+                    }
+                    if(upload.locale == installedUpload.locale && upload.uploadTimestamp != installedUpload.uploadTimestamp) {
+                        Log.d(LOGGING_TAG, "Timestamp changed")
+                        return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId)
+                    }
+
                     Log.d(LOGGING_TAG, "Suggested upload: $suggestedUpload")
                     suggestedUpload = upload
                     break
@@ -121,10 +139,7 @@ class WebUpdateChecker(val db: AppDatabase) {
             }
             if (allVersionsDifferent) {
                 Log.d(LOGGING_TAG, "All upload IDs are different")
-                return UpdateCheckResult(
-                    UpdateCheckResult.UPDATE_NEEDED,
-                    suggestedUpload?.uploadId
-                )
+                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId)
             }
         }
 
@@ -158,7 +173,7 @@ class WebUpdateChecker(val db: AppDatabase) {
             }
         }
 
-        if (installedUpload.uploadTimestamp != null && fetchedUploads[0].locale == installedUpload.locale) {
+        if (fetchedUploads[0].uploadTimestamp != null && fetchedUploads[0].locale == installedUpload.locale) {
             Log.d(LOGGING_TAG, "Checking timestamps...")
             allVersionsDifferent = true
             for (upload in fetchedUploads) {

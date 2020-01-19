@@ -1,23 +1,24 @@
 package ua.gardenapple.itchupdater.ui
 
+import android.app.DownloadManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
-import ua.gardenapple.itchupdater.BuildConfig
-import ua.gardenapple.itchupdater.ItchWebsiteUtils
-import ua.gardenapple.itchupdater.LOGGING_TAG
-import ua.gardenapple.itchupdater.R
+import ua.gardenapple.itchupdater.*
+import ua.gardenapple.itchupdater.installer.*
 
 
-
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
     private var browseFragment: BrowseFragment = BrowseFragment()
     private var libraryFragment: LibraryFragment = LibraryFragment()
     private var settingsFragment: SettingsFragment = SettingsFragment()
@@ -36,6 +37,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
+
+        InstallerEvents.setup()
+        val installerDatabaseHandler = InstallerDatabaseHandler(applicationContext)
+        InstallerEvents.addListener(installerDatabaseHandler as DownloadCompleteListener)
+        InstallerEvents.addListener(installerDatabaseHandler as InstallCompleteListener)
+
 
         Log.d(LOGGING_TAG, "Stored active fragment tag: ${savedInstanceState?.getString(
             SELECTED_FRAGMENT_KEY)}")
@@ -170,6 +177,17 @@ class MainActivity : AppCompatActivity() {
             LIBRARY_FRAGMENT_TAG -> return libraryFragment
             SETTINGS_FRAGMENT_TAG -> return settingsFragment
             else -> return null
+        }
+    }
+
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSION_REQUEST_CODE_DOWNLOAD -> {
+                if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    DownloadRequester.resumeDownload(getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager)
+                }
+            }
         }
     }
 }
