@@ -23,7 +23,7 @@ import ua.gardenapple.itchupdater.database.game.Game
         )
     ],
     indices = [
-        Index(value = [Upload.UPLOAD_ID], unique = true),
+        Index(value = [Upload.UPLOAD_ID]),
         Index(value = [Upload.GAME_ID])
     ])
 data class Upload(

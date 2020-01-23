@@ -1,7 +1,6 @@
 package ua.gardenapple.itchupdater.database.installation
 
 import androidx.room.*
-import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.upload.Upload
 
@@ -16,12 +15,6 @@ import ua.gardenapple.itchupdater.database.upload.Upload
  */
 @Entity(tableName = Installation.TABLE_NAME,
     foreignKeys = [
-        ForeignKey(
-            entity = Upload::class,
-            parentColumns = [Upload.UPLOAD_ID],
-            childColumns = [Installation.UPLOAD_ID],
-            onDelete = ForeignKey.CASCADE
-        ),
         ForeignKey(
             entity = Game::class,
             parentColumns = [Game.GAME_ID],
@@ -54,11 +47,16 @@ data class Installation(
     @ColumnInfo(name = PACKAGE_NAME)
     val packageName: String? = null,
 
-    @ColumnInfo(name = IS_PENDING)
-    var isPending: Boolean = false,
+    @ColumnInfo(name = STATUS)
+    var status: Int = STATUS_INSTALLED,
 
-    @ColumnInfo(name = DOWNLOAD_ID)
-    var downloadId: Long? = null
+    /**
+     * null if [STATUS_INSTALLED]
+     * downloadId if [STATUS_DOWNLOADING]
+     * installId if [STATUS_INSTALLING]
+     */
+    @ColumnInfo(name = DOWNLOAD_OR_INSTALL_ID)
+    var downloadOrInstallId: Long? = null
 ) {
     companion object {
         const val TABLE_NAME = "installations"
@@ -67,7 +65,11 @@ data class Installation(
         const val GAME_ID = "game_id"
         const val UPLOAD_ID = "upload_id"
         const val PACKAGE_NAME = "package_name"
-        const val DOWNLOAD_ID = "download_id"
-        const val IS_PENDING = "is_pending"
+        const val DOWNLOAD_OR_INSTALL_ID = "download_id"
+        const val STATUS = "is_pending"
+
+        const val STATUS_INSTALLED = 0
+        const val STATUS_DOWNLOADING = 1
+        const val STATUS_INSTALLING = 2
     }
 }

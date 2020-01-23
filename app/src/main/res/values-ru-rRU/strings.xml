@@ -2,7 +2,7 @@
 <resources>
     <string name="notification_channel_updates">Обновления приложений</string>
     <string name="notification_channel_install">Установка приложений</string>
-    <string name="notification_install_title">Готово к установке</string>
+    <string name="notification_install_title">Нажмите, чтобы установить</string>
     <string name="notification_download_complete_title">Загрузка завершена</string>
     <string name="notification_channel_install_desc">Уведомлять, когда приложение из itch.io готово к установке</string>
     <string name="notification_channel_updates_desc">Уведомлять, когда для приложения из itch.io доступно обновление
@@ -15,4 +15,8 @@
     <string name="settings_category_browse">Браузер</string>
     <string name="settings_category_updater">Установка и обновления</string>
     <string name="settings_update_check_mode">Режим проверки обновлений</string>
+    <string name="notification_channel_installing">Процесс установки приложений</string>
+    <string name="notification_channel_installing_desc">Показывать сведения о процессе установки приложения.</string>
+    <string name="notification_installing">Приложение устанавливается</string>
+    <string name="notification_install_complete_title">Установка завершена</string>
 </resources>

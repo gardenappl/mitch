@@ -21,7 +21,7 @@ class WebUpdateChecker(val db: AppDatabase) {
                 throw IllegalStateException("Checking update for game ID $gameId with no Game info available")
 
             val currentInstall = db.installDao.findInstallation(gameId)
-            if (currentInstall == null || currentInstall.isPending)
+            if (currentInstall == null || currentInstall.status != Installation.STATUS_INSTALLED)
                 throw IllegalStateException("Checking update for game ${game.name} (ID $gameId) which is not installed")
 
             Log.d(LOGGING_TAG, "Checking updates for ${game.name}")

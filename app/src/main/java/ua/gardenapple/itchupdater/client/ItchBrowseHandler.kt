@@ -96,14 +96,14 @@ class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope
             val uploads = ItchWebsiteParser.getAndroidUploads(gameId, doc, setPending = true)
             var installation = db.installDao.findPendingInstallation(gameId)
             if(installation != null) {
-                installation.downloadId?.let { downloadManager.remove(it) }
+                installation.downloadOrInstallId?.let { downloadManager.remove(it) }
                 db.installDao.delete(installation.internalId)
             }
             installation = Installation(
                 uploadId = uploadId,
                 gameId = gameId,
-                downloadId = downloadId,
-                isPending = true
+                downloadOrInstallId = downloadId,
+                status = Installation.STATUS_DOWNLOADING
             )
             db.uploadDao.clearPendingUploadsForGame(gameId)
             db.uploadDao.insert(uploads)

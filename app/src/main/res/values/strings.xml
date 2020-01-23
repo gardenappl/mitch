@@ -4,7 +4,7 @@
     <string name="notification_channel_install">App install</string>
     <string name="notification_channel_install_desc">Notify when an itch.io app is ready for installation.</string>
     <string name="notification_channel_updates_desc">Notify when an itch.io app receives an update.</string>
-    <string name="notification_install_title">Ready to install</string>
+    <string name="notification_install_title">Click to install</string>
     <string name="notification_download_complete_title">Download complete</string>
     <string name="nav_website_view">Browse</string>
     <string name="nav_installed">My Library</string>
@@ -14,4 +14,8 @@
     <string name="settings_category_browse">Browsing</string>
     <string name="settings_category_updater">Installation and Updates</string>
     <string name="settings_update_check_mode">Update check mode</string>
+    <string name="notification_channel_installing">Installation process</string>
+    <string name="notification_channel_installing_desc">Show the current status of apps during installation.</string>
+    <string name="notification_installing">Installing app</string>
+    <string name="notification_install_complete_title">App installed</string>
 </resources>

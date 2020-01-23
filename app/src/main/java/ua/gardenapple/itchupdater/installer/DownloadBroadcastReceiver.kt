@@ -10,10 +10,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
 import android.util.Log
-import ua.gardenapple.itchupdater.LOGGING_TAG
-import ua.gardenapple.itchupdater.NOTIFICATION_CHANNEL_ID_UPDATES
-import ua.gardenapple.itchupdater.NOTIFICATION_ID_DOWNLOAD
-import ua.gardenapple.itchupdater.R
+import ua.gardenapple.itchupdater.*
 import java.io.File
 
 
@@ -35,31 +32,34 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
             if (downloadStatus == DownloadManager.STATUS_SUCCESSFUL) {
                 val isApk = downloadMimeType == "application/vnd.android.package-archive" ||
                         downloadLocalUri!!.path!!.endsWith(".apk")
-                createNotification(context, downloadLocalUri, downloadID.toInt(), isApk)
+                createNotification(context, downloadLocalUri, downloadID, isApk)
 
-                InstallerEvents.notifyDownloadComplete(downloadID, isApk)
+                if(!isApk)
+                    InstallerEvents.notifyDownloadComplete(downloadID, null)
             }
             Log.d(LOGGING_TAG, downloadMimeType)
         }
         cursor.close()
     }
 
-    private fun createNotification(context: Context, downloadLocalUri: Uri, id: Int, isApk: Boolean) {
-        val intent: Intent
+
+    private fun createNotification(context: Context, downloadLocalUri: Uri, id: Long, isApk: Boolean) {
+        val pendingIntent: PendingIntent
         if(isApk) {
             val downloadPath = downloadLocalUri.path
             Log.d(LOGGING_TAG, downloadPath)
 
-            val providerUri = FileProvider.getUriForFile(context,
-                "ua.gardenapple.itchupdater.fileprovider", File(downloadPath))
-            Log.d(LOGGING_TAG, providerUri.toString())
+//            val providerUri = FileProvider.getUriForFile(context,
+//                "ua.gardenapple.itchupdater.fileprovider", File(downloadPath))
+//            Log.d(LOGGING_TAG, providerUri.toString())
 
-            //TODO: ACTION_INSTALL_PACKAGE intent is deprecated
-            intent = Intent(Intent.ACTION_INSTALL_PACKAGE).apply {
-                setData(providerUri)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
+            val intent = Intent(context, InstallBroadcastReceiver::class.java).apply {
+                data = Uri.parse(downloadPath)
+                putExtra(InstallBroadcastReceiver.EXTRA_DOWNLOAD_ID, id)
+
             }
+            pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
         } else {
 //            var uri = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toURI()
 //            val dirUri = FileProvider.getUriForFile(context, "ua.gardenapple.itchupdater.fileprovider",
@@ -74,13 +74,13 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
 //            //if there's no file manager installed
 //            if(intent.resolveActivityInfo(context.packageManager, 0) == null) {
 //                Log.d(LOGGING_TAG, "no file manager?")
-                intent = Intent(DownloadManager.ACTION_VIEW_DOWNLOADS)
+            val intent = Intent(DownloadManager.ACTION_VIEW_DOWNLOADS)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
 //            }
         }
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
 
-        val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_UPDATES).apply {
+        val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALL).apply {
             setSmallIcon(R.drawable.ic_file_download_black_24dp)
             if(isApk)
                 setContentTitle(context.resources.getString(R.string.notification_install_title))
@@ -93,7 +93,7 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
         }
 
         with(NotificationManagerCompat.from(context)) {
-            notify(NOTIFICATION_ID_DOWNLOAD + id, builder.build())
+            notify(NOTIFICATION_ID_DOWNLOAD + id.toInt(), builder.build())
         }
     }
 }

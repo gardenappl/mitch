@@ -1,20 +1,20 @@
 package ua.gardenapple.itchupdater.installer
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import ua.gardenapple.itchupdater.database.game.Game
 
 interface DownloadStartListener {
     suspend fun onDownloadStarted(downloadId: Long)
 }
 
 interface DownloadCompleteListener {
-    suspend fun onDownloadComplete(downloadId: Long, installPending: Boolean)
+    suspend fun onDownloadComplete(downloadId: Long, pendingInstallId: Int?)
 }
 
 interface InstallCompleteListener {
-    suspend fun onInstallComplete(apkName: String)
+    suspend fun onInstallComplete(installSessionId: Int, apkName: String, game: Game, status: Int)
 }
 
 class InstallerEvents {
@@ -23,18 +23,20 @@ class InstallerEvents {
         private val downloadCompleteListeners = ArrayList<DownloadCompleteListener>()
         private val downloadStartListeners = ArrayList<DownloadStartListener>()
 
-        fun notifyInstallComplete(apkName: String) {
-            for (listener in installCompleteListeners) {
-                GlobalScope.launch {
-                    listener.onInstallComplete(apkName)
+        suspend fun notifyApkInstallComplete(installSessionId: Int, apkName: String, game: Game, status: Int) {
+            coroutineScope {
+                for (listener in installCompleteListeners) {
+                    launch {
+                        listener.onInstallComplete(installSessionId, apkName, game, status)
+                    }
                 }
             }
         }
 
-        fun notifyDownloadComplete(downloadId: Long, installPending: Boolean) {
+        fun notifyDownloadComplete(downloadId: Long, pendingInstallSessionId: Int?) {
             for(listener in downloadCompleteListeners) {
                 GlobalScope.launch {
-                    listener.onDownloadComplete(downloadId, installPending)
+                    listener.onDownloadComplete(downloadId, pendingInstallSessionId)
                 }
             }
         }
