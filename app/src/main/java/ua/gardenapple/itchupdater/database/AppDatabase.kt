@@ -102,6 +102,7 @@ abstract class AppDatabase : RoomDatabase() {
         Log.d(LOGGING_TAG, "Adding upload $upload")
         uploadDao.insert(upload)
 
+        installDao.clearAllInstallationsForGame(Game.MITCH_GAME_ID)
         val installation = Installation(
             gameId = Game.MITCH_GAME_ID,
             uploadId = Upload.MITCH_UPLOAD_ID,

@@ -22,17 +22,17 @@ class UninstallBroadcastReceiver : BroadcastReceiver() {
         Log.d(LOGGING_TAG, "My data: ${intent.data!!.schemeSpecificPart}")
         runBlocking(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
-            var installs = db.installDao.getAllInstallationsSync()
-            for(install in installs) {
-                Log.d(LOGGING_TAG, install.toString())
-            }
+//            var installs = db.installDao.getAllInstallationsSync()
+//            for(install in installs) {
+//                Log.d(LOGGING_TAG, install.toString())
+//            }
 
             db.installDao.deleteFinishedInstallation(intent.data!!.schemeSpecificPart)
 
-            installs = db.installDao.getAllInstallationsSync()
-            for(install in installs) {
-                Log.d(LOGGING_TAG, install.toString())
-            }
+//            installs = db.installDao.getAllInstallationsSync()
+//            for(install in installs) {
+//                Log.d(LOGGING_TAG, install.toString())
+//            }
         }
     }
 }
