@@ -1,5 +1,9 @@
 package ua.gardenapple.itchupdater
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -47,6 +51,25 @@ class Utils {
 
         fun Int.hasFlag(flag: Int): Boolean {
             return this and flag == flag
+        }
+
+        //https://stackoverflow.com/a/10600736/5701177
+        fun drawableToBitmap(drawable: Drawable): Bitmap {
+            if(drawable is BitmapDrawable && drawable.bitmap != null)
+                return drawable.bitmap
+
+            val bitmap: Bitmap
+            if(drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) {
+                // Single color bitmap will be created of 1x1 pixel
+                bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+            } else {
+                bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888);
+            }
+
+            val canvas = Canvas(bitmap);
+            drawable.setBounds(0, 0, canvas.width, canvas.height);
+            drawable.draw(canvas);
+            return bitmap;
         }
     }
 }

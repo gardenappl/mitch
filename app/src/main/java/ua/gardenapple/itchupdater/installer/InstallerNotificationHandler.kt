@@ -3,11 +3,14 @@ package ua.gardenapple.itchupdater.installer
 import android.app.PendingIntent
 import android.content.Context
 import android.content.pm.PackageInstaller
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import ua.gardenapple.itchupdater.NOTIFICATION_CHANNEL_ID_INSTALLING
 import ua.gardenapple.itchupdater.NOTIFICATION_ID_INSTALLING
 import ua.gardenapple.itchupdater.R
+import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.game.Game
 
 class InstallerNotificationHandler(val context: Context) : InstallCompleteListener {
@@ -37,6 +40,9 @@ class InstallerNotificationHandler(val context: Context) : InstallCompleteListen
                     val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
                     val pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, 0)
                     setContentIntent(pendingIntent)
+
+                    val icon = context.packageManager.getApplicationIcon(packageName)
+                    setLargeIcon(Utils.drawableToBitmap(icon))
                 }
             }
 
