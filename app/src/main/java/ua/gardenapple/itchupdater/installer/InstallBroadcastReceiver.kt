@@ -7,6 +7,9 @@ import android.util.Log
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.MitchApp
 
+/**
+ * This is an internal receiver which only receives broadcasts when clicking the "Click to install" notification.
+ */
 class InstallBroadcastReceiver : BroadcastReceiver() {
     companion object {
         const val LOGGING_TAG = "InstallReceiver"

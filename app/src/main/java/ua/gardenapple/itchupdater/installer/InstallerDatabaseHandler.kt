@@ -13,7 +13,7 @@ class InstallerDatabaseHandler(val context: Context) : InstallCompleteListener, 
         const val LOGGING_TAG = "InstallDatabaseHandler"
     }
 
-    override suspend fun onInstallComplete(installSessionId: Int, apkName: String, game: Game, status: Int) {
+    override suspend fun onInstallComplete(installSessionId: Int, packageName: String, game: Game, status: Int) {
         val db = AppDatabase.getDatabase(context)
 
         when(status) {
@@ -31,9 +31,12 @@ class InstallerDatabaseHandler(val context: Context) : InstallCompleteListener, 
             }
             PackageInstaller.STATUS_SUCCESS ->
             {
-                val install = db.installDao.findPendingInstallationBySessionId(installSessionId)!!
-                install.status = Installation.STATUS_INSTALLED
-                install.downloadOrInstallId = null
+                val install = db.installDao.findPendingInstallationBySessionId(installSessionId)!!.copy(
+                    status = Installation.STATUS_INSTALLED,
+                    downloadOrInstallId = null,
+                    packageName = packageName
+                )
+                Log.d(LOGGING_TAG, "New install: $install")
                 db.installDao.update(install)
             }
         }

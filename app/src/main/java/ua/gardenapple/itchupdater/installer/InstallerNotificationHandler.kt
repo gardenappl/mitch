@@ -1,23 +1,19 @@
 package ua.gardenapple.itchupdater.installer
 
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.pm.PackageInstaller
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.NOTIFICATION_CHANNEL_ID_INSTALLING
 import ua.gardenapple.itchupdater.NOTIFICATION_ID_INSTALLING
 import ua.gardenapple.itchupdater.R
-import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 
 class InstallerNotificationHandler(val context: Context) : InstallCompleteListener {
     override suspend fun onInstallComplete(
         installSessionId: Int,
-        apkName: String,
+        packageName: String,
         game: Game,
         status: Int
     ) {
@@ -38,7 +34,7 @@ class InstallerNotificationHandler(val context: Context) : InstallCompleteListen
                 setContentText(message)
                 priority = NotificationCompat.PRIORITY_HIGH
                 if(status == PackageInstaller.STATUS_SUCCESS) {
-                    val launchIntent = context.packageManager.getLaunchIntentForPackage(apkName)
+                    val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
                     val pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, 0)
                     setContentIntent(pendingIntent)
                 }

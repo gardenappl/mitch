@@ -64,6 +64,11 @@ abstract class AppDatabase : RoomDatabase() {
 
                             val mitchInstall = appDb.installDao.findInstallation(Game.MITCH_GAME_ID)
                             Log.d(LOGGING_TAG, "Mitch installation: $mitchInstall")
+
+                            Log.d(LOGGING_TAG, "Known installs:")
+                            val installs = appDb.installDao.getAllInstallationsSync()
+                            for(install in installs)
+                                Log.d(LOGGING_TAG, "$install")
                         }
                     }
                 })

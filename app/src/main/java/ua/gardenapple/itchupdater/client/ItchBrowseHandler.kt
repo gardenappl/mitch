@@ -46,7 +46,7 @@ class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope
                 job1.await()
             }
         }
-        else if(ItchWebsiteUtils.isDownloadPage(doc)) {
+        if(ItchWebsiteUtils.hasGameDownloadLinks(doc)) {
             lastDownloadDoc = doc
             lastDownloadGameId = ItchWebsiteUtils.getGameId(doc)
             lastDownloadPageUrl = url

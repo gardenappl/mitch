@@ -50,6 +50,14 @@
         <receiver
                 android:name=".installer.InstallBroadcastReceiver"
                 android:exported="false" />
+        <receiver
+                android:name=".installer.UninstallBroadcastReceiver"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
         <service android:name=".installer.InstallerService" />
         <provider
                 android:name="androidx.core.content.FileProvider"

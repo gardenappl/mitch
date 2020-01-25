@@ -5,6 +5,7 @@ import androidx.room.*
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.DOWNLOAD_OR_INSTALL_ID
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.GAME_ID
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.INTERNAL_ID
+import ua.gardenapple.itchupdater.database.installation.Installation.Companion.PACKAGE_NAME
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS_DOWNLOADING
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS_INSTALLED
@@ -16,8 +17,12 @@ interface InstallationDao {
     @Query("SELECT * FROM $TABLE_NAME")
     fun getAllKnownInstallations(): LiveData<List<Installation>>
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $STATUS = 0")
+    @Query("SELECT * FROM $TABLE_NAME WHERE $STATUS = $STATUS_INSTALLED")
     fun getAllFinishedInstallations(): LiveData<List<Installation>>
+
+    //for debug purposes
+    @Query("SELECT * FROM $TABLE_NAME")
+    fun getAllInstallationsSync(): List<Installation>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(vararg installations: Installation)
@@ -39,6 +44,9 @@ interface InstallationDao {
 
     @Delete
     fun delete(installation: Installation)
+
+    @Query("DELETE FROM $TABLE_NAME WHERE $PACKAGE_NAME = :packageName AND $STATUS = $STATUS_INSTALLED")
+    fun deleteFinishedInstallation(packageName: String)
 
     @Query("DELETE FROM $TABLE_NAME WHERE $GAME_ID = :gameId")
     fun clearAllInstallationsForGame(gameId: Int)

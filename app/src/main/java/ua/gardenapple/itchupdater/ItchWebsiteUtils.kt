@@ -32,6 +32,10 @@ class ItchWebsiteUtils {
             return htmlDoc.body().attr("data-page_name") == "game_purchase"
         }
 
+        fun hasGameDownloadLinks(htmlDoc: Document): Boolean {
+            return htmlDoc.body().getElementsByClass("download_btn").isNotEmpty()
+        }
+
         /**
          * @return true if the screen is small enough where itch.io starts introducing the bottom navbar
          */
