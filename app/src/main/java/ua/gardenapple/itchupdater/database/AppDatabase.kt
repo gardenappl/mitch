@@ -18,7 +18,7 @@ import ua.gardenapple.itchupdater.ioThread
 
 @Database(
     entities = [Game::class, Upload::class, Installation::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -67,7 +67,7 @@ abstract class AppDatabase : RoomDatabase() {
                         }
                     }
                 })
-//                .addMigrations(Migrations.Migration_1_2)
+                .addMigrations(Migrations.Migration_1_2)
                 .build()
 
     }

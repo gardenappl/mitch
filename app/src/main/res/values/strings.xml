@@ -18,4 +18,11 @@
     <string name="notification_channel_installing_desc">Show the current status of apps during installation.</string>
     <string name="notification_installing">Installing app</string>
     <string name="notification_install_complete_title">App installed</string>
+    <string name="notification_install_cancelled_title">Installation cancelled</string>
+    <string name="notification_install_unknown_title">Unknown error</string>
+    <string name="notification_install_blocked_title">Installation blocked</string>
+    <string name="notification_install_conflict_title">App conflicts with another package</string>
+    <string name="notification_install_incompatible_title">App is incompatible with your device</string>
+    <string name="notification_install_invalid_title">Invalid file</string>
+    <string name="notification_install_storage_title">Installation failed: storage issues</string>
 </resources>

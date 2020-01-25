@@ -44,5 +44,9 @@ class Utils {
                 output.write(buffer, 0, n)
             }
         }
+
+        fun Int.hasFlag(flag: Int): Boolean {
+            return this and flag == flag
+        }
     }
 }

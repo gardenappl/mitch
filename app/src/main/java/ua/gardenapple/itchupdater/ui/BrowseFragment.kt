@@ -261,10 +261,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         override fun onPageFinished(view: WebView, url: String) {
             view.evaluateJavascript("""
-                    var elements = document.getElementsByClassName("download_btn");
-                    for(let element of elements) {
-                        element.addEventListener("click", (event) => {
-                            mitchCustomJS.onDownloadLinkClick(element.getAttribute("data-upload_id"));
+                    let mitchCustomJS_elements = document.getElementsByClassName("download_btn");
+                    for (var mitchCustomJS_element of mitchCustomJS_elements) {
+                        let mitchCustomJS_uploadId = mitchCustomJS_element.getAttribute("data-upload_id");
+                        mitchCustomJS_element.addEventListener("click", (event) => {
+                            mitchCustomJS.onDownloadLinkClick(mitchCustomJS_uploadId);
                         });
                     }
                 """, null

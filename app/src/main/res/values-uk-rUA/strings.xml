@@ -18,4 +18,11 @@
     <string name="notification_channel_installing_desc">Показувати інформацію про процес встановлення додатків.</string>
     <string name="notification_installing">Додаток встановлюється</string>
     <string name="notification_install_complete_title">Додаток встановлено</string>
+    <string name="notification_install_cancelled_title">Зупинили встановлення</string>
+    <string name="notification_install_unknown_title">Невідома помилка</string>
+    <string name="notification_install_blocked_title">Встановлення заблоковано</string>
+    <string name="notification_install_conflict_title">Конфлікт з іншим пакунком</string>
+    <string name="notification_install_incompatible_title">Додаток несумісний з вашим пристроєм</string>
+    <string name="notification_install_invalid_title">Недопустимий файл</string>
+    <string name="notification_install_storage_title">Не вдалося встановити: недостатньо місця</string>
 </resources>

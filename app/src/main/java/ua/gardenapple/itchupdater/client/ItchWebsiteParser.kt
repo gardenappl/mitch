@@ -12,7 +12,6 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.MitchApp
-import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.upload.Upload
 import java.io.IOException
@@ -57,15 +56,32 @@ class ItchWebsiteParser {
             )
         }
 
-        fun getAndroidUploads(gameId: Int, doc: Document, setPending: Boolean = false): ArrayList<Upload> {
+        fun getUploads(gameId: Int, doc: Document, setPending: Boolean = false): ArrayList<Upload> {
             val uploadsList = ArrayList<Upload>()
 
-            val icons = doc.getElementsByClass("icon-android")
-            if (icons.isNotEmpty()) {
-                var iconNum: Int = 0
+            val uploads = doc.getElementsByClass("upload")
+            if (uploads.isNotEmpty()) {
+                Log.d(LOGGING_TAG, "Found uploads: ${uploads.size}")
+                var uploadNum: Int = 0
 
-                for (icon in icons) {
-                    val uploadNameDiv = icon.parent().parent()
+                for (upload in uploads) {
+                    val icons = upload.getElementsByClass("icon")
+
+                    var platforms = Upload.PLATFORM_NONE
+
+                    for(icon in icons)
+                    {
+                        if(icon.hasClass("icon-android"))
+                            platforms = platforms or Upload.PLATFORM_ANDROID
+                        else if(icon.hasClass("icon-windows8"))
+                            platforms = platforms or Upload.PLATFORM_WINDOWS
+                        else if(icon.hasClass("icon-apple"))
+                            platforms = platforms or Upload.PLATFORM_MAC
+                        else if(icon.hasClass("icon-tux"))
+                            platforms = platforms or Upload.PLATFORM_LINUX
+                    }
+
+                    val uploadNameDiv = upload.getElementsByClass("upload_name")[0]
                     val name = uploadNameDiv.getElementsByClass("name").attr("title")
                     val fileSize = uploadNameDiv.getElementsByClass("file_size")[0].child(0).html()
 
@@ -98,12 +114,13 @@ class ItchWebsiteParser {
                         locale = getLocale(doc),
                         version = versionName,
                         uploadTimestamp = versionDate,
-                        isPending = setPending
+                        isPending = setPending,
+                        platforms = platforms
                     )
                     Log.d(LOGGING_TAG, "Found upload: $upload")
 
                     uploadsList.add(upload)
-                    iconNum++
+                    uploadNum++
                 }
             }
             return uploadsList

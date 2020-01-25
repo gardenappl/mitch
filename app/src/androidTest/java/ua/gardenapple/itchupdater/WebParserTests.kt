@@ -11,8 +11,10 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
+import ua.gardenapple.itchupdater.Utils.Companion.hasFlag
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.database.game.Game
+import ua.gardenapple.itchupdater.database.upload.Upload
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -45,14 +47,14 @@ class WebParserTests {
 //        Log.d(LOGGING_TAG, "HTML: ")
 //        Utils.logLongD(LOGGING_TAG, doc.outerHtml())
 
-        val uploads = ItchWebsiteParser.getAndroidUploads(gameId, doc)
+        val uploads = ItchWebsiteParser.getUploads(gameId, doc)
+        assertEquals(4, uploads.size)
 
-        assertEquals(1, uploads.size)
-        assertEquals("Super Hexagon [Android]", uploads[0].name)
-        assertEquals("01 July 2015 @ 01:00", uploads[0].uploadTimestamp)
-        assertEquals("26 MB", uploads[0].fileSize)
-        assertEquals(74588, uploads[0].uploadId)
-        assertEquals(null, uploads[0].version)
+        assertEquals("Super Hexagon [Android]", uploads[3].name)
+        assertEquals("01 July 2015 @ 01:00", uploads[3].uploadTimestamp)
+        assertEquals("26 MB", uploads[3].fileSize)
+        assertEquals(74588, uploads[3].uploadId)
+        assertEquals(null, uploads[3].version)
     }
 
     @Test
@@ -72,14 +74,15 @@ class WebParserTests {
 //        Log.d(LOGGING_TAG, "HTML: ")
 //        Utils.logLongD(LOGGING_TAG, doc.outerHtml())
 
-        val uploads = ItchWebsiteParser.getAndroidUploads(gameId, doc)
+        val uploads = ItchWebsiteParser.getUploads(gameId, doc)
 
-        assertEquals(1, uploads.size)
-        assertEquals("[Android]Mindustry.apk", uploads[0].name)
-        assertEquals(null, uploads[0].uploadTimestamp)
-        assertEquals("34 MB", uploads[0].fileSize)
-        assertEquals(null, uploads[0].uploadId)
-        assertEquals("Версия 102.3", uploads[0].version)
+        assertEquals(6, uploads.size)
+        assertEquals(Upload.PLATFORM_ANDROID, uploads[4].platforms)
+        assertEquals("[Android]Mindustry.apk", uploads[4].name)
+        assertEquals(null, uploads[4].uploadTimestamp)
+        assertEquals("33 MB", uploads[4].fileSize)
+        assertEquals(null, uploads[4].uploadId)
+        assert(uploads[4].version!!.contains("103.3"))
     }
 
     /**

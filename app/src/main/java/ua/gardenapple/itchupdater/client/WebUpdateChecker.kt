@@ -56,7 +56,7 @@ class WebUpdateChecker(val db: AppDatabase) {
                 storePageDoc
             else
                 ItchWebsiteUtils.fetchAndParseDocument(updateCheckUrl)
-            var fetchedUploads = ItchWebsiteParser.getAndroidUploads(gameId, updateCheckDoc)
+            var fetchedUploads = ItchWebsiteParser.getUploads(gameId, updateCheckDoc)
 
 
 
@@ -78,7 +78,7 @@ class WebUpdateChecker(val db: AppDatabase) {
 
             updateCheckUrl = downloadPageInfo.url
             updateCheckDoc = ItchWebsiteUtils.fetchAndParseDocument(updateCheckUrl)
-            fetchedUploads = ItchWebsiteParser.getAndroidUploads(gameId, updateCheckDoc)
+            fetchedUploads = ItchWebsiteParser.getUploads(gameId, updateCheckDoc)
 
             return@withContext compareUploads(db, fetchedUploads, currentInstall, gameId)
         }
@@ -204,7 +204,6 @@ class WebUpdateChecker(val db: AppDatabase) {
                 return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId)
             }
         }
-
 
 
         val currentUploads = db.uploadDao.getUploadsForGame(gameId)

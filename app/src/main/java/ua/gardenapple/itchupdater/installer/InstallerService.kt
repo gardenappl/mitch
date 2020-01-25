@@ -21,6 +21,8 @@ class InstallerService : Service() {
         val status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, -1)
         val apkName = intent.getStringExtra(PackageInstaller.EXTRA_PACKAGE_NAME)
         val sessionId = intent.getIntExtra(PackageInstaller.EXTRA_SESSION_ID, -1)
+        val message = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)
+        Log.d(LOGGING_TAG, "Message: $message")
 
         when(status) {
             PackageInstaller.STATUS_PENDING_USER_ACTION -> {

@@ -66,7 +66,13 @@ data class Upload(
      * Nullable because the build timestamp is not available for some projects.
      */
     @ColumnInfo(name = TIMESTAMP)
-    val uploadTimestamp: String? = null
+    val uploadTimestamp: String? = null,
+
+    /**
+     * A bitmask of platforms which this upload supports
+     */
+    @ColumnInfo(name = PLATFORMS)
+    val platforms: Int = PLATFORM_NONE
 ) {
     companion object {
         const val TABLE_NAME = "uploads"
@@ -84,5 +90,12 @@ data class Upload(
         const val FILE_SIZE = "file_size"
         const val TIMESTAMP = "timestamp"
         const val LOCALE = "locale"
+        const val PLATFORMS = "platforms"
+
+        const val PLATFORM_NONE = 0
+        const val PLATFORM_WINDOWS = 1
+        const val PLATFORM_MAC = 2
+        const val PLATFORM_LINUX = 4
+        const val PLATFORM_ANDROID = 8
     }
 }

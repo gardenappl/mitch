@@ -24,6 +24,10 @@ class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope
     private var currentDownloadId: Long? = null
 
     suspend fun onPageVisited(doc: Document, url: String) {
+        lastDownloadDoc = null
+        lastDownloadGameId = null
+        lastDownloadPageUrl = null
+
         if(ItchWebsiteUtils.isStorePage(doc)) {
 
             val db = AppDatabase.getDatabase(context)
@@ -51,6 +55,7 @@ class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope
     }
 
     fun setClickedUploadId(uploadId: Int) {
+        Log.d(LOGGING_TAG, "Set upload ID: $uploadId")
         clickedUploadId = uploadId
         tryStartDownload()
     }
@@ -72,11 +77,8 @@ class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope
         val downloadId = currentDownloadId ?: return
         val downloadPageUrl = lastDownloadPageUrl ?: return
 
-        lastDownloadDoc = null
-        lastDownloadGameId = null
         clickedUploadId = null
         currentDownloadId = null
-        lastDownloadPageUrl = null
 
         coroutineScope.launch(Dispatchers.IO) {
             Log.d(LOGGING_TAG, "Handling download...")
@@ -93,7 +95,7 @@ class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope
                 db.gameDao.upsert(game)
             }
 
-            val uploads = ItchWebsiteParser.getAndroidUploads(gameId, doc, setPending = true)
+            val uploads = ItchWebsiteParser.getUploads(gameId, doc, setPending = true)
             var installation = db.installDao.findPendingInstallation(gameId)
             if(installation != null) {
                 installation.downloadOrInstallId?.let { downloadManager.remove(it) }
