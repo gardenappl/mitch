@@ -90,8 +90,8 @@ class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope
             if(game == null) {
                 val storeUrl = ItchWebsiteParser.getStoreUrlFromDownloadPage(downloadPageUrl)
                 Log.d(LOGGING_TAG, "Game is null! Fetching $storeUrl...")
-                val doc = ItchWebsiteUtils.fetchAndParseDocument(storeUrl)
-                game = ItchWebsiteParser.getGameInfo(doc, storeUrl)
+                val storeDoc = ItchWebsiteUtils.fetchAndParseDocument(storeUrl)
+                game = ItchWebsiteParser.getGameInfo(storeDoc, storeUrl)
                 db.gameDao.upsert(game)
             }
 

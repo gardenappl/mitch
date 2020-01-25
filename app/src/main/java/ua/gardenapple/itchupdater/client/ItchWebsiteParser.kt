@@ -64,8 +64,8 @@ class ItchWebsiteParser {
                 Log.d(LOGGING_TAG, "Found uploads: ${uploads.size}")
                 var uploadNum: Int = 0
 
-                for (upload in uploads) {
-                    val icons = upload.getElementsByClass("icon")
+                for (uploadDiv in uploads) {
+                    val icons = uploadDiv.getElementsByClass("icon")
 
                     var platforms = Upload.PLATFORM_NONE
 
@@ -81,7 +81,7 @@ class ItchWebsiteParser {
                             platforms = platforms or Upload.PLATFORM_LINUX
                     }
 
-                    val uploadNameDiv = upload.getElementsByClass("upload_name")[0]
+                    val uploadNameDiv = uploadDiv.getElementsByClass("upload_name")[0]
                     val name = uploadNameDiv.getElementsByClass("name").attr("title")
                     val fileSize = uploadNameDiv.getElementsByClass("file_size")[0].child(0).html()
 

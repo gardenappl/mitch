@@ -25,4 +25,6 @@
     <string name="notification_install_incompatible_title">App is incompatible with your device</string>
     <string name="notification_install_invalid_title">Invalid file</string>
     <string name="notification_install_storage_title">Installation failed: storage issues</string>
+    <string name="library_category_installed">Installed apps</string>
+    <string name="library_category_downloads">Downloads</string>
 </resources>

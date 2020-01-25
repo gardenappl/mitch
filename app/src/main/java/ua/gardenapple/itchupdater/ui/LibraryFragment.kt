@@ -2,22 +2,23 @@ package ua.gardenapple.itchupdater.ui
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.library_fragment.view.*
+import ua.gardenapple.itchupdater.LOGGING_TAG
 import ua.gardenapple.itchupdater.R
-import ua.gardenapple.itchupdater.database.game.GameRepository
-import ua.gardenapple.itchupdater.database.game.GameViewModel
+import ua.gardenapple.itchupdater.database.game.GameDownloadsViewModel
+import ua.gardenapple.itchupdater.database.game.InstalledGameViewModel
 
 class LibraryFragment : Fragment() {
-    private lateinit var gameViewModel: GameViewModel
+    private lateinit var installedViewModel: InstalledGameViewModel
+    private lateinit var downloadsViewModel: GameDownloadsViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,14 +29,32 @@ class LibraryFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.library_fragment, container, false)
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.gameList)
-        val adapter = GameListAdapter(requireContext())
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
-        gameViewModel = ViewModelProvider(this).get(GameViewModel::class.java)
-        gameViewModel.allGames.observe(viewLifecycleOwner, Observer { games ->
-            games?.let { adapter.setGames(games) }
+        Log.d(LOGGING_TAG, "DOing studff..")
+
+        val downloadsList = view.findViewById<RecyclerView>(R.id.downloads_list)
+        val downloadsAdapter = GameListAdapter(context!!)
+        downloadsList.adapter = downloadsAdapter
+        downloadsList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+
+        downloadsViewModel = ViewModelProvider(this).get(GameDownloadsViewModel::class.java)
+        downloadsViewModel.allGames.observe(viewLifecycleOwner, Observer { games ->
+            Log.d(LOGGING_TAG, "Downloaded games observe!")
+            games?.let { Log.d(LOGGING_TAG, "${games.size}"); downloadsAdapter.setGames(games) }
+        })
+
+        Log.d(LOGGING_TAG, "DOing more studff..")
+
+        val installedList = view.findViewById<RecyclerView>(R.id.installed_list)
+        val installedAdapter = GameListAdapter(context!!)
+        installedList.adapter = installedAdapter
+        installedList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+
+        Log.d(LOGGING_TAG, "DOing even more studff..")
+        installedViewModel = ViewModelProvider(this).get(InstalledGameViewModel::class.java)
+        installedViewModel.allGames.observe(viewLifecycleOwner, Observer { games ->
+            Log.d(LOGGING_TAG, "Installed games observe!")
+            games?.let { Log.d(LOGGING_TAG, "${games.size}"); installedAdapter.setGames(games) }
         })
 
         return view

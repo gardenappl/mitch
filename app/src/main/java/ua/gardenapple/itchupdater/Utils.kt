@@ -21,7 +21,7 @@ class Utils {
          */
         fun logPrintLong(priority: Int, tag: String, string: String) {
             for (i in string.indices step LOG_LIMIT) {
-                Log.d(tag, string.substring(i, min(string.length, i + LOG_LIMIT)))
+                Log.println(priority, tag, string.substring(i, min(string.length, i + LOG_LIMIT)))
             }
         }
 
@@ -40,7 +40,7 @@ class Utils {
             val BUFFER_SIZE = 1024 * 1024
 
             val buffer = ByteArray(BUFFER_SIZE)
-            var n = 0
+            var n: Int
             while(true) {
                 n = input.read(buffer)
                 if(n == -1)

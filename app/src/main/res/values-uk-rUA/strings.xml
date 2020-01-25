@@ -25,4 +25,6 @@
     <string name="notification_install_incompatible_title">Додаток несумісний з вашим пристроєм</string>
     <string name="notification_install_invalid_title">Недопустимий файл</string>
     <string name="notification_install_storage_title">Не вдалося встановити: недостатньо місця</string>
+    <string name="library_category_downloads">Завантаження</string>
+    <string name="library_category_installed">Встановлені додатки</string>
 </resources>

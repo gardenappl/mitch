@@ -26,4 +26,6 @@
     <string name="notification_install_conflict_title">Конфликт с другим пакетом</string>
     <string name="notification_install_invalid_title">Недопустимый файл</string>
     <string name="notification_install_storage_title">Установка не удалась: не хватает места</string>
+    <string name="library_category_downloads">Загрузки</string>
+    <string name="library_category_installed">Установленные приложения</string>
 </resources>
