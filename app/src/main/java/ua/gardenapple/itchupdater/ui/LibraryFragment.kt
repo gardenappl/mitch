@@ -2,7 +2,6 @@ package ua.gardenapple.itchupdater.ui
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,14 +10,26 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import ua.gardenapple.itchupdater.LOGGING_TAG
+import com.bumptech.glide.Glide
+import com.bumptech.glide.ListPreloader
+import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
+import com.bumptech.glide.util.FixedPreloadSizeProvider
 import ua.gardenapple.itchupdater.R
+import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.game.GameDownloadsViewModel
 import ua.gardenapple.itchupdater.database.game.InstalledGameViewModel
+import java.util.*
 
 class LibraryFragment : Fragment() {
     private lateinit var installedViewModel: InstalledGameViewModel
     private lateinit var downloadsViewModel: GameDownloadsViewModel
+
+    companion object {
+        //2/3 of 315x250
+        const val THUMBNAIL_WIDTH = 650 //210
+        const val THUMBNAIL_HEIGHT = 500 //167
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,32 +40,35 @@ class LibraryFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.library_fragment, container, false)
 
-
-        Log.d(LOGGING_TAG, "DOing studff..")
-
         val downloadsList = view.findViewById<RecyclerView>(R.id.downloads_list)
         val downloadsAdapter = GameListAdapter(context!!)
         downloadsList.adapter = downloadsAdapter
         downloadsList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
+        //Glide thumbnail handling
+        val sizeProvider = FixedPreloadSizeProvider<Game>(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT)
+        val modelProvider = LibraryPreloadModelProvider(downloadsAdapter)
+        val preloader = RecyclerViewPreloader<Game>(
+            Glide.with(this), modelProvider, sizeProvider, 6
+        )
+
+        var recyclerView = view.findViewById<RecyclerView>(R.id.downloads_list)
+        recyclerView.addOnScrollListener(preloader)
+
         downloadsViewModel = ViewModelProvider(this).get(GameDownloadsViewModel::class.java)
-        downloadsViewModel.allGames.observe(viewLifecycleOwner, Observer { games ->
-            Log.d(LOGGING_TAG, "Downloaded games observe!")
-            games?.let { Log.d(LOGGING_TAG, "${games.size}"); downloadsAdapter.setGames(games) }
+        downloadsViewModel.gameDownloads.observe(viewLifecycleOwner, Observer { games ->
+            games?.let { downloadsAdapter.games = games }
         })
 
-        Log.d(LOGGING_TAG, "DOing more studff..")
 
         val installedList = view.findViewById<RecyclerView>(R.id.installed_list)
         val installedAdapter = GameListAdapter(context!!)
         installedList.adapter = installedAdapter
         installedList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
-        Log.d(LOGGING_TAG, "DOing even more studff..")
         installedViewModel = ViewModelProvider(this).get(InstalledGameViewModel::class.java)
-        installedViewModel.allGames.observe(viewLifecycleOwner, Observer { games ->
-            Log.d(LOGGING_TAG, "Installed games observe!")
-            games?.let { Log.d(LOGGING_TAG, "${games.size}"); installedAdapter.setGames(games) }
+        installedViewModel.installedGames.observe(viewLifecycleOwner, Observer { games ->
+            games?.let { installedAdapter.games = games }
         })
 
         return view
@@ -62,5 +76,24 @@ class LibraryFragment : Fragment() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+    }
+
+    private inner class LibraryPreloadModelProvider(
+        val adapter: GameListAdapter
+    ) : ListPreloader.PreloadModelProvider<Game> {
+        override fun getPreloadItems(position: Int): MutableList<Game> {
+            if(adapter.games.isEmpty())
+                return Collections.emptyList()
+            else
+                return Collections.singletonList(adapter.games[position])
+        }
+
+        override fun getPreloadRequestBuilder(item: Game): RequestBuilder<*>? {
+            return Glide.with(this@LibraryFragment)
+                .load(item.thumbnailUrl)
+                .override(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT)
+
+        }
+
     }
 }

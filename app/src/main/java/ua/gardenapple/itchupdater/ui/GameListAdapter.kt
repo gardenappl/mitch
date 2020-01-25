@@ -7,15 +7,20 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.game.Game
 
 class GameListAdapter internal constructor(
-    context: Context
+    val context: Context
 ) : RecyclerView.Adapter<GameListAdapter.GameViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private var games = emptyList<Game>() // Cached copy of games
+    var games = emptyList<Game>() // Cached copy of games
+        internal set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
     inner class GameViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val thumbnailView = itemView.findViewById<ImageView>(R.id.gameThumbnail)
@@ -30,14 +35,12 @@ class GameListAdapter internal constructor(
 
     override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
         val currentGame = games[position]
-        //holder.thumbnailView.setImageURI(Uri.parse(currentGame.thumbnailURL))
         holder.gameName.text = currentGame.name
         holder.authorName.text = currentGame.author
-    }
-
-    internal fun setGames(games: List<Game>) {
-        this.games = games
-        notifyDataSetChanged()
+        Glide.with(context)
+            .load(games[position].thumbnailUrl)
+            .override(LibraryFragment.THUMBNAIL_WIDTH, LibraryFragment.THUMBNAIL_HEIGHT)
+            .into(holder.thumbnailView)
     }
 
     override fun getItemCount() = games.size

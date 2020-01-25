@@ -11,7 +11,7 @@
             android:layout_width="210dp"
             android:layout_height="167dp"
             android:layout_weight="0"
-            android:scaleType="centerInside"
+            android:scaleType="centerCrop"
             app:srcCompat="@color/colorPrimaryDark" />
 
     <TextView
