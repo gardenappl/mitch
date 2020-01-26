@@ -27,4 +27,13 @@
     <string name="notification_install_storage_title">Installation failed: storage issues</string>
     <string name="library_category_installed">Installed apps</string>
     <string name="library_category_downloads">Downloads</string>
+    <string name="game_go_to_store">Show store page</string>
+    <string name="game_package_info">Show app info</string>
+    <string name="game_download_remove">Remove from app</string>
+    <string name="game_package_info_fail">Your system cannot show app info.</string>
+    <string name="dialog_game_remove">Are you sure you want to remove %1$s from your Mitch library? You will no longer receive notifications when a new version is released.\n\nThis will not delete the downloaded file.</string>
+    <string name="dialog_remove">Remove</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_yes">Yes</string>
+    <string name="dialog_game_remove_done">%1$s has been removed from Mitch.</string>
 </resources>

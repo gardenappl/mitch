@@ -131,7 +131,8 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         Log.d(LOGGING_TAG, "Version: ${BuildConfig.VERSION_NAME}")
         Log.d(LOGGING_TAG, "Action: ${intent.action}")
         Log.d(LOGGING_TAG, "Data: ${intent.data}")
-        if(intent.action == Intent.ACTION_VIEW && intent.data?.let { ItchWebsiteUtils.isItchWebPage(it) } == true) {
+        if (intent.action == Intent.ACTION_VIEW &&
+                intent.data?.let { ItchWebsiteUtils.isItchWebPage(it) } == true) {
             switchToFragment(R.id.navigation_website_view)
             browseFragment.webView.loadUrl(intent.data!!.toString())
         }

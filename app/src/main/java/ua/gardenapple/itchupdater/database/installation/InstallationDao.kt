@@ -48,6 +48,9 @@ interface InstallationDao {
     @Query("DELETE FROM $TABLE_NAME WHERE $PACKAGE_NAME = :packageName AND $STATUS = $STATUS_INSTALLED")
     fun deleteFinishedInstallation(packageName: String)
 
+    @Query("DELETE FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS = $STATUS_INSTALLED")
+    fun deleteFinishedInstallation(gameId: Int)
+
     @Query("DELETE FROM $TABLE_NAME WHERE $GAME_ID = :gameId")
     fun clearAllInstallationsForGame(gameId: Int)
 

@@ -35,6 +35,7 @@ class InstallerNotificationHandler(val context: Context) : InstallCompleteListen
                 setSmallIcon(R.drawable.ic_file_download_black_24dp)
                 setContentTitle(game.name)
                 setContentText(message)
+                setAutoCancel(true)
                 priority = NotificationCompat.PRIORITY_HIGH
                 if(status == PackageInstaller.STATUS_SUCCESS) {
                     val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)

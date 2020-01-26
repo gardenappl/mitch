@@ -28,4 +28,13 @@
     <string name="notification_install_storage_title">Установка не удалась: не хватает места</string>
     <string name="library_category_downloads">Загрузки</string>
     <string name="library_category_installed">Установленные приложения</string>
+    <string name="game_go_to_store">Показать страницу игры</string>
+    <string name="game_package_info">Информация о приложении</string>
+    <string name="game_download_remove">Убрать из Mitch</string>
+    <string name="game_package_info_fail">Ваша система не дает возможность просматривать эту информацию.</string>
+    <string name="dialog_cancel">Отмена</string>
+    <string name="dialog_yes">Да</string>
+    <string name="dialog_game_remove">Вы точно хотите убрать %1$s из вашей коллекции Mitch? Вы перестанете получать уведомления о новых версиях.\n\nЭто действие не удалит загруженные файлы.</string>
+    <string name="dialog_remove">Убрать</string>
+    <string name="dialog_game_remove_done">Вы убрали %1$s из вашей коллекции Mitch.</string>
 </resources>
