@@ -69,6 +69,11 @@ abstract class AppDatabase : RoomDatabase() {
                             val installs = appDb.installDao.getAllInstallationsSync()
                             for(install in installs)
                                 Log.d(LOGGING_TAG, "$install")
+
+                            Log.d(LOGGING_TAG, "Known uploads:")
+                            val uploads = appDb.uploadDao.getAllUploadsSync()
+                            for(upload in uploads)
+                                Log.d(LOGGING_TAG, "$upload")
                         }
                     }
                 })

@@ -6,11 +6,11 @@ import kotlinx.coroutines.launch
 import ua.gardenapple.itchupdater.database.game.Game
 
 interface DownloadStartListener {
-    suspend fun onDownloadStarted(downloadId: Long)
+    suspend fun onDownloadStarted(downloadId: Long, startedViaBrowser: Boolean)
 }
 
 interface DownloadCompleteListener {
-    suspend fun onDownloadComplete(downloadId: Long, pendingInstallId: Int?)
+    suspend fun onDownloadComplete(downloadId: Long, packageInstallerId: Int?)
 }
 
 interface InstallCompleteListener {
@@ -41,10 +41,10 @@ class InstallerEvents {
             }
         }
 
-        fun notifyDownloadStart(downloadId: Long) {
+        fun notifyDownloadStart(downloadId: Long, startedViaBrowser: Boolean) {
             for(listener in downloadStartListeners) {
                 GlobalScope.launch {
-                    listener.onDownloadStarted(downloadId)
+                    listener.onDownloadStarted(downloadId, startedViaBrowser)
                 }
             }
         }

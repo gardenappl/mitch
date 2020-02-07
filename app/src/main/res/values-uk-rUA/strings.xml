@@ -36,4 +36,10 @@
     <string name="dialog_game_remove">Ви точно хочете прибрати %1$s із вашої колекції Mitch? Ви більше не будете отримувати сповіщення щодо оновлень.\n\nЗавантажені файли залишаться на вашому пристрої.</string>
     <string name="dialog_remove">Прибрати</string>
     <string name="dialog_game_remove_done">Ви прибрали %1$s із вашої колекції Mitch.</string>
+    <string name="notification_update_access_denied">Доступ заблоковано (ви ввійшли у свій акаунт?)</string>
+    <string name="notification_update_available">Доступне оновлення</string>
+    <string name="notification_update_empty">Більше не доступно для завантеження</string>
+    <string name="notification_update_fail">Помилка під час перевірки оновлень</string>
+    <string name="notification_update_unknown">Не вдалося обробити оновлення</string>
+    <string name="notification_update_up_to_date">Оновлень не знайдено</string>
 </resources>

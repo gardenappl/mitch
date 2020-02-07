@@ -38,12 +38,6 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
         setContentView(R.layout.activity_main)
 
-        InstallerEvents.setup()
-        val installerDatabaseHandler = InstallerDatabaseHandler(applicationContext)
-        InstallerEvents.addListener(installerDatabaseHandler as DownloadCompleteListener)
-        InstallerEvents.addListener(installerDatabaseHandler as InstallCompleteListener)
-        val notificationHandler = InstallerNotificationHandler(applicationContext)
-        InstallerEvents.addListener(notificationHandler)
 
 
         Log.d(LOGGING_TAG, "Stored active fragment tag: ${savedInstanceState?.getString(

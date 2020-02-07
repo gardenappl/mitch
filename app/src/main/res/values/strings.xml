@@ -36,4 +36,10 @@
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_yes">Yes</string>
     <string name="dialog_game_remove_done">%1$s has been removed from Mitch.</string>
+    <string name="notification_update_up_to_date">Up to date</string>
+    <string name="notification_update_available">Update available</string>
+    <string name="notification_update_unknown">Unable to process updates</string>
+    <string name="notification_update_access_denied">Access denied (are you logged in to your account?)</string>
+    <string name="notification_update_empty">Downloads no longer available</string>
+    <string name="notification_update_fail">An error occurred while checking updates</string>
 </resources>

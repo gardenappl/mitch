@@ -37,4 +37,10 @@
     <string name="dialog_game_remove">Вы точно хотите убрать %1$s из вашей коллекции Mitch? Вы перестанете получать уведомления о новых версиях.\n\nЭто действие не удалит загруженные файлы.</string>
     <string name="dialog_remove">Убрать</string>
     <string name="dialog_game_remove_done">Вы убрали %1$s из вашей коллекции Mitch.</string>
+    <string name="notification_update_access_denied">Доступ запрещен (вы войшли в свой аккаунт?)</string>
+    <string name="notification_update_available">Доступно обновление</string>
+    <string name="notification_update_empty">Больше не доступно для загрузки</string>
+    <string name="notification_update_fail">Ошибка во время проверки обновлений</string>
+    <string name="notification_update_unknown">Не удалось распознать обновления</string>
+    <string name="notification_update_up_to_date">Обновлений не найдено</string>
 </resources>

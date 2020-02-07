@@ -1,12 +1,17 @@
 package ua.gardenapple.itchupdater.client
 
+import android.net.Uri
+import org.jsoup.nodes.Document
+
 
 data class UpdateCheckResult(
     val code: Int,
     /**
      * Set to null if there is no upload ID or if there are multiple possibilities
      */
-    val uploadID: Int? = null
+    val uploadID: Int? = null,
+    val downloadPageUrl: ItchWebsiteParser.DownloadUrl? = null,
+    val updateCheckDoc: Document? = null
 ) {
     companion object {
         const val UP_TO_DATE = 0

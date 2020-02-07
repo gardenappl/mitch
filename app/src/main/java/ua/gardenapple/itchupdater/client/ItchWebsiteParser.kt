@@ -17,7 +17,13 @@ import ua.gardenapple.itchupdater.database.upload.Upload
 import java.io.IOException
 
 class ItchWebsiteParser {
-    data class DownloadUrl(val url: String, val isPermanent: Boolean, val isStorePage: Boolean)
+    data class DownloadUrl(val url: String, val isPermanent: Boolean, val isStorePage: Boolean) {
+        fun getDownloadKey(): String? {
+            if(isStorePage || !isPermanent)
+                return null
+            return Uri.parse(url).lastPathSegment
+        }
+    }
 
     companion object {
         const val LOGGING_TAG = "ItchWebsiteParser"
@@ -190,7 +196,7 @@ class ItchWebsiteParser {
             val getDownloadPathUri = uriBuilder.build()
 
             val form = FormBody.Builder().run {
-                add("csrf_token", "0")
+                add("csrf_token", "Mitch-automated")
                 build()
             }
             val request = Request.Builder().run {
@@ -209,7 +215,7 @@ class ItchWebsiteParser {
                 }
             val jsonObject = JSONObject(result)
             return@withContext if (jsonObject.has("url"))
-                DownloadUrl(JSONObject(result).getString("url"), false, false)
+                DownloadUrl(jsonObject.getString("url"), false, false)
             else
                 null
         }

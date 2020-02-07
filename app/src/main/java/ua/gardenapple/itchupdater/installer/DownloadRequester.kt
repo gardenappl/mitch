@@ -18,10 +18,18 @@ class DownloadRequester {
 
     companion object {
         private lateinit var currentUrl: String
-        private lateinit var currentContent: String
-        private lateinit var currentMimeType: String
+        private var currentContent: String? = null
+        private var currentMimeType: String? = null
+        private var startedViaBrowser: Boolean = false
 
-        fun requestDownload(context: Context, activity: Activity?, url: String, contentDisposition: String, mimeType: String) {
+        fun requestDownload(
+            context: Context,
+            activity: Activity?,
+            url: String,
+            contentDisposition: String?,
+            mimeType: String?,
+            startedViaBrowser: Boolean
+        ) {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
                 Log.d(LOGGING_TAG, "Don't have permission")
@@ -29,6 +37,7 @@ class DownloadRequester {
                     currentUrl = url
                     currentContent = contentDisposition
                     currentMimeType = mimeType
+                    this.startedViaBrowser = startedViaBrowser
                     ActivityCompat.requestPermissions(
                         activity,
                         arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
@@ -40,26 +49,37 @@ class DownloadRequester {
                 return
             } else {
                 Log.d(LOGGING_TAG, "Have permission")
-                doDownload(
+                enqueueDownload(
                     context.getSystemService(Activity.DOWNLOAD_SERVICE) as DownloadManager,
                     url,
                     contentDisposition,
-                    mimeType
+                    mimeType,
+                    startedViaBrowser
                 )
             }
         }
 
         fun resumeDownload(downloadManager: DownloadManager) {
             Log.d(LOGGING_TAG, "Resuming download")
-            doDownload(
+            enqueueDownload(
                 downloadManager,
                 currentUrl,
                 currentContent,
-                currentMimeType
+                currentMimeType,
+                startedViaBrowser
             )
         }
 
-        private fun doDownload(downloadManager: DownloadManager, url: String, contentDisposition: String, mimeType: String) {
+        /**
+         * Will fail if the user did not provide required permissions.
+         */
+        fun enqueueDownload(
+            downloadManager: DownloadManager,
+            url: String,
+            contentDisposition: String?,
+            mimeType: String?,
+            startedViaBrowser: Boolean
+        ) : Long {
             val downloadRequest = DownloadManager.Request(Uri.parse(url)).apply {
                 Log.d(LOGGING_TAG, "Url: $url, contentDisposition: $contentDisposition, mimeType: $mimeType")
 
@@ -77,7 +97,8 @@ class DownloadRequester {
             }
 
             val id = downloadManager.enqueue(downloadRequest)
-            InstallerEvents.notifyDownloadStart(id)
+            InstallerEvents.notifyDownloadStart(id, startedViaBrowser)
+            return id
         }
     }
 }

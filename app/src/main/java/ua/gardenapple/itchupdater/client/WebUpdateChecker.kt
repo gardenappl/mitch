@@ -2,6 +2,7 @@ package ua.gardenapple.itchupdater.client
 
 import android.util.Log
 import kotlinx.coroutines.*
+import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
@@ -63,7 +64,7 @@ class WebUpdateChecker(val db: AppDatabase) {
             if (fetchedUploads.isEmpty())
                 return@withContext UpdateCheckResult(UpdateCheckResult.EMPTY)
 
-            val result = compareUploads(db, fetchedUploads, currentInstall, gameId)
+            val result = compareUploads(db, updateCheckDoc, currentInstall, gameId, downloadPageInfo)
 
             if (result.code != UpdateCheckResult.UNKNOWN)
                 return@withContext result
@@ -78,17 +79,18 @@ class WebUpdateChecker(val db: AppDatabase) {
 
             updateCheckUrl = downloadPageInfo.url
             updateCheckDoc = ItchWebsiteUtils.fetchAndParseDocument(updateCheckUrl)
-            fetchedUploads = ItchWebsiteParser.getUploads(gameId, updateCheckDoc)
 
-            return@withContext compareUploads(db, fetchedUploads, currentInstall, gameId)
+            return@withContext compareUploads(db, updateCheckDoc, currentInstall, gameId, downloadPageInfo)
         }
 
     private fun compareUploads(
         db: AppDatabase,
-        fetchedUploads: ArrayList<Upload>,
+        updateCheckDoc: Document,
         currentInstall: Installation,
-        gameId: Int
+        gameId: Int,
+        downloadPageUrl: ItchWebsiteParser.DownloadUrl?
     ): UpdateCheckResult {
+        val fetchedUploads = ItchWebsiteParser.getUploads(gameId, updateCheckDoc)
 
         Log.d(LOGGING_TAG, "Looking for local upload info ${currentInstall.uploadId}")
         val installedUpload = db.uploadDao.getUploadById(currentInstall.uploadId)!!
@@ -115,21 +117,21 @@ class WebUpdateChecker(val db: AppDatabase) {
         if(fetchedUploads[0].uploadId != null && currentInstall.gameId != Game.MITCH_GAME_ID) {
             Log.d(LOGGING_TAG, "Checking upload IDs...")
             for (upload in fetchedUploads) {
-                if (upload.internalId == currentInstall.uploadId) {
+                if (upload.uploadId == currentInstall.uploadId) {
                     Log.d(LOGGING_TAG, "Found same upload ID")
                     allVersionsDifferent = false
 
                     if(upload.locale == installedUpload.locale && upload.version != installedUpload.version) {
                         Log.d(LOGGING_TAG, "Version tag changed")
-                        return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId)
+                        return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId, downloadPageUrl, updateCheckDoc)
                     }
                     if(upload.fileSize != installedUpload.fileSize) {
                         Log.d(LOGGING_TAG, "File size changed")
-                        return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId)
+                        return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId, downloadPageUrl, updateCheckDoc)
                     }
                     if(upload.locale == installedUpload.locale && upload.uploadTimestamp != installedUpload.uploadTimestamp) {
                         Log.d(LOGGING_TAG, "Timestamp changed")
-                        return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId)
+                        return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId, downloadPageUrl, updateCheckDoc)
                     }
 
                     Log.d(LOGGING_TAG, "Suggested upload: $suggestedUpload")
@@ -139,7 +141,7 @@ class WebUpdateChecker(val db: AppDatabase) {
             }
             if (allVersionsDifferent) {
                 Log.d(LOGGING_TAG, "All upload IDs are different")
-                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId)
+                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
             }
         }
 
@@ -156,7 +158,7 @@ class WebUpdateChecker(val db: AppDatabase) {
             }
             if(allVersionsDifferent) {
                 Log.d(LOGGING_TAG, "All version tags are different")
-                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId)
+                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
             }
         } else if (installedUpload.version != null && (fetchedUploads[0].locale == installedUpload.locale)) {
             Log.d(LOGGING_TAG, "Checking version tags...")
@@ -169,7 +171,7 @@ class WebUpdateChecker(val db: AppDatabase) {
             }
             if (allVersionsDifferent) {
                 Log.d(LOGGING_TAG, "All version tags are different")
-                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId)
+                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
             }
         }
 
@@ -185,7 +187,7 @@ class WebUpdateChecker(val db: AppDatabase) {
             }
             if (allVersionsDifferent) {
                 Log.d(LOGGING_TAG, "All timestamps are different")
-                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId)
+                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
             }
         }
 
@@ -201,7 +203,7 @@ class WebUpdateChecker(val db: AppDatabase) {
             }
             if (allVersionsDifferent) {
                 Log.d(LOGGING_TAG, "All file sizes different")
-                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId)
+                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
             }
         }
 
@@ -227,7 +229,7 @@ class WebUpdateChecker(val db: AppDatabase) {
                 }
             } else if (installedUpload.version != null) {
                 Log.d(LOGGING_TAG, "Checking version tags...")
-                for (i in 0..fetchedUploads.size) {
+                for (i in fetchedUploads.indices) {
                     if (fetchedUploads[i].version != currentUploads[i].version) {
                         Log.d(LOGGING_TAG, "Version tags don't match")
                         allVersionsSame = false
@@ -243,7 +245,7 @@ class WebUpdateChecker(val db: AppDatabase) {
             if (installedUpload.uploadTimestamp != null) {
                 Log.d(LOGGING_TAG, "Checking timestamps...")
                 allVersionsSame = true
-                for (i in 0..fetchedUploads.size) {
+                for (i in fetchedUploads.indices) {
                     if (fetchedUploads[i].uploadTimestamp != currentUploads[i].uploadTimestamp) {
                         Log.d(LOGGING_TAG, "Timestamps don't match")
                         allVersionsSame = false

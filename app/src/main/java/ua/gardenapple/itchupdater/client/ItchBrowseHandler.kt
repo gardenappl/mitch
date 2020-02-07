@@ -50,28 +50,30 @@ class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope
             lastDownloadDoc = doc
             lastDownloadGameId = ItchWebsiteUtils.getGameId(doc)
             lastDownloadPageUrl = url
-            tryStartDownload()
+            tryUpdateDatabase()
         }
     }
 
     fun setClickedUploadId(uploadId: Int) {
         Log.d(LOGGING_TAG, "Set upload ID: $uploadId")
         clickedUploadId = uploadId
-        tryStartDownload()
+        tryUpdateDatabase()
     }
 
-    override suspend fun onDownloadStarted(downloadId: Long) {
+    override suspend fun onDownloadStarted(downloadId: Long, startedViaBrowser: Boolean) {
+        if(!startedViaBrowser)
+            return
         currentDownloadId = downloadId
-        tryStartDownload()
+        tryUpdateDatabase()
     }
 
-    private fun tryStartDownload() {
+    private fun tryUpdateDatabase() {
         Log.d(LOGGING_TAG, "Game ID: $lastDownloadGameId")
         Log.d(LOGGING_TAG, "Upload ID: $clickedUploadId")
         Log.d(LOGGING_TAG, "Download ID: $currentDownloadId")
         Log.d(LOGGING_TAG, "Download page URL: $lastDownloadPageUrl")
 
-        val doc = lastDownloadDoc ?: return
+        val downloadPageDoc = lastDownloadDoc ?: return
         val gameId = lastDownloadGameId ?: return
         val uploadId = clickedUploadId ?: return
         val downloadId = currentDownloadId ?: return
@@ -81,35 +83,9 @@ class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope
         currentDownloadId = null
 
         coroutineScope.launch(Dispatchers.IO) {
-            Log.d(LOGGING_TAG, "Handling download...")
-
-            val db = AppDatabase.getDatabase(context)
-            val downloadManager = context.getSystemService(Activity.DOWNLOAD_SERVICE) as DownloadManager
-
-            var game = db.gameDao.getGameById(gameId)
-            if(game == null) {
-                val storeUrl = ItchWebsiteParser.getStoreUrlFromDownloadPage(downloadPageUrl)
-                Log.d(LOGGING_TAG, "Game is null! Fetching $storeUrl...")
-                val storeDoc = ItchWebsiteUtils.fetchAndParseDocument(storeUrl)
-                game = ItchWebsiteParser.getGameInfo(storeDoc, storeUrl)
-                db.gameDao.upsert(game)
-            }
-
-            val uploads = ItchWebsiteParser.getUploads(gameId, doc, setPending = true)
-            var installation = db.installDao.findPendingInstallation(gameId)
-            if(installation != null) {
-                installation.downloadOrInstallId?.let { downloadManager.remove(it) }
-                db.installDao.delete(installation.internalId)
-            }
-            installation = Installation(
-                uploadId = uploadId,
-                gameId = gameId,
-                downloadOrInstallId = downloadId,
-                status = Installation.STATUS_DOWNLOADING
-            )
-            db.uploadDao.clearPendingUploadsForGame(gameId)
-            db.uploadDao.insert(uploads)
-            db.installDao.insert(installation)
+            val downloader = WebGameDownloader(context)
+            val pendingUploads = ItchWebsiteParser.getUploads(gameId, downloadPageDoc, true)
+            downloader.updateDatabase(gameId, uploadId, downloadId, downloadPageUrl, pendingUploads)
         }
     }
 }

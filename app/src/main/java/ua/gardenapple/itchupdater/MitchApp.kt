@@ -5,11 +5,14 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import okhttp3.Cache
 import okhttp3.OkHttpClient
+import ua.gardenapple.itchupdater.client.WebUpdateCheckWorker
 import ua.gardenapple.itchupdater.installer.*
 import java.io.File
 import kotlin.coroutines.CoroutineContext
@@ -23,6 +26,7 @@ const val NOTIFICATION_CHANNEL_ID_UPDATES = "updates_available"
 const val NOTIFICATION_CHANNEL_ID_INSTALL = "updates"
 const val NOTIFICATION_CHANNEL_ID_INSTALLING = "installing"
 
+const val NOTIFICATION_ID_UPDATE_CHECK = 1_000_000_000
 const val NOTIFICATION_ID_DOWNLOAD = 20000
 const val NOTIFICATION_ID_INSTALLING = 1000000
 
@@ -74,6 +78,21 @@ class MitchApp : Application() {
             }
             notificationManager.createNotificationChannel(channel)
         }
+
+        val updateCheckRequest = OneTimeWorkRequestBuilder<WebUpdateCheckWorker>()
+            .build()
+
+        WorkManager.getInstance(applicationContext)
+            .enqueue(updateCheckRequest)
+
+
+
+        InstallerEvents.setup()
+        val installerDatabaseHandler = InstallerDatabaseHandler(applicationContext)
+        InstallerEvents.addListener(installerDatabaseHandler as DownloadCompleteListener)
+        InstallerEvents.addListener(installerDatabaseHandler as InstallCompleteListener)
+        val notificationHandler = InstallerNotificationHandler(applicationContext)
+        InstallerEvents.addListener(notificationHandler)
 
 
         val okHttpCacheDir = File(cacheDir, "OkHttp")

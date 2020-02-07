@@ -10,25 +10,34 @@ import ua.gardenapple.itchupdater.database.upload.Upload.Companion.UPLOAD_ID
 
 
 @Dao
-interface UploadDao {
+abstract class UploadDao {
     @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $IS_PENDING = 0")
-    fun getUploadsForGame(gameId: Int): List<Upload>
+    abstract fun getUploadsForGame(gameId: Int): List<Upload>
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $IS_PENDING = 1")
-    fun getPendingUploadsForGame(gameId: Int): List<Upload>
+    @Query("SELECT * FROM $TABLE_NAME")
+    abstract fun getAllUploadsSync(): List<Upload>
+
+    @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $IS_PENDING != 0")
+    abstract fun getPendingUploadsForGame(gameId: Int): List<Upload>
 
     @Query("DELETE FROM $TABLE_NAME WHERE $GAME_ID = :gameId")
-    fun clearAllUploadsForGame(gameId: Int)
+    abstract fun clearAllUploadsForGame(gameId: Int)
 
-    @Query("DELETE FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $IS_PENDING = 1")
-    fun clearPendingUploadsForGame(gameId: Int)
+    @Query("DELETE FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $IS_PENDING != 0")
+    abstract fun clearPendingUploadsForGame(gameId: Int)
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $IS_PENDING = 0 LIMIT 1")
-    fun getUploadById(uploadId: Int): Upload?
+    abstract fun getUploadById(uploadId: Int): Upload?
 
     @Insert
-    fun insert(vararg uploads: Upload)
+    abstract fun insert(vararg uploads: Upload)
 
     @Insert
-    fun insert(uploads: List<Upload>)
+    abstract fun insert(uploads: List<Upload>)
+
+    @Transaction
+    open fun resetAllUploadsForGame(gameId: Int, newUploads: List<Upload>) {
+        clearAllUploadsForGame(gameId)
+        insert(newUploads)
+    }
 }

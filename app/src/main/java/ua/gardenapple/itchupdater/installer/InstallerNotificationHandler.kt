@@ -23,10 +23,10 @@ class InstallerNotificationHandler(val context: Context) : InstallCompleteListen
         val message = when (status) {
             PackageInstaller.STATUS_FAILURE_ABORTED -> context.resources.getString(R.string.notification_install_cancelled_title)
             PackageInstaller.STATUS_FAILURE_BLOCKED -> context.resources.getString(R.string.notification_install_blocked_title)
-            PackageInstaller.STATUS_FAILURE_CONFLICT -> context.resources.getString(R.string.notification_install_complete_title)
-            PackageInstaller.STATUS_FAILURE_INCOMPATIBLE -> context.resources.getString(R.string.notification_install_complete_title)
-            PackageInstaller.STATUS_FAILURE_INVALID -> context.resources.getString(R.string.notification_install_complete_title)
-            PackageInstaller.STATUS_FAILURE_STORAGE -> context.resources.getString(R.string.notification_install_complete_title)
+            PackageInstaller.STATUS_FAILURE_CONFLICT -> context.resources.getString(R.string.notification_install_conflict_title)
+            PackageInstaller.STATUS_FAILURE_INCOMPATIBLE -> context.resources.getString(R.string.notification_install_incompatible_title)
+            PackageInstaller.STATUS_FAILURE_INVALID -> context.resources.getString(R.string.notification_install_invalid_title)
+            PackageInstaller.STATUS_FAILURE_STORAGE -> context.resources.getString(R.string.notification_install_storage_title)
             PackageInstaller.STATUS_SUCCESS -> context.resources.getString(R.string.notification_install_complete_title)
             else -> context.resources.getString(R.string.notification_install_complete_title)
         }

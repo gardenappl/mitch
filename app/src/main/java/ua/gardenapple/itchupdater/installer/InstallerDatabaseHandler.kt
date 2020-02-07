@@ -37,33 +37,37 @@ class InstallerDatabaseHandler(val context: Context) : InstallCompleteListener, 
                     packageName = packageName
                 )
                 Log.d(LOGGING_TAG, "New install: $install")
-                db.installDao.update(install)
+                db.installDao.resetAllInstallationsForGame(install.gameId, install)
+
+                val pendingUploads = db.uploadDao.getPendingUploadsForGame(install.gameId)
+                for(upload in pendingUploads) {
+                    upload.isPending = false
+                }
+                db.uploadDao.resetAllUploadsForGame(install.gameId, pendingUploads)
             }
         }
     }
 
-    override suspend fun onDownloadComplete(downloadId: Long, pendingInstallId: Int?) {
+    override suspend fun onDownloadComplete(downloadId: Long, packageInstallerId: Int?) {
         val db = AppDatabase.getDatabase(context)
         Log.d(LOGGING_TAG, "onDownloadComplete")
 
         val pendingInstall = db.installDao.findPendingInstallationByDownloadId(downloadId)!!
 
-        if(pendingInstallId == null) {
+        if(packageInstallerId == null) {
             val pendingUploads = db.uploadDao.getPendingUploadsForGame(pendingInstall.gameId)
-            for (upload in pendingUploads) {
+            for(upload in pendingUploads) {
                 upload.isPending = false
             }
-            db.uploadDao.clearAllUploadsForGame(pendingInstall.gameId)
-            db.uploadDao.insert(pendingUploads)
+            db.uploadDao.resetAllUploadsForGame(pendingInstall.gameId, pendingUploads)
 
             pendingInstall.downloadOrInstallId = null
             pendingInstall.status = Installation.STATUS_INSTALLED
-            db.installDao.clearAllInstallationsForGame(pendingInstall.gameId)
-            db.installDao.insert(pendingInstall)
+            db.installDao.resetAllInstallationsForGame(pendingInstall.gameId, pendingInstall)
 
         } else {
             pendingInstall.status = Installation.STATUS_INSTALLING
-            pendingInstall.downloadOrInstallId = pendingInstallId.toLong()
+            pendingInstall.downloadOrInstallId = packageInstallerId.toLong()
             db.installDao.update(pendingInstall)
         }
     }

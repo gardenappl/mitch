@@ -41,13 +41,16 @@
             </intent-filter>
         </activity>
         <receiver
-                android:name=".installer.DownloadBroadcastReceiver" >
+                android:name=".installer.FileDownloadBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
             </intent-filter>
         </receiver>
         <receiver
-                android:name=".installer.InstallBroadcastReceiver"
+                android:name=".installer.InstallNotificationBroadcastReceiver"
+                android:exported="false" />
+        <receiver
+                android:name=".installer.UpdateNotificationBroadcastReceiver"
                 android:exported="false" />
         <receiver
                 android:name=".installer.UninstallBroadcastReceiver"

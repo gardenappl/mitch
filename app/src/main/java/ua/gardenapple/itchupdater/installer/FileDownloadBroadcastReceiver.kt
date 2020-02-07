@@ -8,13 +8,13 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.FileProvider
 import android.util.Log
 import ua.gardenapple.itchupdater.*
-import java.io.File
 
-
-class DownloadBroadcastReceiver : BroadcastReceiver() {
+/**
+ * This receiver responds to finished file downloads from DownloadManager.
+ */
+class FileDownloadBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val downloadID = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
@@ -53,9 +53,9 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
 //                "ua.gardenapple.itchupdater.fileprovider", File(downloadPath))
 //            Log.d(LOGGING_TAG, providerUri.toString())
 
-            val intent = Intent(context, InstallBroadcastReceiver::class.java).apply {
+            val intent = Intent(context, InstallNotificationBroadcastReceiver::class.java).apply {
                 data = Uri.parse(downloadPath)
-                putExtra(InstallBroadcastReceiver.EXTRA_DOWNLOAD_ID, id)
+                putExtra(InstallNotificationBroadcastReceiver.EXTRA_DOWNLOAD_ID, id)
 
             }
             pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -93,7 +93,7 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
         }
 
         with(NotificationManagerCompat.from(context)) {
-            notify(NOTIFICATION_ID_DOWNLOAD + id.toInt(), builder.build())
+            notify(NOTIFICATION_ID_DOWNLOAD + (id % 100000).toInt(), builder.build())
         }
     }
 }

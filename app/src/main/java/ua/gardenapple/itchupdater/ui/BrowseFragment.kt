@@ -82,7 +82,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         webView.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
             Log.d(LOGGING_TAG, "Requesting download...")
-            context!!.let { DownloadRequester.requestDownload(it, activity, url, contentDisposition, mimeType) }
+            context!!.let { DownloadRequester.requestDownload(it, activity, url, contentDisposition, mimeType, true) }
         }
 
         if(savedInstanceState?.getBundle(WEB_VIEW_STATE_KEY) != null) {
