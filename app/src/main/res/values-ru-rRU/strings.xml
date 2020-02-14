@@ -5,8 +5,7 @@
     <string name="notification_install_title">Нажмите, чтобы установить</string>
     <string name="notification_download_complete_title">Загрузка завершена</string>
     <string name="notification_channel_install_desc">Уведомлять, когда приложение из itch.io готово к установке</string>
-    <string name="notification_channel_updates_desc">Уведомлять, когда для приложения из itch.io доступно обновление
-    </string>
+    <string name="notification_channel_updates_desc">Уведомлять, когда для приложения из itch.io доступно обновление</string>
     <string name="nav_website_view">Главная</string>
     <string name="nav_settings">Настройки</string>
     <string name="nav_installed">Моя коллекция</string>
@@ -34,7 +33,7 @@
     <string name="game_package_info_fail">Ваша система не дает возможность просматривать эту информацию.</string>
     <string name="dialog_cancel">Отмена</string>
     <string name="dialog_yes">Да</string>
-    <string name="dialog_game_remove">Вы точно хотите убрать %1$s из вашей коллекции Mitch? Вы перестанете получать уведомления о новых версиях.\n\nЭто действие не удалит загруженные файлы.</string>
+    <string name="dialog_game_remove">Вы точно хотите убрать %1$s из вашей коллекции Mitch? Вы перестанете получать уведомления о новых версиях.\n\Это действие не удалит загруженные файлы.</string>
     <string name="dialog_remove">Убрать</string>
     <string name="dialog_game_remove_done">Вы убрали %1$s из вашей коллекции Mitch.</string>
     <string name="notification_update_access_denied">Доступ запрещен (вы войшли в свой аккаунт?)</string>

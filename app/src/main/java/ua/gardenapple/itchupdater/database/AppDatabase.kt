@@ -60,6 +60,7 @@ abstract class AppDatabase : RoomDatabase() {
                             } else {
                                 Log.d(LOGGING_TAG, "Deleting info on Mitch")
                                 appDb.uploadDao.clearAllUploadsForGame(Game.MITCH_GAME_ID)
+                                appDb.installDao.clearAllInstallationsForGame(Game.MITCH_GAME_ID)
                             }
 
                             val mitchInstall = appDb.installDao.findInstallation(Game.MITCH_GAME_ID)

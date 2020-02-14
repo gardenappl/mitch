@@ -42,4 +42,6 @@
     <string name="notification_update_access_denied">Access denied (are you logged in to your account?)</string>
     <string name="notification_update_empty">Downloads no longer available</string>
     <string name="notification_update_fail">An error occurred while checking updates</string>
+    <string name="settings_update_check_metered">Check updates when on metered connections</string>
+    <string name="settings_update_check_metered_desc">If this option is disabled, Mitch will not check for updates on connections with data limits.\\nUpdate checks may consume a few dozen KBs of data each day.</string>
 </resources>
