@@ -121,7 +121,7 @@ class MitchApp : Application() {
         }
     }
 
-    fun registerUpdateCheckTask(requiresUnmetered: Boolean) {
+    private fun registerUpdateCheckTask(requiresUnmetered: Boolean) {
         val constraints = Constraints.Builder().run {
             if(requiresUnmetered)
                 setRequiredNetworkType(NetworkType.UNMETERED)
@@ -129,10 +129,10 @@ class MitchApp : Application() {
                 setRequiredNetworkType(NetworkType.CONNECTED)
             build()
         }
-        val updateCheckRequest = PeriodicWorkRequestBuilder<WebUpdateCheckWorker>(2, TimeUnit.MINUTES).run {
+        val updateCheckRequest = PeriodicWorkRequestBuilder<WebUpdateCheckWorker>(1, TimeUnit.DAYS).run {
             //addTag(UPDATE_CHECK_TASK_TAG)
             setConstraints(constraints)
-            setInitialDelay(1, TimeUnit.MINUTES)
+            //setInitialDelay(1, TimeUnit.MINUTES)
             build()
         }
 

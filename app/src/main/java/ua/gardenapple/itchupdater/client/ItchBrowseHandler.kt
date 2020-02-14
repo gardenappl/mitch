@@ -9,9 +9,8 @@ import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
-import ua.gardenapple.itchupdater.installer.DownloadStartListener
 
-class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope): DownloadStartListener {
+class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope) {
 
     companion object {
         const val LOGGING_TAG = "ItchBrowseHandler"
@@ -60,9 +59,7 @@ class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope
         tryUpdateDatabase()
     }
 
-    override suspend fun onDownloadStarted(downloadId: Long, startedViaBrowser: Boolean) {
-        if(!startedViaBrowser)
-            return
+    fun onDownloadStarted(downloadId: Long) {
         currentDownloadId = downloadId
         tryUpdateDatabase()
     }

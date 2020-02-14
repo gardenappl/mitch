@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.app.DownloadManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
@@ -13,6 +14,9 @@ import android.util.Log
 import android.webkit.URLUtil
 import ua.gardenapple.itchupdater.LOGGING_TAG
 import ua.gardenapple.itchupdater.PERMISSION_REQUEST_CODE_DOWNLOAD
+import ua.gardenapple.itchupdater.ui.PermissionRequestActivity
+
+typealias OnDownloadStartListener = (downloadId: Long) -> Unit
 
 class DownloadRequester {
 
@@ -20,7 +24,7 @@ class DownloadRequester {
         private lateinit var currentUrl: String
         private var currentContent: String? = null
         private var currentMimeType: String? = null
-        private var startedViaBrowser: Boolean = false
+        private var currentCallback: OnDownloadStartListener? = null
 
         fun requestDownload(
             context: Context,
@@ -28,23 +32,25 @@ class DownloadRequester {
             url: String,
             contentDisposition: String?,
             mimeType: String?,
-            startedViaBrowser: Boolean
+            callback: OnDownloadStartListener? = null
         ) {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
                 Log.d(LOGGING_TAG, "Don't have permission")
+                currentUrl = url
+                currentContent = contentDisposition
+                currentMimeType = mimeType
+                currentCallback = callback
                 if(activity != null) {
-                    currentUrl = url
-                    currentContent = contentDisposition
-                    currentMimeType = mimeType
-                    this.startedViaBrowser = startedViaBrowser
                     ActivityCompat.requestPermissions(
                         activity,
                         arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
                         PERMISSION_REQUEST_CODE_DOWNLOAD
                     )
                 } else {
-                    //TODO: PermissionRequestActivity
+                    val intent = Intent(context, PermissionRequestActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
                 }
                 return
             } else {
@@ -54,7 +60,7 @@ class DownloadRequester {
                     url,
                     contentDisposition,
                     mimeType,
-                    startedViaBrowser
+                    callback
                 )
             }
         }
@@ -66,19 +72,19 @@ class DownloadRequester {
                 currentUrl,
                 currentContent,
                 currentMimeType,
-                startedViaBrowser
+                currentCallback
             )
         }
 
         /**
          * Will fail if the user did not provide required permissions.
          */
-        fun enqueueDownload(
+        private fun enqueueDownload(
             downloadManager: DownloadManager,
             url: String,
             contentDisposition: String?,
             mimeType: String?,
-            startedViaBrowser: Boolean
+            callback: OnDownloadStartListener?
         ) : Long {
             val downloadRequest = DownloadManager.Request(Uri.parse(url)).apply {
                 Log.d(LOGGING_TAG, "Url: $url, contentDisposition: $contentDisposition, mimeType: $mimeType")
@@ -97,7 +103,7 @@ class DownloadRequester {
             }
 
             val id = downloadManager.enqueue(downloadRequest)
-            InstallerEvents.notifyDownloadStart(id, startedViaBrowser)
+            callback?.invoke(id)
             return id
         }
     }

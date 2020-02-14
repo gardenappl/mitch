@@ -48,7 +48,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         super.onAttach(context)
         val browseHandler = ItchBrowseHandler(context, this)
         this.browseHandler = browseHandler
-        InstallerEvents.addListener(browseHandler)
     }
 
     override fun onDetach() {
@@ -82,7 +81,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         webView.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
             Log.d(LOGGING_TAG, "Requesting download...")
-            context!!.let { DownloadRequester.requestDownload(it, activity, url, contentDisposition, mimeType, true) }
+            context!!.let {
+                DownloadRequester.requestDownload(it, activity, url, contentDisposition, mimeType) {
+                    downloadId: Long -> browseHandler!!.onDownloadStarted(downloadId)
+                }
+            }
         }
 
         if(savedInstanceState?.getBundle(WEB_VIEW_STATE_KEY) != null) {

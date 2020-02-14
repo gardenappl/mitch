@@ -10,6 +10,7 @@ import androidx.work.Logger
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
 import okhttp3.Request
@@ -111,15 +112,11 @@ class WebGameDownloader(val context: Context) {
             return
         }
 
-        val downloadManager = context.getSystemService(Activity.DOWNLOAD_SERVICE) as DownloadManager
-        val downloadId = DownloadRequester.enqueueDownload(
-            downloadManager,
-            downloadUrl,
-            contentDisposition,
-            mimeType,
-            false
-        )
-        updateDatabase(game.gameId, uploadId, downloadId, url, pendingUploads)
+        DownloadRequester.requestDownload(context, null, downloadUrl, contentDisposition, mimeType) {
+            downloadId: Long -> runBlocking(Dispatchers.IO) {
+                updateDatabase(game.gameId, uploadId, downloadId, url, pendingUploads)
+            }
+        }
     }
 
     /**

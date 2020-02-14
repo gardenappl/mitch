@@ -40,7 +40,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.PermissionRequestActivity" />
+        <activity
+                android:name=".ui.PermissionRequestActivity"
+                android:theme="@style/Theme.AppCompat.Dialog" />
 
         <receiver
                 android:name=".installer.FileDownloadBroadcastReceiver" >
