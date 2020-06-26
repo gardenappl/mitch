@@ -66,7 +66,7 @@ class WebUpdateChecker(val db: AppDatabase) {
 
             val result = compareUploads(db, updateCheckDoc, currentInstall, gameId, downloadPageInfo)
 
-            if (result.code != UpdateCheckResult.UNKNOWN)
+            if (result.uploadID != null)
                 return@withContext result
 
 
@@ -97,13 +97,13 @@ class WebUpdateChecker(val db: AppDatabase) {
         Log.d(LOGGING_TAG, "Found $installedUpload")
         var suggestedUpload: Upload? = null
 
-        if (fetchedUploads.size == 1)
-            suggestedUpload = fetchedUploads.first()
-        else {
-            for (upload in fetchedUploads) {
-                if (upload.name == installedUpload.name)
-                    suggestedUpload = upload
+        for (upload in fetchedUploads) {
+            if (upload.name == installedUpload.name) {
+                suggestedUpload = upload
+                break
             }
+            if (upload.platforms == installedUpload.platforms)
+                suggestedUpload = upload
         }
         Log.d(LOGGING_TAG, "Suggested upload: $suggestedUpload")
 

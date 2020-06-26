@@ -60,7 +60,7 @@ class ItchWebsiteUtils {
             }
             var html = ""
             MitchApp.httpClient.newCall(request).execute().use { response ->
-                if(!response.isSuccessful)
+                if (!response.isSuccessful)
                     throw IOException("Unexpected response $response")
                 html = response.body!!.string()
             }
