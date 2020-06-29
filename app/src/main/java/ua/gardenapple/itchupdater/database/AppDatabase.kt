@@ -102,7 +102,8 @@ abstract class AppDatabase : RoomDatabase() {
             version = BuildConfig.VERSION_NAME,
             locale = Game.MITCH_LOCALE,
             name = Upload.MITCH_RELEASE_NAME,
-            fileSize = Upload.MITCH_FILE_SIZE
+            fileSize = Upload.MITCH_FILE_SIZE,
+            platforms = Upload.PLATFORM_ANDROID
         )
         uploadDao.clearAllUploadsForGame(Game.MITCH_GAME_ID)
         Log.d(LOGGING_TAG, "Adding upload $upload")

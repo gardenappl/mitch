@@ -66,7 +66,8 @@ class WebUpdateChecker(val db: AppDatabase) {
 
             val result = compareUploads(db, updateCheckDoc, currentInstall, gameId, downloadPageInfo)
 
-            if (result.uploadID != null)
+            if (result.uploadID != null ||
+                (result.code != UpdateCheckResult.ACCESS_DENIED && result.code != UpdateCheckResult.UNKNOWN))
                 return@withContext result
 
 
@@ -97,13 +98,21 @@ class WebUpdateChecker(val db: AppDatabase) {
         Log.d(LOGGING_TAG, "Found $installedUpload")
         var suggestedUpload: Upload? = null
 
+        var oneAvailableUpload: Boolean = false
         for (upload in fetchedUploads) {
             if (upload.name == installedUpload.name) {
                 suggestedUpload = upload
                 break
             }
-            if (upload.platforms == installedUpload.platforms)
-                suggestedUpload = upload
+            if (upload.platforms == installedUpload.platforms) {
+                if (suggestedUpload == null) {
+                    suggestedUpload = upload
+                    oneAvailableUpload = true
+                } else if (oneAvailableUpload) {
+                    suggestedUpload = null
+                    oneAvailableUpload = false
+                }
+            }
         }
         Log.d(LOGGING_TAG, "Suggested upload: $suggestedUpload")
 
@@ -134,8 +143,8 @@ class WebUpdateChecker(val db: AppDatabase) {
                         return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId, downloadPageUrl, updateCheckDoc)
                     }
 
-                    Log.d(LOGGING_TAG, "Suggested upload: $suggestedUpload")
-                    suggestedUpload = upload
+                    Log.d(LOGGING_TAG, "Upload with current uploadID has not changed")
+                    suggestedUpload = null
                     break
                 }
             }
