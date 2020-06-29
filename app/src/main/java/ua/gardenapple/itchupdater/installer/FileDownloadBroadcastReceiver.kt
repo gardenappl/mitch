@@ -46,7 +46,7 @@ class FileDownloadBroadcastReceiver : BroadcastReceiver() {
     private fun createNotification(context: Context, downloadLocalUri: Uri, id: Long, isApk: Boolean) {
         val pendingIntent: PendingIntent
         if(isApk) {
-            val downloadPath = downloadLocalUri.path
+            val downloadPath = downloadLocalUri.path!!
             Log.d(LOGGING_TAG, downloadPath)
 
 //            val providerUri = FileProvider.getUriForFile(context,

@@ -39,7 +39,7 @@ class Installer {
 
         val session = pkgInstaller.openSession(sessionId)
 
-        val apkFile = File(apkUri.path)
+        val apkFile = File(apkUri.path!!)
 
         try {
             apkFile.inputStream().use { inputStream ->
