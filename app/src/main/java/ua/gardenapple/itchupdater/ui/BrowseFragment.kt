@@ -13,10 +13,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
+import android.widget.ProgressBar
 import androidx.annotation.Keep
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.browse_fragment.*
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -327,6 +329,17 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
             customView = null
             customViewCallback = null
+        }
+
+        override fun onProgressChanged(view: WebView?, newProgress: Int) {
+            if (newProgress < 100 && progressBar.visibility == ProgressBar.GONE)
+                progressBar.visibility = ProgressBar.VISIBLE
+
+            //TODO: better animation?
+            progressBar.progress = newProgress
+
+            if (newProgress == 100)
+                progressBar.visibility = ProgressBar.GONE
         }
     }
 }
