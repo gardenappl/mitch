@@ -1,8 +1,10 @@
 package ua.gardenapple.itchupdater.client
 
+import android.graphics.Color
 import android.net.Uri
 import android.util.Log
 import android.webkit.CookieManager
+import androidx.annotation.ColorInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
@@ -28,6 +30,9 @@ class ItchWebsiteParser {
     companion object {
         const val LOGGING_TAG = "ItchWebsiteParser"
         const val UNKNOWN_LOCALE = "Unknown"
+
+//        val COLOR_PATTERN = Regex("root[{]--itchio_ui_bg: (#\\w+);--itchio_ui_bg_dark: (#\\w+)}")
+        val COLOR_PATTERN = Regex("root[{]--itchio_ui_bg: (#\\w+);")
 
         fun getGameInfo(gamePageDoc: Document, gamePageUrl: String): Game {
             val thumbnails = gamePageDoc.head().getElementsByAttributeValue("property", "og:image")
@@ -239,6 +244,14 @@ class ItchWebsiteParser {
                 timestamp = null
 
             return timestamp
+        }
+
+        fun getBackgroundUIColor(doc: Document): Int? {
+            val gameThemeCSS = doc.getElementById("game_theme")?.html() ?: return null
+
+            val foundColors = COLOR_PATTERN.find(gameThemeCSS)
+
+            return Color.parseColor(foundColors?.groupValues?.get(1) ?: "#333")
         }
     }
 }

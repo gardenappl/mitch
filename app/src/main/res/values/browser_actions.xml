@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="browser_reload" type="id"/>
+    <item name="browser_search" type="id"/>
+    <item name="browser_share" type="id"/>
+</resources>

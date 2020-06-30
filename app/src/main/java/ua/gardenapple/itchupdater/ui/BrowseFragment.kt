@@ -15,8 +15,11 @@ import android.view.ViewGroup
 import android.webkit.*
 import android.widget.ProgressBar
 import androidx.annotation.Keep
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
+import com.leinardi.android.speeddial.SpeedDialActionItem
+import com.leinardi.android.speeddial.SpeedDialView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.browse_fragment.*
 import kotlinx.coroutines.*
@@ -25,8 +28,8 @@ import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.client.ItchBrowseHandler
+import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.installer.DownloadRequester
-import ua.gardenapple.itchupdater.installer.InstallerEvents
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.StringReader
@@ -83,13 +86,47 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         webView.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
             Log.d(LOGGING_TAG, "Requesting download...")
-            context!!.let {
+            requireContext().let {
                 DownloadRequester.requestDownload(it, activity, url, contentDisposition, mimeType) {
                     downloadId: Long -> browseHandler!!.onDownloadStarted(downloadId)
                 }
             }
         }
 
+        //TODO: button presses do things
+
+        //Set up FAB buttons
+        //(colors don't matter too much as they will be set by processUI anyway)
+        val speedDialView = view.findViewById<SpeedDialView>(R.id.speedDial)
+        val fabAccentColor = ResourcesCompat.getColor(resources, R.color.colorAccent, requireContext().theme)
+        val fabBgColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
+        val fabFgColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
+        speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_reload, R.drawable.ic_baseline_refresh_24)
+            .setFabBackgroundColor(fabAccentColor)
+            .setLabelBackgroundColor(fabBgColor)
+            .setFabImageTintColor(fabFgColor)
+            .setLabelColor(fabFgColor)
+            .setLabel(R.string.browser_reload)
+            .create()
+        )
+        speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_search, R.drawable.ic_baseline_search_24)
+            .setFabBackgroundColor(fabAccentColor)
+            .setLabelBackgroundColor(fabBgColor)
+            .setFabImageTintColor(fabFgColor)
+            .setLabelColor(fabFgColor)
+            .setLabel(R.string.browser_search)
+            .create()
+        )
+        speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_share, R.drawable.ic_baseline_share_24)
+            .setFabBackgroundColor(fabAccentColor)
+            .setLabelBackgroundColor(fabBgColor)
+            .setFabImageTintColor(fabFgColor)
+            .setLabelColor(fabFgColor)
+            .setLabel(R.string.browser_share)
+            .create()
+        )
+
+        //Loading a URL should be the last action so that it may call updateUI
         if(savedInstanceState?.getBundle(WEB_VIEW_STATE_KEY) != null) {
             Log.d(LOGGING_TAG, "Restoring WebView")
             webView.restoreState(savedInstanceState.getBundle(WEB_VIEW_STATE_KEY))
@@ -132,17 +169,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         cancel()
     }
 
-
-    fun processUI(doc: Document) {
-        Log.d(LOGGING_TAG, "Processing UI...")
-        val navBar = (activity as? MainActivity)?.bottomNavigationView
-        navBar?.post {
-            if (ItchWebsiteUtils.shouldRemoveAppNavbar(webView, doc))
-                navBar.visibility = View.GONE
-            else
-                navBar.visibility = View.VISIBLE
-        }
-    }
     /**
      * Responsible for updating the UI as well as the local game database after a page has loaded.
      */
@@ -170,6 +196,58 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
     }
 
+    fun processUI(doc: Document) {
+        Log.d(LOGGING_TAG, "Processing UI...")
+
+
+        val navBar = (activity as? MainActivity)?.bottomNavigationView
+        val fab = requireView().findViewById<SpeedDialView>(R.id.speedDial)
+        val accentColor = ResourcesCompat.getColor(resources, R.color.colorAccent, requireContext().theme)
+        val lightColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
+        val darkColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
+
+        if (ItchWebsiteUtils.shouldRemoveAppNavbar(webView, doc)) {
+            navBar?.post {
+                navBar.visibility = View.GONE
+            }
+            fab?.post {
+                val fabParams = fab.layoutParams as ViewGroup.MarginLayoutParams
+                val marginDP = (50 * requireContext().resources.displayMetrics.density).toInt()
+                fabParams.bottomMargin = marginDP
+            }
+        } else {
+            navBar?.post {
+                navBar.visibility = View.VISIBLE
+            }
+            //TODO: change color
+            fab?.post {
+                val fabParams = fab.layoutParams as ViewGroup.MarginLayoutParams
+                fabParams.bottomMargin = 0
+            }
+        }
+        launch(Dispatchers.Default) {
+            val gameThemeColor = ItchWebsiteParser.getBackgroundUIColor(doc)
+
+            val fabAccentColor = gameThemeColor ?: accentColor
+            val fabBgColor = gameThemeColor ?: lightColor
+            val fabLabelColor = if (gameThemeColor == null) darkColor else lightColor
+
+            fab?.post {
+                fab.mainFabClosedBackgroundColor = fabAccentColor
+                fab.mainFabOpenedBackgroundColor = fabAccentColor
+                for (actionItem in fab.actionItems) {
+                    val newActionItem = SpeedDialActionItem.Builder(actionItem)
+                        .setFabBackgroundColor(fabBgColor)
+                        .setLabelBackgroundColor(fabBgColor)
+                        .setFabImageTintColor(fabLabelColor)
+                        .setLabelColor(fabLabelColor)
+                        .create()
+                    fab.replaceActionItem(actionItem, newActionItem)
+                }
+            }
+        }
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
@@ -186,6 +264,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         super.onSaveInstanceState(outState)
     }
+
+
 
 
     @Keep //prevent this class from being removed by compiler optimizations

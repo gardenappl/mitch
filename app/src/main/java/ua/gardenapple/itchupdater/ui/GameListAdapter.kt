@@ -113,7 +113,7 @@ class GameListAdapter internal constructor(
                 val dialog = AlertDialog.Builder(context).apply {
                     setMessage(context.getString(R.string.dialog_game_remove, game.name))
 
-                    setPositiveButton(R.string.dialog_remove) { dialog, id ->
+                    setPositiveButton(R.string.dialog_remove) { _, _ ->
                         runBlocking(Dispatchers.IO) {
                             val db = AppDatabase.getDatabase(context)
                             db.installDao.deleteFinishedInstallation(game.gameId)
