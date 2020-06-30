@@ -48,4 +48,5 @@
     <string name="browser_search">Пошук по сайту</string>
     <string name="browser_share">Поділитись посиланням</string>
     <string name="search_games_hint">Пошук ігор або авторів</string>
+    <string name="toast_download_started">Завантаження почалось</string>
 </resources>

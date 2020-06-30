@@ -38,6 +38,9 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
         setContentView(R.layout.activity_main)
 
+        //Add app bar, hidden by default
+        setSupportActionBar(toolbar)
+        supportActionBar!!.hide()
 
 
         Log.d(LOGGING_TAG, "Stored active fragment tag: ${savedInstanceState?.getString(

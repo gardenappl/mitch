@@ -136,6 +136,7 @@ class MitchApp : Application() {
             build()
         }
 
+        //TODO: don't check on every launch
         WorkManager.getInstance(applicationContext)
             .enqueueUniquePeriodicWork(
                 UPDATE_CHECK_TASK_TAG,

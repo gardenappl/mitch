@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.annotation.Keep
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ShareCompat
@@ -91,7 +92,12 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             Log.d(LOGGING_TAG, "Requesting download...")
             requireContext().let {
                 DownloadRequester.requestDownload(it, activity, url, contentDisposition, mimeType) {
-                    downloadId: Long -> browseHandler!!.onDownloadStarted(downloadId)
+                    downloadId: Long ->
+                    run {
+                        Toast.makeText(context, R.string.toast_download_started, Toast.LENGTH_LONG)
+                            .show()
+                        browseHandler!!.onDownloadStarted(downloadId)
+                    }
                 }
             }
         }
@@ -246,42 +252,66 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
     }
 
+    /**
+     * Adapts the app's UI to the theme of the current web page.
+     * @param doc the parsed DOM of the page the user is currently on.
+     */
     fun processUI(doc: Document) {
         Log.d(LOGGING_TAG, "Processing UI...")
 
+        val navBar = (activity as? MainActivity)?.bottomNavigationView
+        val fab = (activity as? MainActivity)?.speedDial
+        val supportAppBar = (activity as? MainActivity)?.supportActionBar
+        val appBar = (activity as? MainActivity)?.toolbar
 
-        val navBar = (activity as MainActivity).bottomNavigationView
-        val fab = (activity as MainActivity).speedDial
         val defaultAccentColor = ResourcesCompat.getColor(resources, R.color.colorAccent, requireContext().theme)
-        val lightColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
-        val darkColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
+        val defaultBgColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
+        val defaultFgColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
 
+        //Change layout
         if (ItchWebsiteUtils.shouldRemoveAppNavbar(webView, doc)) {
             navBar?.post {
                 navBar.visibility = View.GONE
             }
+        } else {
+            navBar?.post {
+                navBar.visibility = View.VISIBLE
+            }
+        }
+
+        if (ItchWebsiteUtils.siteHasNavbar(webView, doc)) {
             fab?.post {
                 val fabParams = fab.layoutParams as ViewGroup.MarginLayoutParams
                 val marginDP = (50 * requireContext().resources.displayMetrics.density).toInt()
                 fabParams.bottomMargin = marginDP
             }
         } else {
-            navBar?.post {
-                navBar.visibility = View.VISIBLE
-            }
             fab?.post {
                 val fabParams = fab.layoutParams as ViewGroup.MarginLayoutParams
                 fabParams.bottomMargin = 0
             }
         }
-        launch(Dispatchers.Default) {
-            //Colors adapt to game theme
 
+
+        //Add app bar
+        appBar?.post {
+            if (ItchWebsiteUtils.isGamePage(doc)) {
+                supportAppBar?.title = ItchWebsiteParser.getGameName(doc)
+                supportAppBar?.show()
+            } else {
+                supportAppBar?.hide()
+            }
+        }
+
+
+        //Colors adapt to game theme
+        //TODO: change color of system UI
+        launch(Dispatchers.Default) {
             val gameThemeColor = ItchWebsiteParser.getBackgroundUIColor(doc)
 
             val accentColor = gameThemeColor ?: defaultAccentColor
-            val bgColor = gameThemeColor ?: lightColor
-            val fgColor = if (gameThemeColor == null) darkColor else lightColor
+            val bgColor = gameThemeColor ?: defaultBgColor
+            val fgColor = if (gameThemeColor == null) defaultFgColor else defaultBgColor
 
             fab?.post {
                 fab.mainFabClosedBackgroundColor = accentColor
@@ -296,8 +326,12 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     fab.replaceActionItem(actionItem, newActionItem)
                 }
             }
-            progressBar.post {
+            progressBar?.post {
                 progressBar.setBackgroundColor(bgColor)
+            }
+            appBar?.post {
+                appBar.setBackgroundColor(bgColor)
+                appBar.setTitleTextColor(fgColor)
             }
         }
     }

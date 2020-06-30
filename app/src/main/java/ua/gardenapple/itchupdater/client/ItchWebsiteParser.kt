@@ -43,11 +43,9 @@ class ItchWebsiteParser {
                 Log.d(LOGGING_TAG, "No thumbnail!")
             }
 
-            val productJsonString: String = gamePageDoc.head().getElementsByAttributeValue("type", "application/ld+json")[1].html()
-            val jsonObject = JSONObject(productJsonString)
-            val name = jsonObject.getString("name")
 
             val gameId: Int = ItchWebsiteUtils.getGameId(gamePageDoc)
+            val name: String = getGameName(gamePageDoc)!!
 
             val infoTable = gamePageDoc.body().getElementsByClass("game_info_panel_widget")[0].child(0).child(0)
 
@@ -252,6 +250,26 @@ class ItchWebsiteParser {
             val foundColors = COLOR_PATTERN.find(gameThemeCSS)
 
             return Color.parseColor(foundColors?.groupValues?.get(1) ?: "#333")
+        }
+
+        fun getGameName(doc: Document): String {
+            if (ItchWebsiteUtils.isPurchasePage(doc)) {
+                return doc.getElementsByTag("h1")[0].child(0).text()
+            }
+
+            if (ItchWebsiteUtils.isDownloadPage(doc)) {
+                return doc.getElementsByTag("h2")[0].child(0).text()
+            }
+
+            if (ItchWebsiteUtils.isStorePage(doc)) {
+                val jsonObjects =
+                    doc.head().getElementsByAttributeValue("type", "application/ld+json")
+                val productJsonString: String = jsonObjects[1].html()
+                val jsonObject = JSONObject(productJsonString)
+                return jsonObject.getString("name")
+            }
+
+            throw IllegalArgumentException("Document is not related to game")
         }
     }
 }
