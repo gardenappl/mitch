@@ -27,13 +27,4 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="1.0" />
-
-    <com.leinardi.android.speeddial.SpeedDialView
-            android:id="@+id/speedDial"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            app:layout_constraintBottom_toTopOf="@+id/progressBar"
-            app:layout_constraintEnd_toEndOf="@+id/webView"
-            app:sdMainFabClosedSrc="@drawable/ic_baseline_more_vert_24" />
 </androidx.constraintlayout.widget.ConstraintLayout>

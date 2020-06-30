@@ -88,6 +88,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
     /**
      * @param itemId one of: R.id.navigation_website_view, R.id.navigation_settings, R.id.navigation_library
+     * @param resetNavBar forcibly change the highlighted option in the bottom navigation bar
      * @return true if the current fragment has changed
      */
     fun switchToFragment(itemId: Int, resetNavBar: Boolean = true): Boolean {
@@ -100,7 +101,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             else -> return false
         }
 
-        if(newFragment === activeFragment)
+        if (newFragment === activeFragment)
             return false
 
         supportFragmentManager.beginTransaction().apply {
@@ -112,8 +113,13 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         }
         activeFragment = newFragment
 
-        if(resetNavBar)
-            findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId = itemId
+        if (resetNavBar)
+            bottomNavigationView.selectedItemId = itemId
+
+        if (newFragment == browseFragment)
+            speedDial.show()
+        else
+            speedDial.hide()
 
         return true
     }

@@ -100,17 +100,14 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             }
         }
 
-        //TODO: button presses do things
-
         //Set up FAB buttons
         //(colors don't matter too much as they will be set by processUI anyway)
-        val speedDialView = view.findViewById<SpeedDialView>(R.id.speedDial)
-        val fabAccentColor = ResourcesCompat.getColor(resources, R.color.colorAccent, requireContext().theme)
+        val speedDialView = (activity as MainActivity).speedDial
         val fabBgColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
         val fabFgColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
         speedDialView.clearActionItems()
         speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_reload, R.drawable.ic_baseline_refresh_24)
-            .setFabBackgroundColor(fabAccentColor)
+            .setFabBackgroundColor(fabBgColor)
             .setLabelBackgroundColor(fabBgColor)
             .setFabImageTintColor(fabFgColor)
             .setLabelColor(fabFgColor)
@@ -118,7 +115,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             .create()
         )
         speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_search, R.drawable.ic_baseline_search_24)
-            .setFabBackgroundColor(fabAccentColor)
+            .setFabBackgroundColor(fabBgColor)
             .setLabelBackgroundColor(fabBgColor)
             .setFabImageTintColor(fabFgColor)
             .setLabelColor(fabFgColor)
@@ -126,7 +123,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             .create()
         )
         speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_share, R.drawable.ic_baseline_share_24)
-            .setFabBackgroundColor(fabAccentColor)
+            .setFabBackgroundColor(fabBgColor)
             .setLabelBackgroundColor(fabBgColor)
             .setFabImageTintColor(fabFgColor)
             .setLabelColor(fabFgColor)
@@ -158,7 +155,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
                     val input = viewInflated.findViewById<TextInputEditText>(R.id.input)
 
-                    val builder = AlertDialog.Builder(requireContext())
+                    AlertDialog.Builder(requireContext())
                         .setTitle(R.string.browser_search)
                         .setView(viewInflated)
                         .setPositiveButton(android.R.string.ok) { dialog, _ ->
@@ -257,8 +254,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         Log.d(LOGGING_TAG, "Processing UI...")
 
 
-        val navBar = (activity as? MainActivity)?.bottomNavigationView
-        val fab = requireView().findViewById<SpeedDialView>(R.id.speedDial)
+        val navBar = (activity as MainActivity).bottomNavigationView
+        val fab = (activity as MainActivity).speedDial
         val accentColor = ResourcesCompat.getColor(resources, R.color.colorAccent, requireContext().theme)
         val lightColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
         val darkColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
@@ -276,7 +273,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             navBar?.post {
                 navBar.visibility = View.VISIBLE
             }
-            //TODO: change color
             fab?.post {
                 val fabParams = fab.layoutParams as ViewGroup.MarginLayoutParams
                 fabParams.bottomMargin = 0
