@@ -2,11 +2,9 @@ package ua.gardenapple.itchupdater.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.util.JsonReader
 import android.util.JsonToken
@@ -15,7 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
-import android.widget.EditText
 import android.widget.ProgressBar
 import androidx.annotation.Keep
 import androidx.appcompat.app.AlertDialog
@@ -25,7 +22,6 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.google.android.material.textfield.TextInputEditText
 import com.leinardi.android.speeddial.SpeedDialActionItem
-import com.leinardi.android.speeddial.SpeedDialView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.browse_fragment.*
 import kotlinx.coroutines.*
@@ -256,7 +252,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         val navBar = (activity as MainActivity).bottomNavigationView
         val fab = (activity as MainActivity).speedDial
-        val accentColor = ResourcesCompat.getColor(resources, R.color.colorAccent, requireContext().theme)
+        val defaultAccentColor = ResourcesCompat.getColor(resources, R.color.colorAccent, requireContext().theme)
         val lightColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
         val darkColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
 
@@ -279,24 +275,29 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             }
         }
         launch(Dispatchers.Default) {
+            //Colors adapt to game theme
+
             val gameThemeColor = ItchWebsiteParser.getBackgroundUIColor(doc)
 
-            val fabAccentColor = gameThemeColor ?: accentColor
-            val fabBgColor = gameThemeColor ?: lightColor
-            val fabLabelColor = if (gameThemeColor == null) darkColor else lightColor
+            val accentColor = gameThemeColor ?: defaultAccentColor
+            val bgColor = gameThemeColor ?: lightColor
+            val fgColor = if (gameThemeColor == null) darkColor else lightColor
 
             fab?.post {
-                fab.mainFabClosedBackgroundColor = fabAccentColor
-                fab.mainFabOpenedBackgroundColor = fabAccentColor
+                fab.mainFabClosedBackgroundColor = accentColor
+                fab.mainFabOpenedBackgroundColor = accentColor
                 for (actionItem in fab.actionItems) {
                     val newActionItem = SpeedDialActionItem.Builder(actionItem)
-                        .setFabBackgroundColor(fabBgColor)
-                        .setLabelBackgroundColor(fabBgColor)
-                        .setFabImageTintColor(fabLabelColor)
-                        .setLabelColor(fabLabelColor)
+                        .setFabBackgroundColor(bgColor)
+                        .setLabelBackgroundColor(bgColor)
+                        .setFabImageTintColor(fgColor)
+                        .setLabelColor(fgColor)
                         .create()
                     fab.replaceActionItem(actionItem, newActionItem)
                 }
+            }
+            progressBar.post {
+                progressBar.setBackgroundColor(bgColor)
             }
         }
     }
