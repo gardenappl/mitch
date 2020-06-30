@@ -2,9 +2,11 @@ package ua.gardenapple.itchupdater.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.util.JsonReader
 import android.util.JsonToken
@@ -13,11 +15,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
+import android.widget.EditText
 import android.widget.ProgressBar
 import androidx.annotation.Keep
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ShareCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
+import com.google.android.material.textfield.TextInputEditText
 import com.leinardi.android.speeddial.SpeedDialActionItem
 import com.leinardi.android.speeddial.SpeedDialView
 import kotlinx.android.synthetic.main.activity_main.*
@@ -33,6 +39,7 @@ import ua.gardenapple.itchupdater.installer.DownloadRequester
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.StringReader
+import java.net.URLEncoder
 
 
 class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
@@ -101,6 +108,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val fabAccentColor = ResourcesCompat.getColor(resources, R.color.colorAccent, requireContext().theme)
         val fabBgColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
         val fabFgColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
+        speedDialView.clearActionItems()
         speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_reload, R.drawable.ic_baseline_refresh_24)
             .setFabBackgroundColor(fabAccentColor)
             .setLabelBackgroundColor(fabBgColor)
@@ -125,8 +133,57 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             .setLabel(R.string.browser_share)
             .create()
         )
+        
+        speedDialView.setOnActionSelectedListener { actionItem ->  
+            when (actionItem.id) {
+                R.id.browser_reload -> {
+                    webView.reload()
+                    speedDialView.close()
+                    return@setOnActionSelectedListener true
+                }
+                R.id.browser_share -> {
+                    ShareCompat.IntentBuilder.from(activity)
+                        .setType("text/plain")
+                        .setChooserTitle(R.string.browser_share)
+                        .setText(webView.url)
+                        .startChooser()
+                    return@setOnActionSelectedListener true
+                }
+                R.id.browser_search -> {
+                    speedDialView.close()
 
-        //Loading a URL should be the last action so that it may call updateUI
+                    //Search dialog
+                    val viewInflated: View = LayoutInflater.from(context)
+                        .inflate(R.layout.dialog_search, getView() as ViewGroup?, false)
+
+                    val input = viewInflated.findViewById<TextInputEditText>(R.id.input)
+
+                    val builder = AlertDialog.Builder(requireContext())
+                        .setTitle(R.string.browser_search)
+                        .setView(viewInflated)
+                        .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                            dialog.dismiss()
+
+                            val searchQuery = URLEncoder.encode(input.text.toString(), "utf-8")
+                            val url = "https://itch.io/search?q=$searchQuery"
+                            webView.loadUrl(url)
+                        }
+                        .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                            dialog.cancel()
+                        }
+                        .show()
+
+                    return@setOnActionSelectedListener true
+                }
+                else -> {
+                    return@setOnActionSelectedListener false
+                }
+            }
+        }
+
+            
+            
+        //Loading a URL should be the last action so that it may call processUI
         if(savedInstanceState?.getBundle(WEB_VIEW_STATE_KEY) != null) {
             Log.d(LOGGING_TAG, "Restoring WebView")
             webView.restoreState(savedInstanceState.getBundle(WEB_VIEW_STATE_KEY))

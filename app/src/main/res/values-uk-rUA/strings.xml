@@ -45,6 +45,7 @@
     <string name="settings_update_check_metered">Перевіряти оновлення при лімітному підключенні</string>
     <string name="settings_update_check_metered_desc">Чи варто Mitch перевіряти оновлення, якщо діє обмеження обсягу даних.\n(Первірка оновлень може займати десятки МБ кожен день)</string>
     <string name="browser_reload">Оновити сторінку</string>
-    <string name="browser_search">Пошук ігор</string>
+    <string name="browser_search">Пошук по сайту</string>
     <string name="browser_share">Поділитись посиланням</string>
+    <string name="search_games_hint">Пошук ігор або авторів</string>
 </resources>

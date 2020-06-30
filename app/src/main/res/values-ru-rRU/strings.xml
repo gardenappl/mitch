@@ -45,6 +45,7 @@
     <string name="settings_update_check_metered">Проверять обновления при лимитном подключении</string>
     <string name="settings_update_check_metered_desc">Стоит ли Mitch проверять обновления, если есть лимит трафика.\n(Проверка обновлений может тратить несколько десятков МБ трафика каждый день)</string>
     <string name="browser_reload">Обновить страницу</string>
-    <string name="browser_search">Поиск игр</string>
+    <string name="browser_search">Поиск на сайте</string>
     <string name="browser_share">Поделиться ссылкой</string>
+    <string name="search_games_hint">Поиск игр или создателей</string>
 </resources>
