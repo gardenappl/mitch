@@ -152,6 +152,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     speedDialView.close()
 
                     //Search dialog
+                    //TODO: better dialog UX (Autofocus, search on enter)
                     val viewInflated: View = LayoutInflater.from(context)
                         .inflate(R.layout.dialog_search, getView() as ViewGroup?, false)
 
@@ -229,6 +230,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
      * Responsible for updating the UI as well as the local game database after a page has loaded.
      */
     private fun processUI() {
+        //Hack for retrieving HTML from WebView
         webView.evaluateJavascript("""
             (function() {
                 return "<html>"+document.getElementsByTagName("html")[0].innerHTML+"</html>";

@@ -54,7 +54,7 @@ class InstallerDatabaseHandler(val context: Context) : InstallCompleteListener, 
 
         val pendingInstall = db.installDao.findPendingInstallationByDownloadId(downloadId)!!
 
-        if(packageInstallerId == null) {
+        if (packageInstallerId == null) {
             val pendingUploads = db.uploadDao.getPendingUploadsForGame(pendingInstall.gameId)
             for(upload in pendingUploads) {
                 upload.isPending = false
@@ -66,6 +66,7 @@ class InstallerDatabaseHandler(val context: Context) : InstallCompleteListener, 
             db.installDao.resetAllInstallationsForGame(pendingInstall.gameId, pendingInstall)
 
         } else {
+            Log.d(LOGGING_TAG, "Yet to install")
             pendingInstall.status = Installation.STATUS_INSTALLING
             pendingInstall.downloadOrInstallId = packageInstallerId.toLong()
             db.installDao.update(pendingInstall)

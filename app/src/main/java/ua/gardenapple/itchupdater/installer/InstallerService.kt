@@ -7,6 +7,7 @@ import android.os.IBinder
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.AppDatabase
 
 class InstallerService : Service() {
@@ -18,12 +19,12 @@ class InstallerService : Service() {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Log.d(LOGGING_TAG, "onStartCommand")
-        val status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, -1)
-        val packageName = intent.getStringExtra(PackageInstaller.EXTRA_PACKAGE_NAME)!!
+        Log.d(LOGGING_TAG, intent.dataString ?: "null")
+        Log.d(LOGGING_TAG, Utils.toString(intent.extras))
+        val status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE)
+        val packageName = intent.getStringExtra(PackageInstaller.EXTRA_PACKAGE_NAME)
         val sessionId = intent.getIntExtra(PackageInstaller.EXTRA_SESSION_ID, -1)
         val message = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)
-        Log.d(LOGGING_TAG, "Message: $message")
-        Log.d(LOGGING_TAG, "Package name: $packageName")
 
         when(status) {
             PackageInstaller.STATUS_PENDING_USER_ACTION -> {
@@ -39,7 +40,7 @@ class InstallerService : Service() {
                     val db = AppDatabase.getDatabase(applicationContext)
                     val installation = db.installDao.findPendingInstallationBySessionId(sessionId)!!
                     val game = db.gameDao.getGameById(installation.gameId)!!
-                    InstallerEvents.notifyApkInstallComplete(sessionId, packageName, game, status)
+                    InstallerEvents.notifyApkInstallComplete(sessionId, packageName!!, game, status)
                 }
                 stopSelf()
             }

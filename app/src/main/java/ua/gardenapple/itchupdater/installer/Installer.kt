@@ -48,7 +48,7 @@ class Installer {
                     session.fsync(outputStream)
                 }
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             session.abandon()
             Log.e(LOGGING_TAG, "Error occurred while creating install session", e)
         }

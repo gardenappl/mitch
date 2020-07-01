@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.os.Bundle
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -41,9 +42,9 @@ class Utils {
 
             val buffer = ByteArray(BUFFER_SIZE)
             var n: Int
-            while(true) {
+            while (true) {
                 n = input.read(buffer)
-                if(n == -1)
+                if (n == -1)
                     break
                 output.write(buffer, 0, n)
             }
@@ -55,11 +56,11 @@ class Utils {
 
         //https://stackoverflow.com/a/10600736/5701177
         fun drawableToBitmap(drawable: Drawable): Bitmap {
-            if(drawable is BitmapDrawable && drawable.bitmap != null)
+            if (drawable is BitmapDrawable && drawable.bitmap != null)
                 return drawable.bitmap
 
             val bitmap: Bitmap
-            if(drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) {
+            if (drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) {
                 // Single color bitmap will be created of 1x1 pixel
                 bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
             } else {
@@ -70,6 +71,19 @@ class Utils {
             drawable.setBounds(0, 0, canvas.width, canvas.height);
             drawable.draw(canvas);
             return bitmap;
+        }
+
+        fun toString(bundle: Bundle?): String {
+            if (bundle == null)
+                return "null"
+
+            val sb = StringBuilder()
+            sb.append("[ ");
+            for (key in bundle.keySet()) {
+                sb.append("$key = ${bundle.get(key)}, ")
+            }
+            sb.append(" ]");
+            return sb.toString()
         }
     }
 }
