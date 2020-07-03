@@ -5,7 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.util.JsonReader
 import android.util.JsonToken
 import android.util.Log
@@ -167,7 +169,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                             as InputMethodManager
                         inputMethodManager.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
                     }
-                    
+
 
                     val alertDialog = AlertDialog.Builder(requireContext())
                         .setTitle(R.string.browser_search)
@@ -284,10 +286,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val supportAppBar = (activity as? MainActivity)?.supportActionBar
         val appBar = (activity as? MainActivity)?.toolbar
 
-        val defaultAccentColor = ResourcesCompat.getColor(resources, R.color.colorAccent, requireContext().theme)
-        val defaultBgColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
-        val defaultFgColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
-
         //Change layout
         if (ItchWebsiteUtils.shouldRemoveAppNavbar(webView, doc)) {
             navBar?.post {
@@ -316,7 +314,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         //Add app bar
         appBar?.post {
             if (ItchWebsiteUtils.isGamePage(doc)) {
-                supportAppBar?.title = ItchWebsiteParser.getGameName(doc)
+                val appBarTitle = "<b>${Html.escapeHtml(ItchWebsiteParser.getGameName(doc))}</b>"
+                if (Build.VERSION.SDK_INT >= 24)
+                    supportAppBar?.title = Html.fromHtml(appBarTitle, 0)
+                else
+                    supportAppBar?.title = Html.fromHtml(appBarTitle)
                 supportAppBar?.show()
             } else {
                 supportAppBar?.hide()
@@ -325,6 +327,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
 
         //Colors adapt to game theme
+
+        val defaultAccentColor = ResourcesCompat.getColor(resources, R.color.colorAccent, requireContext().theme)
+        val defaultBgColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
+        val defaultFgColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
+
         //TODO: change color of system UI
         launch(Dispatchers.Default) {
             val gameThemeColor = ItchWebsiteParser.getBackgroundUIColor(doc)
@@ -520,10 +527,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
 
         override fun onProgressChanged(view: WebView?, newProgress: Int) {
+            //TODO: better animation for progress bar appearing/disappearing?
             if (newProgress < 100 && progressBar.visibility == ProgressBar.GONE)
                 progressBar.visibility = ProgressBar.VISIBLE
 
-            //TODO: better animation?
             progressBar.progress = newProgress
 
             if (newProgress == 100)

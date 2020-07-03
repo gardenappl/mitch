@@ -15,9 +15,8 @@
             android:background="?attr/colorPrimary"
             android:minHeight="?attr/actionBarSize"
             android:elevation="4dp"
-            android:theme="@style/AppTheme.ActionBar"
             app:layout_constraintTop_toTopOf="parent" />
-    <!--            android:theme="?attr/actionBarTheme"-->
+    <!--            android:theme="@style/AppTheme.ActionBar"-->
 
     <FrameLayout
             android:id="@+id/fragmentContainer"

@@ -1,26 +1,42 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:fontFamily">@font/lato</item>
+
         <item name="android:actionBarStyle">@style/AppTheme.ActionBar</item>
         <item name="actionBarStyle">@style/AppTheme.ActionBar</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <item name="alertDialogTheme">@style/AlertDialogStyle</item>
     </style>
-    <style name="AppTheme.NoActionBar">
+    <!--<style name="AppTheme.NoActionBar">
         <item name="windowActionBar">true</item>
         <item name="windowNoTitle">true</item>
-    </style>
+    </style>-->
 
     <style name="AppTheme.ActionBar" parent="Widget.AppCompat.ActionBar.Solid">
-        <item name="titleTextStyle">@style/AppTheme.ActionBar.TitleTextStyle</item>
+        <item name="android:titleTextStyle">@style/AppTheme.TitleTextStyle.ActionBar</item>
+        <item name="titleTextStyle">@style/AppTheme.TitleTextStyle.ActionBar</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="AppTheme.ActionBar.TitleTextStyle" parent="TextAppearance.AppCompat">
+    <style name="AppTheme.TitleTextStyle.ActionBar" parent="TextAppearance.AppCompat">
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="AppTheme.TitleTextStyle" parent="TextAppearance.AppCompat.Title">
+        <item name="android:fontFamily">@font/lato</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="AlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowTitleStyle">@style/AppTheme.TitleTextStyle</item>
     </style>
 
 </resources>
