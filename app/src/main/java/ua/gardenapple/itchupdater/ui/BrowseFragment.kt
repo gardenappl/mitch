@@ -8,8 +8,6 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
-import android.util.JsonReader
-import android.util.JsonToken
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
@@ -33,12 +31,12 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.R
+import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.client.ItchBrowseHandler
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.installer.DownloadRequester
 import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.StringReader
 
 
 class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
@@ -152,6 +150,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         .startChooser()
                     return@setOnActionSelectedListener true
                 }
+                //TODO: hide search if screen is wide enough
                 R.id.browser_search -> {
                     speedDialView.close()
 
@@ -329,20 +328,25 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         //Colors adapt to game theme
 
         val defaultAccentColor = ResourcesCompat.getColor(resources, R.color.colorAccent, requireContext().theme)
-        val defaultBgColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
-        val defaultFgColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
+        val defaultWhiteColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
+        val defaultBlackColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
 
         //TODO: change color of system UI
         launch(Dispatchers.Default) {
-            val gameThemeColor = doc?.run { ItchWebsiteParser.getBackgroundUIColor(doc) }
+            val gameThemeBgColor = doc?.run { ItchWebsiteParser.getBackgroundUIColor(doc) }
+            val gameThemeButtonColor = doc?.run { ItchWebsiteParser.getButtonUIColor(doc) }
+            val gameThemeButtonFgColor = doc?.run { ItchWebsiteParser.getButtonFgUIColor(doc) }
 
-            val accentColor = gameThemeColor ?: defaultAccentColor
-            val bgColor = gameThemeColor ?: defaultBgColor
-            val fgColor = if (gameThemeColor == null) defaultFgColor else defaultBgColor
+            val buttonColor = gameThemeButtonColor ?: defaultAccentColor
+            val buttonFgColor = gameThemeButtonFgColor ?: defaultWhiteColor
+            val bgColor = gameThemeBgColor ?: defaultWhiteColor
+            val fgColor = if (gameThemeBgColor == null) defaultBlackColor else defaultWhiteColor
 
             fab?.post {
-                fab.mainFabClosedBackgroundColor = accentColor
-                fab.mainFabOpenedBackgroundColor = accentColor
+                fab.mainFabClosedBackgroundColor = buttonColor
+                fab.mainFabOpenedBackgroundColor = buttonColor
+                fab.mainFabClosedIconColor = buttonFgColor
+                fab.mainFabOpenedIconColor = buttonFgColor
                 for (actionItem in fab.actionItems) {
                     val newActionItem = SpeedDialActionItem.Builder(actionItem)
                         .setFabBackgroundColor(bgColor)

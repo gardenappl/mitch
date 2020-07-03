@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.net.Uri
 import android.util.Log
 import android.webkit.CookieManager
-import androidx.annotation.ColorInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
@@ -32,7 +31,9 @@ class ItchWebsiteParser {
         const val UNKNOWN_LOCALE = "Unknown"
 
 //        val COLOR_PATTERN = Regex("root[{]--itchio_ui_bg: (#\\w+);--itchio_ui_bg_dark: (#\\w+)}")
-        val COLOR_PATTERN = Regex("root[{]--itchio_ui_bg: (#\\w+);")
+        private val bgColorPattern = Regex("root[{]--itchio_ui_bg: (#?\\w+);")
+        private val buttonColorPattern = Regex("--itchio_button_color: (#?\\w+);")
+        private val buttonFgColorPattern = Regex("--itchio_button_fg_color: (#?\\w+);")
 
         fun getGameInfo(gamePageDoc: Document, gamePageUrl: String): Game {
             val thumbnails = gamePageDoc.head().getElementsByAttributeValue("property", "og:image")
@@ -247,9 +248,26 @@ class ItchWebsiteParser {
         fun getBackgroundUIColor(doc: Document): Int? {
             val gameThemeCSS = doc.getElementById("game_theme")?.html() ?: return null
 
-            val foundColors = COLOR_PATTERN.find(gameThemeCSS)
+            val foundColors = bgColorPattern.find(gameThemeCSS)
 
             return Color.parseColor(foundColors?.groupValues?.get(1) ?: "#333")
+        }
+
+        fun getButtonUIColor(doc: Document): Int? {
+            val gameThemeCSS = doc.getElementById("game_theme")?.html() ?: return null
+
+            val foundColors = buttonColorPattern.find(gameThemeCSS)
+
+            return Color.parseColor(foundColors?.groupValues?.get(1) ?: "#fa5c5c")
+        }
+
+        fun getButtonFgUIColor(doc: Document): Int? {
+            val gameThemeCSS = doc.getElementById("game_theme")?.html() ?: return null
+
+            val foundColors = buttonFgColorPattern.find(gameThemeCSS)
+
+
+            return Color.parseColor(foundColors?.groupValues?.get(1) ?: "#fff")
         }
 
         fun getGameName(doc: Document): String {
