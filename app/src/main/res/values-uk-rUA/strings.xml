@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="nav_settings">Налаштування</string>
-    <string name="nav_website_view">Браузер</string>
+    <string name="nav_website_view">Сайт</string>
     <string name="notification_channel_install">Встановлення додатків</string>
     <string name="notification_channel_install_desc">Сповіщати коли додаток з itch.io готовий до встановлення</string>
     <string name="notification_channel_updates">Оновлення додатків</string>
@@ -10,7 +10,7 @@
     <string name="notification_install_title">Натисніть, щоб встановити</string>
     <string name="settings_block_trackers">Захист від стеження</string>
     <string name="settings_block_trackers_desc">Блокує доступ до Google Analytics. \nЗауважте, що отриманою статистикою користується не тільки itch.io, а й деякі розробники ігор.</string>
-    <string name="settings_category_browse">Браузер</string>
+    <string name="settings_category_browse">Браузинг</string>
     <string name="settings_category_updater">Встановлення та оновлення</string>
     <string name="settings_update_check_mode">Режим перевірки оновлень</string>
     <string name="notification_channel_installing">Процес встановлення додатків</string>
@@ -53,4 +53,5 @@
     <string name="menu_game_devlog">Щоденник розробника</string>
     <string name="menu_game_rate">Залишити відгук</string>
     <string name="menu_game_related">Схожі ігри</string>
+    <string name="browser_open_in_browser">Відкрити у браузері</string>
 </resources>

@@ -3,4 +3,5 @@
     <item name="browser_reload" type="id"/>
     <item name="browser_search" type="id"/>
     <item name="browser_share" type="id"/>
+    <item name="browser_open_in_browser" type="id"/>
 </resources>

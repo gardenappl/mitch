@@ -46,7 +46,7 @@ class ItchWebsiteParser {
 
 
             val gameId: Int = ItchWebsiteUtils.getGameId(gamePageDoc)
-            val name: String = getGameName(gamePageDoc)!!
+            val name: String = getGameName(gamePageDoc)
 
             val infoTable = gamePageDoc.body().getElementsByClass("game_info_panel_widget")[0].child(0).child(0)
 

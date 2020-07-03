@@ -10,7 +10,7 @@
     <string name="nav_installed">Игротека</string>
     <string name="settings_block_trackers">Защита от слежения</string>
     <string name="settings_block_trackers_desc">Блокирует доступ к Google Analytics.\nУчтите, что некоторые разработчики игр могут полагаться на эту статистику.</string>
-    <string name="settings_category_browse">Браузер</string>
+    <string name="settings_category_browse">Браузинг</string>
     <string name="settings_category_updater">Установка и обновления</string>
     <string name="settings_update_check_mode">Режим проверки обновлений</string>
     <string name="notification_channel_installing">Процесс установки приложений</string>
@@ -48,9 +48,10 @@
     <string name="browser_share">Поделиться ссылкой</string>
     <string name="search_games_hint">Поиск игр или создателей</string>
     <string name="toast_download_started">Загрузка началась</string>
-    <string name="nav_website_view">Браузер</string>
+    <string name="nav_website_view">Сайт</string>
     <string name="menu_game_collection">Добавить в коллекцию</string>
     <string name="menu_game_devlog">Дневник разработчика</string>
     <string name="menu_game_rate">Оставить отзыв</string>
     <string name="menu_game_related">Похожие игры</string>
+    <string name="browser_open_in_browser">Открыть в браузере</string>
 </resources>

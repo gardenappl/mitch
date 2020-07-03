@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
@@ -126,6 +127,14 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             .setLabel(R.string.browser_search)
             .create()
         )
+        speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_open_in_browser, R.drawable.ic_baseline_open_in_browser_24)
+            .setFabBackgroundColor(fabBgColor)
+            .setLabelBackgroundColor(fabBgColor)
+            .setFabImageTintColor(fabFgColor)
+            .setLabelColor(fabFgColor)
+            .setLabel(R.string.browser_open_in_browser)
+            .create()
+        )
         speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_share, R.drawable.ic_baseline_share_24)
             .setFabBackgroundColor(fabBgColor)
             .setLabelBackgroundColor(fabBgColor)
@@ -135,11 +144,12 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             .create()
         )
         
-        speedDialView.setOnActionSelectedListener { actionItem ->  
+        speedDialView.setOnActionSelectedListener { actionItem ->
+            speedDialView.close()
+
             when (actionItem.id) {
                 R.id.browser_reload -> {
                     webView.reload()
-                    speedDialView.close()
                     return@setOnActionSelectedListener true
                 }
                 R.id.browser_share -> {
@@ -150,10 +160,17 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         .startChooser()
                     return@setOnActionSelectedListener true
                 }
-                //TODO: hide search if screen is wide enough
-                R.id.browser_search -> {
-                    speedDialView.close()
+                R.id.browser_open_in_browser -> {
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    intent.data = Uri.parse(webView.url)
 
+                    val title = resources.getString(R.string.browser_open_in_browser)
+                    val chooser = Intent.createChooser(intent, title)
+
+                    startActivity(chooser)
+                    return@setOnActionSelectedListener true
+                }
+                R.id.browser_search -> {
                     //Search dialog
 
                     val viewInflated: View = LayoutInflater.from(context)
@@ -193,7 +210,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
                     return@setOnActionSelectedListener true
                 }
-                //TODO: open in browser
                 else -> {
                     return@setOnActionSelectedListener false
                 }
@@ -332,6 +348,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val defaultBlackColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
 
         //TODO: change color of system UI
+        //TODO: change color of app bar menu
         launch(Dispatchers.Default) {
             val gameThemeBgColor = doc?.run { ItchWebsiteParser.getBackgroundUIColor(doc) }
             val gameThemeButtonColor = doc?.run { ItchWebsiteParser.getButtonUIColor(doc) }
@@ -449,6 +466,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             }
         }
 
+        //TODO: proper handling of resize and rotate (for app bar and for ChromeOS)
+        //TODO: hide stuff on scroll
         @JavascriptInterface
         fun onHtmlLoaded(html: String, url: String) {
             Log.d(LOGGING_TAG, url)
