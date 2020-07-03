@@ -55,7 +55,7 @@ class MitchApp : Application() {
             if (key == "preference_update_check_if_metered") {
                 //WorkManager.getInstance(applicationContext).cancelAllWorkByTag(UPDATE_CHECK_TASK_TAG)
                 registerUpdateCheckTask(requiresUnmetered = prefs.getBoolean(key, false))
-                Log.d(LOGGING_TAG, "Reregistering...")
+                Log.d(LOGGING_TAG, "Re-registering...")
             }
         }
 

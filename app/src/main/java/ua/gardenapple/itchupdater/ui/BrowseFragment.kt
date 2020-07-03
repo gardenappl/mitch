@@ -387,38 +387,42 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     private fun setupAppBarMenu(doc: Document, appBar: Toolbar) {
         appBar.menu.clear()
+        Log.d(LOGGING_TAG, "Cleared, now ${appBar.menu.size()}")
 
         //5px of padding on left and right, min width for item is 80px
         val navbarItemFitCount = (webView.contentWidth - 10) / 80
+        Log.d(LOGGING_TAG, "WebView can fit $navbarItemFitCount navbar items")
         val navbarItems = doc.getElementById("user_tools").children()
-        val navbarItemsCount = navbarItems.size
 
-        while (navbarItemFitCount < navbarItemsCount) {
+        while (navbarItemFitCount < navbarItems.size && navbarItems.isNotEmpty()) {
             val lastItem = navbarItems.last()
 
             if (lastItem.getElementsByClass("related_games_btn").isNotEmpty()) {
+                Log.d(LOGGING_TAG, "Adding related games")
                 appBar.menu.add(Menu.NONE, 3, 3, R.string.menu_game_related).setOnMenuItemClickListener {
                     val gameId = ItchWebsiteUtils.getGameId(doc)
                     webView.loadUrl("https://itch.io/games-like/$gameId")
                     true
                 }
             } else if (lastItem.getElementsByClass("rate_game_btn").isNotEmpty()) {
+                Log.d(LOGGING_TAG, "Adding rate")
                 appBar.menu.add(Menu.NONE, 2, 2, R.string.menu_game_rate).setOnMenuItemClickListener {
                     webView.loadUrl(webView.url + "/rate?source=game")
                     true
                 }
             } else if (lastItem.hasClass("devlog_link")) {
+                Log.d(LOGGING_TAG, "Adding devlog")
                 appBar.menu.add(Menu.NONE, 1, 1, R.string.menu_game_devlog).setOnMenuItemClickListener {
                     webView.loadUrl(webView.url + "/devlog")
                     true
                 }
             } else if (lastItem.getElementsByClass("add_to_collection_btn").isNotEmpty()) {
+                Log.d(LOGGING_TAG, "Adding add to collection")
                 appBar.menu.add(Menu.NONE, 0, 0, R.string.menu_game_collection).setOnMenuItemClickListener {
                     webView.loadUrl(webView.url + "/add-to-collection?source=game")
                     true
                 }
-            } else
-                break
+            }
 
             navbarItems.removeAt(navbarItems.size - 1)
         }
@@ -534,12 +538,15 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         override fun onPageFinished(view: WebView, url: String) {
             view.evaluateJavascript("""
-                    let mitchCustomJS_elements = document.getElementsByClassName("download_btn");
-                    for (var mitchCustomJS_element of mitchCustomJS_elements) {
-                        let mitchCustomJS_uploadId = mitchCustomJS_element.getAttribute("data-upload_id");
-                        mitchCustomJS_element.addEventListener("click", (event) => {
-                            mitchCustomJS.onDownloadLinkClick(mitchCustomJS_uploadId);
-                        });
+                    {
+                        //local scope variables only
+                        let downloadButtons = document.getElementsByClassName("download_btn");
+                        for (var downloadButton of downloadButtons) {
+                            let uploadId = downloadButton.getAttribute("data-upload_id");
+                            downloadButton.addEventListener("click", (event) => {
+                                mitchCustomJS.onDownloadLinkClick(uploadId);
+                            });
+                        }
                     }
                 """, null
             )
