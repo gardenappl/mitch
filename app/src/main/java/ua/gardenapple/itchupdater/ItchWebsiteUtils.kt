@@ -83,5 +83,13 @@ class ItchWebsiteUtils {
 
             return@withContext Jsoup.parse(html)
         }
+
+        /**
+         * @return the URL that the user will see by default on the Browse tab.
+         * TODO: add preferences to change this
+         */
+        fun getMainBrowsePage(): String {
+            return "https://itch.io/games/platform-android"
+        }
     }
 }

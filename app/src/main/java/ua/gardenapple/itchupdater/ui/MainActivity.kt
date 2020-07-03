@@ -85,7 +85,12 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
         val navView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         navView.setOnNavigationItemSelectedListener { item ->
-            switchToFragment(item.itemId, false)
+            val fragmentChanged = switchToFragment(item.itemId, false)
+
+            if (!fragmentChanged && activeFragment == browseFragment)
+                browseFragment.webView.loadUrl(ItchWebsiteUtils.getMainBrowsePage())
+
+            return@setOnNavigationItemSelectedListener fragmentChanged
         }
     }
 

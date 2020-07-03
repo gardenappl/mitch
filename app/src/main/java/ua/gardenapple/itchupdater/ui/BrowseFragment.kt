@@ -175,6 +175,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
                     return@setOnActionSelectedListener true
                 }
+                //TODO: open in browser
                 else -> {
                     return@setOnActionSelectedListener false
                 }
@@ -188,7 +189,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             Log.d(LOGGING_TAG, "Restoring WebView")
             webView.restoreState(savedInstanceState.getBundle(WEB_VIEW_STATE_KEY))
         } else {
-            webView.loadUrl("https://itch.io/games/platform-android")
+            webView.loadUrl(ItchWebsiteUtils.getMainBrowsePage())
         }
 
         return view;
