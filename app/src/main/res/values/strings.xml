@@ -49,4 +49,8 @@
     <string name="browser_share">Share link</string>
     <string name="search_games_hint">Search for games or creators</string>
     <string name="toast_download_started">Download started</string>
+    <string name="menu_game_collection">Add to collection</string>
+    <string name="menu_game_devlog">Devlog</string>
+    <string name="menu_game_rate">Rate or Review</string>
+    <string name="menu_game_related">More games like this</string>
 </resources>

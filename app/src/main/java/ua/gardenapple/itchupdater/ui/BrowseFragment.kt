@@ -11,14 +11,13 @@ import android.text.Html
 import android.util.JsonReader
 import android.util.JsonToken
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.*
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.annotation.Keep
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ShareCompat
@@ -54,6 +53,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         private set
 
     var browseHandler: ItchBrowseHandler? = null
+    private var currentDoc: Document? = null
 
 
     override fun onAttach(context: Context) {
@@ -214,7 +214,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         return view;
     }
 
-
     /**
      * @return true if the user can't go back in the web history
      */
@@ -246,10 +245,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         cancel()
     }
 
-    /**
-     * Responsible for updating the UI as well as the local game database after a page has loaded.
-     */
-    private fun processUI() {
+    /*private fun updateUI() {
         //Hack for retrieving HTML from WebView
         webView.evaluateJavascript("""
             (function() {
@@ -268,59 +264,63 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
 //                Log.d(LOGGING_TAG, "HTML:")
 //                Utils.logLongD(LOGGING_TAG, resultParsed)
-                val doc = Jsoup.parse(resultParsed)
-                processUI(doc)
+                currentDoc = Jsoup.parse(resultParsed)
+                updateUI(currentDoc)
             }
         }
-    }
+    }*/
 
     /**
      * Adapts the app's UI to the theme of the current web page.
-     * @param doc the parsed DOM of the page the user is currently on.
      */
-    fun processUI(doc: Document) {
+    fun updateUI() {
+        updateUI(currentDoc)
+    }
+
+    /**
+     * Adapts the app's UI to the theme of a web page.
+     * @param doc the parsed DOM of the page the user is currently on. Null if the UI shouldn't adapt to any web page at all
+     */
+    private fun updateUI(doc: Document?) {
         Log.d(LOGGING_TAG, "Processing UI...")
+        val mainActivity = activity as MainActivity
+
+        if (mainActivity.activeFragment != mainActivity.browseFragment)
+            return
 
         val navBar = (activity as? MainActivity)?.bottomNavigationView
         val fab = (activity as? MainActivity)?.speedDial
         val supportAppBar = (activity as? MainActivity)?.supportActionBar
         val appBar = (activity as? MainActivity)?.toolbar
 
-        //Change layout
-        if (ItchWebsiteUtils.shouldRemoveAppNavbar(webView, doc)) {
-            navBar?.post {
-                navBar.visibility = View.GONE
-            }
-        } else {
-            navBar?.post {
-                navBar.visibility = View.VISIBLE
-            }
-        }
 
-        if (ItchWebsiteUtils.siteHasNavbar(webView, doc)) {
+        if (doc != null && ItchWebsiteUtils.isStylizedGamePage(doc)) {
             fab?.post {
                 val fabParams = fab.layoutParams as ViewGroup.MarginLayoutParams
                 val marginDP = (50 * requireContext().resources.displayMetrics.density).toInt()
                 fabParams.bottomMargin = marginDP
             }
-        } else {
-            fab?.post {
-                val fabParams = fab.layoutParams as ViewGroup.MarginLayoutParams
-                fabParams.bottomMargin = 0
+            navBar?.post {
+                navBar.visibility = View.GONE
             }
-        }
-
-
-        //Add app bar
-        appBar?.post {
-            if (ItchWebsiteUtils.isGamePage(doc)) {
+            appBar?.post {
                 val appBarTitle = "<b>${Html.escapeHtml(ItchWebsiteParser.getGameName(doc))}</b>"
                 if (Build.VERSION.SDK_INT >= 24)
                     supportAppBar?.title = Html.fromHtml(appBarTitle, 0)
                 else
                     supportAppBar?.title = Html.fromHtml(appBarTitle)
                 supportAppBar?.show()
-            } else {
+                setupAppBarMenu(doc, appBar)
+            }
+        } else {
+            fab?.post {
+                val fabParams = fab.layoutParams as ViewGroup.MarginLayoutParams
+                fabParams.bottomMargin = 0
+            }
+            navBar?.post {
+                navBar.visibility = View.VISIBLE
+            }
+            appBar?.post {
                 supportAppBar?.hide()
             }
         }
@@ -334,7 +334,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         //TODO: change color of system UI
         launch(Dispatchers.Default) {
-            val gameThemeColor = ItchWebsiteParser.getBackgroundUIColor(doc)
+            val gameThemeColor = doc?.run { ItchWebsiteParser.getBackgroundUIColor(doc) }
 
             val accentColor = gameThemeColor ?: defaultAccentColor
             val bgColor = gameThemeColor ?: defaultBgColor
@@ -359,14 +359,66 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             appBar?.post {
                 appBar.setBackgroundColor(bgColor)
                 appBar.setTitleTextColor(fgColor)
+                appBar.overflowIcon?.setTint(fgColor)
             }
         }
     }
 
+    private fun setupAppBarMenu(doc: Document, appBar: Toolbar) {
+        appBar.menu.clear()
+
+        //5px of padding on left and right, min width for item is 80px
+        val navbarItemFitCount = (webView.contentWidth - 10) / 80
+        val navbarItems = doc.getElementById("user_tools").children()
+        val navbarItemsCount = navbarItems.size
+
+        while (navbarItemFitCount < navbarItemsCount) {
+            val lastItem = navbarItems.last()
+
+            if (lastItem.getElementsByClass("related_games_btn").isNotEmpty()) {
+                appBar.menu.add(Menu.NONE, 3, 3, R.string.menu_game_related).setOnMenuItemClickListener {
+                    val gameId = ItchWebsiteUtils.getGameId(doc)
+                    webView.loadUrl("https://itch.io/games-like/$gameId")
+                    true
+                }
+            } else if (lastItem.getElementsByClass("rate_game_btn").isNotEmpty()) {
+                appBar.menu.add(Menu.NONE, 2, 2, R.string.menu_game_rate).setOnMenuItemClickListener {
+                    webView.loadUrl(webView.url + "/rate?source=game")
+                    true
+                }
+            } else if (lastItem.hasClass("devlog_link")) {
+                appBar.menu.add(Menu.NONE, 1, 1, R.string.menu_game_devlog).setOnMenuItemClickListener {
+                    webView.loadUrl(webView.url + "/devlog")
+                    true
+                }
+            } else if (lastItem.getElementsByClass("add_to_collection_btn").isNotEmpty()) {
+                appBar.menu.add(Menu.NONE, 0, 0, R.string.menu_game_collection).setOnMenuItemClickListener {
+                    webView.loadUrl(webView.url + "/add-to-collection?source=game")
+                    true
+                }
+            } else
+                break
+
+            navbarItems.removeAt(navbarItems.size - 1)
+        }
+
+        appBar.menu.add(Menu.NONE, 4, 4, R.string.nav_installed).setOnMenuItemClickListener {
+            updateUI(null)
+            (activity as MainActivity).switchToFragment(R.id.navigation_library, true)
+            true
+        }
+        appBar.menu.add(Menu.NONE, 5, 5, R.string.nav_settings).setOnMenuItemClickListener {
+            updateUI(null)
+            (activity as MainActivity).switchToFragment(R.id.navigation_settings, true)
+            true
+        }
+    }
+
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
-        processUI()
+        updateUI()
     }
 
 
@@ -405,7 +457,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             fragment.launch(Dispatchers.Default) {
                 val doc = Jsoup.parse(html)
                 fragment.browseHandler?.onPageVisited(doc, url)
-                fragment.processUI(doc)
+                fragment.currentDoc = doc
+                fragment.updateUI()
             }
         }
     }

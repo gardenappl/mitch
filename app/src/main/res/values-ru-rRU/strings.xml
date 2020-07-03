@@ -6,9 +6,8 @@
     <string name="notification_download_complete_title">Загрузка завершена</string>
     <string name="notification_channel_install_desc">Уведомлять, когда приложение из itch.io готово к установке</string>
     <string name="notification_channel_updates_desc">Уведомлять, когда для приложения из itch.io доступно обновление</string>
-    <string name="nav_website_view">Главная</string>
     <string name="nav_settings">Настройки</string>
-    <string name="nav_installed">Моя коллекция</string>
+    <string name="nav_installed">Игротека</string>
     <string name="settings_block_trackers">Защита от слежения</string>
     <string name="settings_block_trackers_desc">Блокирует доступ к Google Analytics.\nУчтите, что некоторые разработчики игр могут полагаться на эту статистику.</string>
     <string name="settings_category_browse">Браузер</string>
@@ -49,4 +48,9 @@
     <string name="browser_share">Поделиться ссылкой</string>
     <string name="search_games_hint">Поиск игр или создателей</string>
     <string name="toast_download_started">Загрузка началась</string>
+    <string name="nav_website_view">Браузер</string>
+    <string name="menu_game_collection">Добавить в коллекцию</string>
+    <string name="menu_game_devlog">Дневник разработчика</string>
+    <string name="menu_game_rate">Оставить отзыв</string>
+    <string name="menu_game_related">Похожие игры</string>
 </resources>

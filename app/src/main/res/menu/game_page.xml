@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/game_page_collection"
+            android:title="@string/menu_game_collection"/>
+    <item android:id="@+id/game_page_devlog"
+            android:title="@string/menu_game_devlog"/>
+    <item android:id="@+id/game_page_rate"
+            android:title="@string/menu_game_rate"/>
+    <item android:id="@+id/game_page_related"
+            android:title="@string/menu_game_related"/>
+    <item android:id="@+id/game_page_library"
+            android:title="@string/nav_installed"
+            android:icon="@drawable/ic_storage_black_24dp"/>
+    <item android:id="@+id/game_page_settings"
+            android:title="@string/nav_settings"
+            android:icon="@drawable/ic_settings_black_24dp"/>
+</menu>

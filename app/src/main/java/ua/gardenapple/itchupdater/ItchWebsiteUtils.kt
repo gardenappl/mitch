@@ -33,11 +33,10 @@ class ItchWebsiteUtils {
             return htmlDoc.body().attr("data-page_name") == "game_purchase"
         }
 
-        fun isGamePage(htmlDoc: Document): Boolean {
-            return when (htmlDoc.body().attr("data-page_name")) {
-                "view_game" -> true
-                "game_download" -> true
-                "game_purchase" -> true
+        fun isDevlogPage(htmlDoc: Document): Boolean {
+            return when(htmlDoc.body().attr("data-page_name")) {
+                "game.devlog" -> true
+                "game.devlog_post" -> true
                 else -> false
             }
         }
@@ -47,17 +46,18 @@ class ItchWebsiteUtils {
         }
 
         /**
-         * @return true if the screen is small enough where itch.io starts introducing the bottom navbar
+         * @return true if the page is a store page or devlog page
          */
-        fun shouldRemoveAppNavbar(webView: MitchWebView, htmlDoc: Document): Boolean {
-            return webView.contentWidth < 650 && (isStorePage(htmlDoc) || isDownloadPage(htmlDoc) || isPurchasePage(htmlDoc))
+        fun isStylizedGamePage(htmlDoc: Document): Boolean {
+            return htmlDoc.getElementById("game_theme") != null
+                    && htmlDoc.getElementById("user_tools") != null
         }
 
         /**
          * @return true if the screen is small enough where itch.io starts introducing the bottom navbar AND we're looking at a store page now
          */
         fun siteHasNavbar(webView: MitchWebView, htmlDoc: Document): Boolean {
-            return webView.contentWidth < 650 && isStorePage(htmlDoc)
+            return webView.contentWidth < 650 && isStylizedGamePage(htmlDoc)
         }
 
         /**

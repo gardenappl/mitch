@@ -269,6 +269,10 @@ class ItchWebsiteParser {
                 return jsonObject.getString("name")
             }
 
+            if (ItchWebsiteUtils.isDevlogPage(doc)) {
+                return doc.getElementsByClass("game_title")[0].html()
+            }
+
             throw IllegalArgumentException("Document is not related to game")
         }
     }

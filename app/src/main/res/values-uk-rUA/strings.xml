@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="nav_installed">Моя колекція</string>
     <string name="nav_settings">Налаштування</string>
-    <string name="nav_website_view">Головна</string>
+    <string name="nav_website_view">Браузер</string>
     <string name="notification_channel_install">Встановлення додатків</string>
     <string name="notification_channel_install_desc">Сповіщати коли додаток з itch.io готовий до встановлення</string>
     <string name="notification_channel_updates">Оновлення додатків</string>
@@ -49,4 +48,9 @@
     <string name="browser_share">Поділитись посиланням</string>
     <string name="search_games_hint">Пошук ігор або авторів</string>
     <string name="toast_download_started">Завантаження почалось</string>
+    <string name="menu_game_collection">Додати в колекцію</string>
+    <string name="nav_installed">Ігротека</string>
+    <string name="menu_game_devlog">Щоденник розробника</string>
+    <string name="menu_game_rate">Залишити відгук</string>
+    <string name="menu_game_related">Схожі ігри</string>
 </resources>

@@ -44,7 +44,7 @@ class LibraryFragment : Fragment() {
 
 
         val downloadsList = view.findViewById<RecyclerView>(R.id.downloads_list)
-        val downloadsAdapter = GameListAdapter(context!!, downloadsList, GameRepository.Type.Downloads)
+        val downloadsAdapter = GameListAdapter(requireContext(), downloadsList, GameRepository.Type.Downloads)
         downloadsList.adapter = downloadsAdapter
         downloadsList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
@@ -64,7 +64,7 @@ class LibraryFragment : Fragment() {
 
 
         val installedList = view.findViewById<RecyclerView>(R.id.installed_list)
-        val installedAdapter = GameListAdapter(context!!, installedList, GameRepository.Type.Installed)
+        val installedAdapter = GameListAdapter(requireContext(), installedList, GameRepository.Type.Installed)
         installedList.adapter = installedAdapter
         installedList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 

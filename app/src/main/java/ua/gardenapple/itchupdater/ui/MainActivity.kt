@@ -7,23 +7,32 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import ua.gardenapple.itchupdater.*
-import ua.gardenapple.itchupdater.installer.*
+import ua.gardenapple.itchupdater.installer.DownloadRequester
 
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
-    private var browseFragment: BrowseFragment = BrowseFragment()
-    private var libraryFragment: LibraryFragment = LibraryFragment()
-    private var settingsFragment: SettingsFragment = SettingsFragment()
+    var browseFragment: BrowseFragment = BrowseFragment()
+        private set
+    var libraryFragment: LibraryFragment = LibraryFragment()
+        private set
+    var settingsFragment: SettingsFragment = SettingsFragment()
+        private set
 
-    private var activeFragment: Fragment = browseFragment
+    var activeFragment: Fragment = browseFragment
+        private set
 
     companion object {
         const val SELECTED_FRAGMENT_KEY: String = "fragment"
@@ -50,11 +59,11 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         Log.d(LOGGING_TAG, "Active fragment tag: $activeFragmentTag")
 
         //Fragments aren't destroyed on configuration changes
-        val fragment = supportFragmentManager.findFragmentByTag(BROWSE_FRAGMENT_TAG)
+        val tryBrowseFragment = supportFragmentManager.findFragmentByTag(BROWSE_FRAGMENT_TAG)
 
-        if(fragment != null) {
+        if (tryBrowseFragment != null) {
             Log.d(LOGGING_TAG, "Fragment Manager contains some fragments")
-            browseFragment = fragment as BrowseFragment
+            browseFragment = tryBrowseFragment as BrowseFragment
             libraryFragment = supportFragmentManager.findFragmentByTag(LIBRARY_FRAGMENT_TAG) as LibraryFragment
             settingsFragment = supportFragmentManager.findFragmentByTag(SETTINGS_FRAGMENT_TAG) as SettingsFragment
 
@@ -85,6 +94,8 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
         val navView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         navView.setOnNavigationItemSelectedListener { item ->
+            Log.d(LOGGING_TAG, "Current selected: ${bottomNavigationView.selectedItemId}")
+            Log.d(LOGGING_TAG, "New: ${item.itemId}")
             val fragmentChanged = switchToFragment(item.itemId, false)
 
             if (!fragmentChanged && activeFragment == browseFragment)
@@ -121,12 +132,25 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         }
         activeFragment = newFragment
 
-        if (resetNavBar)
-            bottomNavigationView.selectedItemId = itemId
+        if (resetNavBar) {
+            bottomNavigationView.post {
+                var i = 0
+                val menu = bottomNavigationView.menu
+                while (i < menu.size()) {
+                    val item = bottomNavigationView.menu.getItem(i)
+                    if (item.itemId == itemId)
+                        item.isChecked = true
+                    i++
+                }
+               /* bottomNavigationView.selectedItemId = itemId
+                bottomNavigationViewSetIdHack(itemId)*/
+            }
+        }
 
-        if (newFragment == browseFragment)
+        if (newFragment == browseFragment) {
+            browseFragment.updateUI()
             speedDial.show()
-        else
+        } else
             speedDial.hide()
 
         return true
@@ -153,6 +177,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                 return
             }
         }
+        //TODO: handle fragments back stack
         super.onBackPressed()
     }
 
@@ -189,6 +214,11 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             SETTINGS_FRAGMENT_TAG -> return settingsFragment
             else -> return null
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        super.onOptionsItemSelected(item)
+        return false
     }
 
 
