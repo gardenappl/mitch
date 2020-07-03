@@ -200,7 +200,7 @@ class ItchWebsiteParser {
             val getDownloadPathUri = uriBuilder.build()
 
             val form = FormBody.Builder().run {
-                //TODO: proper CSRF token support? Doesn't seem like its enforced for free games
+                //Proper CSRF token support doesn't seem to be enforced for free games
                 add("csrf_token", CookieManager.getInstance().getCookie(storeUrl))
                 build()
             }

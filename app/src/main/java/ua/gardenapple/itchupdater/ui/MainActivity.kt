@@ -35,11 +35,11 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         private set
 
     companion object {
-        const val SELECTED_FRAGMENT_KEY: String = "fragment"
+        private const val SELECTED_FRAGMENT_KEY: String = "fragment"
 
-        const val BROWSE_FRAGMENT_TAG: String = "browse"
-        const val LIBRARY_FRAGMENT_TAG: String = "library"
-        const val SETTINGS_FRAGMENT_TAG: String = "settings"
+        private const val BROWSE_FRAGMENT_TAG: String = "browse"
+        private const val LIBRARY_FRAGMENT_TAG: String = "library"
+        private const val SETTINGS_FRAGMENT_TAG: String = "settings"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,14 +88,21 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             }
         }
 
-        activeFragment = getFragment(activeFragmentTag)!!
+        supportFragmentManager.addOnBackStackChangedListener {
+            if (!settingsFragment.isHidden)
+                activeFragment = settingsFragment
+            else if (!libraryFragment.isHidden)
+                activeFragment = libraryFragment
+            else
+                activeFragment = browseFragment
+
+            onFragmentSwitch(getItemId(activeFragment), true)
+        }
 
         Log.d(LOGGING_TAG, "Fragment manager contains ${supportFragmentManager.fragments.size} fragments")
 
         val navView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         navView.setOnNavigationItemSelectedListener { item ->
-            Log.d(LOGGING_TAG, "Current selected: ${bottomNavigationView.selectedItemId}")
-            Log.d(LOGGING_TAG, "New: ${item.itemId}")
             val fragmentChanged = switchToFragment(item.itemId, false)
 
             if (!fragmentChanged && activeFragment == browseFragment)
@@ -103,57 +110,8 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
             return@setOnNavigationItemSelectedListener fragmentChanged
         }
-    }
 
-    /**
-     * @param itemId one of: R.id.navigation_website_view, R.id.navigation_settings, R.id.navigation_library
-     * @param resetNavBar forcibly change the highlighted option in the bottom navigation bar
-     * @return true if the current fragment has changed
-     */
-    fun switchToFragment(itemId: Int, resetNavBar: Boolean = true): Boolean {
-        val newFragment: Fragment
-
-        when (itemId) {
-            R.id.navigation_website_view -> newFragment = browseFragment
-            R.id.navigation_library -> newFragment = libraryFragment
-            R.id.navigation_settings -> newFragment = settingsFragment
-            else -> return false
-        }
-
-        if (newFragment === activeFragment)
-            return false
-
-        supportFragmentManager.beginTransaction().apply {
-            setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-            hide(activeFragment)
-            setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-            show(newFragment)
-            commit()
-        }
-        activeFragment = newFragment
-
-        if (resetNavBar) {
-            bottomNavigationView.post {
-                var i = 0
-                val menu = bottomNavigationView.menu
-                while (i < menu.size()) {
-                    val item = bottomNavigationView.menu.getItem(i)
-                    if (item.itemId == itemId)
-                        item.isChecked = true
-                    i++
-                }
-               /* bottomNavigationView.selectedItemId = itemId
-                bottomNavigationViewSetIdHack(itemId)*/
-            }
-        }
-
-        if (newFragment == browseFragment) {
-            browseFragment.updateUI()
-            speedDial.show()
-        } else
-            speedDial.hide()
-
-        return true
+        switchToFragment(getItemId(activeFragmentTag), true)
     }
 
     override fun onStart() {
@@ -171,13 +129,12 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     }
 
     override fun onBackPressed() {
-        if(activeFragment === browseFragment) {
+        if (activeFragment === browseFragment) {
             val cantGoBack = browseFragment.onBackPressed()
             if (!cantGoBack) {
                 return
             }
         }
-        //TODO: handle fragments back stack
         super.onBackPressed()
     }
 
@@ -197,24 +154,108 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 //        }
     }
 
+    /**
+     * @param itemId one of: R.id.navigation_website_view, R.id.navigation_settings, R.id.navigation_library
+     * @param resetNavBar forcibly change the highlighted option in the bottom navigation bar
+     * @return true if the current fragment has changed
+     */
+    fun switchToFragment(itemId: Int, resetNavBar: Boolean = true): Boolean {
+        val newFragment = getFragment(itemId)
 
-    fun getFragmentTag(fragment: Fragment): String? {
-        when(fragment) {
-            browseFragment -> return BROWSE_FRAGMENT_TAG
-            libraryFragment -> return LIBRARY_FRAGMENT_TAG
-            settingsFragment -> return SETTINGS_FRAGMENT_TAG
-            else -> return null
+        if (newFragment === activeFragment)
+            return false
+
+        supportFragmentManager.beginTransaction().apply {
+            setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+            hide(activeFragment)
+            setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            show(newFragment)
+
+            addToBackStack(null)
+
+            commit()
+        }
+
+        onFragmentSwitch(itemId, resetNavBar)
+
+        return true
+    }
+
+    private fun onFragmentSwitch(itemId: Int, resetNavBar: Boolean) {
+        val newFragment = getFragment(itemId)
+
+        activeFragment = newFragment
+
+        if (resetNavBar)
+            navBarSelectItem(itemId)
+
+        if (newFragment == browseFragment) {
+            browseFragment.updateUI()
+            speedDial.show()
+        } else {
+            speedDial.hide()
         }
     }
 
-    fun getFragment(tag: String): Fragment? {
-        when(tag) {
-            BROWSE_FRAGMENT_TAG -> return browseFragment
-            LIBRARY_FRAGMENT_TAG -> return libraryFragment
-            SETTINGS_FRAGMENT_TAG -> return settingsFragment
-            else -> return null
+    private fun navBarSelectItem(itemId: Int) {
+        bottomNavigationView.post {
+            var i = 0
+            val menu = bottomNavigationView.menu
+            while (i < menu.size()) {
+                val item = bottomNavigationView.menu.getItem(i)
+                if (item.itemId == itemId)
+                    item.isChecked = true
+                i++
+            }
         }
     }
+
+
+    private fun getFragmentTag(fragment: Fragment): String {
+        return when (fragment) {
+            browseFragment -> BROWSE_FRAGMENT_TAG
+            libraryFragment -> LIBRARY_FRAGMENT_TAG
+            settingsFragment -> SETTINGS_FRAGMENT_TAG
+            else -> throw IllegalArgumentException()
+        }
+    }
+
+    private fun getFragment(tag: String): Fragment {
+        return when (tag) {
+            BROWSE_FRAGMENT_TAG -> browseFragment
+            LIBRARY_FRAGMENT_TAG -> libraryFragment
+            SETTINGS_FRAGMENT_TAG -> settingsFragment
+            else -> throw IllegalArgumentException()
+        }
+    }
+
+    private fun getFragment(itemId: Int): Fragment {
+        return when (itemId) {
+            R.id.navigation_website_view -> browseFragment
+            R.id.navigation_library -> libraryFragment
+            R.id.navigation_settings -> settingsFragment
+            else -> throw IllegalArgumentException()
+        }
+    }
+
+    private fun getItemId(tag: String): Int {
+        return when(tag) {
+            BROWSE_FRAGMENT_TAG -> R.id.navigation_website_view
+            LIBRARY_FRAGMENT_TAG -> R.id.navigation_library
+            SETTINGS_FRAGMENT_TAG -> R.id.navigation_settings
+            else -> throw IllegalArgumentException()
+        }
+    }
+
+    private fun getItemId(fragment: Fragment): Int {
+        return when(fragment) {
+            browseFragment -> R.id.navigation_website_view
+            libraryFragment -> R.id.navigation_library
+            settingsFragment -> R.id.navigation_settings
+            else -> throw IllegalArgumentException()
+        }
+    }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         super.onOptionsItemSelected(item)
