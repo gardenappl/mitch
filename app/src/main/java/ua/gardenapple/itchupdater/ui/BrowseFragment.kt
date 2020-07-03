@@ -220,7 +220,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             
         //Loading a URL should be the last action so that it may call processUI
         if(savedInstanceState?.getBundle(WEB_VIEW_STATE_KEY) != null) {
-            Log.d(LOGGING_TAG, "Restoring WebView")
             webView.restoreState(savedInstanceState.getBundle(WEB_VIEW_STATE_KEY))
         } else {
             webView.loadUrl(ItchWebsiteUtils.getMainBrowsePage())
@@ -233,9 +232,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
      * @return true if the user can't go back in the web history
      */
     fun onBackPressed(): Boolean {
-        if(chromeClient.customViewCallback != null) {
+        val customViewCallback = chromeClient.customViewCallback
+        if(customViewCallback != null) {
             Log.d(LOGGING_TAG, "Hiding custom view")
-            chromeClient.customViewCallback?.onCustomViewHidden()
+            customViewCallback.onCustomViewHidden()
             return false
         } else {
             Log.d(LOGGING_TAG, "Custom view callback is null")
@@ -292,6 +292,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         updateUI(currentDoc)
     }
 
+    //TODO: hide stuff on scroll
     /**
      * Adapts the app's UI to the theme of a web page.
      * @param doc the parsed DOM of the page the user is currently on. Null if the UI shouldn't adapt to any web page at all
@@ -348,7 +349,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val defaultBlackColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
 
         //TODO: change color of system UI
-        //TODO: change color of app bar menu
         launch(Dispatchers.Default) {
             val gameThemeBgColor = doc?.run { ItchWebsiteParser.getBackgroundUIColor(doc) }
             val gameThemeButtonColor = doc?.run { ItchWebsiteParser.getButtonUIColor(doc) }
@@ -436,16 +436,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     }
 
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-
-        updateUI()
-    }
-
-
     override fun onSaveInstanceState(outState: Bundle) {
-        Log.d(LOGGING_TAG, "Saving WebView")
-
         val webViewState = Bundle()
         webView.saveState(webViewState)
         outState.putBundle(WEB_VIEW_STATE_KEY, webViewState)
@@ -466,8 +457,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             }
         }
 
-        //TODO: proper handling of resize and rotate (for app bar and for ChromeOS)
-        //TODO: hide stuff on scroll
         @JavascriptInterface
         fun onHtmlLoaded(html: String, url: String) {
             Log.d(LOGGING_TAG, url)
@@ -483,6 +472,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 fragment.currentDoc = doc
                 fragment.updateUI()
             }
+        }
+
+        @JavascriptInterface
+        fun onResize() {
+            fragment.updateUI()
         }
     }
 
@@ -530,6 +524,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     document.addEventListener("DOMContentLoaded", (event) => {
                         mitchCustomJS.onHtmlLoaded("<html>" + document.getElementsByTagName("html")[0].innerHTML + "</html>",
                                                    window.location.href);
+                    });
+                    window.addEventListener("resize", (event) => {
+                        mitchCustomJS.onResize();
                     });
                 """, null
             )
