@@ -12,7 +12,9 @@
                 android:id="@+id/input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:focusableInTouchMode="true"
                 android:hint="@string/search_games_hint"
+                android:imeOptions="actionSearch"
                 android:singleLine="true" />
     </com.google.android.material.textfield.TextInputLayout>
 </FrameLayout>

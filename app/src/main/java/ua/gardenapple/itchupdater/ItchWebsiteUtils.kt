@@ -10,6 +10,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ui.MitchWebView
 import java.io.IOException
+import java.net.URLEncoder
 
 class ItchWebsiteUtils {
     companion object {
@@ -90,6 +91,15 @@ class ItchWebsiteUtils {
          */
         fun getMainBrowsePage(): String {
             return "https://itch.io/games/platform-android"
+        }
+
+        /**
+         * @param searchQuery an itch.io search query, input from the user
+         * @return the URL for search results on itch.io
+         */
+        fun getSearchUrl(searchQuery: String): String {
+            val searchQueryEncoded = URLEncoder.encode(searchQuery, "utf-8")
+            return "https://itch.io/search?q=$searchQueryEncoded"
         }
     }
 }

@@ -12,6 +12,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.webkit.*
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -21,10 +23,10 @@ import androidx.core.app.ShareCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
-import com.google.android.material.textfield.TextInputEditText
 import com.leinardi.android.speeddial.SpeedDialActionItem
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.browse_fragment.*
+import kotlinx.android.synthetic.main.dialog_search.view.*
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -36,7 +38,6 @@ import ua.gardenapple.itchupdater.installer.DownloadRequester
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.StringReader
-import java.net.URLEncoder
 
 
 class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
@@ -102,6 +103,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             }
         }
 
+
         //Set up FAB buttons
         //(colors don't matter too much as they will be set by processUI anyway)
         val speedDialView = (activity as MainActivity).speedDial
@@ -152,26 +154,41 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     speedDialView.close()
 
                     //Search dialog
-                    //TODO: better dialog UX (Autofocus, search on enter)
+
                     val viewInflated: View = LayoutInflater.from(context)
                         .inflate(R.layout.dialog_search, getView() as ViewGroup?, false)
 
-                    val input = viewInflated.findViewById<TextInputEditText>(R.id.input)
+                    val input = viewInflated.input
 
-                    AlertDialog.Builder(requireContext())
+                    //Show keyboard automatically
+                    input.post {
+                        input.requestFocus()
+                        val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE)
+                            as InputMethodManager
+                        inputMethodManager.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
+                    }
+                    
+
+                    val alertDialog = AlertDialog.Builder(requireContext())
                         .setTitle(R.string.browser_search)
                         .setView(viewInflated)
                         .setPositiveButton(android.R.string.ok) { dialog, _ ->
                             dialog.dismiss()
-
-                            val searchQuery = URLEncoder.encode(input.text.toString(), "utf-8")
-                            val url = "https://itch.io/search?q=$searchQuery"
-                            webView.loadUrl(url)
+                            webView.loadUrl(ItchWebsiteUtils.getSearchUrl(input.text.toString()))
                         }
                         .setNegativeButton(android.R.string.cancel) { dialog, _ ->
                             dialog.cancel()
                         }
                         .show()
+
+                    input.setOnEditorActionListener { textView, actionId, keyEvent ->
+                        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                            alertDialog.dismiss()
+                            webView.loadUrl(ItchWebsiteUtils.getSearchUrl(input.text.toString()))
+                            return@setOnEditorActionListener true
+                        }
+                        false
+                    }
 
                     return@setOnActionSelectedListener true
                 }
