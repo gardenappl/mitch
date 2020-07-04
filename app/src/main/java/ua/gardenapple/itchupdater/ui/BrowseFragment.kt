@@ -353,7 +353,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val defaultWhiteColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
         val defaultBlackColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
 
-        //TODO: change color of system UI
         launch(Dispatchers.Default) {
             val gameThemeBgColor = doc?.run { ItchWebsiteParser.getBackgroundUIColor(doc) }
             val gameThemeButtonColor = doc?.run { ItchWebsiteParser.getButtonUIColor(doc) }
@@ -380,50 +379,60 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 }
             }
             progressBar?.post {
-                progressBar.setBackgroundColor(bgColor)
-                progressBar.progressTintList = ColorStateList.valueOf(accentColor)
+                progressBar.progressDrawable.setTint(accentColor)
             }
             appBar?.post {
                 appBar.setBackgroundColor(bgColor)
                 appBar.setTitleTextColor(fgColor)
                 appBar.overflowIcon?.setTint(fgColor)
             }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                mainActivity.runOnUiThread {
+                    mainActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+                    mainActivity.window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+                    mainActivity.window.statusBarColor = bgColor
+                    if (fgColor == defaultBlackColor)
+                        mainActivity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                    else
+                        mainActivity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+                }
+            }
         }
     }
 
     private fun setupAppBarMenu(doc: Document, appBar: Toolbar) {
         appBar.menu.clear()
-        Log.d(LOGGING_TAG, "Cleared, now ${appBar.menu.size()}")
+//        Log.d(LOGGING_TAG, "Cleared, now ${appBar.menu.size()}")
 
         //5px of padding on left and right, min width for item is 80px
         val navbarItemFitCount = (webView.contentWidth - 10) / 80
-        Log.d(LOGGING_TAG, "WebView can fit $navbarItemFitCount navbar items")
+//        Log.d(LOGGING_TAG, "WebView can fit $navbarItemFitCount navbar items")
         val navbarItems = doc.getElementById("user_tools").children()
 
         while (navbarItemFitCount < navbarItems.size && navbarItems.isNotEmpty()) {
             val lastItem = navbarItems.last()
 
             if (lastItem.getElementsByClass("related_games_btn").isNotEmpty()) {
-                Log.d(LOGGING_TAG, "Adding related games")
+//                Log.d(LOGGING_TAG, "Adding related games")
                 appBar.menu.add(Menu.NONE, 3, 3, R.string.menu_game_related).setOnMenuItemClickListener {
                     val gameId = ItchWebsiteUtils.getGameId(doc)
                     webView.loadUrl("https://itch.io/games-like/$gameId")
                     true
                 }
             } else if (lastItem.getElementsByClass("rate_game_btn").isNotEmpty()) {
-                Log.d(LOGGING_TAG, "Adding rate")
+//                Log.d(LOGGING_TAG, "Adding rate")
                 appBar.menu.add(Menu.NONE, 2, 2, R.string.menu_game_rate).setOnMenuItemClickListener {
                     webView.loadUrl(webView.url + "/rate?source=game")
                     true
                 }
             } else if (lastItem.hasClass("devlog_link")) {
-                Log.d(LOGGING_TAG, "Adding devlog")
+//                Log.d(LOGGING_TAG, "Adding devlog")
                 appBar.menu.add(Menu.NONE, 1, 1, R.string.menu_game_devlog).setOnMenuItemClickListener {
                     webView.loadUrl(webView.url + "/devlog")
                     true
                 }
             } else if (lastItem.getElementsByClass("add_to_collection_btn").isNotEmpty()) {
-                Log.d(LOGGING_TAG, "Adding add to collection")
+//                Log.d(LOGGING_TAG, "Adding add to collection")
                 appBar.menu.add(Menu.NONE, 0, 0, R.string.menu_game_collection).setOnMenuItemClickListener {
                     webView.loadUrl(webView.url + "/add-to-collection?source=game")
                     true
@@ -615,7 +624,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
 
         override fun onProgressChanged(view: WebView?, newProgress: Int) {
-            //TODO: better animation for progress bar appearing/disappearing?
             if (newProgress < 100 && progressBar.visibility == ProgressBar.GONE)
                 progressBar.visibility = ProgressBar.VISIBLE
 
