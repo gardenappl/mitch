@@ -28,7 +28,6 @@ class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope
         lastDownloadPageUrl = null
 
         if(ItchWebsiteUtils.isStorePage(doc)) {
-
             val db = AppDatabase.getDatabase(context)
 
             withContext(Dispatchers.IO) {
