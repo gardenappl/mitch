@@ -3,7 +3,6 @@ package ua.gardenapple.itchupdater.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
@@ -316,11 +315,16 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
 
         if (doc != null && ItchWebsiteUtils.isStylizedGamePage(doc)) {
-            fab?.post {
+            /*fab?.post {
                 val fabParams = fab.layoutParams as ViewGroup.MarginLayoutParams
                 val marginDP = (50 * requireContext().resources.displayMetrics.density).toInt()
                 fabParams.bottomMargin = marginDP
-            }
+            }*/
+            if (ItchWebsiteUtils.siteHasNavbar(webView, doc))
+                setSiteNavbarVisibility(false)
+            else
+                setSiteNavbarVisibility(true)
+
             navBar?.post {
                 navBar.visibility = View.GONE
             }
@@ -334,10 +338,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 setupAppBarMenu(doc, appBar)
             }
         } else {
-            fab?.post {
+            /*fab?.post {
                 val fabParams = fab.layoutParams as ViewGroup.MarginLayoutParams
                 fabParams.bottomMargin = 0
-            }
+            }*/
             navBar?.post {
                 navBar.visibility = View.VISIBLE
             }
@@ -355,8 +359,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         launch(Dispatchers.Default) {
             val gameThemeBgColor = doc?.run { ItchWebsiteParser.getBackgroundUIColor(doc) }
-            val gameThemeButtonColor = doc?.run { ItchWebsiteParser.getButtonUIColor(doc) }
-            val gameThemeButtonFgColor = doc?.run { ItchWebsiteParser.getButtonFgUIColor(doc) }
+            val gameThemeButtonColor = doc?.run { ItchWebsiteParser.getAccentUIColor(doc) }
+            val gameThemeButtonFgColor = doc?.run { ItchWebsiteParser.getAccentFgUIColor(doc) }
 
             val accentColor = gameThemeButtonColor ?: defaultAccentColor
             val accentFgColor = gameThemeButtonFgColor ?: defaultWhiteColor
@@ -402,14 +406,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     private fun setupAppBarMenu(doc: Document, appBar: Toolbar) {
         appBar.menu.clear()
-//        Log.d(LOGGING_TAG, "Cleared, now ${appBar.menu.size()}")
 
-        //5px of padding on left and right, min width for item is 80px
-        val navbarItemFitCount = (webView.contentWidth - 10) / 80
-//        Log.d(LOGGING_TAG, "WebView can fit $navbarItemFitCount navbar items")
         val navbarItems = doc.getElementById("user_tools").children()
 
-        while (navbarItemFitCount < navbarItems.size && navbarItems.isNotEmpty()) {
+        while (navbarItems.isNotEmpty()) {
             val lastItem = navbarItems.last()
 
             if (lastItem.getElementsByClass("related_games_btn").isNotEmpty()) {
@@ -421,10 +421,13 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 }
             } else if (lastItem.getElementsByClass("rate_game_btn").isNotEmpty()) {
 //                Log.d(LOGGING_TAG, "Adding rate")
-                appBar.menu.add(Menu.NONE, 2, 2, R.string.menu_game_rate).setOnMenuItemClickListener {
-                    webView.loadUrl(webView.url + "/rate?source=game")
-                    true
-                }
+                appBar.menu.add(Menu.NONE, 2, 2, R.string.menu_game_rate)
+                    .setOnMenuItemClickListener {
+                        webView.loadUrl(webView.url + "/rate?source=game")
+                        true
+                    }
+                    .setIcon(R.drawable.ic_baseline_rate_review_24)
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
             } else if (lastItem.hasClass("devlog_link")) {
 //                Log.d(LOGGING_TAG, "Adding devlog")
                 appBar.menu.add(Menu.NONE, 1, 1, R.string.menu_game_devlog).setOnMenuItemClickListener {
@@ -451,6 +454,20 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             updateUI(null)
             (activity as MainActivity).switchToFragment(R.id.navigation_settings, true)
             true
+        }
+    }
+
+    private fun setSiteNavbarVisibility(visible: Boolean) {
+        val cssVisibility = if (visible) "visible" else "hidden"
+        webView.post {
+            webView.evaluateJavascript("""
+                    (function() {
+                        let navbar = document.getElementById("user_tools")
+                        if (navbar)
+                            navbar.style.visibility = "$cssVisibility"
+                    })();
+                """, null
+            )
         }
     }
 

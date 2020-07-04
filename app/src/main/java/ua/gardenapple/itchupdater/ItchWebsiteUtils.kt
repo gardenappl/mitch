@@ -54,6 +54,13 @@ class ItchWebsiteUtils {
         }
 
         /**
+         * @return true if the page is a store page or devlog page, or stylized community profile
+         */
+        fun isStylizedPage(htmlDoc: Document): Boolean {
+            return htmlDoc.getElementById("game_theme") != null
+        }
+
+        /**
          * @return true if the screen is small enough where itch.io starts introducing the bottom navbar AND we're looking at a store page now
          */
         fun siteHasNavbar(webView: MitchWebView, htmlDoc: Document): Boolean {

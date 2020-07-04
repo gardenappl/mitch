@@ -30,10 +30,13 @@ class ItchWebsiteParser {
         const val LOGGING_TAG = "ItchWebsiteParser"
         const val UNKNOWN_LOCALE = "Unknown"
 
-//        val COLOR_PATTERN = Regex("root[{]--itchio_ui_bg: (#\\w+);--itchio_ui_bg_dark: (#\\w+)}")
-        private val bgColorPattern = Regex("root[{]--itchio_ui_bg: (#?\\w+);")
-        private val buttonColorPattern = Regex("--itchio_button_color: (#?\\w+);")
-        private val buttonFgColorPattern = Regex("--itchio_button_fg_color: (#?\\w+);")
+        private val gameBgColorPattern = Regex("root[{]--itchio_ui_bg: (#?\\w+);")
+        private val gameButtonColorPattern = Regex("--itchio_button_color: (#?\\w+);")
+        private val gameButtonFgColorPattern = Regex("--itchio_button_fg_color: (#?\\w+);")
+
+        private val userBgColorPattern = Regex("--itchio_gray_back: (#?\\w+);")
+        private val userFgColorPattern = Regex("--itchio_border_radius: ?\\w+;color:(#?\\w+);")
+        private val userLinkColorPattern = Regex("--itchio_link_color: (#?\\w+);")
 
         fun getGameInfo(gamePageDoc: Document, gamePageUrl: String): Game {
             val thumbnails = gamePageDoc.head().getElementsByAttributeValue("property", "og:image")
@@ -246,28 +249,54 @@ class ItchWebsiteParser {
         }
 
         fun getBackgroundUIColor(doc: Document): Int? {
-            val gameThemeCSS = doc.getElementById("game_theme")?.html() ?: return null
+            val gameThemeCSS = doc.getElementById("game_theme")?.html()
+            if (gameThemeCSS != null) {
+                val foundColors = gameBgColorPattern.find(gameThemeCSS)
+                if (foundColors != null)
+                    return Color.parseColor(foundColors.groupValues[1])
+            }
 
-            val foundColors = bgColorPattern.find(gameThemeCSS)
-
-            return Color.parseColor(foundColors?.groupValues?.get(1) ?: "#333")
+            val userThemeCSS = doc.getElementById("user_theme")?.html()
+            if (userThemeCSS != null) {
+                val foundColors = userBgColorPattern.find(userThemeCSS)
+                if (foundColors != null)
+                    return Color.parseColor(foundColors.groupValues[1])
+            }
+            return Color.parseColor("#333")
         }
 
-        fun getButtonUIColor(doc: Document): Int? {
-            val gameThemeCSS = doc.getElementById("game_theme")?.html() ?: return null
+        fun getAccentUIColor(doc: Document): Int? {
+            val gameThemeCSS = doc.getElementById("game_theme")?.html()
+            if (gameThemeCSS != null) {
+                val foundColors = gameButtonColorPattern.find(gameThemeCSS)
+                if (foundColors != null)
+                    return Color.parseColor(foundColors.groupValues[1])
+            }
 
-            val foundColors = buttonColorPattern.find(gameThemeCSS)
-
-            return Color.parseColor(foundColors?.groupValues?.get(1) ?: "#fa5c5c")
+            val userThemeCSS = doc.getElementById("user_theme")?.html()
+            if (userThemeCSS != null) {
+                val foundColors = userFgColorPattern.find(userThemeCSS)
+                if (foundColors != null)
+                    return Color.parseColor(foundColors.groupValues[1])
+            }
+            return Color.parseColor("#fa5c5c")
         }
 
-        fun getButtonFgUIColor(doc: Document): Int? {
-            val gameThemeCSS = doc.getElementById("game_theme")?.html() ?: return null
+        fun getAccentFgUIColor(doc: Document): Int? {
+            val gameThemeCSS = doc.getElementById("game_theme")?.html()
+            if (gameThemeCSS != null) {
+                val foundColors = gameButtonFgColorPattern.find(gameThemeCSS)
+                if (foundColors != null)
+                    return Color.parseColor(foundColors.groupValues[1])
+            }
 
-            val foundColors = buttonFgColorPattern.find(gameThemeCSS)
-
-
-            return Color.parseColor(foundColors?.groupValues?.get(1) ?: "#fff")
+            val userThemeCSS = doc.getElementById("user_theme")?.html()
+            if (userThemeCSS != null) {
+                val foundColors = userBgColorPattern.find(userThemeCSS)
+                if (foundColors != null)
+                    return Color.parseColor(foundColors.groupValues[1])
+            }
+            return Color.parseColor("#fff")
         }
 
         fun getGameName(doc: Document): String {
