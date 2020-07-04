@@ -291,7 +291,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         updateUI(currentDoc)
     }
 
-    //TODO: hide stuff on scroll
+    //TODO: hide stuff on scroll?
     /**
      * Adapts the app's UI to the theme of a web page.
      * @param doc the parsed DOM of the page the user is currently on. Null if the UI shouldn't adapt to any web page at all
@@ -314,7 +314,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val appBar = (activity as? MainActivity)?.toolbar
 
 
-        if (doc != null && ItchWebsiteUtils.isStylizedGamePage(doc)) {
+        if (doc != null && ItchWebsiteUtils.isStylizedPage(doc)) {
             /*fab?.post {
                 val fabParams = fab.layoutParams as ViewGroup.MarginLayoutParams
                 val marginDP = (50 * requireContext().resources.displayMetrics.density).toInt()
@@ -328,14 +328,21 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             navBar?.post {
                 navBar.visibility = View.GONE
             }
-            appBar?.post {
-                val appBarTitle = "<b>${Html.escapeHtml(ItchWebsiteParser.getGameName(doc))}</b>"
-                if (Build.VERSION.SDK_INT >= 24)
-                    supportAppBar?.title = Html.fromHtml(appBarTitle, 0)
-                else
-                    supportAppBar?.title = Html.fromHtml(appBarTitle)
-                supportAppBar?.show()
-                setupAppBarMenu(doc, appBar)
+            if (ItchWebsiteUtils.isGamePage(doc)) {
+                appBar?.post {
+                    val appBarTitle =
+                        "<b>${Html.escapeHtml(ItchWebsiteParser.getGameName(doc))}</b>"
+                    if (Build.VERSION.SDK_INT >= 24)
+                        supportAppBar?.title = Html.fromHtml(appBarTitle, 0)
+                    else
+                        supportAppBar?.title = Html.fromHtml(appBarTitle)
+                    supportAppBar?.show()
+                    setupAppBarMenu(doc, appBar)
+                }
+            } else {
+                appBar?.post {
+                    supportAppBar?.hide()
+                }
             }
         } else {
             /*fab?.post {

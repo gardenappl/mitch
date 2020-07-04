@@ -262,7 +262,7 @@ class ItchWebsiteParser {
                 if (foundColors != null)
                     return Color.parseColor(foundColors.groupValues[1])
             }
-            return Color.parseColor("#333")
+            return null
         }
 
         fun getAccentUIColor(doc: Document): Int? {
@@ -279,7 +279,7 @@ class ItchWebsiteParser {
                 if (foundColors != null)
                     return Color.parseColor(foundColors.groupValues[1])
             }
-            return Color.parseColor("#fa5c5c")
+            return null
         }
 
         fun getAccentFgUIColor(doc: Document): Int? {
@@ -296,7 +296,7 @@ class ItchWebsiteParser {
                 if (foundColors != null)
                     return Color.parseColor(foundColors.groupValues[1])
             }
-            return Color.parseColor("#fff")
+            return null
         }
 
         fun getGameName(doc: Document): String {

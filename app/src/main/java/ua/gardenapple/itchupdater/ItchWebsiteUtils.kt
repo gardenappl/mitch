@@ -41,30 +41,28 @@ class ItchWebsiteUtils {
             }
         }
 
-        fun hasGameDownloadLinks(htmlDoc: Document): Boolean {
-            return htmlDoc.body().getElementsByClass("download_btn").isNotEmpty()
+        fun isGamePage(htmlDoc: Document): Boolean {
+            return isDevlogPage(htmlDoc) || isStorePage(htmlDoc) ||
+                    isPurchasePage(htmlDoc) || isDownloadPage(htmlDoc)
         }
 
-        /**
-         * @return true if the page is a store page or devlog page
-         */
-        fun isStylizedGamePage(htmlDoc: Document): Boolean {
-            return htmlDoc.getElementById("game_theme") != null
-                    && htmlDoc.getElementById("user_tools") != null
+        fun hasGameDownloadLinks(htmlDoc: Document): Boolean {
+            return htmlDoc.body().getElementsByClass("download_btn").isNotEmpty()
         }
 
         /**
          * @return true if the page is a store page or devlog page, or stylized community profile
          */
         fun isStylizedPage(htmlDoc: Document): Boolean {
-            return htmlDoc.getElementById("game_theme") != null
+            return htmlDoc.getElementById("game_theme") != null ||
+                    htmlDoc.getElementById("user_theme") != null
         }
 
         /**
          * @return true if the screen is small enough where itch.io starts introducing the bottom navbar AND we're looking at a store page now
          */
         fun siteHasNavbar(webView: MitchWebView, htmlDoc: Document): Boolean {
-            return webView.contentWidth < 650 && isStylizedGamePage(htmlDoc)
+            return webView.contentWidth < 650 && htmlDoc.getElementById("user_tools") != null
         }
 
         /**
