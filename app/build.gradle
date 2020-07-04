@@ -98,7 +98,6 @@ dependencies {
 
     // Jsoup
     implementation "org.jsoup:jsoup:$rootProject.jsoupVersion"
-
     // Glide
     implementation "com.github.bumptech.glide:glide:$rootProject.glideVersion"
     kapt "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
@@ -106,10 +105,10 @@ dependencies {
         // Excludes the support library because it's already included by Glide.
         transitive = false
     }
-
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:$rootProject.okHttpVersion")
-
     // FAB Speed DIal
     implementation "com.leinardi.android:speed-dial:$rootProject.speedDialVersion"
+    // Material Progress Bar
+    implementation "me.zhanghai.android.materialprogressbar:library:$rootProject.materialProgressBarVersion"
 }

@@ -3,7 +3,7 @@ package ua.gardenapple.itchupdater.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
@@ -32,7 +32,6 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.R
-import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.client.ItchBrowseHandler
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.installer.DownloadRequester
@@ -234,11 +233,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     fun onBackPressed(): Boolean {
         val customViewCallback = chromeClient.customViewCallback
         if(customViewCallback != null) {
-            Log.d(LOGGING_TAG, "Hiding custom view")
             customViewCallback.onCustomViewHidden()
             return false
         } else {
-            Log.d(LOGGING_TAG, "Custom view callback is null")
         }
 
         if(webView.canGoBack()) {
@@ -285,6 +282,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
     }*/
 
+    val isWebFullscreen: Boolean
+        get() = chromeClient.customViewCallback != null
+
     /**
      * Adapts the app's UI to the theme of the current web page.
      */
@@ -299,10 +299,15 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
      */
     private fun updateUI(doc: Document?) {
         Log.d(LOGGING_TAG, "Processing UI...")
+
+        if (isWebFullscreen)
+            return
+
         val mainActivity = activity as MainActivity
 
         if (mainActivity.activeFragment != mainActivity.browseFragment)
             return
+
 
         val navBar = (activity as? MainActivity)?.bottomNavigationView
         val fab = (activity as? MainActivity)?.speedDial
@@ -354,16 +359,16 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             val gameThemeButtonColor = doc?.run { ItchWebsiteParser.getButtonUIColor(doc) }
             val gameThemeButtonFgColor = doc?.run { ItchWebsiteParser.getButtonFgUIColor(doc) }
 
-            val buttonColor = gameThemeButtonColor ?: defaultAccentColor
-            val buttonFgColor = gameThemeButtonFgColor ?: defaultWhiteColor
+            val accentColor = gameThemeButtonColor ?: defaultAccentColor
+            val accentFgColor = gameThemeButtonFgColor ?: defaultWhiteColor
             val bgColor = gameThemeBgColor ?: defaultWhiteColor
             val fgColor = if (gameThemeBgColor == null) defaultBlackColor else defaultWhiteColor
 
             fab?.post {
-                fab.mainFabClosedBackgroundColor = buttonColor
-                fab.mainFabOpenedBackgroundColor = buttonColor
-                fab.mainFabClosedIconColor = buttonFgColor
-                fab.mainFabOpenedIconColor = buttonFgColor
+                fab.mainFabClosedBackgroundColor = accentColor
+                fab.mainFabOpenedBackgroundColor = accentColor
+                fab.mainFabClosedIconColor = accentFgColor
+                fab.mainFabOpenedIconColor = accentFgColor
                 for (actionItem in fab.actionItems) {
                     val newActionItem = SpeedDialActionItem.Builder(actionItem)
                         .setFabBackgroundColor(bgColor)
@@ -376,6 +381,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             }
             progressBar?.post {
                 progressBar.setBackgroundColor(bgColor)
+                progressBar.progressTintList = ColorStateList.valueOf(accentColor)
             }
             appBar?.post {
                 appBar.setBackgroundColor(bgColor)
@@ -558,7 +564,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         private var originalUiVisibility: Int = View.SYSTEM_UI_FLAG_VISIBLE
         var customViewCallback: CustomViewCallback? = null
             private set
-        private var originalNavBarVisibility: Int = View.VISIBLE
 
         override fun onShowCustomView(view: View, callback: CustomViewCallback) {
             Log.d(LOGGING_TAG, "onShowCustomView")
@@ -568,11 +573,13 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             }
 
             val mainActivity = activity as? MainActivity
-            originalNavBarVisibility = mainActivity?.bottomNavigationView?.visibility ?: View.VISIBLE
             mainActivity?.bottomNavigationView?.visibility = View.GONE
+            mainActivity?.speedDial?.visibility = View.GONE
+            mainActivity?.toolbar?.visibility = View.GONE
             webView.visibility = View.GONE
 
-            if(mainActivity?.fragmentContainer != null) {
+
+            if (mainActivity?.fragmentContainer != null) {
                 mainActivity.fragmentContainer.addView(view)
 
                 originalUiVisibility = mainActivity.fragmentContainer.systemUiVisibility
@@ -596,7 +603,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             }
 
             val mainActivity = activity as? MainActivity
-            mainActivity?.bottomNavigationView?.visibility = originalNavBarVisibility
             webView.visibility = View.VISIBLE
 
             mainActivity?.fragmentContainer?.removeView(customView)
@@ -604,6 +610,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
             customView = null
             customViewCallback = null
+
+            updateUI()
         }
 
         override fun onProgressChanged(view: WebView?, newProgress: Int) {

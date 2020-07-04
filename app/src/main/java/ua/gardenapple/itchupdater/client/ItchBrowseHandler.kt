@@ -31,7 +31,7 @@ class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope
             val db = AppDatabase.getDatabase(context)
 
             withContext(Dispatchers.IO) {
-                val job1 =  async {
+                val job1 = async {
                     if (ItchWebsiteUtils.isStorePage(doc)) {
                         val game = ItchWebsiteParser.getGameInfo(doc, url)
 
