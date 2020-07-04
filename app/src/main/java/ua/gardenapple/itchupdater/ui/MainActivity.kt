@@ -131,10 +131,11 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     override fun onBackPressed() {
         if (activeFragment === browseFragment) {
             val cantGoBack = browseFragment.onBackPressed()
-            if (!cantGoBack) {
-                return
-            }
+            if (cantGoBack)
+                finish()
+            return
         }
+        //super method handles fragment back stack
         super.onBackPressed()
     }
 
