@@ -63,18 +63,18 @@ abstract class AppDatabase : RoomDatabase() {
                                 appDb.installDao.clearAllInstallationsForGame(Game.MITCH_GAME_ID)
                             }
 
-                            val mitchInstall = appDb.installDao.findInstallation(Game.MITCH_GAME_ID)
+                            /*val mitchInstall = appDb.installDao.findInstallation(Game.MITCH_GAME_ID)
                             Log.d(LOGGING_TAG, "Mitch installation: $mitchInstall")
 
                             Log.d(LOGGING_TAG, "Known installs:")
                             val installs = appDb.installDao.getAllInstallationsSync()
-                            for(install in installs)
+                            for (install in installs)
                                 Log.d(LOGGING_TAG, "$install")
 
                             Log.d(LOGGING_TAG, "Known uploads:")
                             val uploads = appDb.uploadDao.getAllUploadsSync()
-                            for(upload in uploads)
-                                Log.d(LOGGING_TAG, "$upload")
+                            for (upload in uploads)
+                                Log.d(LOGGING_TAG, "$upload")*/
                         }
                     }
                 })

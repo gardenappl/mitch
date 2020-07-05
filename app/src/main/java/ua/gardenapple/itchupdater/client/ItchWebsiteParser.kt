@@ -31,14 +31,6 @@ class ItchWebsiteParser {
         const val LOGGING_TAG = "ItchWebsiteParser"
         const val UNKNOWN_LOCALE = "Unknown"
 
-        private val gameBgColorPattern = Regex("root[{]--itchio_ui_bg: (#?\\w+);")
-        private val gameButtonColorPattern = Regex("--itchio_button_color: (#?\\w+);")
-        private val gameButtonFgColorPattern = Regex("--itchio_button_fg_color: (#?\\w+);")
-
-        private val userBgColorPattern = Regex("--itchio_gray_back: (#?\\w+);")
-        private val userFgColorPattern = Regex("--itchio_border_radius: ?\\w+;color:(#?\\w+);")
-        //private val userLinkColorPattern = Regex("--itchio_link_color: (#?\\w+);")
-
         fun getGameInfo(gamePageDoc: Document, gamePageUrl: String): Game {
             val thumbnails = gamePageDoc.head().getElementsByAttributeValue("property", "og:image")
             var thumbnailUrl = ""
@@ -238,56 +230,6 @@ class ItchWebsiteParser {
         private fun getInfoTable(doc: Document): Element {
             return doc.body().getElementsByClass("game_info_panel_widget")[0].child(0).child(0)
         }
-
-        fun getBackgroundUIColor(doc: Document): Int? {
-            val gameThemeCSS = doc.getElementById("game_theme")?.html()
-            if (gameThemeCSS != null) {
-                val foundColors = gameBgColorPattern.find(gameThemeCSS)
-                if (foundColors != null)
-                    return Color.parseColor(foundColors.groupValues[1])
-            }
-
-            val userThemeCSS = doc.getElementById("user_theme")?.html()
-            if (userThemeCSS != null) {
-                return Color.parseColor("#333333")
-            }
-            return null
-        }
-
-        fun getAccentUIColor(doc: Document): Int? {
-            val gameThemeCSS = doc.getElementById("game_theme")?.html()
-            if (gameThemeCSS != null) {
-                val foundColors = gameButtonColorPattern.find(gameThemeCSS)
-                if (foundColors != null)
-                    return Color.parseColor(foundColors.groupValues[1])
-            }
-
-            val userThemeCSS = doc.getElementById("user_theme")?.html()
-            if (userThemeCSS != null) {
-                val foundColors = userFgColorPattern.find(userThemeCSS)
-                if (foundColors != null)
-                    return Color.parseColor(foundColors.groupValues[1])
-            }
-            return null
-        }
-
-        fun getAccentFgUIColor(doc: Document): Int? {
-            val gameThemeCSS = doc.getElementById("game_theme")?.html()
-            if (gameThemeCSS != null) {
-                val foundColors = gameButtonFgColorPattern.find(gameThemeCSS)
-                if (foundColors != null)
-                    return Color.parseColor(foundColors.groupValues[1])
-            }
-
-            val userThemeCSS = doc.getElementById("user_theme")?.html()
-            if (userThemeCSS != null) {
-                val foundColors = userBgColorPattern.find(userThemeCSS)
-                if (foundColors != null)
-                    return Color.parseColor(foundColors.groupValues[1])
-            }
-            return null
-        }
-
         fun getGameName(doc: Document): String {
             if (ItchWebsiteUtils.isPurchasePage(doc)) {
                 return doc.getElementsByTag("h1")[0].child(0).text()

@@ -14,7 +14,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.*
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.annotation.Keep
 import androidx.appcompat.app.AlertDialog
@@ -224,7 +223,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             webView.loadUrl(ItchWebsiteUtils.getMainBrowsePage())
         }
 
-        return view;
+        return view
     }
 
     /**
@@ -365,9 +364,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val defaultBlackColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
 
         launch(Dispatchers.Default) {
-            val gameThemeBgColor = doc?.run { ItchWebsiteParser.getBackgroundUIColor(doc) }
-            val gameThemeButtonColor = doc?.run { ItchWebsiteParser.getAccentUIColor(doc) }
-            val gameThemeButtonFgColor = doc?.run { ItchWebsiteParser.getAccentFgUIColor(doc) }
+            val gameThemeBgColor = doc?.run { ItchWebsiteUtils.getBackgroundUIColor(doc) }
+            val gameThemeButtonColor = doc?.run { ItchWebsiteUtils.getAccentUIColor(doc) }
+            val gameThemeButtonFgColor = doc?.run { ItchWebsiteUtils.getAccentFgUIColor(doc) }
 
             val accentColor = gameThemeButtonColor ?: defaultAccentColor
             val accentFgColor = gameThemeButtonFgColor ?: defaultWhiteColor
@@ -416,62 +415,67 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         val navbarItems = doc.getElementById("user_tools").children()
 
-        while (navbarItems.isNotEmpty()) {
-            val lastItem = navbarItems.last()
+        if (ItchWebsiteUtils.siteHasNavbar(webView, doc)) {
+            while (navbarItems.isNotEmpty()) {
+                val lastItem = navbarItems.last()
 
-            if (lastItem.getElementsByClass("related_games_btn").isNotEmpty()) {
-                appBar.menu.add(Menu.NONE, 3, 3, R.string.menu_game_related).setOnMenuItemClickListener {
-                    val gameId = ItchWebsiteUtils.getGameId(doc)
-                    webView.loadUrl("https://itch.io/games-like/$gameId")
-                    true
-                }
+                if (lastItem.getElementsByClass("related_games_btn").isNotEmpty()) {
+                    appBar.menu.add(Menu.NONE, 3, 3, R.string.menu_game_related)
+                        .setOnMenuItemClickListener {
+                            val gameId = ItchWebsiteUtils.getGameId(doc)
+                            webView.loadUrl("https://itch.io/games-like/$gameId")
+                            true
+                        }
 
-            } else if (lastItem.getElementsByClass("rate_game_btn").isNotEmpty()) {
-                appBar.menu.add(Menu.NONE, 2, 2, R.string.menu_game_rate)
-                    .setOnMenuItemClickListener {
-                        webView.loadUrl(webView.url + "/rate?source=game")
+                } else if (lastItem.getElementsByClass("rate_game_btn").isNotEmpty()) {
+                    appBar.menu.add(Menu.NONE, 2, 2, R.string.menu_game_rate)
+                        .setOnMenuItemClickListener {
+                            webView.loadUrl(webView.url + "/rate?source=game")
+                            true
+                        }
+                        .setIcon(R.drawable.ic_baseline_rate_review_24)
+                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
+
+                } else if (lastItem.hasClass("devlog_link")) {
+                    appBar.menu.add(Menu.NONE, 1, 1, R.string.menu_game_devlog)
+                        .setOnMenuItemClickListener {
+                            webView.loadUrl(webView.url + "/devlog")
+                            true
+                        }
+
+                } else if (lastItem.getElementsByClass("add_to_collection_btn").isNotEmpty()) {
+                    appBar.menu.add(Menu.NONE, 0, 0, R.string.menu_game_collection)
+                        .setOnMenuItemClickListener {
+                            webView.loadUrl(webView.url + "/add-to-collection?source=game")
+                            true
+                        }
+
+                } else if (lastItem.getElementsByClass("view_more").isNotEmpty()) {
+                    val authorUrl = lastItem.getElementsByClass("view_more")[0].attr("href")
+                    val authorName = lastItem.getElementsByClass("mobile_label")[0].text()
+                    val menuItemName = resources.getString(R.string.menu_game_author, authorName)
+
+                    appBar.menu.add(Menu.NONE, 0, 0, menuItemName).setOnMenuItemClickListener {
+                        webView.loadUrl(authorUrl)
                         true
                     }
-                    .setIcon(R.drawable.ic_baseline_rate_review_24)
-                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
 
-            } else if (lastItem.hasClass("devlog_link")) {
-                appBar.menu.add(Menu.NONE, 1, 1, R.string.menu_game_devlog).setOnMenuItemClickListener {
-                    webView.loadUrl(webView.url + "/devlog")
-                    true
+                } else if (lastItem.hasClass("jam_entry")) {
+                    val gameJamUrl = lastItem.child(0).attr("href")
+                    val menuItemName = lastItem.child(0).text()
+
+                    appBar.menu.add(Menu.NONE, 0, 0, menuItemName)
+                        .setOnMenuItemClickListener {
+                            webView.loadUrl(gameJamUrl)
+                            true
+                        }
+                        .setIcon(R.drawable.ic_baseline_emoji_events_24)
+                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
                 }
 
-            } else if (lastItem.getElementsByClass("add_to_collection_btn").isNotEmpty()) {
-                appBar.menu.add(Menu.NONE, 0, 0, R.string.menu_game_collection).setOnMenuItemClickListener {
-                    webView.loadUrl(webView.url + "/add-to-collection?source=game")
-                    true
-                }
 
-            } else if (lastItem.getElementsByClass("view_more").isNotEmpty()) {
-                val authorUrl = lastItem.getElementsByClass("view_more")[0].attr("href")
-                val authorName = lastItem.getElementsByClass("mobile_label")[0].text()
-                val menuItemName = resources.getString(R.string.menu_game_author, authorName)
-
-                appBar.menu.add(Menu.NONE, 0, 0, menuItemName).setOnMenuItemClickListener {
-                    webView.loadUrl(authorUrl)
-                    true
-                }
-
-            } else if (lastItem.hasClass("jam_entry")) {
-                val gameJamUrl = lastItem.child(0).attr("href")
-                val menuItemName = lastItem.child(0).text()
-
-                appBar.menu.add(Menu.NONE, 0, 0, menuItemName)
-                    .setOnMenuItemClickListener {
-                        webView.loadUrl(gameJamUrl)
-                        true
-                    }
-                    .setIcon(R.drawable.ic_baseline_emoji_events_24)
-                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                navbarItems.removeAt(navbarItems.size - 1)
             }
-
-
-            navbarItems.removeAt(navbarItems.size - 1)
         }
 
         appBar.menu.add(Menu.NONE, 4, 4, R.string.nav_installed).setOnMenuItemClickListener {
