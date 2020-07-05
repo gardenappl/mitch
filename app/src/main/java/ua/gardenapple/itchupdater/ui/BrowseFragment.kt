@@ -297,28 +297,29 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
      * @param doc the parsed DOM of the page the user is currently on. Null if the UI shouldn't adapt to any web page at all
      */
     private fun updateUI(doc: Document?) {
-        Log.d(LOGGING_TAG, "Processing UI...")
-
         if (isWebFullscreen)
             return
 
-        val mainActivity = activity as MainActivity
+        val mainActivity = activity as? MainActivity
 
-        if (mainActivity.activeFragment != mainActivity.browseFragment)
+        if (mainActivity == null || mainActivity.activeFragment != mainActivity.browseFragment)
             return
 
+        Log.d(LOGGING_TAG, "Processing UI...")
 
-        val navBar = (activity as? MainActivity)?.bottomNavigationView
-        val fab = (activity as? MainActivity)?.speedDial
-        val supportAppBar = (activity as? MainActivity)?.supportActionBar
-        val appBar = (activity as? MainActivity)?.toolbar
 
+        val navBar = mainActivity.bottomNavigationView
+        val fab = mainActivity.speedDial
+        val supportAppBar = mainActivity.supportActionBar!!
+        val appBar = mainActivity.toolbar
+
+        fab.show()
 
         if (doc != null && ItchWebsiteUtils.isStylizedPage(doc)) {
             if (ItchWebsiteUtils.isGamePage(doc)) {
                 //Hide app's navbar after hiding wen navbar
                 val navBarHideCallback: (String) -> Unit = {
-                    navBar?.post {
+                    navBar.post {
                         navBar.visibility = View.GONE
                     }
                 }
@@ -328,30 +329,30 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     setSiteNavbarVisibility(true, navBarHideCallback)
                 }
 
-                appBar?.post {
+                appBar.post {
                     val appBarTitle =
                         "<b>${Html.escapeHtml(ItchWebsiteParser.getGameName(doc))}</b>"
                     if (Build.VERSION.SDK_INT >= 24)
-                        supportAppBar?.title = Html.fromHtml(appBarTitle, 0)
+                        supportAppBar.title = Html.fromHtml(appBarTitle, 0)
                     else
-                        supportAppBar?.title = Html.fromHtml(appBarTitle)
-                    supportAppBar?.show()
+                        supportAppBar.title = Html.fromHtml(appBarTitle)
+                    supportAppBar.show()
                     setupAppBarMenu(doc, appBar)
                 }
             } else {
-                appBar?.post {
-                    supportAppBar?.hide()
+                appBar.post {
+                    supportAppBar.hide()
                 }
-                navBar?.post {
+                navBar.post {
                     navBar.visibility = View.GONE
                 }
             }
         } else {
-            navBar?.post {
+            navBar.post {
                 navBar.visibility = View.VISIBLE
             }
-            appBar?.post {
-                supportAppBar?.hide()
+            appBar.post {
+                supportAppBar.hide()
             }
         }
 
@@ -373,7 +374,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             val bgColor = gameThemeBgColor ?: defaultWhiteColor
             val fgColor = if (gameThemeBgColor == null) defaultBlackColor else defaultWhiteColor
 
-            fab?.post {
+            fab.post {
                 fab.mainFabClosedBackgroundColor = accentColor
                 fab.mainFabOpenedBackgroundColor = accentColor
                 fab.mainFabClosedIconColor = accentFgColor
@@ -388,10 +389,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     fab.replaceActionItem(actionItem, newActionItem)
                 }
             }
-            progressBar?.post {
+            progressBar.post {
                 progressBar.progressDrawable.setTint(accentColor)
             }
-            appBar?.post {
+            appBar.post {
                 appBar.setBackgroundColor(bgColor)
                 appBar.setTitleTextColor(fgColor)
                 appBar.overflowIcon?.setTint(fgColor)
