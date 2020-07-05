@@ -6,6 +6,8 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
+import com.github.ajalt.colormath.ConvertibleColor
+import com.github.ajalt.colormath.fromCss
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.InputStream
@@ -84,6 +86,14 @@ class Utils {
             }
             sb.append(" ]");
             return sb.toString()
+        }
+
+        /**
+         * Wrapper method for external library
+         * TODO: minimal CSS color parsing without library?
+         */
+        fun parseCssColor(color: String): Int {
+            return ConvertibleColor.fromCss(color).toRGB().toPackedInt()
         }
     }
 }

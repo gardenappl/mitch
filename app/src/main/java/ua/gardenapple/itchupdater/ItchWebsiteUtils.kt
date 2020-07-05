@@ -4,6 +4,8 @@ import android.graphics.Color
 import android.net.Uri
 import android.util.Log
 import android.webkit.CookieManager
+import com.github.ajalt.colormath.ConvertibleColor
+import com.github.ajalt.colormath.fromCss
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Request
@@ -128,12 +130,12 @@ class ItchWebsiteUtils {
             if (gameThemeCSS != null) {
                 val foundColors = gameBgColorPattern.find(gameThemeCSS)
                 if (foundColors != null)
-                    return Color.parseColor(foundColors.groupValues[1])
+                    return Utils.parseCssColor(foundColors.groupValues[1])
             }
 
             val userThemeCSS = doc.getElementById("user_theme")?.html()
             if (userThemeCSS != null) {
-                return Color.parseColor("#333333")
+                return Utils.parseCssColor("#333333")
             }
             return null
         }
@@ -143,14 +145,14 @@ class ItchWebsiteUtils {
             if (gameThemeCSS != null) {
                 val foundColors = gameButtonColorPattern.find(gameThemeCSS)
                 if (foundColors != null)
-                    return Color.parseColor(foundColors.groupValues[1])
+                    return Utils.parseCssColor(foundColors.groupValues[1])
             }
 
             val userThemeCSS = doc.getElementById("user_theme")?.html()
             if (userThemeCSS != null) {
                 val foundColors = userFgColorPattern.find(userThemeCSS)
                 if (foundColors != null)
-                    return Color.parseColor(foundColors.groupValues[1])
+                    return Utils.parseCssColor(foundColors.groupValues[1])
             }
             return null
         }
@@ -161,14 +163,14 @@ class ItchWebsiteUtils {
             if (gameThemeCSS != null) {
                 val foundColors = gameButtonFgColorPattern.find(gameThemeCSS)
                 if (foundColors != null)
-                    return Color.parseColor(foundColors.groupValues[1])
+                    return Utils.parseCssColor(foundColors.groupValues[1])
             }
 
             val userThemeCSS = doc.getElementById("user_theme")?.html()
             if (userThemeCSS != null) {
                 val foundColors = userBgColorPattern.find(userThemeCSS)
                 if (foundColors != null)
-                    return Color.parseColor(foundColors.groupValues[1])
+                    return Utils.parseCssColor(foundColors.groupValues[1])
             }
             return null
         }
