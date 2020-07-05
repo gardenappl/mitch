@@ -93,7 +93,7 @@ class WebUpdateCheckWorker(val context: Context, params: WorkerParameters) :
                         val intent = Intent(context, UpdateNotificationBroadcastReceiver::class.java).apply {
                             putExtra(UpdateNotificationBroadcastReceiver.EXTRA_GAME_ID, game.gameId)
                             putExtra(UpdateNotificationBroadcastReceiver.EXTRA_UPLOAD_ID, result.uploadID)
-                            val downloadKey = result.downloadPageUrl?.getDownloadKey()
+                            val downloadKey = result.downloadPageUrl?.downloadKey
                             if(downloadKey != null)
                                 putExtra(UpdateNotificationBroadcastReceiver.EXTRA_DOWNLOAD_KEY, downloadKey)
                         }

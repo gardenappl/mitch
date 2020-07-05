@@ -22,6 +22,7 @@ import androidx.core.app.ShareCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
+import com.google.android.material.snackbar.Snackbar
 import com.leinardi.android.speeddial.SpeedDialActionItem
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.browse_fragment.*
@@ -94,7 +95,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 DownloadRequester.requestDownload(it, activity, url, contentDisposition, mimeType) {
                     downloadId: Long ->
                     run {
-                        Toast.makeText(context, R.string.toast_download_started, Toast.LENGTH_LONG)
+                        Snackbar.make(view, R.string.toast_download_started, Snackbar.LENGTH_LONG)
                             .show()
                         browseHandler!!.onDownloadStarted(downloadId)
                     }
@@ -315,20 +316,19 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
 
         if (doc != null && ItchWebsiteUtils.isStylizedPage(doc)) {
-            /*fab?.post {
-                val fabParams = fab.layoutParams as ViewGroup.MarginLayoutParams
-                val marginDP = (50 * requireContext().resources.displayMetrics.density).toInt()
-                fabParams.bottomMargin = marginDP
-            }*/
-            if (ItchWebsiteUtils.siteHasNavbar(webView, doc))
-                setSiteNavbarVisibility(false)
-            else
-                setSiteNavbarVisibility(true)
-
-            navBar?.post {
-                navBar.visibility = View.GONE
-            }
             if (ItchWebsiteUtils.isGamePage(doc)) {
+                //Hide app's navbar after hiding wen navbar
+                val navBarHideCallback: (String) -> Unit = {
+                    navBar?.post {
+                        navBar.visibility = View.GONE
+                    }
+                }
+                if (ItchWebsiteUtils.siteHasNavbar(webView, doc)) {
+                    setSiteNavbarVisibility(false, navBarHideCallback)
+                } else {
+                    setSiteNavbarVisibility(true, navBarHideCallback)
+                }
+
                 appBar?.post {
                     val appBarTitle =
                         "<b>${Html.escapeHtml(ItchWebsiteParser.getGameName(doc))}</b>"
@@ -343,12 +343,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 appBar?.post {
                     supportAppBar?.hide()
                 }
+                navBar?.post {
+                    navBar.visibility = View.GONE
+                }
             }
         } else {
-            /*fab?.post {
-                val fabParams = fab.layoutParams as ViewGroup.MarginLayoutParams
-                fabParams.bottomMargin = 0
-            }*/
             navBar?.post {
                 navBar.visibility = View.VISIBLE
             }
@@ -359,6 +358,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
 
         //Colors adapt to game theme
+        //TODO: dark theme for app
 
         val defaultAccentColor = ResourcesCompat.getColor(resources, R.color.colorAccent, requireContext().theme)
         val defaultWhiteColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
@@ -420,14 +420,13 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             val lastItem = navbarItems.last()
 
             if (lastItem.getElementsByClass("related_games_btn").isNotEmpty()) {
-//                Log.d(LOGGING_TAG, "Adding related games")
                 appBar.menu.add(Menu.NONE, 3, 3, R.string.menu_game_related).setOnMenuItemClickListener {
                     val gameId = ItchWebsiteUtils.getGameId(doc)
                     webView.loadUrl("https://itch.io/games-like/$gameId")
                     true
                 }
+
             } else if (lastItem.getElementsByClass("rate_game_btn").isNotEmpty()) {
-//                Log.d(LOGGING_TAG, "Adding rate")
                 appBar.menu.add(Menu.NONE, 2, 2, R.string.menu_game_rate)
                     .setOnMenuItemClickListener {
                         webView.loadUrl(webView.url + "/rate?source=game")
@@ -435,19 +434,42 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     }
                     .setIcon(R.drawable.ic_baseline_rate_review_24)
                     .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
+
             } else if (lastItem.hasClass("devlog_link")) {
-//                Log.d(LOGGING_TAG, "Adding devlog")
                 appBar.menu.add(Menu.NONE, 1, 1, R.string.menu_game_devlog).setOnMenuItemClickListener {
                     webView.loadUrl(webView.url + "/devlog")
                     true
                 }
+
             } else if (lastItem.getElementsByClass("add_to_collection_btn").isNotEmpty()) {
-//                Log.d(LOGGING_TAG, "Adding add to collection")
                 appBar.menu.add(Menu.NONE, 0, 0, R.string.menu_game_collection).setOnMenuItemClickListener {
                     webView.loadUrl(webView.url + "/add-to-collection?source=game")
                     true
                 }
+
+            } else if (lastItem.getElementsByClass("view_more").isNotEmpty()) {
+                val authorUrl = lastItem.getElementsByClass("view_more")[0].attr("href")
+                val authorName = lastItem.getElementsByClass("mobile_label")[0].text()
+                val menuItemName = resources.getString(R.string.menu_game_author, authorName)
+
+                appBar.menu.add(Menu.NONE, 0, 0, menuItemName).setOnMenuItemClickListener {
+                    webView.loadUrl(authorUrl)
+                    true
+                }
+
+            } else if (lastItem.hasClass("jam_entry")) {
+                val gameJamUrl = lastItem.child(0).attr("href")
+                val menuItemName = lastItem.child(0).text()
+
+                appBar.menu.add(Menu.NONE, 0, 0, menuItemName)
+                    .setOnMenuItemClickListener {
+                        webView.loadUrl(gameJamUrl)
+                        true
+                    }
+                    .setIcon(R.drawable.ic_baseline_emoji_events_24)
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
             }
+
 
             navbarItems.removeAt(navbarItems.size - 1)
         }
@@ -464,7 +486,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
     }
 
-    private fun setSiteNavbarVisibility(visible: Boolean) {
+    private fun setSiteNavbarVisibility(visible: Boolean, callback: (String) -> (Unit)) {
         val cssVisibility = if (visible) "visible" else "hidden"
         webView.post {
             webView.evaluateJavascript("""
@@ -473,7 +495,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         if (navbar)
                             navbar.style.visibility = "$cssVisibility"
                     })();
-                """, null
+                """, callback
             )
         }
     }
@@ -562,7 +584,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             return null
         }
 
-        override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
+        override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
             view.evaluateJavascript("""
                     document.addEventListener("DOMContentLoaded", (event) => {
                         mitchCustomJS.onHtmlLoaded("<html>" + document.getElementsByTagName("html")[0].innerHTML + "</html>",

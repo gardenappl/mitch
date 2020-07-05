@@ -54,4 +54,6 @@
     <string name="menu_game_rate">Rate or Review</string>
     <string name="menu_game_related">More games like this</string>
     <string name="browser_open_in_browser">Open in browser</string>
+    <string name="menu_game_gamejam">%1$s entry</string>
+    <string name="menu_game_author">More from %1$s</string>
 </resources>

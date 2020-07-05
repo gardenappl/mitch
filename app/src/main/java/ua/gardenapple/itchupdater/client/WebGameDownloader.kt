@@ -136,7 +136,7 @@ class WebGameDownloader(val context: Context) {
 
         var game = db.gameDao.getGameById(gameId)
         if (game == null) {
-            val storeUrl = ItchWebsiteParser.getStoreUrlFromDownloadPage(downloadPageUrl)
+            val storeUrl = ItchWebsiteParser.getStoreUrlFromDownloadPage(Uri.parse(downloadPageUrl))
             Log.d(ItchBrowseHandler.LOGGING_TAG, "Game is null! Fetching $storeUrl...")
             val storeDoc = ItchWebsiteUtils.fetchAndParseDocument(storeUrl)
             game = ItchWebsiteParser.getGameInfo(storeDoc, storeUrl)

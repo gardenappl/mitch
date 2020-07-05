@@ -19,11 +19,12 @@ import java.io.IOException
 
 class ItchWebsiteParser {
     data class DownloadUrl(val url: String, val isPermanent: Boolean, val isStorePage: Boolean) {
-        fun getDownloadKey(): String? {
-            if(isStorePage || !isPermanent)
-                return null
-            return Uri.parse(url).lastPathSegment
-        }
+        val downloadKey: String?
+            get() {
+                if(isStorePage || !isPermanent)
+                    return null
+                return Uri.parse(url).lastPathSegment
+            }
     }
 
     companion object {
@@ -36,7 +37,7 @@ class ItchWebsiteParser {
 
         private val userBgColorPattern = Regex("--itchio_gray_back: (#?\\w+);")
         private val userFgColorPattern = Regex("--itchio_border_radius: ?\\w+;color:(#?\\w+);")
-        private val userLinkColorPattern = Regex("--itchio_link_color: (#?\\w+);")
+        //private val userLinkColorPattern = Regex("--itchio_link_color: (#?\\w+);")
 
         fun getGameInfo(gamePageDoc: Document, gamePageUrl: String): Game {
             val thumbnails = gamePageDoc.head().getElementsByAttributeValue("property", "og:image")
@@ -51,11 +52,9 @@ class ItchWebsiteParser {
             val gameId: Int = ItchWebsiteUtils.getGameId(gamePageDoc)
             val name: String = getGameName(gamePageDoc)
 
-            val infoTable = gamePageDoc.body().getElementsByClass("game_info_panel_widget")[0].child(0).child(0)
+            val infoTable = getInfoTable(gamePageDoc)
 
-            val authorUrl = "https://${Uri.parse(gamePageUrl).host}"
-            val authorName = infoTable.getElementsByAttributeValue("href", authorUrl)[0].html()
-
+            val authorName = getAuthorName(Uri.parse(gamePageUrl), infoTable)
             val lastDownloadTimestamp: String? = getTimestamp(gamePageDoc, infoTable)
 
             return Game(
@@ -139,32 +138,14 @@ class ItchWebsiteParser {
             return uploadsList
         }
 
-        fun getStoreUrlFromDownloadPage(downloadUrl: String): String {
-            val uri = Uri.parse(downloadUrl)
-            return "${uri.scheme}://${uri.host}/${uri.pathSegments[0]}"
+        fun getStoreUrlFromDownloadPage(downloadUri: Uri): String {
+            return "https://${downloadUri.host}/${downloadUri.pathSegments[0]}"
         }
 
+        fun getAuthorUrlFromGamePage(gamePageUri: Uri): String {
+            return "https://${gamePageUri.host}"
+        }
 
-
-//        suspend fun getDownloadUrlFromStorePage(storeUrl: String, doExtraFetches: Boolean): DownloadUrl? = withContext(Dispatchers.IO) {
-//            val request = Request.Builder().run {
-//                url(storeUrl)
-//                addHeader("Cookie", CookieManager.getInstance().getCookie(storeUrl))
-//                build()
-//            }
-//            var html: String = ""
-//            MitchApp.httpClient.newCall(request).execute().use { response ->
-//                if(!response.isSuccessful)
-//                    throw IOException("Unexpected response $response")
-//                html = response.body!!.string()
-//            }
-//
-//            val doc = withContext(Dispatchers.Default) {
-//                Jsoup.parse(html)
-//            }
-//
-//            return@withContext getDownloadUrlFromStorePage(doc, storeUrl, doExtraFetches)
-//        }
 
 
         suspend fun getDownloadUrlFromStorePage(doc: Document, storeUrl: String, doExtraFetches: Boolean): DownloadUrl? = withContext(Dispatchers.IO) {
@@ -238,14 +219,24 @@ class ItchWebsiteParser {
             return UNKNOWN_LOCALE
         }
 
-        fun getTimestamp(doc: Document, infoTable: Element? = null): String? {
-            val theInfoTable = infoTable ?: doc.body().getElementsByClass("game_info_panel_widget")[0].child(0).child(0)
-
-            var timestamp = theInfoTable.child(0).child(1).child(0).attr("title")
+        private fun getTimestamp(doc: Document, infoTable: Element): String? {
+            var timestamp = infoTable.child(0).child(1).child(0).attr("title")
             if(timestamp?.contains('@') != true)
                 timestamp = null
 
             return timestamp
+        }
+
+        private fun getAuthorName(gamePageUri: Uri, infoTable: Element): String {
+            return infoTable.getElementsByAttributeValue("href", getAuthorUrlFromGamePage(gamePageUri))[0].html()
+        }
+
+        /*fun getAuthorName(doc: Document, gamePageUri: Uri): String {
+            return getAuthorName(gamePageUri, getInfoTable(doc))
+        }*/
+
+        private fun getInfoTable(doc: Document): Element {
+            return doc.body().getElementsByClass("game_info_panel_widget")[0].child(0).child(0)
         }
 
         fun getBackgroundUIColor(doc: Document): Int? {
@@ -258,9 +249,7 @@ class ItchWebsiteParser {
 
             val userThemeCSS = doc.getElementById("user_theme")?.html()
             if (userThemeCSS != null) {
-                val foundColors = userBgColorPattern.find(userThemeCSS)
-                if (foundColors != null)
-                    return Color.parseColor(foundColors.groupValues[1])
+                return Color.parseColor("#333333")
             }
             return null
         }

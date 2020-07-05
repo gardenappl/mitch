@@ -54,4 +54,6 @@
     <string name="menu_game_rate">Залишити відгук</string>
     <string name="menu_game_related">Схожі ігри</string>
     <string name="browser_open_in_browser">Відкрити у браузері</string>
+    <string name="menu_game_gamejam">Бере участь у %1$s</string>
+    <string name="menu_game_author">Інше від %1$s</string>
 </resources>
