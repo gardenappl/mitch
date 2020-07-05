@@ -56,4 +56,5 @@
     <string name="browser_open_in_browser">Open in browser</string>
     <string name="menu_game_gamejam">%1$s entry</string>
     <string name="menu_game_author">More from %1$s</string>
+    <string name="menu_game_author_generic">More from this creator</string>
 </resources>

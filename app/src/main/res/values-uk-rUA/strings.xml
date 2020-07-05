@@ -56,4 +56,5 @@
     <string name="browser_open_in_browser">Відкрити у браузері</string>
     <string name="menu_game_gamejam">Бере участь у %1$s</string>
     <string name="menu_game_author">Інше від %1$s</string>
+    <string name="menu_game_author_generic">Інше від розробника</string>
 </resources>
