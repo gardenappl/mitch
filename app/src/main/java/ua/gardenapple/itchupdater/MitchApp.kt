@@ -38,6 +38,8 @@ const val UPDATE_CHECK_TASK_TAG = "update_check"
 const val FLAVOR_FDROID = "fdroid"
 const val FLAVOR_ITCHIO = "itchio"
 
+//TODO: Splash Screen
+//TODO: Catch exceptions in a nice way
 class MitchApp : Application() {
 
     companion object {
@@ -136,11 +138,10 @@ class MitchApp : Application() {
             build()
         }
 
-        //TODO: don't check on every launch
         WorkManager.getInstance(applicationContext)
             .enqueueUniquePeriodicWork(
                 UPDATE_CHECK_TASK_TAG,
-                ExistingPeriodicWorkPolicy.REPLACE,
+                ExistingPeriodicWorkPolicy.KEEP,
                 updateCheckRequest
             )
     }
