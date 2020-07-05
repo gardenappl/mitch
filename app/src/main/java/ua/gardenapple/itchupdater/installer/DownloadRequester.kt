@@ -44,7 +44,8 @@ class DownloadRequester {
                 if(activity != null) {
                     ActivityCompat.requestPermissions(
                         activity,
-                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.READ_EXTERNAL_STORAGE),
                         PERMISSION_REQUEST_CODE_DOWNLOAD
                     )
                 } else {
