@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
 import com.leinardi.android.speeddial.SpeedDialActionItem
+import com.leinardi.android.speeddial.SpeedDialView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.browse_fragment.*
 import kotlinx.android.synthetic.main.dialog_search.view.*
@@ -106,38 +107,20 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         //Set up FAB buttons
         //(colors don't matter too much as they will be set by processUI anyway)
         val speedDialView = (activity as MainActivity).speedDial
-        val fabBgColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
-        val fabFgColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
         speedDialView.clearActionItems()
         speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_reload, R.drawable.ic_baseline_refresh_24)
-            .setFabBackgroundColor(fabBgColor)
-            .setLabelBackgroundColor(fabBgColor)
-            .setFabImageTintColor(fabFgColor)
-            .setLabelColor(fabFgColor)
             .setLabel(R.string.browser_reload)
             .create()
         )
         speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_search, R.drawable.ic_baseline_search_24)
-            .setFabBackgroundColor(fabBgColor)
-            .setLabelBackgroundColor(fabBgColor)
-            .setFabImageTintColor(fabFgColor)
-            .setLabelColor(fabFgColor)
             .setLabel(R.string.browser_search)
             .create()
         )
         speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_open_in_browser, R.drawable.ic_baseline_open_in_browser_24)
-            .setFabBackgroundColor(fabBgColor)
-            .setLabelBackgroundColor(fabBgColor)
-            .setFabImageTintColor(fabFgColor)
-            .setLabelColor(fabFgColor)
             .setLabel(R.string.browser_open_in_browser)
             .create()
         )
         speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_share, R.drawable.ic_baseline_share_24)
-            .setFabBackgroundColor(fabBgColor)
-            .setLabelBackgroundColor(fabBgColor)
-            .setFabImageTintColor(fabFgColor)
-            .setLabelColor(fabFgColor)
             .setLabel(R.string.browser_share)
             .create()
         )
@@ -231,10 +214,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
      */
     fun onBackPressed(): Boolean {
         val customViewCallback = chromeClient.customViewCallback
-        if(customViewCallback != null) {
+        if (customViewCallback != null) {
             customViewCallback.onCustomViewHidden()
             return false
-        } else {
         }
 
         if(webView.canGoBack()) {
@@ -255,31 +237,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         cancel()
     }
-
-    /*private fun updateUI() {
-        //Hack for retrieving HTML from WebView
-        webView.evaluateJavascript("""
-            (function() {
-                return "<html>"+document.getElementsByTagName("html")[0].innerHTML+"</html>";
-            })();"""
-        ) { result ->
-            launch(Dispatchers.Default) {
-                var resultParsed: String = ""
-
-                val jsonReader = JsonReader(StringReader(result))
-                jsonReader.isLenient = true
-                jsonReader.use {
-                    if(jsonReader.peek() == JsonToken.STRING)
-                        resultParsed = jsonReader.nextString()
-                }
-
-//                Log.d(LOGGING_TAG, "HTML:")
-//                Utils.logLongD(LOGGING_TAG, resultParsed)
-                currentDoc = Jsoup.parse(resultParsed)
-                updateUI(currentDoc)
-            }
-        }
-    }*/
 
     val isWebFullscreen: Boolean
         get() = chromeClient.customViewCallback != null
@@ -317,7 +274,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         if (doc != null && ItchWebsiteUtils.isStylizedPage(doc)) {
             if (ItchWebsiteUtils.isGamePage(doc)) {
-                //Hide app's navbar after hiding wen navbar
+                //Hide app's navbar after hiding web navbar
                 val navBarHideCallback: (String) -> Unit = {
                     navBar.post {
                         navBar.visibility = View.GONE
@@ -382,8 +339,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 for (actionItem in fab.actionItems) {
                     val newActionItem = SpeedDialActionItem.Builder(actionItem)
                         .setFabBackgroundColor(bgColor)
-                        .setLabelBackgroundColor(bgColor)
                         .setFabImageTintColor(fgColor)
+                        .setLabelBackgroundColor(bgColor)
                         .setLabelColor(fgColor)
                         .create()
                     fab.replaceActionItem(actionItem, newActionItem)
@@ -411,12 +368,21 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
     }
 
+    /**
+     * Set up app bar actions. These actions come from the website's default navbar, which it shows
+     * on game store pages and devlog pages.
+     *
+     * Should run on the UI thread!
+     *
+     * @param doc the parsed HTML document of a game store page or devlog page
+     * @param appBar the app UI's top Toolbar
+     */
     private fun setupAppBarMenu(doc: Document, appBar: Toolbar) {
         appBar.menu.clear()
 
         val navbarItems = doc.getElementById("user_tools").children()
 
-        if (ItchWebsiteUtils.siteHasNavbar(webView, doc)) {
+//        if (ItchWebsiteUtils.siteHasNavbar(webView, doc)) {
             while (navbarItems.isNotEmpty()) {
                 val item = navbarItems.last()
                 val url = item.child(0).attr("href")
@@ -453,7 +419,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         }
 
                 } else if (item.hasClass("jam_entry")) {
-                    //TODO: handle multiple jam entries
+                    //TODO: handle multiple jam entries nicely
                     val menuItemName = item.child(0).text()
 
                     appBar.menu.add(Menu.NONE, 1, 1, menuItemName)
@@ -485,7 +451,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
                 navbarItems.removeAt(navbarItems.size - 1)
             }
-        }
+//        }
 
         appBar.menu.add(Menu.NONE, 10, 10, R.string.nav_installed).setOnMenuItemClickListener {
             updateUI(null)
