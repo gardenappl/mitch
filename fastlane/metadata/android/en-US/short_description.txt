@@ -1,0 +1,1 @@
+Unofficial itch.io client for Android. Buy, install, and play indie games.
