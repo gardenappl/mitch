@@ -272,6 +272,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         fab.show()
 
+        hideUnwantedElements()
+
         if (doc != null && ItchWebsiteUtils.isStylizedPage(doc)) {
             if (ItchWebsiteUtils.isGamePage(doc)) {
                 //Hide app's navbar after hiding web navbar
@@ -469,12 +471,25 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val cssVisibility = if (visible) "visible" else "hidden"
         webView.post {
             webView.evaluateJavascript("""
-                    (function() {
+                    {
                         let navbar = document.getElementById("user_tools")
                         if (navbar)
                             navbar.style.visibility = "$cssVisibility"
-                    })();
+                    }
                 """, callback
+            )
+        }
+    }
+
+    private fun hideUnwantedElements() {
+        webView.post {
+            webView.evaluateJavascript("""
+                    {
+                        let elements = document.getElementsByClassName("youtube_mobile_banner_widget")
+                        for (var element of elements)
+                            element.style.visibility = "hidden"
+                    }
+                """, null
             )
         }
     }
