@@ -19,4 +19,4 @@
 <li>Improvements to UI and stability</li>
 </ul>
 
-<p><b>If you wish to support the app developer, consider <a href="https://gardenapple.itch.io/mitch">paying fot this app on itch.io!</a></b></p>
+<p><b>If you wish to support the app developer, consider <a href="https://gardenapple.itch.io/mitch">paying for this app on itch.io!</a></b></p>

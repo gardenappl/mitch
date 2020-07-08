@@ -392,7 +392,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 if (item.getElementsByClass("related_games_btn").isNotEmpty()) {
                     appBar.menu.add(Menu.NONE, 5, 5, R.string.menu_game_related)
                         .setOnMenuItemClickListener {
-                            val gameId = ItchWebsiteUtils.getGameId(doc)
                             webView.loadUrl(url)
                             true
                         }
