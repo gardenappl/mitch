@@ -2,9 +2,11 @@ package ua.gardenapple.itchupdater.database
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.database.upload.Upload
+import java.lang.RuntimeException
 
 
 class Migrations {
@@ -92,6 +94,47 @@ class Migrations {
         val Migration_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE uploads ADD COLUMN platforms INTEGER NOT NULL DEFAULT 8")
+            }
+        }
+
+        val Migration_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                //Fix unknown locales
+                database.execSQL("""
+                    UPDATE ${Game.TABLE_NAME}
+                    SET
+                        ${Game.LOCALE} = 'en'
+                    WHERE
+                        ${Game.LOCALE} = 'Unknown'
+                """)
+                database.execSQL("""
+                    UPDATE ${Upload.TABLE_NAME}
+                    SET
+                        ${Upload.LOCALE} = 'en'
+                    WHERE
+                        ${Upload.LOCALE} = 'Unknown'
+                """)
+
+                //Thumbnail is nullable
+                database.execSQL("""
+                    CREATE TABLE games_copy(
+                        ${Game.GAME_ID} INTEGER PRIMARY KEY NOT NULL,
+                        ${Game.NAME} TEXT NOT NULL,
+                        ${Game.STORE_URL} TEXT NOT NULL,
+                        ${Game.DOWNLOAD_PAGE_URL} TEXT,
+                        ${Game.AUTHOR} TEXT NOT NULL,
+                        ${Game.LOCALE} TEXT NOT NULL,
+                        ${Game.THUMBNAIL_URL} TEXT,
+                        ${Game.LAST_UPDATED_TIMESTAMP} TEXT
+                    )
+                    """.trimIndent())
+
+                database.execSQL("""
+                    INSERT INTO games_copy (${Game.GAME_ID}, ${Game.NAME}, ${Game.STORE_URL}, ${Game.DOWNLOAD_PAGE_URL}, ${Game.AUTHOR}, ${Game.LOCALE}, ${Game.THUMBNAIL_URL}, ${Game.LAST_UPDATED_TIMESTAMP})
+                        SELECT ${Game.GAME_ID}, ${Game.NAME}, ${Game.STORE_URL}, ${Game.DOWNLOAD_PAGE_URL}, ${Game.AUTHOR}, ${Game.LOCALE}, ${Game.THUMBNAIL_URL}, ${Game.LAST_UPDATED_TIMESTAMP} FROM games
+                """)
+                database.execSQL("DROP TABLE games")
+                database.execSQL("ALTER TABLE games_copy RENAME TO games")
             }
         }
     }

@@ -16,6 +16,7 @@ import ua.gardenapple.itchupdater.MitchApp
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.upload.Upload
 import java.io.IOException
+import kotlin.RuntimeException
 
 class ItchWebsiteParser {
     data class DownloadUrl(val url: String, val isPermanent: Boolean, val isStorePage: Boolean) {
@@ -25,11 +26,16 @@ class ItchWebsiteParser {
                     return null
                 return Uri.parse(url).lastPathSegment
             }
+
+        override fun toString(): String {
+            return "{ URL: $url, is permanent?: $isPermanent, is store page?: $isStorePage }"
+        }
     }
 
     companion object {
         const val LOGGING_TAG = "ItchWebsiteParser"
         const val UNKNOWN_LOCALE = "Unknown"
+        const val ENGLISH_LOCALE = "en"
 
         fun getGameInfo(gamePageDoc: Document, gamePageUrl: String): Game {
             val thumbnails = gamePageDoc.head().getElementsByAttributeValue("property", "og:image")
@@ -68,6 +74,7 @@ class ItchWebsiteParser {
                 Log.d(LOGGING_TAG, "Found uploads: ${uploads.size}")
                 var uploadNum: Int = 0
 
+                val locale = getLocale(doc)
                 for (uploadDiv in uploads) {
                     val icons = uploadDiv.getElementsByClass("icon")
 
@@ -115,7 +122,7 @@ class ItchWebsiteParser {
                         uploadId = uploadId,
                         name = name,
                         fileSize = fileSize,
-                        locale = getLocale(doc),
+                        locale = locale,
                         version = versionName,
                         uploadTimestamp = versionDate,
                         isPending = setPending,
@@ -168,7 +175,14 @@ class ItchWebsiteParser {
                 null
         }
 
+        /**
+         * Requests the URL of a web page with available downloads for an itch.io game.
+         * This download URL might be temporary, or might not be available at all.
+         * @param storeURL URL of a game's store page.
+         * @return For paid games, always returns null, otherwise returns a URL of a downloads page.
+         */
         suspend fun fetchDownloadUrlFromStorePage(storeUrl: String): DownloadUrl? = withContext(Dispatchers.IO) {
+            Log.d(LOGGING_TAG, "Fetching download URL for $storeUrl")
             val storeUriParsed = Uri.parse(storeUrl)
 
             val uriBuilder = storeUriParsed.buildUpon()
@@ -176,7 +190,7 @@ class ItchWebsiteParser {
             val getDownloadPathUri = uriBuilder.build()
 
             val form = FormBody.Builder().run {
-                //Proper CSRF token support doesn't seem to be enforced for free games
+                //TODO: Proper CSRF token support, for paid game update checking
                 add("csrf_token", CookieManager.getInstance().getCookie(storeUrl))
                 build()
             }
@@ -194,21 +208,37 @@ class ItchWebsiteParser {
                     //Log.d(LOGGING_TAG, "Response: ${response.body!!.string()}")
                     response.body!!.string()
                 }
-            val jsonObject = JSONObject(result)
-            return@withContext if (jsonObject.has("url"))
-                DownloadUrl(jsonObject.getString("url"), false, false)
+            val resultJson = JSONObject(result)
+            Log.d(LOGGING_TAG, "Result for $storeUrl: $resultJson")
+            if (resultJson.has("errors")) {
+                val errorsArray = resultJson.getJSONArray("errors")
+                for (i in 0 until errorsArray.length()) {
+                    if (errorsArray.getString(i) == "you must buy this game to download")
+                        return@withContext null
+                }
+
+            }
+
+            if (resultJson.has("url"))
+                return@withContext DownloadUrl(resultJson.getString("url"),
+                    isPermanent = false,
+                    isStorePage = false
+                )
             else
-                null
+                throw RuntimeException("Unexpected JSON response")
         }
 
         fun getLocale(doc: Document): String {
             val scripts = doc.head().getElementsByTag("script")
-            for(script in scripts) {
+            for (script in scripts) {
                 val html = script.html().trimStart()
-                if(html.startsWith("window.itchio_locale"))
+                if (html.startsWith("window.itchio_locale"))
                     return html.substring(24, 26)
             }
-            return UNKNOWN_LOCALE
+
+            if (doc.body().hasClass("locale_en"))
+                return ENGLISH_LOCALE
+            throw RuntimeException("Could not determine locale of web page")
         }
 
         private fun getTimestamp(doc: Document, infoTable: Element): String? {

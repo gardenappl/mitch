@@ -141,7 +141,7 @@ class MitchApp : Application() {
         WorkManager.getInstance(applicationContext)
             .enqueueUniquePeriodicWork(
                 UPDATE_CHECK_TASK_TAG,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.REPLACE,
                 updateCheckRequest
             )
     }

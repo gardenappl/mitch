@@ -32,8 +32,11 @@ data class Game(
     @ColumnInfo(name = DOWNLOAD_PAGE_URL)
     val downloadPageUrl: String? = null,
 
+    /**
+     * Some games don't have thumbnails
+     */
     @ColumnInfo(name = THUMBNAIL_URL)
-    val thumbnailUrl: String,
+    val thumbnailUrl: String?,
 
     /**
      * Affects timestamps and version strings.

@@ -18,7 +18,7 @@ import ua.gardenapple.itchupdater.ioThread
 
 @Database(
     entities = [Game::class, Upload::class, Installation::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -44,12 +44,11 @@ abstract class AppDatabase : RoomDatabase() {
 
 
         private fun buildDatabase(context: Context): AppDatabase =
-                Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java, "app_database"
-                )
+            Room.databaseBuilder(
+                context.applicationContext,
+                AppDatabase::class.java, "app_database"
+            )
                 .addCallback(object : Callback() {
-
                     override fun onOpen(db: SupportSQLiteDatabase) {
                         Log.d(LOGGING_TAG, "Opening database...")
 
@@ -63,7 +62,7 @@ abstract class AppDatabase : RoomDatabase() {
                                 appDb.installDao.clearAllInstallationsForGame(Game.MITCH_GAME_ID)
                             }
 
-                            /*val mitchInstall = appDb.installDao.findInstallation(Game.MITCH_GAME_ID)
+                            val mitchInstall = appDb.installDao.findInstallation(Game.MITCH_GAME_ID)
                             Log.d(LOGGING_TAG, "Mitch installation: $mitchInstall")
 
                             Log.d(LOGGING_TAG, "Known installs:")
@@ -74,11 +73,12 @@ abstract class AppDatabase : RoomDatabase() {
                             Log.d(LOGGING_TAG, "Known uploads:")
                             val uploads = appDb.uploadDao.getAllUploadsSync()
                             for (upload in uploads)
-                                Log.d(LOGGING_TAG, "$upload")*/
+                                Log.d(LOGGING_TAG, "$upload")
                         }
                     }
                 })
                 .addMigrations(Migrations.Migration_1_2)
+                .addMigrations(Migrations.Migration_2_3)
                 .build()
 
     }
