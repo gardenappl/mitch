@@ -1,5 +1,7 @@
 # Mitch
 
+### The main repository of this project is hosted on GitLab: https://gitlab.com/gardenappl/mitch
+
 **Mitch** is an unofficial mobile client for [itch.io](https://itch.io), the indie game storefront. The app allows you to install Android games from the store and keep them updated. Thus, this can act as an alternative to the Google Play Store for indie game developers and enthusiasts.
 
   * Download games from itch.io and keep them updated
