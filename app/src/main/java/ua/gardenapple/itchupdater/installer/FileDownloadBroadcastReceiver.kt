@@ -81,7 +81,7 @@ class FileDownloadBroadcastReceiver : BroadcastReceiver() {
         }
 
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALL).apply {
-            setSmallIcon(R.drawable.ic_file_download_black_24dp)
+            setSmallIcon(R.drawable.ic_mitch_notification)
             if(isApk)
                 setContentTitle(context.resources.getString(R.string.notification_install_title))
             else

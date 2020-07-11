@@ -32,7 +32,7 @@ class InstallerNotificationHandler(val context: Context) : InstallCompleteListen
         }
         val builder =
             NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
-                setSmallIcon(R.drawable.ic_file_download_black_24dp)
+                setSmallIcon(R.drawable.ic_mitch_notification)
                 setContentTitle(game.name)
                 setContentText(message)
                 setAutoCancel(true)
