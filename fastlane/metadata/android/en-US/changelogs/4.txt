@@ -1,0 +1,2 @@
+Notifications now have the Mitch icon instead of a generic "download" icon.
+Fixed issues with update checking.
