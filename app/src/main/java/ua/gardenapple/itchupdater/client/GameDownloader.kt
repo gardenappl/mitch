@@ -6,7 +6,6 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.webkit.CookieManager
-import androidx.work.Logger
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +14,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.FormBody
 import okhttp3.Request
 import org.json.JSONObject
-import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.MitchApp
 import ua.gardenapple.itchupdater.database.AppDatabase
@@ -25,9 +23,9 @@ import ua.gardenapple.itchupdater.database.upload.Upload
 import ua.gardenapple.itchupdater.installer.DownloadRequester
 import java.io.IOException
 
-class WebGameDownloader(val context: Context) {
+class GameDownloader(val context: Context) {
     companion object {
-        const val LOGGING_TAG = "WebGameDownloader"
+        const val LOGGING_TAG = "GameDownloader"
     }
 
     class ItchAccessDeniedException(message: String) : Exception(message)
@@ -105,7 +103,7 @@ class WebGameDownloader(val context: Context) {
         val pendingUploads = ItchWebsiteParser.getUploads(game.gameId, doc, true)
         if(pendingUploads.find { upload -> upload.uploadId == uploadId } == null) {
             Log.d(LOGGING_TAG, "Required upload not found, requesting update check...")
-            val updateCheckRequest = OneTimeWorkRequestBuilder<WebUpdateCheckWorker>()
+            val updateCheckRequest = OneTimeWorkRequestBuilder<UpdateCheckWorker>()
                 .build()
 
             WorkManager.getInstance(context).enqueue(updateCheckRequest)

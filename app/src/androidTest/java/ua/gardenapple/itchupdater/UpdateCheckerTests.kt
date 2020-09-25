@@ -9,17 +9,17 @@ import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
-import ua.gardenapple.itchupdater.client.WebUpdateCheckResult
-import ua.gardenapple.itchupdater.client.WebUpdateChecker
+import ua.gardenapple.itchupdater.client.UpdateCheckResult
+import ua.gardenapple.itchupdater.client.UpdateChecker
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 
 @RunWith(AndroidJUnit4::class)
-class WebUpdateCheckerTests {
+class UpdateCheckerTests {
     companion object {
         const val LOGGING_TAG: String = "Test"
 
-        private lateinit var updateChecker: WebUpdateChecker
+        private lateinit var updateChecker: UpdateChecker
 
         @BeforeClass
         @JvmStatic fun setup() {
@@ -28,7 +28,7 @@ class WebUpdateCheckerTests {
 
             db.addMitchToDatabase(context)
 
-            updateChecker = WebUpdateChecker(db)
+            updateChecker = UpdateChecker(db)
         }
     }
 
@@ -36,9 +36,9 @@ class WebUpdateCheckerTests {
 
     @Test
     fun testUpdateCheck_mitch() {
-        val result: WebUpdateCheckResult = runBlocking(Dispatchers.IO) {
+        val result: UpdateCheckResult = runBlocking(Dispatchers.IO) {
             updateChecker.checkUpdates(Game.MITCH_GAME_ID)
         }
-        Assert.assertEquals(WebUpdateCheckResult.UP_TO_DATE, result.code)
+        Assert.assertEquals(UpdateCheckResult.UP_TO_DATE, result.code)
     }
 }

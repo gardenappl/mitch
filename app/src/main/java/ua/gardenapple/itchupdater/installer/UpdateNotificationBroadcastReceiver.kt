@@ -6,8 +6,7 @@ import android.content.Intent
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import ua.gardenapple.itchupdater.MitchApp
-import ua.gardenapple.itchupdater.client.WebGameDownloader
+import ua.gardenapple.itchupdater.client.GameDownloader
 import ua.gardenapple.itchupdater.database.AppDatabase
 
 /**
@@ -30,7 +29,7 @@ class UpdateNotificationBroadcastReceiver : BroadcastReceiver() {
         val downloadKey = extras.getString(EXTRA_DOWNLOAD_KEY)
 
         runBlocking(Dispatchers.IO) {
-            val downloader = WebGameDownloader(context)
+            val downloader = GameDownloader(context)
             val db = AppDatabase.getDatabase(context)
             val game = db.gameDao.getGameById(gameId)!!
             downloader.startDownload(game, uploadId, downloadKey)

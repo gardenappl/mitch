@@ -4,7 +4,7 @@ import android.net.Uri
 import org.jsoup.nodes.Document
 
 
-data class WebUpdateCheckResult(
+data class UpdateCheckResult(
     val code: Int,
     /**
      * Set to null if there is no upload ID or if there are multiple possibilities

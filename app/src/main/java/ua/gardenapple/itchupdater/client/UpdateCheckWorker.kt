@@ -19,17 +19,17 @@ import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.installer.UpdateNotificationBroadcastReceiver
 import ua.gardenapple.itchupdater.ui.MainActivity
 
-class WebUpdateCheckWorker(val context: Context, params: WorkerParameters) :
+class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
     companion object {
-        const val LOGGING_TAG = "WebUpdateCheckWorker"
+        const val LOGGING_TAG = "UpdateCheckWorker"
     }
 
     override suspend fun doWork(): Result = coroutineScope {
         val db = AppDatabase.getDatabase(context)
         val installations = db.installDao.getFinishedInstallationsSync()
-        val updateChecker = WebUpdateChecker(db)
+        val updateChecker = UpdateChecker(db)
         var success = true
 
         coroutineScope {
@@ -58,15 +58,15 @@ class WebUpdateCheckWorker(val context: Context, params: WorkerParameters) :
     /**
      * @param result the result of the update check, can be null if the update check failed (due to network error or parsing error)
      */
-    private fun handleNotification(game: Game, install: Installation, result: WebUpdateCheckResult?) {
-        if(result?.code == WebUpdateCheckResult.UP_TO_DATE)
+    private fun handleNotification(game: Game, install: Installation, result: UpdateCheckResult?) {
+        if(result?.code == UpdateCheckResult.UP_TO_DATE)
             return
 
         val message = when (result?.code) {
-            WebUpdateCheckResult.UPDATE_NEEDED -> context.resources.getString(R.string.notification_update_available)
-            WebUpdateCheckResult.EMPTY -> context.resources.getString(R.string.notification_update_empty)
-            WebUpdateCheckResult.ACCESS_DENIED -> context.resources.getString(R.string.notification_update_access_denied)
-            WebUpdateCheckResult.UNKNOWN -> context.resources.getString(R.string.notification_update_unknown)
+            UpdateCheckResult.UPDATE_NEEDED -> context.resources.getString(R.string.notification_update_available)
+            UpdateCheckResult.EMPTY -> context.resources.getString(R.string.notification_update_empty)
+            UpdateCheckResult.ACCESS_DENIED -> context.resources.getString(R.string.notification_update_access_denied)
+            UpdateCheckResult.UNKNOWN -> context.resources.getString(R.string.notification_update_unknown)
             else -> context.resources.getString(R.string.notification_update_fail)
         }
         val builder =
@@ -85,7 +85,7 @@ class WebUpdateCheckWorker(val context: Context, params: WorkerParameters) :
 
                 val pendingIntent: PendingIntent
 
-                if (result?.code == WebUpdateCheckResult.UPDATE_NEEDED) {
+                if (result?.code == UpdateCheckResult.UPDATE_NEEDED) {
                     if (result.uploadID != null) {
                         val intent = Intent(context, UpdateNotificationBroadcastReceiver::class.java).apply {
                             putExtra(UpdateNotificationBroadcastReceiver.EXTRA_GAME_ID, game.gameId)

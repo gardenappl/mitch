@@ -9,12 +9,12 @@ import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.database.upload.Upload
 
-class WebUpdateChecker(val db: AppDatabase) {
+class UpdateChecker(val db: AppDatabase) {
     companion object {
-        const val LOGGING_TAG: String = "WebUpdateChecker"
+        const val LOGGING_TAG: String = "UpdateChecker"
     }
 
-    suspend fun checkUpdates(gameId: Int): WebUpdateCheckResult =
+    suspend fun checkUpdates(gameId: Int): UpdateCheckResult =
         withContext(Dispatchers.IO) {
 
             var game = db.gameDao.getGameById(gameId)
@@ -64,7 +64,7 @@ class WebUpdateChecker(val db: AppDatabase) {
             logD(game, "Update check result: $result")
 
             if (result.uploadID != null ||
-                (result.code != WebUpdateCheckResult.ACCESS_DENIED && result.code != WebUpdateCheckResult.UNKNOWN))
+                (result.code != UpdateCheckResult.ACCESS_DENIED && result.code != UpdateCheckResult.UNKNOWN))
                 return@withContext result
 
 
@@ -73,7 +73,7 @@ class WebUpdateChecker(val db: AppDatabase) {
 
             downloadPageInfo = ItchWebsiteParser.fetchDownloadUrlFromStorePage(game.storeUrl)
             if (downloadPageInfo == null)
-                return@withContext WebUpdateCheckResult(WebUpdateCheckResult.UNKNOWN)
+                return@withContext UpdateCheckResult(UpdateCheckResult.UNKNOWN)
 
 
             updateCheckUrl = downloadPageInfo.url
@@ -90,11 +90,11 @@ class WebUpdateChecker(val db: AppDatabase) {
         currentInstall: Installation,
         gameId: Int,
         downloadPageUrl: ItchWebsiteParser.DownloadUrl?
-    ): WebUpdateCheckResult {
+    ): UpdateCheckResult {
         val fetchedUploads = ItchWebsiteParser.getUploads(gameId, updateCheckDoc)
 
         if (fetchedUploads.isEmpty())
-            return WebUpdateCheckResult(WebUpdateCheckResult.EMPTY)
+            return UpdateCheckResult(UpdateCheckResult.EMPTY)
             
         val game = db.gameDao.getGameById(gameId)!!
 
@@ -137,21 +137,21 @@ class WebUpdateChecker(val db: AppDatabase) {
 
                     if(isSameLocale(installedUpload, upload) && upload.version != installedUpload.version) {
                         logD(game, "Version tag changed")
-                        return WebUpdateCheckResult(WebUpdateCheckResult.UPDATE_NEEDED, upload.uploadId, downloadPageUrl, updateCheckDoc)
+                        return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId, downloadPageUrl, updateCheckDoc)
                     }
                     else if (installedUpload.version == null && upload.version == null) {
                         logD(game, "Version tag unchanged, not a butler upload")
-                        return WebUpdateCheckResult(WebUpdateCheckResult.UP_TO_DATE, updateCheckDoc = updateCheckDoc)
+                        return UpdateCheckResult(UpdateCheckResult.UP_TO_DATE, updateCheckDoc = updateCheckDoc)
                     }
 
                     if(upload.fileSize != installedUpload.fileSize) {
                         logD(game, "File size changed")
-                        return WebUpdateCheckResult(WebUpdateCheckResult.UPDATE_NEEDED, upload.uploadId, downloadPageUrl, updateCheckDoc)
+                        return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId, downloadPageUrl, updateCheckDoc)
                     }
                     if(isSameLocale(installedUpload, upload) && upload.uploadTimestamp != installedUpload.uploadTimestamp &&
                             installedUpload.uploadTimestamp != null) {
                         logD(game, "Timestamp changed")
-                        return WebUpdateCheckResult(WebUpdateCheckResult.UPDATE_NEEDED, upload.uploadId, downloadPageUrl, updateCheckDoc)
+                        return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId, downloadPageUrl, updateCheckDoc)
                     }
 
                     logD(game, "Upload with current uploadID has not changed")
@@ -161,7 +161,7 @@ class WebUpdateChecker(val db: AppDatabase) {
             }
             if (allVersionsDifferent) {
                 logD(game, "All upload IDs are different")
-                return WebUpdateCheckResult(WebUpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
+                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
             }
         }
 
@@ -178,7 +178,7 @@ class WebUpdateChecker(val db: AppDatabase) {
             }
             if(allVersionsDifferent) {
                 logD(game, "All version tags are different")
-                return WebUpdateCheckResult(WebUpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
+                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
             }
         } else if (installedUpload.version != null && isSameLocale(installedUpload, fetchedUploads[0])) {
             logD(game, "Checking version tags...")
@@ -191,7 +191,7 @@ class WebUpdateChecker(val db: AppDatabase) {
             }
             if (allVersionsDifferent) {
                 logD(game, "All version tags are different")
-                return WebUpdateCheckResult(WebUpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
+                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
             }
         }
 
@@ -211,7 +211,7 @@ class WebUpdateChecker(val db: AppDatabase) {
             }
             if (allVersionsDifferent) {
                 logD(game, "All timestamps are different")
-                return WebUpdateCheckResult(WebUpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
+                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
             }
         }
 
@@ -227,7 +227,7 @@ class WebUpdateChecker(val db: AppDatabase) {
             }
             if (allVersionsDifferent) {
                 logD(game, "All file sizes different")
-                return WebUpdateCheckResult(WebUpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
+                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
             }
         }
 
@@ -249,7 +249,7 @@ class WebUpdateChecker(val db: AppDatabase) {
                 }
                 if (allVersionsSame) {
                     logD(game, "Version tags all match")
-                    return WebUpdateCheckResult(WebUpdateCheckResult.UP_TO_DATE, updateCheckDoc = updateCheckDoc)
+                    return UpdateCheckResult(UpdateCheckResult.UP_TO_DATE, updateCheckDoc = updateCheckDoc)
                 }
             } else if (installedUpload.version != null) {
                 if (isSameLocale(installedUpload, fetchedUploads[0])) {
@@ -263,7 +263,7 @@ class WebUpdateChecker(val db: AppDatabase) {
                     }
                     if (allVersionsSame) {
                         logD(game, "Version tags all match")
-                        return WebUpdateCheckResult(WebUpdateCheckResult.UP_TO_DATE, updateCheckDoc = updateCheckDoc)
+                        return UpdateCheckResult(UpdateCheckResult.UP_TO_DATE, updateCheckDoc = updateCheckDoc)
                     }
                 }
             }
@@ -281,16 +281,16 @@ class WebUpdateChecker(val db: AppDatabase) {
                     }
                     if (allVersionsSame) {
                         logD(game, "Timestamps all match")
-                        return WebUpdateCheckResult(WebUpdateCheckResult.UP_TO_DATE, updateCheckDoc = updateCheckDoc)
+                        return UpdateCheckResult(UpdateCheckResult.UP_TO_DATE, updateCheckDoc = updateCheckDoc)
                     }
                 }
             } else {
                 logD(game, "Current timestamp is null")
-                return WebUpdateCheckResult(WebUpdateCheckResult.UP_TO_DATE, updateCheckDoc = updateCheckDoc)
+                return UpdateCheckResult(UpdateCheckResult.UP_TO_DATE, updateCheckDoc = updateCheckDoc)
             }
         }
 
-        return WebUpdateCheckResult(WebUpdateCheckResult.UNKNOWN, updateCheckDoc = updateCheckDoc)
+        return UpdateCheckResult(UpdateCheckResult.UNKNOWN, updateCheckDoc = updateCheckDoc)
     }
 
     private fun isSameLocale(upload1: Upload, upload2: Upload): Boolean {

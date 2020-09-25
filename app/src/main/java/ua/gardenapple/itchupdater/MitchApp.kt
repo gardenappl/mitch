@@ -9,16 +9,12 @@ import android.os.Build
 import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.work.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import okhttp3.Cache
 import okhttp3.OkHttpClient
-import ua.gardenapple.itchupdater.client.WebUpdateCheckWorker
+import ua.gardenapple.itchupdater.client.UpdateCheckWorker
 import ua.gardenapple.itchupdater.installer.*
 import java.io.File
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.CoroutineContext
 
 
 const val LOGGING_TAG: String = "Mitch"
@@ -131,7 +127,7 @@ class MitchApp : Application() {
                 setRequiredNetworkType(NetworkType.CONNECTED)
             build()
         }
-        val updateCheckRequest = PeriodicWorkRequestBuilder<WebUpdateCheckWorker>(1, TimeUnit.DAYS).run {
+        val updateCheckRequest = PeriodicWorkRequestBuilder<UpdateCheckWorker>(1, TimeUnit.DAYS).run {
             //addTag(UPDATE_CHECK_TASK_TAG)
             setConstraints(constraints)
             //setInitialDelay(1, TimeUnit.MINUTES)

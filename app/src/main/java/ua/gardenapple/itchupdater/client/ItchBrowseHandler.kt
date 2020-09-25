@@ -1,14 +1,11 @@
 package ua.gardenapple.itchupdater.client
 
-import android.app.Activity
-import android.app.DownloadManager
 import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.*
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.database.AppDatabase
-import ua.gardenapple.itchupdater.database.installation.Installation
 
 class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope) {
 
@@ -79,7 +76,7 @@ class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope
         currentDownloadId = null
 
         coroutineScope.launch(Dispatchers.IO) {
-            val downloader = WebGameDownloader(context)
+            val downloader = GameDownloader(context)
             val pendingUploads = ItchWebsiteParser.getUploads(gameId, downloadPageDoc, true)
             downloader.updateDatabase(gameId, uploadId, downloadId, downloadPageUrl, pendingUploads)
         }
