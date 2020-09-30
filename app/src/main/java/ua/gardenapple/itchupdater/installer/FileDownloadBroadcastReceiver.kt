@@ -9,7 +9,10 @@ import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.*
+import ua.gardenapple.itchupdater.database.AppDatabase
 
 /**
  * This receiver responds to finished file downloads from DownloadManager.
@@ -30,7 +33,7 @@ class FileDownloadBroadcastReceiver : BroadcastReceiver() {
             val downloadMimeType = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE))
 
             if (downloadStatus == DownloadManager.STATUS_SUCCESSFUL) {
-                val isApk = downloadMimeType == "application/vnd.android.package-archive" ||
+                val isApk = downloadMimeType == DownloadRequester.APK_MIME ||
                         downloadLocalUri!!.path!!.endsWith(".apk")
                 createNotification(context, downloadLocalUri, downloadID, isApk)
 
@@ -56,7 +59,6 @@ class FileDownloadBroadcastReceiver : BroadcastReceiver() {
             val intent = Intent(context, InstallNotificationBroadcastReceiver::class.java).apply {
                 data = Uri.parse(downloadPath)
                 putExtra(InstallNotificationBroadcastReceiver.EXTRA_DOWNLOAD_ID, id)
-
             }
             pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
@@ -86,6 +88,7 @@ class FileDownloadBroadcastReceiver : BroadcastReceiver() {
                 setContentTitle(context.resources.getString(R.string.notification_install_title))
             else
                 setContentTitle(context.resources.getString(R.string.notification_download_complete_title))
+
             setContentText(downloadLocalUri.lastPathSegment)
             priority = NotificationCompat.PRIORITY_HIGH
             setContentIntent(pendingIntent)

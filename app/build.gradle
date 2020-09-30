@@ -28,8 +28,8 @@ android {
         applicationId "ua.gardenapple.itchupdater"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 4
-        versionName "1.0.2"
+        versionCode 5
+        versionName "1.0.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.sign
     }
@@ -108,7 +108,7 @@ dependencies {
     }
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:$rootProject.okHttpVersion")
-    // FAB Speed Dial
+    // FAB Speed DIal
     implementation "com.leinardi.android:speed-dial:$rootProject.speedDialVersion"
     // Material Progress Bar
     implementation "me.zhanghai.android.materialprogressbar:library:$rootProject.materialProgressBarVersion"

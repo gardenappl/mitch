@@ -3,6 +3,7 @@ package ua.gardenapple.itchupdater.installer
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.database.game.Game
 
 interface DownloadCompleteListener {
@@ -10,7 +11,7 @@ interface DownloadCompleteListener {
 }
 
 interface InstallCompleteListener {
-    suspend fun onInstallComplete(installSessionId: Int, packageName: String, game: Game, status: Int)
+    suspend fun onInstallComplete(installSessionId: Int, packageName: String, apkName: String?, status: Int)
 }
 
 class InstallerEvents {
@@ -18,11 +19,11 @@ class InstallerEvents {
         private val installCompleteListeners = ArrayList<InstallCompleteListener>()
         private val downloadCompleteListeners = ArrayList<DownloadCompleteListener>()
 
-        suspend fun notifyApkInstallComplete(installSessionId: Int, packageName: String, game: Game, status: Int) {
+        suspend fun notifyApkInstallComplete(installSessionId: Int, packageName: String, apkName: String?, status: Int) {
             coroutineScope {
                 for (listener in installCompleteListeners) {
                     launch {
-                        listener.onInstallComplete(installSessionId, packageName, game, status)
+                        listener.onInstallComplete(installSessionId, packageName, apkName, status)
                     }
                 }
             }

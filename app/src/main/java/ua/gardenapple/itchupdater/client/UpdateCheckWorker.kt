@@ -34,6 +34,9 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
 
         coroutineScope {
             for (install in installations) {
+                if (!UpdateChecker.shouldCheck(install.gameId))
+                    continue;
+
                 launch(Dispatchers.IO) {
                     val game = db.gameDao.getGameById(install.gameId)!!
                     try {
@@ -71,7 +74,7 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
         }
         val builder =
             NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
-                setSmallIcon(R.drawable.ic_file_download_black_24dp)
+                setSmallIcon(R.drawable.ic_mitch_notification)
                 setContentTitle(game.name)
                 setContentText(message)
                 setAutoCancel(true)

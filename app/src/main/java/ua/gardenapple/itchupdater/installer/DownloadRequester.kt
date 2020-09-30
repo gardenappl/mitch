@@ -26,6 +26,17 @@ class DownloadRequester {
         private var currentMimeType: String? = null
         private var currentCallback: OnDownloadStartListener? = null
 
+        const val APK_MIME = "application/vnd.android.package-archive"
+
+        /**
+         * Request to start downloading file, and ask the user for read/write permissions if necessary.
+         * @param context current context
+         * @param activity activity which will request permissions (must implement onRequestPermissionsResult and call resumeDownload!)
+         * @param url URL of file to download
+         * @param contentDisposition HTTP content disposition header
+         * @param mimeType MIME type
+         * @param callback function to run once the download has been enqueued.
+         */
         fun requestDownload(
             context: Context,
             activity: Activity?,
@@ -42,6 +53,7 @@ class DownloadRequester {
                 currentMimeType = mimeType
                 currentCallback = callback
                 if(activity != null) {
+                    Log.d(LOGGING_TAG, "Requesting...")
                     ActivityCompat.requestPermissions(
                         activity,
                         arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -49,6 +61,7 @@ class DownloadRequester {
                         PERMISSION_REQUEST_CODE_DOWNLOAD
                     )
                 } else {
+                    Log.d(LOGGING_TAG, "Starting PermissionRequestActivity")
                     val intent = Intent(context, PermissionRequestActivity::class.java)
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     context.startActivity(intent)

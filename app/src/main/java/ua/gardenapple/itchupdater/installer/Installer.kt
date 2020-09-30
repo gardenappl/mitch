@@ -54,6 +54,7 @@ class Installer {
         }
 
         val callbackIntent = Intent(context, InstallerService::class.java)
+            .putExtra(InstallerService.EXTRA_APK_NAME, apkUri.lastPathSegment)
         val pendingIntent = PendingIntent.getService(
             context, sessionId, callbackIntent, PendingIntent.FLAG_UPDATE_CURRENT
         )

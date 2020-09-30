@@ -34,6 +34,5 @@ class UpdateNotificationBroadcastReceiver : BroadcastReceiver() {
             val game = db.gameDao.getGameById(gameId)!!
             downloader.startDownload(game, uploadId, downloadKey)
         }
-        Log.d(LOGGING_TAG, "Installed")
     }
 }

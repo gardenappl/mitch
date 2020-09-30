@@ -12,6 +12,7 @@ import androidx.work.*
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import ua.gardenapple.itchupdater.client.UpdateCheckWorker
+import ua.gardenapple.itchupdater.gitlab.GitlabUpdateCheckWorker
 import ua.gardenapple.itchupdater.installer.*
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -25,14 +26,17 @@ const val NOTIFICATION_CHANNEL_ID_UPDATES = "updates_available"
 const val NOTIFICATION_CHANNEL_ID_INSTALL = "updates"
 const val NOTIFICATION_CHANNEL_ID_INSTALLING = "installing"
 
+const val NOTIFICATION_ID_SELF_UPDATE_CHECK = 999_999_999
 const val NOTIFICATION_ID_UPDATE_CHECK = 1_000_000_000
 const val NOTIFICATION_ID_DOWNLOAD = 20000
 const val NOTIFICATION_ID_INSTALLING = 1000000
 
 const val UPDATE_CHECK_TASK_TAG = "update_check"
+const val GITLAB_UPDATE_CHECK_TASK_TAG = "gitlab_check"
 
 const val FLAVOR_FDROID = "fdroid"
 const val FLAVOR_ITCHIO = "itchio"
+const val FLAVOR_GITLAB = "gitlab"
 
 //TODO: Splash Screen
 //TODO: Catch exceptions in a nice way
@@ -139,6 +143,18 @@ class MitchApp : Application() {
                 UPDATE_CHECK_TASK_TAG,
                 ExistingPeriodicWorkPolicy.REPLACE,
                 updateCheckRequest
+            )
+
+        val gitlabUpdateCheckRequest = PeriodicWorkRequestBuilder<GitlabUpdateCheckWorker>(1, TimeUnit.DAYS).run {
+            setConstraints(constraints)
+            build()
+        }
+
+        WorkManager.getInstance(applicationContext)
+            .enqueueUniquePeriodicWork(
+                GITLAB_UPDATE_CHECK_TASK_TAG,
+                ExistingPeriodicWorkPolicy.REPLACE,
+                gitlabUpdateCheckRequest
             )
     }
 }

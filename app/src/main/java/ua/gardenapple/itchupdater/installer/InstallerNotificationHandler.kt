@@ -13,13 +13,13 @@ import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.game.Game
 
+/**
+ * This handler is invoked when an .apk installation is complete, providing a notification.
+ * This should *NOT* depend on the AppDatabase as this could be used for the GitLab build update
+ * check or other things
+ */
 class InstallerNotificationHandler(val context: Context) : InstallCompleteListener {
-    override suspend fun onInstallComplete(
-        installSessionId: Int,
-        packageName: String,
-        game: Game,
-        status: Int
-    ) {
+    override suspend fun onInstallComplete(installSessionId: Int, packageName: String, apkName: String?, status: Int) {
         val message = when (status) {
             PackageInstaller.STATUS_FAILURE_ABORTED -> context.resources.getString(R.string.notification_install_cancelled_title)
             PackageInstaller.STATUS_FAILURE_BLOCKED -> context.resources.getString(R.string.notification_install_blocked_title)
@@ -33,11 +33,19 @@ class InstallerNotificationHandler(val context: Context) : InstallCompleteListen
         val builder =
             NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
                 setSmallIcon(R.drawable.ic_mitch_notification)
-                setContentTitle(game.name)
+
+                if (status == PackageInstaller.STATUS_SUCCESS) {
+                    val appInfo = context.packageManager.getApplicationInfo(packageName, 0)
+                    setContentTitle(context.packageManager.getApplicationLabel(appInfo))
+                } else if (apkName != null)
+                    setContentTitle(apkName)
+                else
+                    setContentTitle(packageName)
+
                 setContentText(message)
                 setAutoCancel(true)
                 priority = NotificationCompat.PRIORITY_HIGH
-                if(status == PackageInstaller.STATUS_SUCCESS) {
+                if (status == PackageInstaller.STATUS_SUCCESS) {
                     val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
                     val pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, 0)
                     setContentIntent(pendingIntent)

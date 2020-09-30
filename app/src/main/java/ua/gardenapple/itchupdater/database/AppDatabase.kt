@@ -7,6 +7,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import ua.gardenapple.itchupdater.BuildConfig
+import ua.gardenapple.itchupdater.FLAVOR_FDROID
 import ua.gardenapple.itchupdater.FLAVOR_ITCHIO
 import ua.gardenapple.itchupdater.database.game.GameDao
 import ua.gardenapple.itchupdater.database.game.Game
@@ -54,7 +55,8 @@ abstract class AppDatabase : RoomDatabase() {
 
                         ioThread {
                             val appDb = getDatabase(context)
-                            if (BuildConfig.FLAVOR == FLAVOR_ITCHIO) {
+                            //TODO: set correct flavor
+                            if (BuildConfig.FLAVOR == FLAVOR_FDROID) {
                                 appDb.addMitchToDatabase(context)
                             } else {
                                 Log.d(LOGGING_TAG, "Deleting info on Mitch")
@@ -89,7 +91,7 @@ abstract class AppDatabase : RoomDatabase() {
             gameId = Game.MITCH_GAME_ID,
             name = "Mitch",
             author = "gardenapple",
-            storeUrl = "https://gardenapple.itch.io/mitch",
+            storeUrl = Game.MITCH_STORE_PAGE,
             thumbnailUrl = "https://img.itch.zone/aW1nLzM4MDY5ODgucG5n/347x500/gRyDqJ.png",
             locale = Game.MITCH_LOCALE
         )

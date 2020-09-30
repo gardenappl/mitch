@@ -13,8 +13,10 @@ class InstallerDatabaseHandler(val context: Context) : InstallCompleteListener, 
         const val LOGGING_TAG = "InstallDatabaseHandler"
     }
 
-    override suspend fun onInstallComplete(installSessionId: Int, packageName: String, game: Game, status: Int) {
+    override suspend fun onInstallComplete(installSessionId: Int, packageName: String, apkName: String?, status: Int) {
         val db = AppDatabase.getDatabase(context)
+
+        val install = db.installDao.findPendingInstallationBySessionId(installSessionId) ?: return
 
         when(status) {
             PackageInstaller.STATUS_FAILURE,
@@ -25,22 +27,20 @@ class InstallerDatabaseHandler(val context: Context) : InstallCompleteListener, 
             PackageInstaller.STATUS_FAILURE_INVALID,
             PackageInstaller.STATUS_FAILURE_STORAGE ->
             {
-                val install = db.installDao.findPendingInstallationBySessionId(installSessionId)
-                if(install != null)
-                    db.installDao.delete(install)
+                db.installDao.delete(install)
             }
             PackageInstaller.STATUS_SUCCESS ->
             {
-                val install = db.installDao.findPendingInstallationBySessionId(installSessionId)!!.copy(
+                val newInstall = install.copy(
                     status = Installation.STATUS_INSTALLED,
                     downloadOrInstallId = null,
                     packageName = packageName
                 )
-                Log.d(LOGGING_TAG, "New install: $install")
-                db.installDao.resetAllInstallationsForGame(install.gameId, install)
+                Log.d(LOGGING_TAG, "New install: $newInstall")
+                db.installDao.resetAllInstallationsForGame(install.gameId, newInstall)
 
                 val pendingUploads = db.uploadDao.getPendingUploadsForGame(install.gameId)
-                for(upload in pendingUploads) {
+                for (upload in pendingUploads) {
                     upload.isPending = false
                 }
                 db.uploadDao.resetAllUploadsForGame(install.gameId, pendingUploads)
@@ -52,7 +52,7 @@ class InstallerDatabaseHandler(val context: Context) : InstallCompleteListener, 
         val db = AppDatabase.getDatabase(context)
         Log.d(LOGGING_TAG, "onDownloadComplete")
 
-        val pendingInstall = db.installDao.findPendingInstallationByDownloadId(downloadId)!!
+        val pendingInstall = db.installDao.findPendingInstallationByDownloadId(downloadId) ?: return
 
         if (packageInstallerId == null) {
             val pendingUploads = db.uploadDao.getPendingUploadsForGame(pendingInstall.gameId)

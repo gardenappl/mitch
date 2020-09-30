@@ -3,6 +3,8 @@ package ua.gardenapple.itchupdater.client
 import android.util.Log
 import kotlinx.coroutines.*
 import org.jsoup.nodes.Document
+import ua.gardenapple.itchupdater.BuildConfig
+import ua.gardenapple.itchupdater.FLAVOR_ITCHIO
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
@@ -12,11 +14,16 @@ import ua.gardenapple.itchupdater.database.upload.Upload
 class UpdateChecker(val db: AppDatabase) {
     companion object {
         const val LOGGING_TAG: String = "UpdateChecker"
+
+        fun shouldCheck(gameId: Int): Boolean {
+            return !(gameId == Game.MITCH_GAME_ID && BuildConfig.FLAVOR != FLAVOR_ITCHIO)
+        }
     }
 
     suspend fun checkUpdates(gameId: Int): UpdateCheckResult =
         withContext(Dispatchers.IO) {
-
+            if (!shouldCheck(gameId))
+                throw IllegalStateException("Should not be checking updates using itch.io for this")
             var game = db.gameDao.getGameById(gameId)
             if (game == null)
                 throw IllegalStateException("Checking update for game ID $gameId with no Game info available")

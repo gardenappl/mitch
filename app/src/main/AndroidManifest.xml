@@ -58,6 +58,9 @@
                 android:name=".installer.UpdateNotificationBroadcastReceiver"
                 android:exported="false" />
         <receiver
+                android:name=".gitlab.GitlabUpdateBroadcastReceiver"
+                android:exported="false" />
+        <receiver
                 android:name=".installer.UninstallBroadcastReceiver"
                 android:exported="true">
             <intent-filter>

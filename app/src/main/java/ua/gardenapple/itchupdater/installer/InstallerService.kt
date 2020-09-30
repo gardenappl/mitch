@@ -10,9 +10,14 @@ import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.AppDatabase
 
+/**
+ * This service gets started after an APK gets installed by an Installer.
+ */
 class InstallerService : Service() {
     companion object {
         const val LOGGING_TAG = "InstallerService"
+
+        const val EXTRA_APK_NAME = "APK_NAME"
     }
 
     override fun onBind(p0: Intent?): IBinder? = null
@@ -24,7 +29,7 @@ class InstallerService : Service() {
         val status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE)
         val packageName = intent.getStringExtra(PackageInstaller.EXTRA_PACKAGE_NAME)
         val sessionId = intent.getIntExtra(PackageInstaller.EXTRA_SESSION_ID, -1)
-        val message = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)
+        val apkName = intent.getStringExtra(EXTRA_APK_NAME)
 
         when(status) {
             PackageInstaller.STATUS_PENDING_USER_ACTION -> {
@@ -37,10 +42,7 @@ class InstallerService : Service() {
             }
             else -> {
                 runBlocking(Dispatchers.IO) {
-                    val db = AppDatabase.getDatabase(applicationContext)
-                    val installation = db.installDao.findPendingInstallationBySessionId(sessionId)!!
-                    val game = db.gameDao.getGameById(installation.gameId)!!
-                    InstallerEvents.notifyApkInstallComplete(sessionId, packageName!!, game, status)
+                    InstallerEvents.notifyApkInstallComplete(sessionId, packageName!!, apkName, status)
                 }
                 stopSelf()
             }
