@@ -108,7 +108,7 @@ dependencies {
     }
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:$rootProject.okHttpVersion")
-    // FAB Speed DIal
+    // FAB Speed Dial
     implementation "com.leinardi.android:speed-dial:$rootProject.speedDialVersion"
     // Material Progress Bar
     implementation "me.zhanghai.android.materialprogressbar:library:$rootProject.materialProgressBarVersion"
