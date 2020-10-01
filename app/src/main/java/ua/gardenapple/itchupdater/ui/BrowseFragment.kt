@@ -134,7 +134,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     return@setOnActionSelectedListener true
                 }
                 R.id.browser_share -> {
-                    ShareCompat.IntentBuilder.from(activity)
+                    ShareCompat.IntentBuilder.from(requireActivity())
                         .setType("text/plain")
                         .setChooserTitle(R.string.browser_share)
                         .setText(webView.url)
