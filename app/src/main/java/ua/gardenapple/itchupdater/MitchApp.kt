@@ -145,16 +145,19 @@ class MitchApp : Application() {
                 updateCheckRequest
             )
 
-        val gitlabUpdateCheckRequest = PeriodicWorkRequestBuilder<GitlabUpdateCheckWorker>(1, TimeUnit.DAYS).run {
-            setConstraints(constraints)
-            build()
-        }
+        if (BuildConfig.FLAVOR == FLAVOR_GITLAB) {
+            val gitlabUpdateCheckRequest =
+                PeriodicWorkRequestBuilder<GitlabUpdateCheckWorker>(1, TimeUnit.DAYS).run {
+                    setConstraints(constraints)
+                    build()
+                }
 
-        WorkManager.getInstance(applicationContext)
-            .enqueueUniquePeriodicWork(
-                GITLAB_UPDATE_CHECK_TASK_TAG,
-                ExistingPeriodicWorkPolicy.REPLACE,
-                gitlabUpdateCheckRequest
-            )
+            WorkManager.getInstance(applicationContext)
+                .enqueueUniquePeriodicWork(
+                    GITLAB_UPDATE_CHECK_TASK_TAG,
+                    ExistingPeriodicWorkPolicy.REPLACE,
+                    gitlabUpdateCheckRequest
+                )
+        }
     }
 }
