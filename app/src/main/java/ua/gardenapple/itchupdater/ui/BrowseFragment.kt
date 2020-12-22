@@ -42,8 +42,8 @@ import java.io.File
 class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     companion object {
-        const val LOGGING_TAG = "BrowseFragment"
-        const val WEB_VIEW_STATE_KEY: String = "WebView"
+        private const val LOGGING_TAG = "BrowseFragment"
+        private const val WEB_VIEW_STATE_KEY: String = "WebView"
     }
 
     private lateinit var chromeClient: MitchWebChromeClient
@@ -180,7 +180,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         }
                         .show()
 
-                    input.setOnEditorActionListener { textView, actionId, keyEvent ->
+                    input.setOnEditorActionListener { _, actionId, _ ->
                         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                             alertDialog.dismiss()
                             webView.loadUrl(ItchWebsiteUtils.getSearchUrl(input.text.toString()))
@@ -199,7 +199,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
             
             
-        //Loading a URL should be the last action so that it may call processUI
+        //Loading a URL should be the last action so that it may call updateUI
         if(savedInstanceState?.getBundle(WEB_VIEW_STATE_KEY) != null) {
             webView.restoreState(savedInstanceState.getBundle(WEB_VIEW_STATE_KEY))
         } else {
@@ -291,10 +291,13 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 appBar.post {
                     val appBarTitle =
                         "<b>${Html.escapeHtml(ItchWebsiteParser.getGameName(doc))}</b>"
+
+                    @Suppress("DEPRECATION")
                     if (Build.VERSION.SDK_INT >= 24)
                         supportAppBar.title = Html.fromHtml(appBarTitle, 0)
                     else
                         supportAppBar.title = Html.fromHtml(appBarTitle)
+
                     supportAppBar.show()
                     setupAppBarMenu(doc, appBar)
                 }
@@ -384,75 +387,72 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         val navbarItems = doc.getElementById("user_tools").children()
 
-//        if (ItchWebsiteUtils.siteHasNavbar(webView, doc)) {
-            while (navbarItems.isNotEmpty()) {
-                val item = navbarItems.last()
-                val url = item.child(0).attr("href")
+        while (navbarItems.isNotEmpty()) {
+            val item = navbarItems.last()
+            val url = item.child(0).attr("href")
 
-                if (item.getElementsByClass("related_games_btn").isNotEmpty()) {
-                    appBar.menu.add(Menu.NONE, 5, 5, R.string.menu_game_related)
-                        .setOnMenuItemClickListener {
-                            webView.loadUrl(url)
-                            true
-                        }
-
-                } else if (item.getElementsByClass("rate_game_btn").isNotEmpty()) {
-                    appBar.menu.add(Menu.NONE, 4, 4, R.string.menu_game_rate)
-                        .setOnMenuItemClickListener {
-                            webView.loadUrl(url)
-                            true
-                        }
-                        .setIcon(R.drawable.ic_baseline_rate_review_24)
-                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
-
-                } else if (item.hasClass("devlog_link")) {
-                    appBar.menu.add(Menu.NONE, 3, 3, R.string.menu_game_devlog)
-                        .setOnMenuItemClickListener {
-                            webView.loadUrl(url)
-                            true
-                        }
-
-                } else if (item.getElementsByClass("add_to_collection_btn").isNotEmpty()) {
-                    appBar.menu.add(Menu.NONE, 2, 2, R.string.menu_game_collection)
-                        .setOnMenuItemClickListener {
-                            webView.loadUrl(url)
-                            true
-                        }
-
-                } else if (item.hasClass("jam_entry")) {
-                    //TODO: handle multiple jam entries nicely
-                    val menuItemName = item.child(0).text()
-
-                    appBar.menu.add(Menu.NONE, 1, 1, menuItemName)
-                        .setOnMenuItemClickListener {
-                            webView.loadUrl(url)
-                            true
-                        }
-                        .setIcon(R.drawable.ic_baseline_emoji_events_24)
-                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
-
-                } else if (item.getElementsByClass("view_more").isNotEmpty()) {
-                    //Cannot rely on ItchWebsiteParser, because its method requires the current URL,
-                    //and while loading another page, webView.url changes prematurely
-                    //(leading to crashes...)
-                    val authorName = item.getElementsByClass("mobile_label")[0].text()
-
-                    val menuItemName =
-                        if (item.getElementsByClass("full_label")[0].text().contains(authorName))
-                            resources.getString(R.string.menu_game_author, authorName)
-                        else
-                            resources.getString(R.string.menu_game_author_generic)
-
-                    appBar.menu.add(Menu.NONE, 0, 0, menuItemName).setOnMenuItemClickListener {
+            if (item.getElementsByClass("related_games_btn").isNotEmpty()) {
+                appBar.menu.add(Menu.NONE, 5, 5, R.string.menu_game_related)
+                    .setOnMenuItemClickListener {
                         webView.loadUrl(url)
                         true
                     }
+
+            } else if (item.getElementsByClass("rate_game_btn").isNotEmpty()) {
+                appBar.menu.add(Menu.NONE, 4, 4, R.string.menu_game_rate)
+                    .setOnMenuItemClickListener {
+                        webView.loadUrl(url)
+                        true
+                    }
+                    .setIcon(R.drawable.ic_baseline_rate_review_24)
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
+
+            } else if (item.hasClass("devlog_link")) {
+                appBar.menu.add(Menu.NONE, 3, 3, R.string.menu_game_devlog)
+                    .setOnMenuItemClickListener {
+                        webView.loadUrl(url)
+                        true
+                    }
+
+            } else if (item.getElementsByClass("add_to_collection_btn").isNotEmpty()) {
+                appBar.menu.add(Menu.NONE, 2, 2, R.string.menu_game_collection)
+                    .setOnMenuItemClickListener {
+                        webView.loadUrl(url)
+                        true
+                    }
+
+            } else if (item.hasClass("jam_entry")) {
+                //TODO: handle multiple jam entries nicely
+                val menuItemName = item.child(0).text()
+
+                appBar.menu.add(Menu.NONE, 1, 1, menuItemName)
+                    .setOnMenuItemClickListener {
+                        webView.loadUrl(url)
+                        true
+                    }
+                    .setIcon(R.drawable.ic_baseline_emoji_events_24)
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
+
+            } else if (item.getElementsByClass("view_more").isNotEmpty()) {
+                //Cannot rely on ItchWebsiteParser, because its method requires the current URL,
+                //and while loading another page, webView.url changes prematurely
+                //(leading to crashes...)
+                val authorName = item.getElementsByClass("mobile_label")[0].text()
+
+                val menuItemName =
+                    if (item.getElementsByClass("full_label")[0].text().contains(authorName))
+                        resources.getString(R.string.menu_game_author, authorName)
+                    else
+                        resources.getString(R.string.menu_game_author_generic)
+
+                appBar.menu.add(Menu.NONE, 0, 0, menuItemName).setOnMenuItemClickListener {
+                    webView.loadUrl(url)
+                    true
                 }
-
-
-                navbarItems.removeAt(navbarItems.size - 1)
             }
-//        }
+
+            navbarItems.removeAt(navbarItems.size - 1)
+        }
 
         appBar.menu.add(Menu.NONE, 10, 10, R.string.nav_installed).setOnMenuItemClickListener {
             updateUI(null)

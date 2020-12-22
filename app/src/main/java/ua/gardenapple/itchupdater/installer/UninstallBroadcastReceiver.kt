@@ -10,7 +10,7 @@ import ua.gardenapple.itchupdater.database.AppDatabase
 
 class UninstallBroadcastReceiver : BroadcastReceiver() {
     companion object {
-        const val LOGGING_TAG = "UninstallReceiver"
+        private const val LOGGING_TAG = "UninstallReceiver"
     }
 
     override fun onReceive(context: Context, intent: Intent) {

@@ -23,7 +23,7 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
     companion object {
-        const val LOGGING_TAG = "UpdateCheckWorker"
+        private const val LOGGING_TAG = "UpdateCheckWorker"
     }
 
     override suspend fun doWork(): Result = coroutineScope {

@@ -10,7 +10,7 @@ import ua.gardenapple.itchupdater.database.AppDatabase
 class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope) {
 
     companion object {
-        const val LOGGING_TAG = "ItchBrowseHandler"
+        private const val LOGGING_TAG = "ItchBrowseHandler"
     }
 
     private var lastDownloadDoc: Document? = null

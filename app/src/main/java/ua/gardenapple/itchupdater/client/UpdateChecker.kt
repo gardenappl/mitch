@@ -13,7 +13,7 @@ import ua.gardenapple.itchupdater.database.upload.Upload
 
 class UpdateChecker(val db: AppDatabase) {
     companion object {
-        const val LOGGING_TAG: String = "UpdateChecker"
+        private const val LOGGING_TAG: String = "UpdateChecker"
 
         fun shouldCheck(gameId: Int): Boolean {
             return !(gameId == Game.MITCH_GAME_ID && BuildConfig.FLAVOR != FLAVOR_ITCHIO)

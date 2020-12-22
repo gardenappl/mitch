@@ -12,7 +12,8 @@ import ua.gardenapple.itchupdater.MitchApp
  */
 class InstallNotificationBroadcastReceiver : BroadcastReceiver() {
     companion object {
-        const val LOGGING_TAG = "InstallReceiver"
+        private const val LOGGING_TAG = "InstallReceiver"
+
         const val EXTRA_DOWNLOAD_ID = "DOWNLOAD_ID"
     }
 

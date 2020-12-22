@@ -10,7 +10,7 @@ import ua.gardenapple.itchupdater.database.installation.Installation
 
 class InstallerDatabaseHandler(val context: Context) : InstallCompleteListener, DownloadCompleteListener {
     companion object {
-        const val LOGGING_TAG = "InstallDatabaseHandler"
+        private const val LOGGING_TAG = "InstallDatabaseHandler"
     }
 
     override suspend fun onInstallComplete(installSessionId: Int, packageName: String, apkName: String?, status: Int) {

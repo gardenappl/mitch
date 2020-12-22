@@ -33,7 +33,7 @@ class ItchWebsiteParser {
     }
 
     companion object {
-        const val LOGGING_TAG = "ItchWebsiteParser"
+        private const val LOGGING_TAG = "ItchWebsiteParser"
         const val UNKNOWN_LOCALE = "Unknown"
         const val ENGLISH_LOCALE = "en"
 
@@ -53,7 +53,7 @@ class ItchWebsiteParser {
             val infoTable = getInfoTable(gamePageDoc)
 
             val authorName = getAuthorName(Uri.parse(gamePageUrl), infoTable)
-            val lastDownloadTimestamp: String? = getTimestamp(gamePageDoc, infoTable)
+            val lastDownloadTimestamp: String? = getTimestamp(infoTable)
 
             return Game(
                 gameId = gameId,
@@ -241,7 +241,7 @@ class ItchWebsiteParser {
             throw RuntimeException("Could not determine locale of web page")
         }
 
-        private fun getTimestamp(doc: Document, infoTable: Element): String? {
+        private fun getTimestamp(infoTable: Element): String? {
             var timestamp = infoTable.child(0).child(1).child(0).attr("title")
             if(timestamp?.contains('@') != true)
                 timestamp = null

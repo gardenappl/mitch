@@ -14,8 +14,9 @@ import ua.gardenapple.itchupdater.installer.DownloadRequester
 class PermissionRequestActivity : Activity(), ActivityCompat.OnRequestPermissionsResultCallback {
 
     companion object {
-        const val LOGGING_TAG = "PermissionRequest"
+        private const val LOGGING_TAG = "PermissionRequest"
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(LOGGING_TAG, "Created")

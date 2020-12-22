@@ -31,7 +31,7 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
     companion object {
-        const val LOGGING_TAG = "SelfUpdaterWorker"
+        private const val LOGGING_TAG = "SelfUpdaterWorker"
 
         val REPO_URL = Uri.parse("https://gitlab.com/gardenappl/mitch")
         const val VERSION_CHECK_URL = "https://gitlab.com/api/v4/projects/gardenappl%2Fmitch/releases"

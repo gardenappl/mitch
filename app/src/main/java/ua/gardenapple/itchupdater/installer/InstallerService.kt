@@ -15,7 +15,7 @@ import ua.gardenapple.itchupdater.database.AppDatabase
  */
 class InstallerService : Service() {
     companion object {
-        const val LOGGING_TAG = "InstallerService"
+        private const val LOGGING_TAG = "InstallerService"
 
         const val EXTRA_APK_NAME = "APK_NAME"
     }

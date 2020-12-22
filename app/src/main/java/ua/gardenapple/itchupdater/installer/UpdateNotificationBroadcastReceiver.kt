@@ -14,7 +14,8 @@ import ua.gardenapple.itchupdater.database.AppDatabase
  */
 class UpdateNotificationBroadcastReceiver : BroadcastReceiver() {
     companion object {
-        const val LOGGING_TAG = "DownloadNotification"
+        private const val LOGGING_TAG = "DownloadNotification"
+
         const val EXTRA_GAME_ID = "GAME_ID"
         const val EXTRA_UPLOAD_ID = "UPLOAD_ID"
         const val EXTRA_DOWNLOAD_KEY = "DOWNLOAD_KEY"

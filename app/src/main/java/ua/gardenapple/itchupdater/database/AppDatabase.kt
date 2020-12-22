@@ -31,7 +31,7 @@ abstract class AppDatabase : RoomDatabase() {
      * https://gist.github.com/florina-muntenescu/697e543652b03d3d2a06703f5d6b44b5
      */
     companion object {
-        const val LOGGING_TAG = "DatabaseSetup"
+        private const val LOGGING_TAG = "DatabaseSetup"
         @Volatile
         private var INSTANCE: AppDatabase? = null
 

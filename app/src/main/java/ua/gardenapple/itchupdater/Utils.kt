@@ -16,7 +16,7 @@ import kotlin.math.min
 
 class Utils {
     companion object {
-        const val LOG_LIMIT: Int = 1000
+        private const val LOG_LIMIT: Int = 1000
 
         /**
          * Logcat normally has a limit of 1000 characters.

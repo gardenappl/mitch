@@ -28,8 +28,8 @@ class LibraryFragment : Fragment() {
 
     companion object {
         //2x of 315x250
-        const val THUMBNAIL_WIDTH = 650
-        const val THUMBNAIL_HEIGHT = 500
+        private const val THUMBNAIL_WIDTH = 650
+        private const val THUMBNAIL_HEIGHT = 500
     }
 
     override fun onCreateView(

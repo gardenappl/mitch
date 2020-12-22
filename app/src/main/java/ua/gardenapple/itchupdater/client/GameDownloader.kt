@@ -25,7 +25,7 @@ import java.io.IOException
 
 class GameDownloader(val context: Context) {
     companion object {
-        const val LOGGING_TAG = "GameDownloader"
+        private const val LOGGING_TAG = "GameDownloader"
     }
 
     class ItchAccessDeniedException(message: String) : Exception(message)

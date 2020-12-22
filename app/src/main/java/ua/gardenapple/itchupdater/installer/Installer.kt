@@ -19,7 +19,7 @@ import java.util.*
 
 class Installer {
     companion object {
-        const val LOGGING_TAG = "Installer"
+        private const val LOGGING_TAG = "Installer"
     }
 
     /**
