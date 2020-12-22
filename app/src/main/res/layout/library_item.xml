@@ -22,7 +22,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/gameName"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@color/colorPrimary" />
+                app:srcCompat="@color/colorBackground" />
 
         <TextView
                 android:id="@+id/gameName"
@@ -33,7 +33,7 @@
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:text="Game name, possibly very long"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/colorForeground"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/authorName"
@@ -46,7 +46,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Author"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/colorForeground"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="@+id/gameName"
                 app:layout_constraintStart_toStartOf="@+id/gameName"

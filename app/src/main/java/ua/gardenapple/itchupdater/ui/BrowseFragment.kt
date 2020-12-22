@@ -23,7 +23,6 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
 import com.leinardi.android.speeddial.SpeedDialActionItem
-import com.leinardi.android.speeddial.SpeedDialView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.browse_fragment.*
 import kotlinx.android.synthetic.main.dialog_search.view.*
@@ -32,6 +31,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.R
+import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.client.ItchBrowseHandler
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.installer.DownloadRequester
@@ -54,10 +54,14 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     private var currentDoc: Document? = null
 
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d(LOGGING_TAG, "onCreate")
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        val browseHandler = ItchBrowseHandler(context, this)
-        this.browseHandler = browseHandler
+        this.browseHandler = ItchBrowseHandler(context, this)
     }
 
     override fun onDetach() {
@@ -70,7 +74,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         val view = inflater.inflate(R.layout.browse_fragment, container, false)
 
         webView = view.findViewById(R.id.webView)
@@ -254,7 +257,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
      * @param doc the parsed DOM of the page the user is currently on. Null if the UI shouldn't adapt to any web page at all
      */
     private fun updateUI(doc: Document?) {
-        if (isWebFullscreen)
+        if (!this::chromeClient.isInitialized || isWebFullscreen)
             return
 
         val mainActivity = activity as? MainActivity
@@ -320,11 +323,13 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
 
         //Colors adapt to game theme
-        //TODO: dark theme for app
 
-        val defaultAccentColor = ResourcesCompat.getColor(resources, R.color.colorAccent, requireContext().theme)
-        val defaultWhiteColor = ResourcesCompat.getColor(resources, R.color.colorPrimary, requireContext().theme)
-        val defaultBlackColor = ResourcesCompat.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
+        val defaultAccentColor = Utils.getColor(resources, R.color.colorAccent, requireContext().theme)
+        val defaultWhiteColor = Utils.getColor(resources, R.color.colorPrimary, requireContext().theme)
+        val defaultBlackColor = Utils.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
+        
+        val defaultBackgroundColor = Utils.getColor(resources, R.color.colorBackground, requireContext().theme)
+        val defaultForegroundColor = Utils.getColor(resources, R.color.colorForeground, requireContext().theme)
 
         launch(Dispatchers.Default) {
             val gameThemeBgColor = doc?.run { ItchWebsiteUtils.getBackgroundUIColor(doc) }
@@ -335,6 +340,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             val accentFgColor = gameThemeButtonFgColor ?: defaultWhiteColor
             val bgColor = gameThemeBgColor ?: defaultWhiteColor
             val fgColor = if (gameThemeBgColor == null) defaultBlackColor else defaultWhiteColor
+
+            val appBarBgColor = gameThemeBgColor ?: defaultBackgroundColor
+            val appBarFgColor = if (gameThemeBgColor == null) defaultForegroundColor else defaultWhiteColor
 
             fab.post {
                 fab.mainFabClosedBackgroundColor = accentColor
@@ -355,16 +363,16 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 progressBar.progressDrawable.setTint(accentColor)
             }
             appBar.post {
-                appBar.setBackgroundColor(bgColor)
-                appBar.setTitleTextColor(fgColor)
-                appBar.overflowIcon?.setTint(fgColor)
+                appBar.setBackgroundColor(appBarBgColor)
+                appBar.setTitleTextColor(appBarFgColor)
+                appBar.overflowIcon?.setTint(appBarFgColor)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 mainActivity.runOnUiThread {
                     mainActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
                     mainActivity.window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-                    mainActivity.window.statusBarColor = bgColor
-                    if (fgColor == defaultBlackColor)
+                    mainActivity.window.statusBarColor = appBarBgColor
+                    if (appBarFgColor == defaultBlackColor)
                         mainActivity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
                     else
                         mainActivity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE

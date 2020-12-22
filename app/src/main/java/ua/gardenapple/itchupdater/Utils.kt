@@ -1,17 +1,23 @@
 package ua.gardenapple.itchupdater
 
+import android.content.res.ColorStateList
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import com.github.ajalt.colormath.ConvertibleColor
 import com.github.ajalt.colormath.fromCss
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.io.OutputStream
+import kotlin.coroutines.Continuation
 import kotlin.math.min
 
 class Utils {
@@ -94,6 +100,41 @@ class Utils {
          */
         fun parseCssColor(color: String): Int {
             return ConvertibleColor.fromCss(color).toRGB().toPackedInt()
+        }
+
+        
+        fun colorStateListOf(vararg mapping: Pair<IntArray, Int>): ColorStateList {
+            val (states, colors) = mapping.unzip()
+            return ColorStateList(states.toTypedArray(), colors.toIntArray())
+        }
+
+        fun colorStateListOf(@ColorInt color: Int): ColorStateList {
+            return ColorStateList.valueOf(color)
+        }
+
+        /**
+         * Similar to ActivityCompat.getColor, except also aware of light/dark themes
+         */
+        @ColorInt
+        @Suppress("DEPRECATION")
+        fun getColor(resources: Resources, @ColorRes id: Int, theme: Resources.Theme): Int {
+            return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                resources.getColor(id, theme)
+            } else {
+                val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
+                    when (id) {
+                        R.color.colorBackground -> resources.getColor(R.color.colorPrimaryDark)
+                        R.color.colorForeground -> resources.getColor(R.color.colorPrimary)
+                    }
+                } else {
+                    when (id) {
+                        R.color.colorBackground -> resources.getColor(R.color.colorPrimary)
+                        R.color.colorForeground -> resources.getColor(R.color.colorPrimaryDark)
+                    }
+                }
+                resources.getColor(id)
+            }
         }
     }
 }

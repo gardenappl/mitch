@@ -4,11 +4,16 @@ import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -52,17 +57,12 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         supportActionBar!!.hide()
 
 
-        Log.d(LOGGING_TAG, "Stored active fragment tag: ${savedInstanceState?.getString(
-            SELECTED_FRAGMENT_KEY)}")
         val activeFragmentTag = savedInstanceState?.getString(SELECTED_FRAGMENT_KEY) ?: BROWSE_FRAGMENT_TAG
-
-        Log.d(LOGGING_TAG, "Active fragment tag: $activeFragmentTag")
 
         //Fragments aren't destroyed on configuration changes
         val tryBrowseFragment = supportFragmentManager.findFragmentByTag(BROWSE_FRAGMENT_TAG)
 
         if (tryBrowseFragment != null) {
-            Log.d(LOGGING_TAG, "Fragment Manager contains some fragments")
             browseFragment = tryBrowseFragment as BrowseFragment
             libraryFragment = supportFragmentManager.findFragmentByTag(LIBRARY_FRAGMENT_TAG) as LibraryFragment
             settingsFragment = supportFragmentManager.findFragmentByTag(SETTINGS_FRAGMENT_TAG) as SettingsFragment
@@ -99,8 +99,6 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             onFragmentSwitch(getItemId(activeFragment), true)
         }
 
-        Log.d(LOGGING_TAG, "Fragment manager contains ${supportFragmentManager.fragments.size} fragments")
-
         val navView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         navView.setOnNavigationItemSelectedListener { item ->
             val fragmentChanged = switchToFragment(item.itemId, false)
@@ -117,10 +115,6 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     override fun onStart() {
         super.onStart()
 
-        Log.d(LOGGING_TAG, "Starting...")
-        Log.d(LOGGING_TAG, "Version: ${BuildConfig.VERSION_NAME}")
-        Log.d(LOGGING_TAG, "Action: ${intent.action}")
-        Log.d(LOGGING_TAG, "Data: ${intent.data}")
         if (intent.action == Intent.ACTION_VIEW &&
                 intent.data?.let { ItchWebsiteUtils.isItchWebPage(it) } == true) {
             switchToFragment(R.id.navigation_website_view)
@@ -144,15 +138,46 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         outState.putString(SELECTED_FRAGMENT_KEY, getFragmentTag(activeFragment))
     }
 
+    // Handle light/dark theme changes
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-//        if(activeFragment !== browseFragment) {
-//            supportFragmentManager.beginTransaction().apply {
-//                detach(activeFragment)
-//                attach(activeFragment)
-//                commit()
-//            }
-//        }
+        
+        val nightMode = newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK
+
+        Log.d(LOGGING_TAG, "dark equal? " + (R.color.colorBackground == R.color.colorPrimaryDark))
+        Log.d(LOGGING_TAG, "light equal? " + (R.color.colorBackground == R.color.colorPrimary))
+
+        val backgroundColor = Utils.getColor(resources, R.color.colorBackground, theme)
+        val foregroundColor = Utils.getColor(resources, R.color.colorForeground, theme)
+        val accentColor = Utils.getColor(resources, R.color.colorAccent, theme)
+
+        val itemColorStateList = Utils.colorStateListOf(
+            intArrayOf(android.R.attr.state_selected) to accentColor,
+            intArrayOf() to foregroundColor
+        )
+
+        bottomNavigationView.setBackgroundColor(backgroundColor)
+        bottomNavigationView.itemBackground = ColorDrawable(backgroundColor)
+        bottomNavigationView.itemIconTintList = itemColorStateList
+        bottomNavigationView.itemTextColor = itemColorStateList
+        mainLayout.setBackgroundColor(backgroundColor)
+        
+        if (activeFragment == browseFragment) {
+            // Browse fragment has special handling for system bar color
+            browseFragment.updateUI()
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+                window.statusBarColor = backgroundColor
+                if (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+                        Configuration.UI_MODE_NIGHT_NO) {
+                    window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                } else {
+                    window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+                }
+            }
+        }
     }
 
     /**

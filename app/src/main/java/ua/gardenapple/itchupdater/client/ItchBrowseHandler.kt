@@ -11,13 +11,15 @@ class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope
 
     companion object {
         private const val LOGGING_TAG = "ItchBrowseHandler"
-    }
 
-    private var lastDownloadDoc: Document? = null
-    private var lastDownloadGameId: Int? = null
-    private var lastDownloadPageUrl: String? = null
-    private var clickedUploadId: Int? = null
-    private var currentDownloadId: Long? = null
+        // ItchBrowseHandler may be re-created on fragment re-attachment,
+        // but I want these values to be retained. Making them static is a lazy solution.
+        private var lastDownloadDoc: Document? = null
+        private var lastDownloadGameId: Int? = null
+        private var lastDownloadPageUrl: String? = null
+        private var clickedUploadId: Int? = null
+        private var currentDownloadId: Long? = null
+    }
 
     suspend fun onPageVisited(doc: Document, url: String) {
         lastDownloadDoc = null
