@@ -18,18 +18,15 @@ import ua.gardenapple.itchupdater.installer.DownloadRequester
  */
 class GitlabUpdateBroadcastReceiver : BroadcastReceiver() {
     companion object {
-        const val LOGGING_TAG = "GitlabNotification"
-
-        const val DOWNLOAD_URL = "https://gitlab.com/gardenappl/mitch/-/raw/version-check/app-gitlab-release.apk"
+        const val EXTRA_DOWNLOAD_URL = "DOWNLOAD_URL"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        Log.d(LOGGING_TAG, "onReceive")
+        val downloadUrl = intent.getStringExtra(EXTRA_DOWNLOAD_URL)!!
 
         runBlocking(Dispatchers.IO) {
-            DownloadRequester.requestDownload(
-                context, null, DOWNLOAD_URL, null, DownloadRequester.APK_MIME
-            )
+            DownloadRequester.requestDownload(context, null, downloadUrl,
+                null, DownloadRequester.APK_MIME)
         }
     }
 }

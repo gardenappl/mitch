@@ -12,6 +12,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.*
 import okhttp3.Request
+import org.json.JSONArray
+import org.json.JSONObject
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.client.UpdateCheckResult
 import ua.gardenapple.itchupdater.client.UpdateChecker
@@ -31,7 +33,11 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
     companion object {
         const val LOGGING_TAG = "SelfUpdaterWorker"
 
-        const val VERSION_CHECK_URL = "https://gitlab.com/gardenappl/mitch/-/raw/version-check/version"
+        val REPO_URL = Uri.parse("https://gitlab.com/gardenappl/mitch")
+        const val VERSION_CHECK_URL = "https://gitlab.com/api/v4/projects/gardenappl%2Fmitch/releases"
+        //Have to get download URL by parsing markdown from description, ugh
+        //Strips leading slash
+        val RELEASE_DESC_PATTERN = Regex("""\[\S+\]\(/?(\S+)\)""")
     }
 
     override suspend fun doWork(): Result = coroutineScope {
@@ -41,37 +47,48 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
         }
 
         try {
-            var versionString = ""
-
-            withContext(Dispatchers.IO) {
+            val releasesData = JSONArray(withContext(Dispatchers.IO) {
                 MitchApp.httpClient.newCall(request).execute().use { response ->
                     if (!response.isSuccessful)
                         throw IOException("Unexpected response $response")
-                    versionString = response.body!!.string()
+                    return@use response.body!!.string()
                 }
-            }
-            if (versionString.contains(BuildConfig.VERSION_NAME)) {
+            })
+
+            val latestRelease = releasesData[0] as JSONObject
+            val latestVersionString = latestRelease["name"] as String
+
+            if (latestVersionString.contains(BuildConfig.VERSION_NAME)) {
                 Log.d(LOGGING_TAG, "GitLab Mitch is up to date")
-                handleNotification(UpdateCheckResult(UpdateCheckResult.UP_TO_DATE))
+                handleNotification(UpdateCheckResult(UpdateCheckResult.UP_TO_DATE), null)
             } else {
                 Log.d(LOGGING_TAG, "GitLab Mitch needs update")
-                Log.d(LOGGING_TAG, "Current version: ${BuildConfig.VERSION_NAME}, GitLab says $versionString")
-                handleNotification(UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED))
+                Log.d(LOGGING_TAG, "Current version: ${BuildConfig.VERSION_NAME}, GitLab says $latestVersionString")
+
+                val descriptionMatch =
+                    RELEASE_DESC_PATTERN.matchEntire(latestRelease["description"] as String)
+                val relativeUrl = descriptionMatch!!.groupValues[1]
+                Log.d(LOGGING_TAG, "Relative download URL is $relativeUrl")
+                val absoluteUrl = Uri.withAppendedPath(REPO_URL, relativeUrl)
+                Log.d(LOGGING_TAG, "Absolute download URL is $absoluteUrl")
+
+                handleNotification(UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED), absoluteUrl)
             }
 
             return@coroutineScope Result.success()
 
         } catch (e: Exception) {
             Log.e(LOGGING_TAG, "Error occurred while checking updates for GitLab Mitch", e)
-            handleNotification(null)
+            handleNotification(null, null)
             return@coroutineScope Result.failure()
         }
     }
 
     /**
      * @param result the result of the update check, can be null if the update check failed (due to network error or parsing error)
+     * @param downloadUrl URL for downloading the latest .apk, can be null if no new version detected
      */
-    private fun handleNotification(result: UpdateCheckResult?) {
+    private fun handleNotification(result: UpdateCheckResult?, downloadUrl: Uri?) {
         if(result?.code == UpdateCheckResult.UP_TO_DATE)
             return
 
@@ -98,6 +115,8 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
 
                 if (result?.code == UpdateCheckResult.UPDATE_NEEDED) {
                     val intent = Intent(context, GitlabUpdateBroadcastReceiver::class.java)
+                    intent.putExtra(GitlabUpdateBroadcastReceiver.EXTRA_DOWNLOAD_URL, downloadUrl.toString())
+
                     pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
                 } else {
                     val activityIntent = Intent(Intent.ACTION_VIEW,
