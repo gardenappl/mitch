@@ -84,10 +84,6 @@ class LibraryFragment : Fragment() {
         return view
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-    }
-
     private inner class LibraryPreloadModelProvider(
         val adapter: GameListAdapter
     ) : ListPreloader.PreloadModelProvider<Game> {
