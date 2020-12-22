@@ -405,7 +405,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         true
                     }
                     .setIcon(R.drawable.ic_baseline_rate_review_24)
-                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM)
 
             } else if (item.hasClass("devlog_link")) {
                 appBar.menu.add(Menu.NONE, 3, 3, R.string.menu_game_devlog)
@@ -431,7 +431,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         true
                     }
                     .setIcon(R.drawable.ic_baseline_emoji_events_24)
-                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM)
 
             } else if (item.getElementsByClass("view_more").isNotEmpty()) {
                 //Cannot rely on ItchWebsiteParser, because its method requires the current URL,

@@ -129,13 +129,13 @@ class GameDownloader(val context: Context) {
         pendingUploads: List<Upload>
     ) {
         val db = AppDatabase.getDatabase(context)
-        Log.d(ItchBrowseHandler.LOGGING_TAG, "Handling download...")
+        Log.d(LOGGING_TAG, "Handling download...")
         val downloadManager = context.getSystemService(Activity.DOWNLOAD_SERVICE) as DownloadManager
 
         var game = db.gameDao.getGameById(gameId)
         if (game == null) {
             val storeUrl = ItchWebsiteParser.getStoreUrlFromDownloadPage(Uri.parse(downloadPageUrl))
-            Log.d(ItchBrowseHandler.LOGGING_TAG, "Game is null! Fetching $storeUrl...")
+            Log.d(LOGGING_TAG, "Game is null! Fetching $storeUrl...")
             val storeDoc = ItchWebsiteUtils.fetchAndParseDocument(storeUrl)
             game = ItchWebsiteParser.getGameInfo(storeDoc, storeUrl)
             db.gameDao.upsert(game)

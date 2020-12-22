@@ -12,7 +12,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.util.Log
 import android.webkit.URLUtil
-import ua.gardenapple.itchupdater.LOGGING_TAG
 import ua.gardenapple.itchupdater.PERMISSION_REQUEST_CODE_DOWNLOAD
 import ua.gardenapple.itchupdater.ui.PermissionRequestActivity
 
@@ -21,6 +20,7 @@ typealias OnDownloadStartListener = (downloadId: Long) -> Unit
 class DownloadRequester {
 
     companion object {
+        private const val LOGGING_TAG = "DownloadRequester"
         private lateinit var currentUrl: String
         private var currentContent: String? = null
         private var currentMimeType: String? = null
