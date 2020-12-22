@@ -141,11 +141,6 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     // Handle light/dark theme changes
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        
-        val nightMode = newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK
-
-        Log.d(LOGGING_TAG, "dark equal? " + (R.color.colorBackground == R.color.colorPrimaryDark))
-        Log.d(LOGGING_TAG, "light equal? " + (R.color.colorBackground == R.color.colorPrimary))
 
         val backgroundColor = Utils.getColor(resources, R.color.colorBackground, theme)
         val foregroundColor = Utils.getColor(resources, R.color.colorForeground, theme)
@@ -170,8 +165,9 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
                 window.statusBarColor = backgroundColor
-                if (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
-                        Configuration.UI_MODE_NIGHT_NO) {
+
+                val nightMode = newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
                     window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
                 } else {
                     window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE

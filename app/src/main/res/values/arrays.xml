@@ -1,3 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="pref_theme_entries">
+        <item>@string/settings_theme_dark</item>
+        <item>@string/settings_theme_light</item>
+        <item>@string/settings_theme_system</item>
+        <item>@string/settings_theme_site</item>
+    </string-array>
+    <string-array name="pref_theme_values">
+        <item>dark</item>
+        <item>light</item>
+        <item>system</item>
+        <item>site</item>
+    </string-array>
 </resources>

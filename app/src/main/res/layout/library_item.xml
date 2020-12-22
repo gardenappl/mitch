@@ -8,6 +8,7 @@
         android:clickable="true"
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground"
+        android:background="@color/colorBackground"
         app:cardElevation="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout

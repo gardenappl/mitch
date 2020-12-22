@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import androidx.work.*
 import okhttp3.Cache
@@ -53,11 +54,19 @@ class MitchApp : Application() {
 
     private val preferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
-            Log.d(LOGGING_TAG, "Changed key: $key")
-            if (key == "preference_update_check_if_metered") {
-                //WorkManager.getInstance(applicationContext).cancelAllWorkByTag(UPDATE_CHECK_TASK_TAG)
-                registerUpdateCheckTask(requiresUnmetered = prefs.getBoolean(key, false))
-                Log.d(LOGGING_TAG, "Re-registering...")
+            when (key) {
+                "preference_update_check_if_metered" -> {
+                    //WorkManager.getInstance(applicationContext).cancelAllWorkByTag(UPDATE_CHECK_TASK_TAG)
+                    registerUpdateCheckTask(requiresUnmetered = prefs.getBoolean(key, false))
+                    Log.d(LOGGING_TAG, "Re-registering...")
+                }
+                "preference_theme" -> {
+                    when (prefs.getString(key, "site")) {
+                        "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                        "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                        "system" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                    }
+                }
             }
         }
 

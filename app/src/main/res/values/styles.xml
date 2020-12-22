@@ -35,8 +35,11 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="AlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+    <style name="AlertDialogStyle" parent="Theme.AppCompat.DayNight.Dialog.Alert">
         <item name="android:windowTitleStyle">@style/AppTheme.TitleTextStyle</item>
+        <item name="colorPrimary">@color/colorBackground</item>
+        <item name="colorPrimaryDark">@color/colorForeground</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
 </resources>

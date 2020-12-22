@@ -18,7 +18,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.annotation.Keep
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ShareCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
@@ -328,8 +327,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val defaultWhiteColor = Utils.getColor(resources, R.color.colorPrimary, requireContext().theme)
         val defaultBlackColor = Utils.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
         
-        val defaultBackgroundColor = Utils.getColor(resources, R.color.colorBackground, requireContext().theme)
-        val defaultForegroundColor = Utils.getColor(resources, R.color.colorForeground, requireContext().theme)
+        val defaultBgColor = Utils.getColor(resources, R.color.colorBackground, requireContext().theme)
+        val defaultFgColor = Utils.getColor(resources, R.color.colorForeground, requireContext().theme)
 
         launch(Dispatchers.Default) {
             val gameThemeBgColor = doc?.run { ItchWebsiteUtils.getBackgroundUIColor(doc) }
@@ -338,11 +337,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
             val accentColor = gameThemeButtonColor ?: defaultAccentColor
             val accentFgColor = gameThemeButtonFgColor ?: defaultWhiteColor
-            val bgColor = gameThemeBgColor ?: defaultWhiteColor
-            val fgColor = if (gameThemeBgColor == null) defaultBlackColor else defaultWhiteColor
 
-            val appBarBgColor = gameThemeBgColor ?: defaultBackgroundColor
-            val appBarFgColor = if (gameThemeBgColor == null) defaultForegroundColor else defaultWhiteColor
+            val bgColor = gameThemeBgColor ?: defaultBgColor
+            val fgColor = if (gameThemeBgColor == null) defaultFgColor else defaultWhiteColor
 
             fab.post {
                 fab.mainFabClosedBackgroundColor = accentColor
@@ -363,16 +360,16 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 progressBar.progressDrawable.setTint(accentColor)
             }
             appBar.post {
-                appBar.setBackgroundColor(appBarBgColor)
-                appBar.setTitleTextColor(appBarFgColor)
-                appBar.overflowIcon?.setTint(appBarFgColor)
+                appBar.setBackgroundColor(bgColor)
+                appBar.setTitleTextColor(fgColor)
+                appBar.overflowIcon?.setTint(fgColor)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 mainActivity.runOnUiThread {
                     mainActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
                     mainActivity.window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-                    mainActivity.window.statusBarColor = appBarBgColor
-                    if (appBarFgColor == defaultBlackColor)
+                    mainActivity.window.statusBarColor = bgColor
+                    if (fgColor == defaultBlackColor)
                         mainActivity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
                     else
                         mainActivity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE

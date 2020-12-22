@@ -57,4 +57,10 @@
     <string name="menu_game_gamejam">Учавствует в %1$s</string>
     <string name="menu_game_author">Другое от %1$s</string>
     <string name="menu_game_author_generic">Другое от создателя</string>
+    <string name="settings_category_ui">Внешний вид</string>
+    <string name="settings_theme">Тема</string>
+    <string name="settings_theme_dark">Тёмная</string>
+    <string name="settings_theme_light">Светлая</string>
+    <string name="settings_theme_system">Как у системы</string>
+    <string name="settings_theme_site">Как у сайта</string>
 </resources>
