@@ -460,6 +460,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
 
         appBar.menu.add(Menu.NONE, 10, 10, R.string.nav_installed).setOnMenuItemClickListener {
+            //TODO: make this more robust
             updateUI(null)
             (activity as MainActivity).switchToFragment(R.id.navigation_library, true)
             true

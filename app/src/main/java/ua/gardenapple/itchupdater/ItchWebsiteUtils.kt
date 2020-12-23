@@ -24,15 +24,14 @@ class ItchWebsiteUtils {
 
         private val userBgColorPattern = Regex("--itchio_gray_back: (#?\\w+);")
         private val userFgColorPattern = Regex("--itchio_border_radius: ?\\w+;color:(#?\\w+);")
-        //private val userLinkColorPattern = Regex("--itchio_link_color: (#?\\w+);")
 
 
 
         fun isItchWebPage(uri: Uri): Boolean {
-            return uri.host == "itch.io" ||
+            return uri.host != null && (uri.host == "itch.io" ||
                     uri.host!!.endsWith(".itch.io") ||
                     uri.host!!.endsWith(".itch.zone") ||
-                    uri.host!!.endsWith(".hwcdn.net")
+                    uri.host!!.endsWith(".hwcdn.net"))
         }
 
         fun isStorePage(htmlDoc: Document): Boolean {
@@ -175,5 +174,8 @@ class ItchWebsiteUtils {
             return null
         }
 
+        fun isDarkTheme(doc: Document): Boolean {
+            return doc.getElementsByClass("main_layout").first()?.hasClass("dark_theme") ?: false
+        }
     }
 }

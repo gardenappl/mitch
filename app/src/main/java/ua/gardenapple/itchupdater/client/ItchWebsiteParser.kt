@@ -1,6 +1,5 @@
 package ua.gardenapple.itchupdater.client
 
-import android.graphics.Color
 import android.net.Uri
 import android.util.Log
 import android.webkit.CookieManager
@@ -37,8 +36,8 @@ class ItchWebsiteParser {
         const val UNKNOWN_LOCALE = "Unknown"
         const val ENGLISH_LOCALE = "en"
 
-        fun getGameInfo(gamePageDoc: Document, gamePageUrl: String): Game {
-            val thumbnails = gamePageDoc.head().getElementsByAttributeValue("property", "og:image")
+        fun getGameInfoForStorePage(storePageDoc: Document, gamePageUrl: String): Game {
+            val thumbnails = storePageDoc.head().getElementsByAttributeValue("property", "og:image")
             var thumbnailUrl = ""
             if(thumbnails.isNotEmpty()) {
                 thumbnailUrl = thumbnails[0].attr("content")
@@ -47,10 +46,10 @@ class ItchWebsiteParser {
             }
 
 
-            val gameId: Int = ItchWebsiteUtils.getGameId(gamePageDoc)
-            val name: String = getGameName(gamePageDoc)
+            val gameId: Int = ItchWebsiteUtils.getGameId(storePageDoc)
+            val name: String = getGameName(storePageDoc)
 
-            val infoTable = getInfoTable(gamePageDoc)
+            val infoTable = getInfoTable(storePageDoc)
 
             val authorName = getAuthorName(Uri.parse(gamePageUrl), infoTable)
             val lastDownloadTimestamp: String? = getTimestamp(infoTable)
@@ -62,7 +61,7 @@ class ItchWebsiteParser {
                 storeUrl = gamePageUrl,
                 thumbnailUrl = thumbnailUrl,
                 lastUpdatedTimestamp = lastDownloadTimestamp,
-                locale = getLocale(gamePageDoc)
+                locale = getLocale(storePageDoc)
             )
         }
 
@@ -190,7 +189,7 @@ class ItchWebsiteParser {
             val getDownloadPathUri = uriBuilder.build()
 
             val form = FormBody.Builder().run {
-                //TODO: Proper CSRF token support, for paid game update checking
+                //TODO: Proper CSRF token support? For paid game update checking
                 add("csrf_token", CookieManager.getInstance().getCookie(storeUrl))
                 build()
             }

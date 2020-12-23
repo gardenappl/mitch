@@ -137,7 +137,7 @@ class GameDownloader(val context: Context) {
             val storeUrl = ItchWebsiteParser.getStoreUrlFromDownloadPage(Uri.parse(downloadPageUrl))
             Log.d(LOGGING_TAG, "Game is null! Fetching $storeUrl...")
             val storeDoc = ItchWebsiteUtils.fetchAndParseDocument(storeUrl)
-            game = ItchWebsiteParser.getGameInfo(storeDoc, storeUrl)
+            game = ItchWebsiteParser.getGameInfoForStorePage(storeDoc, storeUrl)
             db.gameDao.upsert(game)
         }
 

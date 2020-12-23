@@ -156,9 +156,10 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         bottomNavigationView.itemIconTintList = itemColorStateList
         bottomNavigationView.itemTextColor = itemColorStateList
         mainLayout.setBackgroundColor(backgroundColor)
-        
+
+        //Handle system bar color
         if (activeFragment == browseFragment) {
-            // Browse fragment has special handling for system bar color
+            //BrowseFragment has special handling
             browseFragment.updateUI()
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -276,12 +277,6 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             settingsFragment -> R.id.navigation_settings
             else -> throw IllegalArgumentException()
         }
-    }
-
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        super.onOptionsItemSelected(item)
-        return false
     }
 
 

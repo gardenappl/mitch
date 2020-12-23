@@ -60,11 +60,13 @@ class MitchApp : Application() {
                     registerUpdateCheckTask(requiresUnmetered = prefs.getBoolean(key, false))
                     Log.d(LOGGING_TAG, "Re-registering...")
                 }
-                "preference_theme" -> {
-                    when (prefs.getString(key, "site")) {
-                        "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                        "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                        "system" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                "preference_theme" -> setThemeFromPreferences(prefs)
+                "current_site_theme" -> {
+                    if (prefs.getString("preference_theme", "site") == "site") {
+                        when (prefs.getString(key, "light")) {
+                            "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                            "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                        }
                     }
                 }
             }
@@ -73,6 +75,7 @@ class MitchApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        setThemeFromPreferences(PreferenceManager.getDefaultSharedPreferences(this))
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             var name = getString(R.string.notification_channel_install)
@@ -167,6 +170,18 @@ class MitchApp : Application() {
                     ExistingPeriodicWorkPolicy.REPLACE,
                     gitlabUpdateCheckRequest
                 )
+        }
+    }
+
+    private fun setThemeFromPreferences(prefs: SharedPreferences) {
+        when (prefs.getString("preference_theme", "site")) {
+            "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            "system" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            "site" -> when (prefs.getString("current_site_theme", null)) {
+                "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }
         }
     }
 }

@@ -2,12 +2,13 @@ package ua.gardenapple.itchupdater.client
 
 import android.content.Context
 import android.util.Log
+import androidx.preference.PreferenceManager
 import kotlinx.coroutines.*
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.database.AppDatabase
 
-class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope) {
+class ItchBrowseHandler(private val context: Context, private val coroutineScope: CoroutineScope) {
 
     companion object {
         private const val LOGGING_TAG = "ItchBrowseHandler"
@@ -26,28 +27,28 @@ class ItchBrowseHandler(val context: Context, val coroutineScope: CoroutineScope
         lastDownloadGameId = null
         lastDownloadPageUrl = null
 
-        if(ItchWebsiteUtils.isStorePage(doc)) {
+        if (ItchWebsiteUtils.isStorePage(doc)) {
             val db = AppDatabase.getDatabase(context)
+            val game = ItchWebsiteParser.getGameInfoForStorePage(doc, url)
 
             withContext(Dispatchers.IO) {
-                val job1 = async {
-                    if (ItchWebsiteUtils.isStorePage(doc)) {
-                        val game = ItchWebsiteParser.getGameInfo(doc, url)
-
-                        withContext(Dispatchers.IO) {
-                            Log.d(LOGGING_TAG, "Adding game $game")
-                            db.gameDao.upsert(game)
-                        }
-                    }
-                }
-                job1.await()
+                Log.d(LOGGING_TAG, "Adding game $game")
+                db.gameDao.upsert(game)
             }
         }
-        if(ItchWebsiteUtils.hasGameDownloadLinks(doc)) {
+        if (ItchWebsiteUtils.hasGameDownloadLinks(doc)) {
             lastDownloadDoc = doc
             lastDownloadGameId = ItchWebsiteUtils.getGameId(doc)
             lastDownloadPageUrl = url
             tryUpdateDatabase()
+        }
+        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+        preferences.edit().also {
+            if (ItchWebsiteUtils.isDarkTheme(doc))
+                it.putString("current_site_theme", "dark")
+            else
+                it.putString("current_site_theme", "light")
+            it.apply()
         }
     }
 

@@ -39,7 +39,7 @@ class UpdateChecker(val db: AppDatabase) {
 //        game = updateStoreInfoIfNecessary(game)
 
             val storePageDoc = ItchWebsiteUtils.fetchAndParseDocument(game.storeUrl)
-            game = ItchWebsiteParser.getGameInfo(storePageDoc, game.storeUrl)
+            game = ItchWebsiteParser.getGameInfoForStorePage(storePageDoc, game.storeUrl)
 
             var updateCheckUrl = game.downloadPageUrl
             var downloadPageInfo: ItchWebsiteParser.DownloadUrl? = null
