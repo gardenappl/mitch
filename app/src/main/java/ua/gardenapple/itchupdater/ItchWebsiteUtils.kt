@@ -1,7 +1,9 @@
 package ua.gardenapple.itchupdater
 
+import android.content.Context
 import android.net.Uri
 import android.webkit.CookieManager
+import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Request
@@ -100,10 +102,18 @@ class ItchWebsiteUtils {
 
         /**
          * @return the URL that the user will see by default on the Browse tab.
-         * TODO: add preferences to change this
          */
-        fun getMainBrowsePage(): String {
-            return "https://itch.io/games/platform-android"
+        fun getMainBrowsePage(context: Context): String {
+            val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+            return when (prefs.getString("preference_start_page", "android")) {
+                "android" -> "https://itch.io/games/platform-android"
+                "web" -> "https://itch.io/games/platform-web"
+                "web_touch" -> "https://itch.io/games/input-touchscreen/platform-web"
+                "all_games" -> "https://itch.io/games"
+                "library" -> "https://itch.io/my-collections"
+                "feed" -> "https://itch.io/my-feed"
+                else -> "https://itch.io"
+            }
         }
 
         /**

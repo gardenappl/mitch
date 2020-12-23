@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             val fragmentChanged = setActiveFragment(item.itemId, false)
 
             if (!fragmentChanged && activeFragment == browseFragment)
-                browseFragment.webView.loadUrl(ItchWebsiteUtils.getMainBrowsePage())
+                browseFragment.webView.loadUrl(ItchWebsiteUtils.getMainBrowsePage(this))
 
             return@setOnNavigationItemSelectedListener fragmentChanged
         }

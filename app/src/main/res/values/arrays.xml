@@ -12,4 +12,23 @@
         <item>system</item>
         <item>site</item>
     </string-array>
+
+    <string-array name="pref_start_page_entries">
+        <item>@string/settings_start_page_itch</item>
+        <item>@string/settings_start_page_android</item>
+        <item>@string/settings_start_page_web</item>
+        <item>@string/settings_start_page_web_touch</item>
+        <item>@string/settings_start_page_all_games</item>
+        <item>@string/settings_start_page_library</item>
+        <item>@string/settings_start_page_feed</item>
+    </string-array>
+    <string-array name="pref_start_page_values">
+        <item>main</item>
+        <item>android</item>
+        <item>web</item>
+        <item>web_touch</item>
+        <item>all_games</item>
+        <item>library</item>
+        <item>feed</item>
+    </string-array>
 </resources>

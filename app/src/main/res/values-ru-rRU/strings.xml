@@ -63,4 +63,12 @@
     <string name="settings_theme_light">Светлая</string>
     <string name="settings_theme_system">Как у системы</string>
     <string name="settings_theme_site">Как у сайта</string>
+    <string name="settings_start_page">Стартовая страница</string>
+    <string name="settings_start_page_android">Популярные игры для Android</string>
+    <string name="settings_start_page_library">Моя коллекция игр</string>
+    <string name="settings_start_page_itch">Главная страница itch.io</string>
+    <string name="settings_start_page_all_games">Популярные игры</string>
+    <string name="settings_start_page_web">Популярные игры для веб</string>
+    <string name="settings_start_page_web_touch">Популярные игры для веб (с сенсорным экраном)</string>
+    <string name="settings_start_page_feed">Лента новостей</string>
 </resources>

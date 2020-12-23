@@ -110,17 +110,12 @@ class LibraryFragment : Fragment() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
-//        val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-//        val newNightMode = newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK
-
-//        if (currentNightMode != newNightMode) {
-            //Re-attaching a fragment will redraw its UI
-
-            (activity as MainActivity).supportFragmentManager.beginTransaction().apply {
-                detach(this@LibraryFragment)
-                attach(this@LibraryFragment)
-                commit()
-            }
-//        }
+        //Re-attaching a fragment will redraw its UI
+        //This takes care of changing day/night theme
+        (activity as MainActivity).supportFragmentManager.beginTransaction().apply {
+            detach(this@LibraryFragment)
+            attach(this@LibraryFragment)
+            commit()
+        }
     }
 }

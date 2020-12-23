@@ -199,13 +199,12 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             }
         }
 
-            
-            
-        //Loading a URL should be the last action so that it may call updateUI
+
+        //Load page, this will also update the UI
         if(savedInstanceState?.getBundle(WEB_VIEW_STATE_KEY) != null) {
             webView.restoreState(savedInstanceState.getBundle(WEB_VIEW_STATE_KEY))
         } else {
-            webView.loadUrl(ItchWebsiteUtils.getMainBrowsePage())
+            webView.loadUrl(ItchWebsiteUtils.getMainBrowsePage(requireContext()))
         }
 
         return view
