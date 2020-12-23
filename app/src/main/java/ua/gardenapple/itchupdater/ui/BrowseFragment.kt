@@ -256,7 +256,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     //TODO: hide stuff on scroll?
     /**
-     * Adapts the app's UI to the theme of a web page.
+     * Adapts the app's UI to the theme of a web page. Should only affect the UI while the browse
+     * fragment is selected.
+     * Must run on the UI thread!
      * @param doc the parsed DOM of the page the user is currently on. Null if the UI shouldn't adapt to any web page at all
      */
     private fun updateUI(doc: Document?) {
@@ -265,11 +267,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         val mainActivity = activity as? MainActivity
 
-        if (mainActivity == null || mainActivity.activeFragment != mainActivity.browseFragment)
+        if (mainActivity?.activeFragment !== this)
             return
 
         Log.d(LOGGING_TAG, "Processing UI...")
-
 
         val navBar = mainActivity.bottomNavigationView
         val fab = mainActivity.speedDial
@@ -284,9 +285,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             if (ItchWebsiteUtils.isGamePage(doc)) {
                 //Hide app's navbar after hiding web navbar
                 val navBarHideCallback: (String) -> Unit = {
-                    navBar.post {
+                    if ((activity as? MainActivity)?.activeFragment === this)
                         navBar.visibility = View.GONE
-                    }
                 }
                 if (ItchWebsiteUtils.siteHasNavbar(webView, doc)) {
                     setSiteNavbarVisibility(false, navBarHideCallback)
@@ -294,91 +294,71 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     setSiteNavbarVisibility(true, navBarHideCallback)
                 }
 
-                appBar.post {
-                    val appBarTitle =
-                        "<b>${Html.escapeHtml(ItchWebsiteParser.getGameName(doc))}</b>"
+                val appBarTitle =
+                    "<b>${Html.escapeHtml(ItchWebsiteParser.getGameName(doc))}</b>"
 
-                    @Suppress("DEPRECATION")
-                    if (Build.VERSION.SDK_INT >= 24)
-                        supportAppBar.title = Html.fromHtml(appBarTitle, 0)
-                    else
-                        supportAppBar.title = Html.fromHtml(appBarTitle)
+                @Suppress("DEPRECATION")
+                if (Build.VERSION.SDK_INT >= 24)
+                    supportAppBar.title = Html.fromHtml(appBarTitle, 0)
+                else
+                    supportAppBar.title = Html.fromHtml(appBarTitle)
 
-                    supportAppBar.show()
-                    setupAppBarMenu(doc, appBar)
-                }
+                supportAppBar.show()
+                setupAppBarMenu(doc, appBar)
             } else {
-                appBar.post {
-                    supportAppBar.hide()
-                }
-                navBar.post {
-                    navBar.visibility = View.GONE
-                }
+                supportAppBar.hide()
+                navBar.visibility = View.GONE
             }
         } else {
-            navBar.post {
-                navBar.visibility = View.VISIBLE
-            }
-            appBar.post {
-                supportAppBar.hide()
-            }
+            navBar.visibility = View.VISIBLE
+            supportAppBar.hide()
         }
-
 
         //Colors adapt to game theme
 
         val defaultAccentColor = Utils.getColor(resources, R.color.colorAccent, requireContext().theme)
         val defaultWhiteColor = Utils.getColor(resources, R.color.colorPrimary, requireContext().theme)
         val defaultBlackColor = Utils.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
-        
+
         val defaultBgColor = Utils.getColor(resources, R.color.colorBackground, requireContext().theme)
         val defaultFgColor = Utils.getColor(resources, R.color.colorForeground, requireContext().theme)
 
-        launch(Dispatchers.Default) {
-            val gameThemeBgColor = doc?.run { ItchWebsiteUtils.getBackgroundUIColor(doc) }
-            val gameThemeButtonColor = doc?.run { ItchWebsiteUtils.getAccentUIColor(doc) }
-            val gameThemeButtonFgColor = doc?.run { ItchWebsiteUtils.getAccentFgUIColor(doc) }
+        val gameThemeBgColor = doc?.run { ItchWebsiteUtils.getBackgroundUIColor(doc) }
+        val gameThemeButtonColor = doc?.run { ItchWebsiteUtils.getAccentUIColor(doc) }
+        val gameThemeButtonFgColor = doc?.run { ItchWebsiteUtils.getAccentFgUIColor(doc) }
 
-            val accentColor = gameThemeButtonColor ?: defaultAccentColor
-            val accentFgColor = gameThemeButtonFgColor ?: defaultWhiteColor
+        val accentColor = gameThemeButtonColor ?: defaultAccentColor
+        val accentFgColor = gameThemeButtonFgColor ?: defaultWhiteColor
 
-            val bgColor = gameThemeBgColor ?: defaultBgColor
-            val fgColor = if (gameThemeBgColor == null) defaultFgColor else defaultWhiteColor
+        val bgColor = gameThemeBgColor ?: defaultBgColor
+        val fgColor = if (gameThemeBgColor == null) defaultFgColor else defaultWhiteColor
 
-            fab.post {
-                fab.mainFabClosedBackgroundColor = accentColor
-                fab.mainFabOpenedBackgroundColor = accentColor
-                fab.mainFabClosedIconColor = accentFgColor
-                fab.mainFabOpenedIconColor = accentFgColor
-                for (actionItem in fab.actionItems) {
-                    val newActionItem = SpeedDialActionItem.Builder(actionItem)
-                        .setFabBackgroundColor(bgColor)
-                        .setFabImageTintColor(fgColor)
-                        .setLabelBackgroundColor(bgColor)
-                        .setLabelColor(fgColor)
-                        .create()
-                    fab.replaceActionItem(actionItem, newActionItem)
-                }
-            }
-            progressBar.post {
-                progressBar.progressDrawable.setTint(accentColor)
-            }
-            appBar.post {
-                appBar.setBackgroundColor(bgColor)
-                appBar.setTitleTextColor(fgColor)
-                appBar.overflowIcon?.setTint(fgColor)
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                mainActivity.runOnUiThread {
-                    mainActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-                    mainActivity.window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-                    mainActivity.window.statusBarColor = bgColor
-                    if (fgColor == defaultBlackColor)
-                        mainActivity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                    else
-                        mainActivity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
-                }
-            }
+        fab.mainFabClosedBackgroundColor = accentColor
+        fab.mainFabOpenedBackgroundColor = accentColor
+        fab.mainFabClosedIconColor = accentFgColor
+        fab.mainFabOpenedIconColor = accentFgColor
+        for (actionItem in fab.actionItems) {
+            val newActionItem = SpeedDialActionItem.Builder(actionItem)
+                .setFabBackgroundColor(bgColor)
+                .setFabImageTintColor(fgColor)
+                .setLabelBackgroundColor(bgColor)
+                .setLabelColor(fgColor)
+                .create()
+            fab.replaceActionItem(actionItem, newActionItem)
+        }
+        progressBar.progressDrawable.setTint(accentColor)
+        appBar.setBackgroundColor(bgColor)
+        appBar.setTitleTextColor(fgColor)
+        appBar.overflowIcon?.setTint(fgColor)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mainActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            mainActivity.window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            mainActivity.window.statusBarColor = bgColor
+            if (fgColor == defaultBlackColor)
+                mainActivity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            else
+                mainActivity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
         }
     }
 
@@ -535,13 +515,17 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 val doc = Jsoup.parse(html)
                 fragment.browseHandler?.onPageVisited(doc, url)
                 fragment.currentDoc = doc
-                fragment.updateUI()
+                fragment.activity?.runOnUiThread {
+                    fragment.updateUI()
+                }
             }
         }
 
         @JavascriptInterface
         fun onResize() {
-            fragment.updateUI()
+            fragment.activity?.runOnUiThread {
+                fragment.updateUI()
+            }
         }
     }
 
