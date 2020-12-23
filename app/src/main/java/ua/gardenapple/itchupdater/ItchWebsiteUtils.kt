@@ -1,17 +1,12 @@
 package ua.gardenapple.itchupdater
 
-import android.graphics.Color
 import android.net.Uri
-import android.util.Log
 import android.webkit.CookieManager
-import com.github.ajalt.colormath.ConvertibleColor
-import com.github.ajalt.colormath.fromCss
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Request
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.ui.MitchWebView
 import java.io.IOException
 import java.net.URLEncoder

@@ -11,7 +11,6 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
-import ua.gardenapple.itchupdater.Utils.Companion.hasFlag
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.upload.Upload

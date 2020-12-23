@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import android.webkit.CookieManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
@@ -16,11 +15,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.client.UpdateCheckResult
-import ua.gardenapple.itchupdater.client.UpdateChecker
-import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
-import ua.gardenapple.itchupdater.database.installation.Installation
-import ua.gardenapple.itchupdater.installer.UpdateNotificationBroadcastReceiver
 import ua.gardenapple.itchupdater.ui.MainActivity
 import java.io.IOException
 

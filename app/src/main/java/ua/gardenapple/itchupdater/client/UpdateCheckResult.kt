@@ -1,6 +1,5 @@
 package ua.gardenapple.itchupdater.client
 
-import android.net.Uri
 import org.jsoup.nodes.Document
 
 

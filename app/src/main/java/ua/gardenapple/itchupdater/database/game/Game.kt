@@ -2,7 +2,6 @@ package ua.gardenapple.itchupdater.database.game
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 

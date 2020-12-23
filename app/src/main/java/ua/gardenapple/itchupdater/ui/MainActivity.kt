@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.browse_fragment.*
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.installer.DownloadRequester
+import ua.gardenapple.itchupdater.ItchWebsiteUtils
 
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {

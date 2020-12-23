@@ -2,11 +2,8 @@ package ua.gardenapple.itchupdater.database
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.database.game.Game
-import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.database.upload.Upload
-import java.lang.RuntimeException
 
 
 class Migrations {
