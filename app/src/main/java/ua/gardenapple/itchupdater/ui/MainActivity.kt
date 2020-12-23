@@ -41,8 +41,9 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        //Initially set to SplashScreenTheme during loading, this sets the proper theme
+        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
 
         //Add app bar, hidden by default

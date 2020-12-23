@@ -39,7 +39,6 @@ const val FLAVOR_FDROID = "fdroid"
 const val FLAVOR_ITCHIO = "itchio"
 const val FLAVOR_GITLAB = "gitlab"
 
-//TODO: Splash Screen
 //TODO: Catch exceptions in a nice way
 class MitchApp : Application() {
 
