@@ -11,5 +11,6 @@ keystore.properties
 /.idea/assetWizardSettings.xml
 .DS_Store
 /build
+/build-release
 /captures
 .externalNativeBuild

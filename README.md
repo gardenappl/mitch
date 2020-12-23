@@ -13,10 +13,32 @@
 
 The app is still in development, some features are planned but not yet implemented.
 
-**Planned features:**
+**If you wish to support this app, consider [buying it on itch.io](https://gardenapple.itch.io/mitch)**
 
-  * Dark theme for app (currently there's a white theme, if you set your itch.io account to use the dark theme the app will look odd)
-  * Some extra features for owners of the famous Bundle for Racial Justice and Equality
-  * Improvements to UI and stability
+## Installing
 
-**If you wish to support the app developer, consider [paying for this app on itch.io!](https://gardenapple.itch.io/mitch)**
+There are a few ways to get this app:
+
+* Get the APK from [GitLab releases](https://gitlab.com/gardenappl/mitch/-/releases)
+* Get the APK from [itch.io](https://gardenapple.itch.io/mitch)
+* Compiling from source
+
+## Compiling from source
+
+This is a standard Android Studio project, which relies on Gradle.
+
+**Unix-y systems:**
+
+```
+git clone https://gitlab.com/gardenappl/mitch.git
+cd mitch
+./gradlew build
+```
+
+**Windows:**
+
+```
+git clone https://gitlab.com/gardenappl/mitch.git
+cd mitch
+gradlew.bat build
+```
