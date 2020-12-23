@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.browse_fragment.*
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.installer.DownloadRequester
 
@@ -135,6 +136,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         super.onConfigurationChanged(newConfig)
 
         val backgroundColor = Utils.getColor(resources, R.color.colorBackground, theme)
+        val backgroundMainColor = Utils.getColor(resources, R.color.colorBackgroundMain, theme)
         val foregroundColor = Utils.getColor(resources, R.color.colorForeground, theme)
         val accentColor = Utils.getColor(resources, R.color.colorAccent, theme)
 
@@ -147,7 +149,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         bottomNavigationView.itemBackground = ColorDrawable(backgroundColor)
         bottomNavigationView.itemIconTintList = itemColorStateList
         bottomNavigationView.itemTextColor = itemColorStateList
-        mainLayout.setBackgroundColor(backgroundColor)
+        mainLayout.setBackgroundColor(backgroundMainColor)
 
         //Handle system bar color
         if (activeFragment == browseFragment) {

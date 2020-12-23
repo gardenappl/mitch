@@ -8,12 +8,12 @@
         android:clickable="true"
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground"
-        android:background="@color/colorBackground"
         app:cardElevation="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="?colorPrimary">
 
         <ImageView
                 android:id="@+id/gameThumbnail"
@@ -23,7 +23,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/gameName"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@color/colorBackground" />
+                app:srcCompat="?colorPrimary" />
 
         <TextView
                 android:id="@+id/gameName"
@@ -34,7 +34,7 @@
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:text="Game name, possibly very long"
-                android:textColor="@color/colorForeground"
+                android:textColor="?colorPrimaryDark"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/authorName"
@@ -47,7 +47,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Author"
-                android:textColor="@color/colorForeground"
+                android:textColor="?colorPrimaryDark"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="@+id/gameName"
                 app:layout_constraintStart_toStartOf="@+id/gameName"

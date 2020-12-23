@@ -7,11 +7,15 @@
         <item name="colorPrimaryDark">@color/colorForeground</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:fontFamily">@font/lato</item>
+        
+        <item name="android:windowBackground">@color/colorBackgroundMain</item>
 
         <item name="android:actionBarStyle">@style/AppTheme.ActionBar</item>
         <item name="actionBarStyle">@style/AppTheme.ActionBar</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+
+        <item name="android:statusBarColor">@color/colorBackground</item>
 
         <item name="alertDialogTheme">@style/AlertDialogStyle</item>
     </style>

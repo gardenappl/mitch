@@ -19,7 +19,7 @@
                 android:padding="5dp"
                 android:paddingTop="20dp"
                 android:text="@string/library_category_installed"
-                android:textColor="@color/colorForeground"
+                android:textColor="?colorPrimaryDark"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -36,7 +36,7 @@
                 android:padding="5dp"
                 android:paddingTop="20dp"
                 android:text="@string/library_category_downloads"
-                android:textColor="@color/colorForeground"
+                android:textColor="?colorPrimaryDark"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
