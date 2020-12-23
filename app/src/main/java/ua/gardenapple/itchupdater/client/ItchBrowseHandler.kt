@@ -42,13 +42,15 @@ class ItchBrowseHandler(private val context: Context, private val coroutineScope
             lastDownloadPageUrl = url
             tryUpdateDatabase()
         }
-        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-        preferences.edit().also {
-            if (ItchWebsiteUtils.isDarkTheme(doc))
-                it.putString("current_site_theme", "dark")
-            else
-                it.putString("current_site_theme", "light")
-            it.apply()
+        if (!ItchWebsiteUtils.isStylizedPage(doc)) {
+            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+            preferences.edit().also {
+                if (ItchWebsiteUtils.isDarkTheme(doc))
+                    it.putString("current_site_theme", "dark")
+                else
+                    it.putString("current_site_theme", "light")
+                it.apply()
+            }
         }
     }
 

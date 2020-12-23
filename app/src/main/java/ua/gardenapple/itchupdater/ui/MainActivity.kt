@@ -4,14 +4,10 @@ import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.ColorStateList
 import android.content.res.Configuration
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
@@ -20,10 +16,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.installer.DownloadRequester
 
@@ -96,12 +88,12 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             else
                 activeFragment = browseFragment
 
-            onFragmentSwitch(getItemId(activeFragment), true)
+            onFragmentSet(getItemId(activeFragment), true)
         }
 
         val navView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         navView.setOnNavigationItemSelectedListener { item ->
-            val fragmentChanged = switchToFragment(item.itemId, false)
+            val fragmentChanged = setActiveFragment(item.itemId, false)
 
             if (!fragmentChanged && activeFragment == browseFragment)
                 browseFragment.webView.loadUrl(ItchWebsiteUtils.getMainBrowsePage())
@@ -109,7 +101,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             return@setOnNavigationItemSelectedListener fragmentChanged
         }
 
-        switchToFragment(getItemId(activeFragmentTag), true)
+        setActiveFragment(getItemId(activeFragmentTag), true)
     }
 
     override fun onStart() {
@@ -117,7 +109,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
         if (intent.action == Intent.ACTION_VIEW &&
                 intent.data?.let { ItchWebsiteUtils.isItchWebPage(it) } == true) {
-            switchToFragment(R.id.navigation_website_view)
+            setActiveFragment(R.id.navigation_website_view)
             browseFragment.webView.loadUrl(intent.data!!.toString())
         }
     }
@@ -182,7 +174,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
      * @param resetNavBar forcibly change the highlighted option in the bottom navigation bar
      * @return true if the current fragment has changed
      */
-    fun switchToFragment(itemId: Int, resetNavBar: Boolean = true): Boolean {
+    fun setActiveFragment(itemId: Int, resetNavBar: Boolean = true): Boolean {
         val newFragment = getFragment(itemId)
 
         if (newFragment === activeFragment)
@@ -199,13 +191,16 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             commit()
         }
 
-        onFragmentSwitch(itemId, resetNavBar)
+        onFragmentSet(itemId, resetNavBar)
 
         return true
     }
 
-    private fun onFragmentSwitch(itemId: Int, resetNavBar: Boolean) {
+    private fun onFragmentSet(itemId: Int, resetNavBar: Boolean) {
         val newFragment = getFragment(itemId)
+
+        if (activeFragment == browseFragment && newFragment != browseFragment)
+            browseFragment.restoreDefaultUI()
 
         activeFragment = newFragment
 
@@ -222,13 +217,14 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
     private fun navBarSelectItem(itemId: Int) {
         bottomNavigationView.post {
-            var i = 0
             val menu = bottomNavigationView.menu
-            while (i < menu.size()) {
-                val item = bottomNavigationView.menu.getItem(i)
-                if (item.itemId == itemId)
-                    item.isChecked = true
-                i++
+            
+            for (index in 0 until menu.size()) {
+                val item = bottomNavigationView.menu.getItem(index)
+                if (item.itemId == itemId) {
+                    item.setChecked(true)
+                    break
+                }
             }
         }
     }

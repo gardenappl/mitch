@@ -250,6 +250,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         updateUI(currentDoc)
     }
 
+    fun restoreDefaultUI() {
+        updateUI(null)
+    }
+
     //TODO: hide stuff on scroll?
     /**
      * Adapts the app's UI to the theme of a web page.
@@ -460,14 +464,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
 
         appBar.menu.add(Menu.NONE, 10, 10, R.string.nav_installed).setOnMenuItemClickListener {
-            //TODO: make this more robust
-            updateUI(null)
-            (activity as MainActivity).switchToFragment(R.id.navigation_library, true)
+            (activity as MainActivity).setActiveFragment(R.id.navigation_library, true)
             true
         }
         appBar.menu.add(Menu.NONE, 11, 11, R.string.nav_settings).setOnMenuItemClickListener {
-            updateUI(null)
-            (activity as MainActivity).switchToFragment(R.id.navigation_settings, true)
+            (activity as MainActivity).setActiveFragment(R.id.navigation_settings, true)
             true
         }
     }
