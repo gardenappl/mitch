@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
@@ -67,30 +68,33 @@
                 android:id="@+id/progressBarLayout"
                 android:layout_width="210dp"
                 android:layout_height="167dp"
+                android:alpha="0.8"
+                android:background="?colorPrimary"
+                android:elevation="10dp"
+                android:gravity="center"
                 android:orientation="vertical"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="@+id/gameThumbnail"
                 app:layout_constraintEnd_toEndOf="@+id/gameThumbnail"
                 app:layout_constraintStart_toStartOf="@+id/gameThumbnail"
-                android:gravity="center"
-                android:elevation="10dp"
-                app:layout_constraintTop_toTopOf="parent"
-                android:background="#cfff"
-                android:visibility="gone">
+                app:layout_constraintTop_toTopOf="parent">
 
             <ProgressBar
                     android:id="@+id/progressBar"
                     style="?android:attr/progressBarStyle"
-                    android:gravity="center"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:progressTint="?colorPrimaryDark" />
 
             <TextView
                     android:id="@+id/progressBarLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:textStyle="bold"
-                    android:text="" />
+                    android:text=""
+                    android:textColor="?colorPrimaryDark"
+                    android:textStyle="bold" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

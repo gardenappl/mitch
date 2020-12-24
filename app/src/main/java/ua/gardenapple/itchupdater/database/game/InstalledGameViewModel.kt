@@ -7,7 +7,7 @@ import ua.gardenapple.itchupdater.database.AppDatabase
 
 class InstalledGameViewModel(app: Application) : AndroidViewModel(app) {
     private val repository: GameRepository
-    val installedGames: LiveData<List<GameWithInstallationStatus>>
+    val installedGames: LiveData<List<GameInstallation>>
 
     init {
         val gamesDao = AppDatabase.getDatabase(app).gameDao

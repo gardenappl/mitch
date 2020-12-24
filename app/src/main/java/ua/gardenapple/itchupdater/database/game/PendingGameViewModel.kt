@@ -7,7 +7,7 @@ import ua.gardenapple.itchupdater.database.AppDatabase
 
 class PendingGameViewModel(app: Application) : AndroidViewModel(app) {
     private val repository: GameRepository
-    val pendingGames: LiveData<List<GameWithInstallationStatus>>
+    val pendingGames: LiveData<List<GameInstallation>>
 
     init {
         val gamesDao = AppDatabase.getDatabase(app).gameDao

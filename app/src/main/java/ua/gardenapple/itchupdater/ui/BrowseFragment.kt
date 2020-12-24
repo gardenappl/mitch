@@ -270,7 +270,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         if (mainActivity?.activeFragment !== this)
             return
 
-        Log.d(LOGGING_TAG, "Processing UI...")
+        //Log.d(LOGGING_TAG, "Processing UI...")
 
         val navBar = mainActivity.bottomNavigationView
         val fab = mainActivity.speedDial

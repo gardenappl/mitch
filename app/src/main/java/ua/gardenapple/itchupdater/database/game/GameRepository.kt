@@ -1,6 +1,5 @@
 package ua.gardenapple.itchupdater.database.game
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 
 class GameRepository(private val gameDao: GameDao, val type: Type) {
@@ -10,7 +9,7 @@ class GameRepository(private val gameDao: GameDao, val type: Type) {
         Pending
     }
 
-    val games: LiveData<List<GameWithInstallationStatus>> = when(type) {
+    val games: LiveData<List<GameInstallation>> = when(type) {
         Type.Downloads -> gameDao.getGameDownloads()
         Type.Installed -> gameDao.getInstalledAndroidGames()
         Type.Pending -> gameDao.getPendingGames()

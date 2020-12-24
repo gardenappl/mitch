@@ -11,7 +11,6 @@ import androidx.core.app.NotificationManagerCompat
 import android.util.Log
 import kotlinx.coroutines.*
 import ua.gardenapple.itchupdater.*
-import ua.gardenapple.itchupdater.database.AppDatabase
 
 /**
  * This receiver responds to finished file downloads from DownloadManager.
@@ -56,10 +55,6 @@ class FileDownloadBroadcastReceiver : BroadcastReceiver() {
             val downloadPath = downloadLocalUri.path!!
             Log.d(LOGGING_TAG, downloadPath)
 
-//            val providerUri = FileProvider.getUriForFile(context,
-//                "ua.gardenapple.itchupdater.fileprovider", File(downloadPath))
-//            Log.d(LOGGING_TAG, providerUri.toString())
-
             val intent = Intent(context, InstallNotificationBroadcastReceiver::class.java).apply {
                 data = Uri.parse(downloadPath)
                 putExtra(InstallNotificationBroadcastReceiver.EXTRA_DOWNLOAD_ID, id)
@@ -67,23 +62,9 @@ class FileDownloadBroadcastReceiver : BroadcastReceiver() {
             pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         } else {
-//            var uri = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toURI()
-//            val dirUri = FileProvider.getUriForFile(context, "ua.gardenapple.itchupdater.fileprovider",
-//                    File(uri).resolve("itchAnd"))
-//
-//            Log.d(LOGGING_TAG, dirUri.toString())
-//            intent = Intent(Intent.ACTION_VIEW).apply {
-//                setDataAndType(dirUri, "resource/folder")
-//                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//            }
-//
-//            //if there's no file manager installed
-//            if(intent.resolveActivityInfo(context.packageManager, 0) == null) {
-//                Log.d(LOGGING_TAG, "no file manager?")
             val intent = Intent(DownloadManager.ACTION_VIEW_DOWNLOADS)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
-//            }
         }
 
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALL).apply {
@@ -100,7 +81,7 @@ class FileDownloadBroadcastReceiver : BroadcastReceiver() {
         }
 
         with(NotificationManagerCompat.from(context)) {
-            notify(NOTIFICATION_ID_DOWNLOAD + (id % 100000).toInt(), builder.build())
+            notify(NOTIFICATION_TAG_DOWNLOADED, id.toInt(), builder.build())
         }
     }
 }

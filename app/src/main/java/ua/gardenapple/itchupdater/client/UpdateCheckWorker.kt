@@ -134,7 +134,7 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
 
         with(NotificationManagerCompat.from(context)) {
             //TODO: better system for notification IDs
-            notify(NOTIFICATION_ID_UPDATE_CHECK + game.gameId, builder.build())
+            notify(NOTIFICATION_TAG_UPDATE_CHECK, game.gameId, builder.build())
         }
     }
 }

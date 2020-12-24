@@ -26,16 +26,9 @@ class InstallNotificationBroadcastReceiver : BroadcastReceiver() {
 
         val downloadId = extras.getLong(EXTRA_DOWNLOAD_ID)
 
-        val sessionID = MitchApp.installer.createSession(context)
-        Log.d(LOGGING_TAG, "Created session")
-        runBlocking(Dispatchers.IO) {
-            InstallerEvents.notifyApkInstallStart(downloadId, sessionID)
-        }
-        Log.d(LOGGING_TAG, "Notified")
         runBlocking {
-            MitchApp.installer.install(intent.data!!, sessionID, context)
+            MitchApp.installer.installFromDownloadId(context, downloadId, intent.data!!)
         }
-        Log.d(LOGGING_TAG, "Installed")
     }
 
 }

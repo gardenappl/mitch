@@ -76,4 +76,5 @@
     <string name="library_item_installing">Устанавливается...</string>
     <string name="library_item_ready_to_install">Нажмите, чтобы установить</string>
     <string name="game_cancel_download_or_install">Отменить</string>
+    <string name="toast_download_or_install_cancelled">Отменено</string>
 </resources>
