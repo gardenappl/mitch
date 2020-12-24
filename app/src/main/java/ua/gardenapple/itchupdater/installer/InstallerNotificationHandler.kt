@@ -6,7 +6,7 @@ import android.content.pm.PackageInstaller
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import ua.gardenapple.itchupdater.NOTIFICATION_CHANNEL_ID_INSTALLING
-import ua.gardenapple.itchupdater.NOTIFICATION_ID_INSTALLING
+import ua.gardenapple.itchupdater.NOTIFICATION_TAG_INSTALL_RESULT
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.Utils
 
@@ -54,7 +54,7 @@ class InstallerNotificationHandler(val context: Context) : InstallResultListener
 
         with(NotificationManagerCompat.from(context)) {
             //TODO: better system for notification IDs
-            notify(NOTIFICATION_ID_INSTALLING + installSessionId, builder.build())
+            notify(NOTIFICATION_TAG_INSTALL_RESULT, installSessionId, builder.build())
         }
 
     }

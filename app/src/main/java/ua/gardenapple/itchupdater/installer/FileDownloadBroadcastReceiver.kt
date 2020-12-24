@@ -81,7 +81,7 @@ class FileDownloadBroadcastReceiver : BroadcastReceiver() {
         }
 
         with(NotificationManagerCompat.from(context)) {
-            notify(NOTIFICATION_TAG_DOWNLOADED, id.toInt(), builder.build())
+            notify(NOTIFICATION_TAG_DOWNLOAD_RESULT, id.toInt(), builder.build())
         }
     }
 }

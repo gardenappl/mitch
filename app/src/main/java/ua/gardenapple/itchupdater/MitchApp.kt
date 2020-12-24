@@ -29,8 +29,8 @@ const val NOTIFICATION_CHANNEL_ID_INSTALLING = "installing"
 
 const val NOTIFICATION_ID_SELF_UPDATE_CHECK = 999_999_999
 const val NOTIFICATION_TAG_UPDATE_CHECK = "UpdateCheck"
-const val NOTIFICATION_TAG_DOWNLOADED = "Downloaded"
-const val NOTIFICATION_ID_INSTALLING = 1000000
+const val NOTIFICATION_TAG_DOWNLOAD_RESULT = "DownloadResult"
+const val NOTIFICATION_TAG_INSTALL_RESULT = "InstallResult"
 
 const val UPDATE_CHECK_TASK_TAG = "update_check"
 const val GITLAB_UPDATE_CHECK_TASK_TAG = "gitlab_check"

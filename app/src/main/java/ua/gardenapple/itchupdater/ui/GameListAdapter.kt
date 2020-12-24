@@ -23,7 +23,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.MitchApp
-import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOADED
+import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD_RESULT
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.GameRepository
@@ -94,7 +94,7 @@ class GameListAdapter internal constructor(
 
         if (gameInstall.status == Installation.STATUS_READY_TO_INSTALL) {
             val notificationService = context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-            notificationService.cancel(NOTIFICATION_TAG_DOWNLOADED, gameInstall.downloadOrInstallId.toInt())
+            notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD_RESULT, gameInstall.downloadOrInstallId.toInt())
 
             GlobalScope.launch {
                 MitchApp.installer.installFromDownloadId(context, gameInstall.downloadOrInstallId)
