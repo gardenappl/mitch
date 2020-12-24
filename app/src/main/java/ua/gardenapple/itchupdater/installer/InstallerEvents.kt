@@ -1,47 +1,80 @@
 package ua.gardenapple.itchupdater.installer
 
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import ua.gardenapple.itchupdater.database.game.Game
 
 interface DownloadCompleteListener {
-    suspend fun onDownloadComplete(downloadId: Long, packageInstallerId: Int?)
+    suspend fun onDownloadComplete(downloadId: Long, isInstallable: Boolean)
 }
 
-interface InstallCompleteListener {
-    suspend fun onInstallComplete(installSessionId: Int, packageName: String, apkName: String?, status: Int)
+interface DownloadFailListener {
+    suspend fun onDownloadFailed(downloadId: Long)
+}
+
+interface InstallResultListener {
+    suspend fun onInstallResult(installSessionId: Int, packageName: String, apkName: String?, status: Int)
+}
+
+interface InstallStartListener {
+    suspend fun onInstallStart(downloadId: Long, pendingInstallSessionId: Int)
 }
 
 class InstallerEvents {
     companion object {
-        private val installCompleteListeners = ArrayList<InstallCompleteListener>()
         private val downloadCompleteListeners = ArrayList<DownloadCompleteListener>()
+        private val downloadFailListeners = ArrayList<DownloadFailListener>()
+        private val installResultListeners = ArrayList<InstallResultListener>()
+        private val installStartListeners = ArrayList<InstallStartListener>()
 
-        suspend fun notifyApkInstallComplete(installSessionId: Int, packageName: String, apkName: String?, status: Int) {
+        suspend fun notifyApkInstallResult(installSessionId: Int, packageName: String, apkName: String?, status: Int) {
             coroutineScope {
-                for (listener in installCompleteListeners) {
+                for (listener in installResultListeners) {
                     launch {
-                        listener.onInstallComplete(installSessionId, packageName, apkName, status)
+                        listener.onInstallResult(installSessionId, packageName, apkName, status)
                     }
                 }
             }
         }
 
-        fun notifyDownloadComplete(downloadId: Long, pendingInstallSessionId: Int?) {
-            for(listener in downloadCompleteListeners) {
-                GlobalScope.launch {
-                    listener.onDownloadComplete(downloadId, pendingInstallSessionId)
+        suspend fun notifyApkInstallStart(downloadId: Long, pendingInstallSessionId: Int) {
+            coroutineScope {
+                for (listener in installStartListeners) {
+                    launch {
+                        listener.onInstallStart(downloadId, pendingInstallSessionId)
+                    }
                 }
             }
         }
 
-        fun addListener(listener: InstallCompleteListener) = installCompleteListeners.add(listener)
+        suspend fun notifyDownloadComplete(downloadId: Long, isInstallable: Boolean) {
+            coroutineScope {
+                for (listener in downloadCompleteListeners) {
+                    launch {
+                        listener.onDownloadComplete(downloadId, isInstallable)
+                    }
+                }
+            }
+        }
+
+        suspend fun notifyDownloadFailed(downloadId: Long) {
+            coroutineScope {
+                for (listener in downloadFailListeners) {
+                    launch {
+                        listener.onDownloadFailed(downloadId)
+                    }
+                }
+            }
+        }
+
+        fun addListener(listener: InstallStartListener) = installStartListeners.add(listener)
+        fun addListener(listener: InstallResultListener) = installResultListeners.add(listener)
+        fun addListener(listener: DownloadFailListener) = downloadFailListeners.add(listener)
         fun addListener(listener: DownloadCompleteListener) = downloadCompleteListeners.add(listener)
 
         fun setup() {
-            installCompleteListeners.clear()
+            installStartListeners.clear()
+            installResultListeners.clear()
+            downloadFailListeners.clear()
             downloadCompleteListeners.clear()
         }
     }

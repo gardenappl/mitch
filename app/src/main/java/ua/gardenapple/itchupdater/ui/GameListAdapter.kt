@@ -4,6 +4,9 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.net.Uri
 import android.provider.Settings
 import android.util.Log
@@ -16,14 +19,20 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.library_item.view.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.game.GameRepository
+import ua.gardenapple.itchupdater.database.game.GameWithInstallationStatus
+import ua.gardenapple.itchupdater.database.installation.Installation
 
 class GameListAdapter internal constructor(
     val context: Context,
@@ -31,17 +40,23 @@ class GameListAdapter internal constructor(
     val type: GameRepository.Type
 ) : RecyclerView.Adapter<GameListAdapter.GameViewHolder>() {
 
+    companion object {
+        private const val LOGGING_TAG = "GameListAdapter"
+    }
+
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    var games = emptyList<Game>() // Cached copy of games
+    var games = emptyList<GameWithInstallationStatus>() // Cached copy of games
         internal set(value) {
             field = value
             notifyDataSetChanged()
         }
 
     inner class GameViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val thumbnailView = itemView.findViewById<ImageView>(R.id.gameThumbnail)
-        val gameName = itemView.findViewById<TextView>(R.id.gameName)
-        val authorName = itemView.findViewById<TextView>(R.id.authorName)
+        val thumbnailView = itemView.gameThumbnail
+        val gameName = itemView.gameName
+        val authorName = itemView.authorName
+        val progressBarLayout = itemView.progressBarLayout
+        val progressBarLabel = itemView.progressBarLabel
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameViewHolder {
@@ -51,11 +66,26 @@ class GameListAdapter internal constructor(
     }
 
     override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
-        val currentGame = games[position]
+        val currentGame = games[position].game
         holder.gameName.text = currentGame.name
         holder.authorName.text = currentGame.author
+
+        if (type == GameRepository.Type.Pending) {
+            holder.progressBarLayout.visibility = View.VISIBLE
+
+            holder.progressBarLabel.text = when (games[position].status) {
+                Installation.STATUS_READY_TO_INSTALL ->
+                    context.resources.getString(R.string.library_item_ready_to_install)
+                Installation.STATUS_DOWNLOADING ->
+                    context.resources.getString(R.string.library_item_downloading)
+                Installation.STATUS_INSTALLING ->
+                    context.resources.getString(R.string.library_item_installing)
+                else -> ""
+            }
+        }
+
         Glide.with(context)
-            .load(games[position].thumbnailUrl)
+            .load(currentGame.thumbnailUrl)
             .override(LibraryFragment.THUMBNAIL_WIDTH, LibraryFragment.THUMBNAIL_HEIGHT)
             .into(holder.thumbnailView)
     }
@@ -68,7 +98,7 @@ class GameListAdapter internal constructor(
         PopupMenu(context, view).apply {
             setOnMenuItemClickListener{ menuItem -> onMenuItemClick(menuItem, game) }
             inflate(R.menu.game_actions)
-            when(type) {
+            when (type) {
                 GameRepository.Type.Installed -> {
                     menu.removeItem(R.id.remove_from_app)
                 }
@@ -80,7 +110,9 @@ class GameListAdapter internal constructor(
         }
     }
 
-    private fun onMenuItemClick(item: MenuItem?, game: Game): Boolean {
+    private fun onMenuItemClick(item: MenuItem?,
+                                gameWithStatus: GameWithInstallationStatus): Boolean {
+        val game = gameWithStatus.game
         when (item?.itemId) {
             R.id.go_to_store -> {
                 val intent = Intent(

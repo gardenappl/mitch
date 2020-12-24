@@ -35,8 +35,8 @@ data class Installation(
     val gameId: Int,
 
     /**
-     * Corresponds to an Upload's uploadId (which should always non-null for files which have actually been downloaded).
-     * Mitch has a hardcoded upload ID. (see [MITCH_UPLOAD_ID])
+     * Corresponds to an Upload's uploadId (which should always be non-null for files which have actually been downloaded).
+     * Mitch has a hardcoded upload ID. (see [Upload.MITCH_UPLOAD_ID])
      */
     @ColumnInfo(name = UPLOAD_ID)
     val uploadId: Int,
@@ -52,7 +52,7 @@ data class Installation(
 
     /**
      * null if [STATUS_INSTALLED]
-     * downloadId if [STATUS_DOWNLOADING]
+     * downloadId if [STATUS_DOWNLOADING] or [STATUS_READY_TO_INSTALL]
      * installId if [STATUS_INSTALLING]
      */
     @ColumnInfo(name = DOWNLOAD_OR_INSTALL_ID)
@@ -71,5 +71,6 @@ data class Installation(
         const val STATUS_INSTALLED = 0
         const val STATUS_DOWNLOADING = 1
         const val STATUS_INSTALLING = 2
+        const val STATUS_READY_TO_INSTALL = 3
     }
 }

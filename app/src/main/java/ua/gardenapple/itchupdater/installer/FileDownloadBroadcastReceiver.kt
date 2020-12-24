@@ -9,8 +9,7 @@ import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
 
@@ -37,8 +36,13 @@ class FileDownloadBroadcastReceiver : BroadcastReceiver() {
                         downloadLocalUri!!.path!!.endsWith(".apk")
                 createNotification(context, downloadLocalUri, downloadID, isApk)
 
-                if(!isApk)
-                    InstallerEvents.notifyDownloadComplete(downloadID, null)
+                GlobalScope.launch {
+                    InstallerEvents.notifyDownloadComplete(downloadID, isApk)
+                }
+            } else if (downloadStatus == DownloadManager.STATUS_FAILED) {
+                GlobalScope.launch {
+                    InstallerEvents.notifyDownloadFailed(downloadID)
+                }
             }
             Log.d(LOGGING_TAG, downloadMimeType)
         }

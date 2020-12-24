@@ -42,7 +42,7 @@ class InstallerService : Service() {
             }
             else -> {
                 runBlocking(Dispatchers.IO) {
-                    InstallerEvents.notifyApkInstallComplete(sessionId, packageName!!, apkName, status)
+                    InstallerEvents.notifyApkInstallResult(sessionId, packageName!!, apkName, status)
                 }
                 stopSelf()
             }

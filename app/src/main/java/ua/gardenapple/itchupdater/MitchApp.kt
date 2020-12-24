@@ -118,7 +118,9 @@ class MitchApp : Application() {
         InstallerEvents.setup()
         val installerDatabaseHandler = InstallerDatabaseHandler(applicationContext)
         InstallerEvents.addListener(installerDatabaseHandler as DownloadCompleteListener)
-        InstallerEvents.addListener(installerDatabaseHandler as InstallCompleteListener)
+        InstallerEvents.addListener(installerDatabaseHandler as DownloadFailListener)
+        InstallerEvents.addListener(installerDatabaseHandler as InstallStartListener)
+        InstallerEvents.addListener(installerDatabaseHandler as InstallResultListener)
         val notificationHandler = InstallerNotificationHandler(applicationContext)
         InstallerEvents.addListener(notificationHandler)
 

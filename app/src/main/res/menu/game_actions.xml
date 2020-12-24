@@ -9,4 +9,7 @@
     <item
             android:id="@+id/remove_from_app"
             android:title="@string/game_download_remove" />
+    <item
+            android:id="@+id/cancel"
+            android:title="@string/game_cancel_download_or_install" />
 </menu>

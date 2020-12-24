@@ -6,11 +6,13 @@ import androidx.lifecycle.LiveData
 class GameRepository(private val gameDao: GameDao, val type: Type) {
     enum class Type {
         Installed,
-        Downloads
+        Downloads,
+        Pending
     }
 
-    val games: LiveData<List<Game>> = when(type) {
+    val games: LiveData<List<GameWithInstallationStatus>> = when(type) {
         Type.Downloads -> gameDao.getGameDownloads()
-        else -> gameDao.getInstalledAndroidGames()
+        Type.Installed -> gameDao.getInstalledAndroidGames()
+        Type.Pending -> gameDao.getPendingGames()
     }
 }

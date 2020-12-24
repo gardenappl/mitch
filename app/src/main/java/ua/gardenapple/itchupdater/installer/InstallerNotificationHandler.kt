@@ -3,23 +3,20 @@ package ua.gardenapple.itchupdater.installer
 import android.app.PendingIntent
 import android.content.Context
 import android.content.pm.PackageInstaller
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import ua.gardenapple.itchupdater.NOTIFICATION_CHANNEL_ID_INSTALLING
 import ua.gardenapple.itchupdater.NOTIFICATION_ID_INSTALLING
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.Utils
-import ua.gardenapple.itchupdater.database.game.Game
 
 /**
  * This handler is invoked when an .apk installation is complete, providing a notification.
  * This should *NOT* depend on the AppDatabase as this could be used for the GitLab build update
  * check or other things
  */
-class InstallerNotificationHandler(val context: Context) : InstallCompleteListener {
-    override suspend fun onInstallComplete(installSessionId: Int, packageName: String, apkName: String?, status: Int) {
+class InstallerNotificationHandler(val context: Context) : InstallResultListener {
+    override suspend fun onInstallResult(installSessionId: Int, packageName: String, apkName: String?, status: Int) {
         val message = when (status) {
             PackageInstaller.STATUS_FAILURE_ABORTED -> context.resources.getString(R.string.notification_install_cancelled_title)
             PackageInstaller.STATUS_FAILURE_BLOCKED -> context.resources.getString(R.string.notification_install_blocked_title)

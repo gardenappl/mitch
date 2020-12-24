@@ -4,6 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.MitchApp
 
@@ -25,7 +28,9 @@ class InstallNotificationBroadcastReceiver : BroadcastReceiver() {
 
         val sessionID = MitchApp.installer.createSession(context)
         Log.d(LOGGING_TAG, "Created session")
-        InstallerEvents.notifyDownloadComplete(downloadId, sessionID)
+        runBlocking(Dispatchers.IO) {
+            InstallerEvents.notifyApkInstallStart(downloadId, sessionID)
+        }
         Log.d(LOGGING_TAG, "Notified")
         runBlocking {
             MitchApp.installer.install(intent.data!!, sessionID, context)

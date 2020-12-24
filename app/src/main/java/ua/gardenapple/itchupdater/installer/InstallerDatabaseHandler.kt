@@ -4,17 +4,18 @@ import android.content.Context
 import android.content.pm.PackageInstaller
 import android.util.Log
 import ua.gardenapple.itchupdater.database.AppDatabase
-import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 
 
-class InstallerDatabaseHandler(val context: Context) : InstallCompleteListener, DownloadCompleteListener {
+class InstallerDatabaseHandler(val context: Context) :
+    InstallResultListener, DownloadCompleteListener, InstallStartListener, DownloadFailListener {
     companion object {
         private const val LOGGING_TAG = "InstallDatabaseHandler"
     }
 
-    override suspend fun onInstallComplete(installSessionId: Int, packageName: String, apkName: String?, status: Int) {
+    override suspend fun onInstallResult(installSessionId: Int, packageName: String, apkName: String?, status: Int) {
         val db = AppDatabase.getDatabase(context)
+        Log.d(LOGGING_TAG, "onInstallComplete")
 
         val install = db.installDao.findPendingInstallationBySessionId(installSessionId) ?: return
 
@@ -48,15 +49,20 @@ class InstallerDatabaseHandler(val context: Context) : InstallCompleteListener, 
         }
     }
 
-    override suspend fun onDownloadComplete(downloadId: Long, packageInstallerId: Int?) {
+    override suspend fun onDownloadComplete(downloadId: Long, isInstallable: Boolean) {
         val db = AppDatabase.getDatabase(context)
         Log.d(LOGGING_TAG, "onDownloadComplete")
 
         val pendingInstall = db.installDao.findPendingInstallationByDownloadId(downloadId) ?: return
+        if (pendingInstall.status != Installation.STATUS_DOWNLOADING)
+            return
 
-        if (packageInstallerId == null) {
+        if (isInstallable) {
+            pendingInstall.status = Installation.STATUS_READY_TO_INSTALL
+            db.installDao.update(pendingInstall)
+        } else {
             val pendingUploads = db.uploadDao.getPendingUploadsForGame(pendingInstall.gameId)
-            for(upload in pendingUploads) {
+            for (upload in pendingUploads) {
                 upload.isPending = false
             }
             db.uploadDao.resetAllUploadsForGame(pendingInstall.gameId, pendingUploads)
@@ -64,12 +70,25 @@ class InstallerDatabaseHandler(val context: Context) : InstallCompleteListener, 
             pendingInstall.downloadOrInstallId = null
             pendingInstall.status = Installation.STATUS_INSTALLED
             db.installDao.resetAllInstallationsForGame(pendingInstall.gameId, pendingInstall)
-
-        } else {
-            Log.d(LOGGING_TAG, "Yet to install")
-            pendingInstall.status = Installation.STATUS_INSTALLING
-            pendingInstall.downloadOrInstallId = packageInstallerId.toLong()
-            db.installDao.update(pendingInstall)
         }
+    }
+
+    override suspend fun onDownloadFailed(downloadId: Long) {
+        val db = AppDatabase.getDatabase(context)
+        Log.d(LOGGING_TAG, "onDownloadFailed")
+
+        val pendingInstall = db.installDao.findPendingInstallationByDownloadId(downloadId) ?: return
+        db.installDao.delete(pendingInstall)
+    }
+
+    override suspend fun onInstallStart(downloadId: Long, pendingInstallSessionId: Int) {
+        val db = AppDatabase.getDatabase(context)
+        Log.d(LOGGING_TAG, "onInstallStart")
+
+        val pendingInstall = db.installDao.findPendingInstallationByDownloadId(downloadId) ?: return
+
+        pendingInstall.status = Installation.STATUS_INSTALLING
+        pendingInstall.downloadOrInstallId = pendingInstallSessionId.toLong()
+        db.installDao.update(pendingInstall)
     }
 }

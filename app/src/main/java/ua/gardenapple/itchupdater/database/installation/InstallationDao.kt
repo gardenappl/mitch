@@ -60,7 +60,7 @@ abstract class InstallationDao {
     @Query("DELETE FROM $TABLE_NAME WHERE $GAME_ID = :gameId")
     abstract fun clearAllInstallationsForGame(gameId: Int)
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :downloadId AND $STATUS = $STATUS_DOWNLOADING LIMIT 1")
+    @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :downloadId AND $STATUS != $STATUS_INSTALLING LIMIT 1")
     abstract fun findPendingInstallationByDownloadId(downloadId: Long): Installation?
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :installSessionId AND $STATUS = $STATUS_INSTALLING LIMIT 1")
