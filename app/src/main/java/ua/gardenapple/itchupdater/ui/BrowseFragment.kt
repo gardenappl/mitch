@@ -28,6 +28,7 @@ import kotlinx.android.synthetic.main.dialog_search.view.*
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.Utils
@@ -302,10 +303,24 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 else
                     supportAppBar.title = Html.fromHtml(appBarTitle)
 
+                appBar.menu.clear()
+                addAppBarActions(appBar, doc)
+                addDefaultAppBarActions(appBar)
                 supportAppBar.show()
-                setupAppBarMenu(doc, appBar)
-            } else {
-                supportAppBar.hide()
+            } else if (ItchWebsiteUtils.isUserPage(doc)) {
+                val appBarTitle =
+                    "<b>${Html.escapeHtml(ItchWebsiteParser.getUserName(doc))}</b>"
+
+                @Suppress("DEPRECATION")
+                if (Build.VERSION.SDK_INT >= 24)
+                    supportAppBar.title = Html.fromHtml(appBarTitle, 0)
+                else
+                    supportAppBar.title = Html.fromHtml(appBarTitle)
+
+                appBar.menu.clear()
+                addDefaultAppBarActions(appBar)
+                supportAppBar.show()
+
                 navBar.visibility = View.GONE
             }
         } else {
@@ -362,15 +377,15 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     }
 
     /**
-     * Set up app bar actions. These actions come from the website's default navbar, which it shows
-     * on game store pages and devlog pages.
+     * Add app bar actions from itch.io toolbar, which appears on game pages and devlog pages.
+     * Does not clear the current list.
      *
      * Should run on the UI thread!
      *
      * @param doc the parsed HTML document of a game store page or devlog page
      * @param appBar the app UI's top Toolbar
      */
-    private fun setupAppBarMenu(doc: Document, appBar: Toolbar) {
+    private fun addAppBarActions(appBar: Toolbar, doc: Document) {
         appBar.menu.clear()
 
         val navbarItems = doc.getElementById("user_tools").children()
@@ -441,7 +456,15 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
             navbarItems.removeAt(navbarItems.size - 1)
         }
+    }
 
+    /**
+     * Adds basic app bar actions for navigating between fragments.
+     * Should run on UI thread.
+     *
+     * @param appBar the application's top toolbar
+     */
+    private fun addDefaultAppBarActions(appBar: Toolbar) {
         appBar.menu.add(Menu.NONE, 10, 10, R.string.nav_installed).setOnMenuItemClickListener {
             (activity as MainActivity).setActiveFragment(R.id.navigation_library, true)
             true

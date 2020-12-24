@@ -42,6 +42,10 @@ class ItchWebsiteUtils {
         fun isPurchasePage(htmlDoc: Document): Boolean {
             return htmlDoc.body().attr("data-page_name") == "game_purchase"
         }
+        
+        fun isUserPage(htmlDoc: Document): Boolean {
+            return htmlDoc.body().attr("data-page_name") == "user"
+        }
 
         fun isDevlogPage(htmlDoc: Document): Boolean {
             return when(htmlDoc.body().attr("data-page_name")) {

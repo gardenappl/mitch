@@ -259,6 +259,7 @@ class ItchWebsiteParser {
         private fun getInfoTable(doc: Document): Element {
             return doc.body().getElementsByClass("game_info_panel_widget")[0].child(0).child(0)
         }
+
         fun getGameName(doc: Document): String {
             if (ItchWebsiteUtils.isPurchasePage(doc)) {
                 return doc.getElementsByTag("h1")[0].child(0).text()
@@ -281,6 +282,14 @@ class ItchWebsiteParser {
             }
 
             throw IllegalArgumentException("Document is not related to game")
+        }
+
+        fun getUserName(doc: Document): String {
+            if (ItchWebsiteUtils.isUserPage(doc)) {
+                return doc.getElementById("profile_header").getElementsByTag("h1")[0].text()
+            }
+
+            throw IllegalArgumentException("Document is not a user page")
         }
     }
 }
