@@ -23,22 +23,15 @@ import ua.gardenapple.itchupdater.ItchWebsiteUtils
 
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
-    var browseFragment: BrowseFragment = BrowseFragment()
-        private set
-    var libraryFragment: LibraryFragment = LibraryFragment()
-        private set
-    var settingsFragment: SettingsFragment = SettingsFragment()
-        private set
-
-    var activeFragment: Fragment = browseFragment
-        private set
+    private lateinit var browseFragment: BrowseFragment
+    private lateinit var currentFragmentTag: String
 
     companion object {
-        private const val SELECTED_FRAGMENT_KEY: String = "fragment"
+        private const val ACTIVE_FRAGMENT_KEY: String = "fragment"
 
-        private const val BROWSE_FRAGMENT_TAG: String = "browse"
-        private const val LIBRARY_FRAGMENT_TAG: String = "library"
-        private const val SETTINGS_FRAGMENT_TAG: String = "settings"
+        const val BROWSE_FRAGMENT_TAG: String = "browse"
+        const val LIBRARY_FRAGMENT_TAG: String = "library"
+        const val SETTINGS_FRAGMENT_TAG: String = "settings"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,59 +45,62 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         supportActionBar!!.hide()
 
 
-        val activeFragmentTag = savedInstanceState?.getString(SELECTED_FRAGMENT_KEY) ?: BROWSE_FRAGMENT_TAG
+        currentFragmentTag = savedInstanceState?.getString(ACTIVE_FRAGMENT_KEY) ?: BROWSE_FRAGMENT_TAG
 
         //Fragments aren't destroyed on configuration changes
+        
         val tryBrowseFragment = supportFragmentManager.findFragmentByTag(BROWSE_FRAGMENT_TAG)
-
         if (tryBrowseFragment != null) {
             browseFragment = tryBrowseFragment as BrowseFragment
-            libraryFragment = supportFragmentManager.findFragmentByTag(LIBRARY_FRAGMENT_TAG) as LibraryFragment
-            settingsFragment = supportFragmentManager.findFragmentByTag(SETTINGS_FRAGMENT_TAG) as SettingsFragment
-
         } else {
+            browseFragment = BrowseFragment()
             supportFragmentManager.beginTransaction().apply {
                 add(R.id.fragmentContainer, browseFragment, BROWSE_FRAGMENT_TAG)
-                if(activeFragmentTag != BROWSE_FRAGMENT_TAG)
+                if (currentFragmentTag != BROWSE_FRAGMENT_TAG)
                     hide(browseFragment)
                 commit()
             }
+        }
+
+        if (currentFragmentTag == LIBRARY_FRAGMENT_TAG &&
+                supportFragmentManager.findFragmentByTag(LIBRARY_FRAGMENT_TAG) == null) {
             supportFragmentManager.beginTransaction().apply {
-                add(R.id.fragmentContainer, libraryFragment, LIBRARY_FRAGMENT_TAG)
-                if(activeFragmentTag != LIBRARY_FRAGMENT_TAG)
-                    hide(libraryFragment)
+                add(R.id.fragmentContainer, LibraryFragment(), LIBRARY_FRAGMENT_TAG)
                 commit()
             }
+        }
+
+        if (currentFragmentTag == SETTINGS_FRAGMENT_TAG &&
+                supportFragmentManager.findFragmentByTag(SETTINGS_FRAGMENT_TAG) == null) {
             supportFragmentManager.beginTransaction().apply {
-                add(R.id.fragmentContainer, settingsFragment, SETTINGS_FRAGMENT_TAG)
-                if(activeFragmentTag != SETTINGS_FRAGMENT_TAG)
-                    hide(settingsFragment)
+                add(R.id.fragmentContainer, SettingsFragment(), SETTINGS_FRAGMENT_TAG)
                 commit()
             }
         }
 
         supportFragmentManager.addOnBackStackChangedListener {
-            if (!settingsFragment.isHidden)
-                activeFragment = settingsFragment
-            else if (!libraryFragment.isHidden)
-                activeFragment = libraryFragment
+            val newFragmentTag = if (browseFragment.isVisible)
+                BROWSE_FRAGMENT_TAG
+            else if (supportFragmentManager.findFragmentByTag(LIBRARY_FRAGMENT_TAG)?.isVisible == true)
+                LIBRARY_FRAGMENT_TAG
+            else if (supportFragmentManager.findFragmentByTag(SETTINGS_FRAGMENT_TAG)?.isVisible == true)
+                SETTINGS_FRAGMENT_TAG
             else
-                activeFragment = browseFragment
-
-            onFragmentSet(getItemId(activeFragment), true)
+                throw IllegalStateException("No active fragments?")
+            onFragmentSet(newFragmentTag, true)
         }
 
         val navView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         navView.setOnNavigationItemSelectedListener { item ->
-            val fragmentChanged = setActiveFragment(item.itemId, false)
+            val fragmentChanged = setActiveFragment(getFragmentTag(item.itemId), false)
 
-            if (!fragmentChanged && activeFragment == browseFragment)
+            if (!fragmentChanged && currentFragmentTag == BROWSE_FRAGMENT_TAG)
                 browseFragment.webView.loadUrl(ItchWebsiteUtils.getMainBrowsePage(this))
 
             return@setOnNavigationItemSelectedListener fragmentChanged
         }
 
-        setActiveFragment(getItemId(activeFragmentTag), true)
+        setActiveFragment(currentFragmentTag, true)
     }
 
     override fun onStart() {
@@ -112,13 +108,13 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
         if (intent.action == Intent.ACTION_VIEW &&
                 intent.data?.let { ItchWebsiteUtils.isItchWebPage(it) } == true) {
-            setActiveFragment(R.id.navigation_website_view)
+            setActiveFragment(BROWSE_FRAGMENT_TAG)
             browseFragment.webView.loadUrl(intent.data!!.toString())
         }
     }
 
     override fun onBackPressed() {
-        if (activeFragment === browseFragment) {
+        if (browseFragment.isVisible) {
             val cantGoBack = browseFragment.onBackPressed()
             if (cantGoBack)
                 finish()
@@ -130,7 +126,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(SELECTED_FRAGMENT_KEY, getFragmentTag(activeFragment))
+        outState.putString(ACTIVE_FRAGMENT_KEY, currentFragmentTag)
     }
 
     // Handle light/dark theme changes
@@ -154,7 +150,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         mainLayout.setBackgroundColor(backgroundMainColor)
 
         //Handle system bar color
-        if (activeFragment == browseFragment) {
+        if (browseFragment.isVisible) {
             //BrowseFragment has special handling
             browseFragment.updateUI()
         } else {
@@ -178,40 +174,44 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
      * @param resetNavBar forcibly change the highlighted option in the bottom navigation bar
      * @return true if the current fragment has changed
      */
-    fun setActiveFragment(itemId: Int, resetNavBar: Boolean = true): Boolean {
-        val newFragment = getFragment(itemId)
-
-        if (newFragment === activeFragment)
-            return false
-
+    fun setActiveFragment(newFragmentTag: String, resetNavBar: Boolean = true): Boolean {
         supportFragmentManager.beginTransaction().apply {
+            if (newFragmentTag == currentFragmentTag)
+                return false
+
             setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-            hide(activeFragment)
+            if (currentFragmentTag == BROWSE_FRAGMENT_TAG)
+                hide(browseFragment)
+            else
+                remove(supportFragmentManager.findFragmentByTag(currentFragmentTag)!!)
+
             setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-            show(newFragment)
+            if (newFragmentTag == BROWSE_FRAGMENT_TAG)
+                show(browseFragment)
+            else
+                add(R.id.fragmentContainer, getFragmentClass(newFragmentTag), Bundle.EMPTY, newFragmentTag)
 
             addToBackStack(null)
 
             commit()
         }
 
-        onFragmentSet(itemId, resetNavBar)
+        onFragmentSet(newFragmentTag, resetNavBar)
 
         return true
     }
 
-    private fun onFragmentSet(itemId: Int, resetNavBar: Boolean) {
-        val newFragment = getFragment(itemId)
+    private fun onFragmentSet(newFragmentTag: String, resetNavBar: Boolean) {
+        if (resetNavBar)
+            navBarSelectItem(getItemId(newFragmentTag))
 
-        if (activeFragment == browseFragment && newFragment != browseFragment)
+
+        if (currentFragmentTag == BROWSE_FRAGMENT_TAG && newFragmentTag != BROWSE_FRAGMENT_TAG)
             browseFragment.restoreDefaultUI()
 
-        activeFragment = newFragment
+        currentFragmentTag = newFragmentTag
 
-        if (resetNavBar)
-            navBarSelectItem(itemId)
-
-        if (newFragment == browseFragment) {
+        if (newFragmentTag == BROWSE_FRAGMENT_TAG) {
             browseFragment.updateUI()
             speedDial.show()
         } else {
@@ -233,48 +233,29 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         }
     }
 
-
-    private fun getFragmentTag(fragment: Fragment): String {
-        return when (fragment) {
-            browseFragment -> BROWSE_FRAGMENT_TAG
-            libraryFragment -> LIBRARY_FRAGMENT_TAG
-            settingsFragment -> SETTINGS_FRAGMENT_TAG
-            else -> throw IllegalArgumentException()
-        }
-    }
-
-    private fun getFragment(tag: String): Fragment {
-        return when (tag) {
-            BROWSE_FRAGMENT_TAG -> browseFragment
-            LIBRARY_FRAGMENT_TAG -> libraryFragment
-            SETTINGS_FRAGMENT_TAG -> settingsFragment
-            else -> throw IllegalArgumentException()
-        }
-    }
-
-    private fun getFragment(itemId: Int): Fragment {
-        return when (itemId) {
-            R.id.navigation_website_view -> browseFragment
-            R.id.navigation_library -> libraryFragment
-            R.id.navigation_settings -> settingsFragment
-            else -> throw IllegalArgumentException()
-        }
-    }
-
     private fun getItemId(tag: String): Int {
-        return when(tag) {
+        return when (tag) {
             BROWSE_FRAGMENT_TAG -> R.id.navigation_website_view
             LIBRARY_FRAGMENT_TAG -> R.id.navigation_library
             SETTINGS_FRAGMENT_TAG -> R.id.navigation_settings
             else -> throw IllegalArgumentException()
         }
     }
-
-    private fun getItemId(fragment: Fragment): Int {
-        return when(fragment) {
-            browseFragment -> R.id.navigation_website_view
-            libraryFragment -> R.id.navigation_library
-            settingsFragment -> R.id.navigation_settings
+    
+    private fun getFragmentTag(itemId: Int): String {
+        return when (itemId) {
+            R.id.navigation_website_view -> BROWSE_FRAGMENT_TAG
+            R.id.navigation_library -> LIBRARY_FRAGMENT_TAG
+            R.id.navigation_settings -> SETTINGS_FRAGMENT_TAG
+            else -> throw IllegalArgumentException()
+        }
+    }
+    
+    private fun getFragmentClass(tag: String): Class<out Fragment> {
+        return when (tag) {
+            BROWSE_FRAGMENT_TAG -> BrowseFragment::class.java
+            LIBRARY_FRAGMENT_TAG -> LibraryFragment::class.java
+            SETTINGS_FRAGMENT_TAG -> SettingsFragment::class.java
             else -> throw IllegalArgumentException()
         }
     }

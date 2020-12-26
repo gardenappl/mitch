@@ -3,15 +3,18 @@ package ua.gardenapple.itchupdater.client
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
@@ -26,7 +29,7 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
         private const val LOGGING_TAG = "UpdateCheckWorker"
     }
 
-    override suspend fun doWork(): Result = coroutineScope {
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val db = AppDatabase.getDatabase(context)
         val installations = db.installDao.getFinishedInstallationsSync()
         val updateChecker = UpdateChecker(db)
@@ -35,7 +38,7 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
         coroutineScope {
             for (install in installations) {
                 if (!UpdateChecker.shouldCheck(install.gameId))
-                    continue;
+                    continue
 
                 launch(Dispatchers.IO) {
                     val game = db.gameDao.getGameById(install.gameId)!!
@@ -52,7 +55,7 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
             }
         }
 
-        if(success)
+        if (success)
             Result.success()
         else
             Result.failure()

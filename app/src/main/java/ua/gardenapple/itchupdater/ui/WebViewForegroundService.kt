@@ -9,6 +9,12 @@ import androidx.core.app.NotificationCompat
 import ua.gardenapple.itchupdater.NOTIFICATION_CHANNEL_ID_WEB_RUNNING
 import ua.gardenapple.itchupdater.R
 
+
+/**
+ * This is just a dummy foreground service, which is started when the WebView is showing
+ * fullscreen content. Hopefully this will prevent Android form killing the app while an HTML5 game
+ * is running in the background.
+ */
 class WebViewForegroundService : Service() {
     companion object {
         private const val LOGGING_TAG = "WebViewForeground"

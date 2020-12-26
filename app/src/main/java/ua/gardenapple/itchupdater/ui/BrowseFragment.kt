@@ -268,9 +268,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         if (!this::chromeClient.isInitialized || isWebFullscreen)
             return
 
-        val mainActivity = activity as? MainActivity
+        val mainActivity = activity as? MainActivity ?: return
 
-        if (mainActivity?.activeFragment !== this)
+        if (!isVisible)
             return
 
         //Log.d(LOGGING_TAG, "Processing UI...")
@@ -288,7 +288,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             if (ItchWebsiteUtils.isGamePage(doc)) {
                 //Hide app's navbar after hiding web navbar
                 val navBarHideCallback: (String) -> Unit = {
-                    if ((activity as? MainActivity)?.activeFragment === this)
+                    if (isVisible)
                         navBar.visibility = View.GONE
                 }
                 if (ItchWebsiteUtils.siteHasNavbar(webView, doc)) {
@@ -469,11 +469,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
      */
     private fun addDefaultAppBarActions(appBar: Toolbar) {
         appBar.menu.add(Menu.NONE, 10, 10, R.string.nav_installed).setOnMenuItemClickListener {
-            (activity as MainActivity).setActiveFragment(R.id.navigation_library, true)
+            (activity as MainActivity).setActiveFragment(MainActivity.LIBRARY_FRAGMENT_TAG, true)
             true
         }
         appBar.menu.add(Menu.NONE, 11, 11, R.string.nav_settings).setOnMenuItemClickListener {
-            (activity as MainActivity).setActiveFragment(R.id.navigation_settings, true)
+            (activity as MainActivity).setActiveFragment(MainActivity.SETTINGS_FRAGMENT_TAG, true)
             true
         }
     }
