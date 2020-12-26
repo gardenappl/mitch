@@ -77,4 +77,7 @@
     <string name="library_item_ready_to_install">Натисніть, щоб встановити</string>
     <string name="game_cancel_download_or_install">Скасувати</string>
     <string name="toast_download_or_install_cancelled">Скасовано</string>
+    <string name="notification_game_running">Запущена веб-гра на itch.io</string>
+    <string name="notification_channel_web_running">Запущена веб-гра на itch.io</string>
+    <string name="notification_channel_web_running_desc">Сповіщати коли у вбудованому веб-браузері запущена гра</string>
 </resources>

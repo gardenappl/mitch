@@ -26,6 +26,7 @@ const val PERMISSION_REQUEST_CODE_DOWNLOAD = 1
 const val NOTIFICATION_CHANNEL_ID_UPDATES = "updates_available"
 const val NOTIFICATION_CHANNEL_ID_INSTALL = "updates"
 const val NOTIFICATION_CHANNEL_ID_INSTALLING = "installing"
+const val NOTIFICATION_CHANNEL_ID_WEB_RUNNING = "web_running"
 
 const val NOTIFICATION_ID_SELF_UPDATE_CHECK = 999_999_999
 const val NOTIFICATION_TAG_UPDATE_CHECK = "UpdateCheck"
@@ -89,6 +90,7 @@ class MitchApp : Application() {
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
 
+
             name = getString(R.string.notification_channel_updates)
             descriptionText = getString(R.string.notification_channel_updates_desc)
             importance = NotificationManager.IMPORTANCE_DEFAULT
@@ -97,6 +99,7 @@ class MitchApp : Application() {
             }
             notificationManager.createNotificationChannel(channel)
 
+
             name = getString(R.string.notification_channel_installing)
             descriptionText = getString(R.string.notification_channel_installing_desc)
             importance = NotificationManager.IMPORTANCE_DEFAULT
@@ -104,6 +107,15 @@ class MitchApp : Application() {
                 NotificationChannel(NOTIFICATION_CHANNEL_ID_INSTALLING, name, importance).apply {
                     description = descriptionText
                 }
+            notificationManager.createNotificationChannel(channel)
+
+
+            name = getString(R.string.notification_channel_web_running)
+            descriptionText = getString(R.string.notification_channel_web_running_desc)
+            importance = NotificationManager.IMPORTANCE_LOW
+            channel = NotificationChannel(NOTIFICATION_CHANNEL_ID_WEB_RUNNING, name, importance).apply {
+                description = descriptionText
+            }
             notificationManager.createNotificationChannel(channel)
         }
 

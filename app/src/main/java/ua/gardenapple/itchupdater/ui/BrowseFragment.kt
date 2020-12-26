@@ -75,7 +75,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.browse_fragment, container, false)
-
+        
         webView = view.findViewById(R.id.webView)
         chromeClient = MitchWebChromeClient()
 
@@ -236,6 +236,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     override fun onDestroy() {
         super.onDestroy()
+
+        Log.d(LOGGING_TAG, "Destroying fragment")
+        requireContext().stopService(Intent(context, WebViewForegroundService::class.java))
 
         cancel()
     }
@@ -513,7 +516,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
 
 
-
     @Keep //prevent this class from being removed by compiler optimizations
     private class ItchJavaScriptInterface(val fragment: BrowseFragment) {
         @JavascriptInterface
@@ -633,6 +635,16 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 return
             }
 
+            val foregroundServiceIntent = Intent(context, WebViewForegroundService::class.java)
+            foregroundServiceIntent.putExtra(WebViewForegroundService.EXTRA_ORIGINAL_INTENT,
+                requireActivity().intent)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                requireContext().startForegroundService(foregroundServiceIntent)
+            } else {
+                requireContext().startService(foregroundServiceIntent)
+            }
+
             val mainActivity = activity as? MainActivity
             mainActivity?.bottomNavigationView?.visibility = View.GONE
             mainActivity?.speedDial?.visibility = View.GONE
@@ -662,6 +674,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 Log.d(LOGGING_TAG, "return")
                 return
             }
+
+            requireContext().stopService(Intent(context, WebViewForegroundService::class.java))
 
             val mainActivity = activity as? MainActivity
             webView.visibility = View.VISIBLE
