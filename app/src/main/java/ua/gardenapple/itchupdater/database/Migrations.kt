@@ -3,6 +3,8 @@ package ua.gardenapple.itchupdater.database
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import ua.gardenapple.itchupdater.database.game.Game
+import ua.gardenapple.itchupdater.database.installation.Installation
+import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultModel
 import ua.gardenapple.itchupdater.database.upload.Upload
 
 
@@ -132,6 +134,31 @@ class Migrations {
                 """)
                 database.execSQL("DROP TABLE games")
                 database.execSQL("ALTER TABLE games_copy RENAME TO games")
+            }
+        }
+        
+        val Migration_3_4 = object : Migration(3, 4) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("""
+                    CREATE TABLE ${UpdateCheckResultModel.TABLE_NAME}(
+                        ${UpdateCheckResultModel.INSTALLATION_ID} INTEGER PRIMARY KEY NOT NULL,
+                        ${UpdateCheckResultModel.CODE} INTEGER NOT NULL,
+                        ${UpdateCheckResultModel.TIMESTAMP} TEXT,
+                        ${UpdateCheckResultModel.VERSION} TEXT,
+                        ${UpdateCheckResultModel.FILE_SIZE} TEXT,
+                        ${UpdateCheckResultModel.UPLOAD_ID} INTEGER,
+                        ${UpdateCheckResultModel.DOWNLOAD_URL} TEXT,
+                        ${UpdateCheckResultModel.DOWNLOAD_IS_STORE_PAGE} INTEGER NOT NULL,
+                        ${UpdateCheckResultModel.DOWNLOAD_IS_PERMANENT} INTEGER NOT NULL,
+                        FOREIGN KEY(${UpdateCheckResultModel.INSTALLATION_ID}) REFERENCES 
+                            ${Installation.TABLE_NAME}(${Installation.INTERNAL_ID}) ON DELETE CASCADE
+                    )
+                    """)
+
+                database.execSQL("""
+                    CREATE INDEX index_${UpdateCheckResultModel.TABLE_NAME}_${UpdateCheckResultModel.INSTALLATION_ID}
+                        ON ${UpdateCheckResultModel.TABLE_NAME}(${UpdateCheckResultModel.INSTALLATION_ID})
+                """)
             }
         }
     }

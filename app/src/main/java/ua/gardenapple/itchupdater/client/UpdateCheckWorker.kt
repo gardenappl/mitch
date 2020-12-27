@@ -21,6 +21,8 @@ import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.installer.UpdateNotificationBroadcastReceiver
 import ua.gardenapple.itchupdater.ui.MainActivity
+import java.io.PrintWriter
+import java.io.StringWriter
 
 class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
@@ -42,14 +44,23 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
 
                 launch(Dispatchers.IO) {
                     val game = db.gameDao.getGameById(install.gameId)!!
+                    var result: UpdateCheckResult
+
                     try {
-                        val result = updateChecker.checkUpdates(game.gameId)
-                        handleNotification(game, install, result)
+                        result = updateChecker.checkUpdates(game.gameId)
 
                     } catch (e: Exception) {
-                        Log.e(LOGGING_TAG, "Error occurred while checking updates", e)
-                        handleNotification(game, install, null)
+                        result = UpdateCheckResult(
+                            installationId = install.internalId,
+                            code = UpdateCheckResult.ERROR,
+                            errorReport = Utils.toString(e)
+                        )
                         success = false
+                    }
+
+                    handleNotification(game, install, result)
+                    launch(Dispatchers.IO) {
+                        db.updateCheckDao.insert(result)
                     }
                 }
             }
@@ -62,13 +73,13 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
     }
 
     /**
-     * @param result the result of the update check, can be null if the update check failed (due to network error or parsing error)
+     * @param result the result of the update check
      */
-    private fun handleNotification(game: Game, install: Installation, result: UpdateCheckResult?) {
-        if(result?.code == UpdateCheckResult.UP_TO_DATE)
+    private fun handleNotification(game: Game, install: Installation, result: UpdateCheckResult) {
+        if(result.code == UpdateCheckResult.UP_TO_DATE)
             return
 
-        val message = when (result?.code) {
+        val message = when (result.code) {
             UpdateCheckResult.UPDATE_NEEDED -> context.resources.getString(R.string.notification_update_available)
             UpdateCheckResult.EMPTY -> context.resources.getString(R.string.notification_update_empty)
             UpdateCheckResult.ACCESS_DENIED -> context.resources.getString(R.string.notification_update_access_denied)
@@ -91,7 +102,7 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
 
                 val pendingIntent: PendingIntent
 
-                if (result?.code == UpdateCheckResult.UPDATE_NEEDED) {
+                if (result.code == UpdateCheckResult.UPDATE_NEEDED) {
                     if (result.uploadID != null) {
                         val intent = Intent(context, UpdateNotificationBroadcastReceiver::class.java).apply {
                             putExtra(UpdateNotificationBroadcastReceiver.EXTRA_GAME_ID, game.gameId)
@@ -101,7 +112,7 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
                                 putExtra(UpdateNotificationBroadcastReceiver.EXTRA_DOWNLOAD_KEY, downloadKey)
                         }
                         pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-                    } else if(game.downloadPageUrl == null) {
+                    } else if (game.downloadPageUrl == null) {
                         val activityIntent = Intent(
                             Intent.ACTION_VIEW,
                             Uri.parse(game.storeUrl).run {
@@ -136,7 +147,6 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
             }
 
         with(NotificationManagerCompat.from(context)) {
-            //TODO: better system for notification IDs
             notify(NOTIFICATION_TAG_UPDATE_CHECK, game.gameId, builder.build())
         }
     }

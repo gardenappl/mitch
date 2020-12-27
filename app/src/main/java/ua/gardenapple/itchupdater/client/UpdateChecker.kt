@@ -10,6 +10,7 @@ import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.database.upload.Upload
+import java.util.*
 
 class UpdateChecker(val db: AppDatabase) {
     companion object {
@@ -80,7 +81,10 @@ class UpdateChecker(val db: AppDatabase) {
 
             downloadPageInfo = ItchWebsiteParser.fetchDownloadUrlFromStorePage(game.storeUrl)
             if (downloadPageInfo == null)
-                return@withContext UpdateCheckResult(UpdateCheckResult.UNKNOWN)
+                return@withContext UpdateCheckResult(
+                    currentInstall.internalId,
+                    UpdateCheckResult.UNKNOWN
+                )
 
 
             updateCheckUrl = downloadPageInfo.url
@@ -101,7 +105,7 @@ class UpdateChecker(val db: AppDatabase) {
         val fetchedUploads = ItchWebsiteParser.getUploads(gameId, updateCheckDoc)
 
         if (fetchedUploads.isEmpty())
-            return UpdateCheckResult(UpdateCheckResult.EMPTY)
+            return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.EMPTY)
             
         val game = db.gameDao.getGameById(gameId)!!
 
@@ -110,13 +114,13 @@ class UpdateChecker(val db: AppDatabase) {
         logD(game, "Found $installedUpload")
         var suggestedUpload: Upload? = null
 
-        var oneAvailableUpload: Boolean = false
+        var oneAvailableUpload = false
         for (upload in fetchedUploads) {
             if (upload.name == installedUpload.name) {
                 suggestedUpload = upload
                 break
             }
-            if (upload.platforms == installedUpload.platforms) {
+            if (upload.platforms and installedUpload.platforms == installedUpload.platforms) {
                 if (suggestedUpload == null) {
                     suggestedUpload = upload
                     oneAvailableUpload = true
@@ -135,30 +139,50 @@ class UpdateChecker(val db: AppDatabase) {
         an update. Builds pushed via butler don't change the upload ID.
          */
         var allVersionsDifferent = true
-        if(fetchedUploads[0].uploadId != null && currentInstall.gameId != Game.MITCH_GAME_ID) {
+        if (fetchedUploads[0].uploadId != null && currentInstall.gameId != Game.MITCH_GAME_ID) {
             logD(game, "Checking upload IDs...")
             for (upload in fetchedUploads) {
                 if (upload.uploadId == currentInstall.uploadId) {
                     logD(game, "Found same upload ID")
                     allVersionsDifferent = false
 
-                    if(isSameLocale(installedUpload, upload) && upload.version != installedUpload.version) {
+                    if (isSameLocale(installedUpload, upload) && upload.version != installedUpload.version) {
                         logD(game, "Version tag changed")
-                        return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId, downloadPageUrl, updateCheckDoc)
-                    }
-                    else if (installedUpload.version == null && upload.version == null) {
+                        return UpdateCheckResult(currentInstall.internalId,
+                            UpdateCheckResult.UPDATE_NEEDED, 
+                            uploadID = upload.uploadId, 
+                            downloadPageUrl = downloadPageUrl,
+                            newVersionString = upload.version,
+                            newTimestamp = upload.uploadTimestamp,
+                            newSize = upload.fileSize
+                        )
+                    } else if (installedUpload.version == null && upload.version == null) {
                         logD(game, "Version tag unchanged, not a butler upload")
-                        return UpdateCheckResult(UpdateCheckResult.UP_TO_DATE, updateCheckDoc = updateCheckDoc)
+                        return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
                     }
 
-                    if(upload.fileSize != installedUpload.fileSize) {
+                    if (upload.fileSize != installedUpload.fileSize) {
                         logD(game, "File size changed")
-                        return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId, downloadPageUrl, updateCheckDoc)
+                        return UpdateCheckResult(currentInstall.internalId,
+                            UpdateCheckResult.UPDATE_NEEDED, 
+                            uploadID = upload.uploadId, 
+                            downloadPageUrl = downloadPageUrl,
+                            newTimestamp = upload.uploadTimestamp,
+                            newSize = upload.fileSize,
+                            newVersionString = upload.version
+                        )
                     }
-                    if(isSameLocale(installedUpload, upload) && upload.uploadTimestamp != installedUpload.uploadTimestamp &&
+                    if (isSameLocale(installedUpload, upload) && upload.uploadTimestamp != installedUpload.uploadTimestamp &&
                             installedUpload.uploadTimestamp != null) {
                         logD(game, "Timestamp changed")
-                        return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, upload.uploadId, downloadPageUrl, updateCheckDoc)
+                        return UpdateCheckResult(currentInstall.internalId,
+                            UpdateCheckResult.UPDATE_NEEDED,
+                            uploadID = upload.uploadId,
+                            downloadPageUrl = downloadPageUrl,
+                            newTimestamp = upload.uploadTimestamp,
+                            newSize = upload.fileSize,
+                            newVersionString = upload.version
+                        )
                     }
 
                     logD(game, "Upload with current uploadID has not changed")
@@ -168,7 +192,14 @@ class UpdateChecker(val db: AppDatabase) {
             }
             if (allVersionsDifferent) {
                 logD(game, "All upload IDs are different")
-                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
+                return UpdateCheckResult(currentInstall.internalId,
+                    UpdateCheckResult.UPDATE_NEEDED, 
+                    uploadID = suggestedUpload?.uploadId,
+                    downloadPageUrl = downloadPageUrl,
+                    newVersionString = suggestedUpload?.version ?: suggestedUpload?.uploadTimestamp,
+                    newSize = suggestedUpload?.fileSize,
+                    newTimestamp = suggestedUpload?.uploadTimestamp
+                )
             }
         }
 
@@ -176,16 +207,23 @@ class UpdateChecker(val db: AppDatabase) {
         if(installedUpload.gameId == Game.MITCH_GAME_ID && installedUpload.locale == Game.MITCH_LOCALE) {
             logD(game, "Checking version tags...")
             logD(game, "Special processing for Mitch")
-            for(upload in fetchedUploads) {
-                if(upload.version!!.contains(installedUpload.version!!)) {
+            for (upload in fetchedUploads) {
+                if (upload.version!!.contains(installedUpload.version!!)) {
                     logD(game, "Found same version tag")
                     allVersionsDifferent = false
                     break
                 }
             }
-            if(allVersionsDifferent) {
+            if (allVersionsDifferent) {
                 logD(game, "All version tags are different")
-                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
+                return UpdateCheckResult(currentInstall.internalId,
+                    UpdateCheckResult.UPDATE_NEEDED, 
+                    uploadID = suggestedUpload?.uploadId, 
+                    downloadPageUrl = downloadPageUrl,
+                    newTimestamp = suggestedUpload?.uploadTimestamp,
+                    newVersionString = suggestedUpload?.version,
+                    newSize = suggestedUpload?.fileSize
+                )
             }
         } else if (installedUpload.version != null && isSameLocale(installedUpload, fetchedUploads[0])) {
             logD(game, "Checking version tags...")
@@ -198,7 +236,14 @@ class UpdateChecker(val db: AppDatabase) {
             }
             if (allVersionsDifferent) {
                 logD(game, "All version tags are different")
-                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
+                return UpdateCheckResult(installationId = currentInstall.internalId,
+                    UpdateCheckResult.UPDATE_NEEDED,
+                    uploadID = suggestedUpload?.uploadId, 
+                    downloadPageUrl = downloadPageUrl,
+                    newTimestamp = suggestedUpload?.uploadTimestamp,
+                    newVersionString = suggestedUpload?.version,
+                    newSize = suggestedUpload?.fileSize
+                )
             }
         }
 
@@ -218,7 +263,14 @@ class UpdateChecker(val db: AppDatabase) {
             }
             if (allVersionsDifferent) {
                 logD(game, "All timestamps are different")
-                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
+                return UpdateCheckResult(currentInstall.internalId,
+                    UpdateCheckResult.UPDATE_NEEDED,
+                    uploadID = suggestedUpload?.uploadId, 
+                    downloadPageUrl = downloadPageUrl,
+                    newTimestamp = suggestedUpload?.uploadTimestamp,
+                    newVersionString = suggestedUpload?.version,
+                    newSize = suggestedUpload?.fileSize
+                )
             }
         }
 
@@ -234,7 +286,14 @@ class UpdateChecker(val db: AppDatabase) {
             }
             if (allVersionsDifferent) {
                 logD(game, "All file sizes different")
-                return UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED, suggestedUpload?.uploadId, downloadPageUrl, updateCheckDoc)
+                return UpdateCheckResult(currentInstall.internalId,
+                    UpdateCheckResult.UPDATE_NEEDED,
+                    uploadID = suggestedUpload?.uploadId, 
+                    downloadPageUrl = downloadPageUrl,
+                    newTimestamp = suggestedUpload?.uploadTimestamp,
+                    newVersionString = suggestedUpload?.version,
+                    newSize = suggestedUpload?.fileSize
+                )
             }
         }
 
@@ -256,7 +315,7 @@ class UpdateChecker(val db: AppDatabase) {
                 }
                 if (allVersionsSame) {
                     logD(game, "Version tags all match")
-                    return UpdateCheckResult(UpdateCheckResult.UP_TO_DATE, updateCheckDoc = updateCheckDoc)
+                    return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
                 }
             } else if (installedUpload.version != null) {
                 if (isSameLocale(installedUpload, fetchedUploads[0])) {
@@ -270,7 +329,7 @@ class UpdateChecker(val db: AppDatabase) {
                     }
                     if (allVersionsSame) {
                         logD(game, "Version tags all match")
-                        return UpdateCheckResult(UpdateCheckResult.UP_TO_DATE, updateCheckDoc = updateCheckDoc)
+                        return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
                     }
                 }
             }
@@ -288,16 +347,16 @@ class UpdateChecker(val db: AppDatabase) {
                     }
                     if (allVersionsSame) {
                         logD(game, "Timestamps all match")
-                        return UpdateCheckResult(UpdateCheckResult.UP_TO_DATE, updateCheckDoc = updateCheckDoc)
+                        return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
                     }
                 }
             } else {
                 logD(game, "Current timestamp is null")
-                return UpdateCheckResult(UpdateCheckResult.UP_TO_DATE, updateCheckDoc = updateCheckDoc)
+                return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
             }
         }
 
-        return UpdateCheckResult(UpdateCheckResult.UNKNOWN, updateCheckDoc = updateCheckDoc)
+        return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UNKNOWN)
     }
 
     private fun isSameLocale(upload1: Upload, upload2: Upload): Boolean {

@@ -67,7 +67,7 @@ abstract class GameDao {
 
     @Transaction
     open fun upsert(vararg games: Game) {
-        for(game in games) {
+        for (game in games) {
             val existingGame = getGameById(game.gameId)
             if (existingGame == null)
                 insert(game)

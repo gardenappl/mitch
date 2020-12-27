@@ -17,6 +17,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.io.OutputStream
+import java.io.PrintWriter
+import java.io.StringWriter
 import kotlin.coroutines.Continuation
 import kotlin.math.min
 
@@ -92,6 +94,14 @@ class Utils {
             }
             sb.append(" ]");
             return sb.toString()
+        }
+        
+        fun toString(e: Exception): String {
+            val errorWriter = StringWriter()
+            errorWriter.append(e.localizedMessage)
+            e.printStackTrace(PrintWriter(errorWriter))
+
+            return errorWriter.toString()
         }
 
         /**

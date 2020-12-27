@@ -14,7 +14,9 @@ import okhttp3.Request
 import org.json.JSONArray
 import org.json.JSONObject
 import ua.gardenapple.itchupdater.*
+import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.client.UpdateCheckResult
+import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.ui.MainActivity
 import java.io.IOException
@@ -41,6 +43,11 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
             build()
         }
 
+        var resultCode: Int
+        var downloadUrl: Uri?
+        var errorString: String?
+        var versionString: String? = null
+
         try {
             val releasesData = JSONArray(withContext(Dispatchers.IO) {
                 MitchApp.httpClient.newCall(request).execute().use { response ->
@@ -51,43 +58,57 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
             })
 
             val latestRelease = releasesData[0] as JSONObject
-            val latestVersionString = latestRelease["name"] as String
+            versionString = latestRelease["name"] as String
 
-            if (latestVersionString.contains(BuildConfig.VERSION_NAME)) {
-                Log.d(LOGGING_TAG, "GitLab Mitch is up to date")
-                handleNotification(UpdateCheckResult(UpdateCheckResult.UP_TO_DATE), null)
+            if (versionString.contains(BuildConfig.VERSION_NAME)) {
+                resultCode = UpdateCheckResult.UP_TO_DATE
+                downloadUrl = null
+                errorString = null
             } else {
-                Log.d(LOGGING_TAG, "GitLab Mitch needs update")
-                Log.d(LOGGING_TAG, "Current version: ${BuildConfig.VERSION_NAME}, GitLab says $latestVersionString")
-
                 val descriptionMatch =
                     RELEASE_DESC_PATTERN.matchEntire(latestRelease["description"] as String)
                 val relativeUrl = descriptionMatch!!.groupValues[1]
-                Log.d(LOGGING_TAG, "Relative download URL is $relativeUrl")
-                val absoluteUrl = Uri.withAppendedPath(REPO_URL, relativeUrl)
-                Log.d(LOGGING_TAG, "Absolute download URL is $absoluteUrl")
 
-                handleNotification(UpdateCheckResult(UpdateCheckResult.UPDATE_NEEDED), absoluteUrl)
+                resultCode = UpdateCheckResult.UPDATE_NEEDED
+                downloadUrl = Uri.withAppendedPath(REPO_URL, relativeUrl)
+                errorString = null
             }
 
-            return@coroutineScope Result.success()
-
         } catch (e: Exception) {
-            Log.e(LOGGING_TAG, "Error occurred while checking updates for GitLab Mitch", e)
-            handleNotification(null, null)
-            return@coroutineScope Result.failure()
+            resultCode = UpdateCheckResult.ERROR
+            downloadUrl = null
+            errorString = Utils.toString(e)
         }
+
+        handleNotification(resultCode, downloadUrl)
+        
+        val db = AppDatabase.getDatabase(context)
+        val install = db.installDao.findInstallation(Game.MITCH_GAME_ID)
+        db.updateCheckDao.insert(UpdateCheckResult(
+            installationId = install!!.internalId,
+            code = resultCode,
+            newVersionString = versionString,
+            downloadPageUrl = downloadUrl?.let {
+                ItchWebsiteParser.DownloadUrl(downloadUrl.toString(), true, false)
+            },
+            errorReport = errorString
+        ))
+        
+        return@coroutineScope if (resultCode == UpdateCheckResult.ERROR)
+            Result.success()
+        else
+            Result.failure()
     }
 
     /**
-     * @param result the result of the update check, can be null if the update check failed (due to network error or parsing error)
+     * @param resultCode the result of the update check, see [UpdateCheckResult]
      * @param downloadUrl URL for downloading the latest .apk, can be null if no new version detected
      */
-    private fun handleNotification(result: UpdateCheckResult?, downloadUrl: Uri?) {
-        if(result?.code == UpdateCheckResult.UP_TO_DATE)
+    private fun handleNotification(resultCode: Int, downloadUrl: Uri?) {
+        if(resultCode == UpdateCheckResult.UP_TO_DATE)
             return
 
-        val message = when (result?.code) {
+        val message = when (resultCode) {
             UpdateCheckResult.UPDATE_NEEDED -> context.resources.getString(R.string.notification_update_available)
             UpdateCheckResult.EMPTY -> context.resources.getString(R.string.notification_update_empty)
             UpdateCheckResult.ACCESS_DENIED -> context.resources.getString(R.string.notification_update_access_denied)
@@ -108,7 +129,7 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
 
                 val pendingIntent: PendingIntent
 
-                if (result?.code == UpdateCheckResult.UPDATE_NEEDED) {
+                if (resultCode == UpdateCheckResult.UPDATE_NEEDED) {
                     val intent = Intent(context, GitlabUpdateBroadcastReceiver::class.java)
                     intent.putExtra(GitlabUpdateBroadcastReceiver.EXTRA_DOWNLOAD_URL, downloadUrl.toString())
 

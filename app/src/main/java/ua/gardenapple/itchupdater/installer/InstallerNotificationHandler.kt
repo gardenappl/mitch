@@ -53,7 +53,6 @@ class InstallerNotificationHandler(val context: Context) : InstallResultListener
             }
 
         with(NotificationManagerCompat.from(context)) {
-            //TODO: better system for notification IDs
             notify(NOTIFICATION_TAG_INSTALL_RESULT, installSessionId, builder.build())
         }
 

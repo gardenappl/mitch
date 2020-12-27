@@ -72,8 +72,8 @@
     <string name="settings_start_page_web_touch">Популярні ігри для веб (зі сенсорним екраном)</string>
     <string name="settings_start_page_feed">Стрічка новин</string>
     <string name="library_category_pending">В очікуванні</string>
-    <string name="library_item_downloading">Завантажується...</string>
-    <string name="library_item_installing">Встановлюється...</string>
+    <string name="library_item_downloading">Завантажується…</string>
+    <string name="library_item_installing">Встановлюється…</string>
     <string name="library_item_ready_to_install">Натисніть, щоб встановити</string>
     <string name="game_cancel_download_or_install">Скасувати</string>
     <string name="toast_download_or_install_cancelled">Скасовано</string>

@@ -5,25 +5,31 @@ import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.game.GameDao
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.database.installation.InstallationDao
+import ua.gardenapple.itchupdater.database.updatecheck.Converters
+import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultDao
+import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultModel
 import ua.gardenapple.itchupdater.database.upload.Upload
 import ua.gardenapple.itchupdater.database.upload.UploadDao
 
 @Database(
-    entities = [Game::class, Upload::class, Installation::class],
-    version = 3,
+    entities = [Game::class, Upload::class, Installation::class, UpdateCheckResultModel::class],
+    version = 4,
     exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract val gameDao: GameDao
     abstract val uploadDao: UploadDao
     abstract val installDao: InstallationDao
+    abstract val updateCheckDao: UpdateCheckResultDao
 
 
     /**
@@ -77,6 +83,7 @@ abstract class AppDatabase : RoomDatabase() {
                 })
                 .addMigrations(Migrations.Migration_1_2)
                 .addMigrations(Migrations.Migration_2_3)
+                .addMigrations(Migrations.Migration_3_4)
                 .build()
 
     }

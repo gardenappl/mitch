@@ -108,7 +108,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
 
         //Set up FAB buttons
-        //(colors don't matter too much as they will be set by processUI anyway)
+        //(colors don't matter too much as they will be set by updateUI() anyway)
         val speedDialView = (activity as MainActivity).speedDial
         speedDialView.clearActionItems()
         speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_reload, R.drawable.ic_baseline_refresh_24)
