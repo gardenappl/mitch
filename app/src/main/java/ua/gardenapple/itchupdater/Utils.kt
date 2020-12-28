@@ -19,7 +19,6 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.io.PrintWriter
 import java.io.StringWriter
-import kotlin.coroutines.Continuation
 import kotlin.math.min
 
 class Utils {
@@ -72,15 +71,15 @@ class Utils {
             val bitmap: Bitmap
             if (drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) {
                 // Single color bitmap will be created of 1x1 pixel
-                bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+                bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
             } else {
-                bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888);
+                bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
             }
 
-            val canvas = Canvas(bitmap);
-            drawable.setBounds(0, 0, canvas.width, canvas.height);
-            drawable.draw(canvas);
-            return bitmap;
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
+            return bitmap
         }
 
         fun toString(bundle: Bundle?): String {
@@ -88,11 +87,11 @@ class Utils {
                 return "null"
 
             val sb = StringBuilder()
-            sb.append("[ ");
+            sb.append("[ ")
             for (key in bundle.keySet()) {
                 sb.append("$key = ${bundle.get(key)}, ")
             }
-            sb.append(" ]");
+            sb.append(" ]")
             return sb.toString()
         }
         

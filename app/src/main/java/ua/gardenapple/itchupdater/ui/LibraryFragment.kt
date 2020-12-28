@@ -60,13 +60,12 @@ class LibraryFragment : Fragment() {
         pendingList.addOnScrollListener(preloader)
 
         pendingViewModel = ViewModelProvider(this).get(PendingGameViewModel::class.java)
-        pendingViewModel.pendingGames.observe(viewLifecycleOwner, { games ->
-            Log.d(LOGGING_TAG, "Pending games list changed")
-            games?.let {
-                pendingAdapter.gameInstalls = games
+        pendingViewModel.pendingGames.observe(viewLifecycleOwner, { gameInstalls ->
+            gameInstalls?.let {
+                pendingAdapter.gameInstalls = gameInstalls
             }
             view?.post {
-                if (games?.isNotEmpty() == true) {
+                if (gameInstalls?.isNotEmpty() == true) {
                     pendingList.visibility = View.VISIBLE
                     pendingLabel.visibility = View.VISIBLE
                 } else {
@@ -92,8 +91,8 @@ class LibraryFragment : Fragment() {
         downloadsList.addOnScrollListener(preloader)
 
         downloadsViewModel = ViewModelProvider(this).get(GameDownloadsViewModel::class.java)
-        downloadsViewModel.gameDownloads.observe(viewLifecycleOwner, { games ->
-            games?.let { downloadsAdapter.gameInstalls = games }
+        downloadsViewModel.gameDownloads.observe(viewLifecycleOwner, { gameInstalls ->
+            gameInstalls?.let { downloadsAdapter.gameInstalls = gameInstalls }
         })
 
 
@@ -112,8 +111,8 @@ class LibraryFragment : Fragment() {
         installedList.addOnScrollListener(preloader)
 
         installedViewModel = ViewModelProvider(this).get(InstalledGameViewModel::class.java)
-        installedViewModel.installedGames.observe(viewLifecycleOwner, Observer { games ->
-            games?.let { installedAdapter.gameInstalls = games }
+        installedViewModel.installedGames.observe(viewLifecycleOwner, Observer { gameInstalls ->
+            gameInstalls?.let { installedAdapter.gameInstalls = gameInstalls }
         })
 
         return view
@@ -129,11 +128,10 @@ class LibraryFragment : Fragment() {
                 return Collections.singletonList(adapter.gameInstalls[position])
         }
 
-        override fun getPreloadRequestBuilder(item: GameInstallation): RequestBuilder<*>? {
+        override fun getPreloadRequestBuilder(item: GameInstallation): RequestBuilder<*> {
             return Glide.with(this@LibraryFragment)
                 .load(item.game.thumbnailUrl)
                 .override(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT)
-
         }
     }
 

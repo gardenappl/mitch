@@ -6,11 +6,15 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import android.util.Log
-import kotlinx.coroutines.*
-import ua.gardenapple.itchupdater.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import ua.gardenapple.itchupdater.LOGGING_TAG
+import ua.gardenapple.itchupdater.NOTIFICATION_CHANNEL_ID_INSTALL
+import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD_RESULT
+import ua.gardenapple.itchupdater.R
 
 /**
  * This receiver responds to finished file downloads from DownloadManager.
@@ -51,7 +55,7 @@ class FileDownloadBroadcastReceiver : BroadcastReceiver() {
 
     private fun createNotification(context: Context, downloadLocalUri: Uri, id: Long, isApk: Boolean) {
         val pendingIntent: PendingIntent
-        if(isApk) {
+        if (isApk) {
             val downloadPath = downloadLocalUri.path!!
             Log.d(LOGGING_TAG, downloadPath)
 
@@ -69,7 +73,7 @@ class FileDownloadBroadcastReceiver : BroadcastReceiver() {
 
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALL).apply {
             setSmallIcon(R.drawable.ic_mitch_notification)
-            if(isApk)
+            if (isApk)
                 setContentTitle(context.resources.getString(R.string.notification_install_title))
             else
                 setContentTitle(context.resources.getString(R.string.notification_download_complete_title))

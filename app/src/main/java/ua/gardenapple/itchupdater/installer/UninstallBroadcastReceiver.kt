@@ -15,24 +15,17 @@ class UninstallBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(LOGGING_TAG, "onReceive")
-        if(intent.action != Intent.ACTION_PACKAGE_FULLY_REMOVED) {
-            Log.w(LOGGING_TAG, "Wrong action type!")
-        }
+        if(intent.action != Intent.ACTION_PACKAGE_FULLY_REMOVED)
+            throw RuntimeException("Wrong action type!")
+
         Log.d(LOGGING_TAG, "Data: ${intent.data}")
-        Log.d(LOGGING_TAG, "My data: ${intent.data!!.schemeSpecificPart}")
+
+        val packageName = intent.data!!.schemeSpecificPart
+        Log.d(LOGGING_TAG, "Package name: $packageName")
+
         runBlocking(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
-//            var installs = db.installDao.getAllInstallationsSync()
-//            for(install in installs) {
-//                Log.d(LOGGING_TAG, install.toString())
-//            }
-
-            db.installDao.deleteFinishedInstallation(intent.data!!.schemeSpecificPart)
-
-//            installs = db.installDao.getAllInstallationsSync()
-//            for(install in installs) {
-//                Log.d(LOGGING_TAG, install.toString())
-//            }
+            db.installDao.deleteFinishedInstallation(packageName)
         }
     }
 }

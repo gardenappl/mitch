@@ -26,8 +26,8 @@ import ua.gardenapple.itchupdater.MitchApp
 import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD_RESULT
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.AppDatabase
-import ua.gardenapple.itchupdater.database.game.GameRepository
 import ua.gardenapple.itchupdater.database.game.GameInstallation
+import ua.gardenapple.itchupdater.database.game.GameRepository
 import ua.gardenapple.itchupdater.database.installation.Installation
 
 class GameListAdapter internal constructor(
@@ -131,18 +131,15 @@ class GameListAdapter internal constructor(
                 return true
             }
             R.id.app_info -> {
-                runBlocking(Dispatchers.IO) {
-                    val db = AppDatabase.getDatabase(context)
-                    val install = db.installDao.findInstallation(game.gameId)!!
-                    val packageUri = Uri.parse("package:${install.packageName}")
-                    try {
-                        val intent =
-                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri)
-                        context.startActivity(intent)
-                    } catch (e: ActivityNotFoundException) {
-                        val toast = Toast.makeText(context, R.string.game_package_info_fail, Toast.LENGTH_LONG)
-                        toast.show()
-                    }
+                try {
+                    val packageUri = Uri.parse("package:${gameInstall.packageName}")
+                    val intent =
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri)
+                    context.startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    val toast =
+                        Toast.makeText(context, R.string.game_package_info_fail, Toast.LENGTH_LONG)
+                    toast.show()
                 }
                 return true
             }
@@ -184,7 +181,7 @@ class GameListAdapter internal constructor(
                 }
                 runBlocking(Dispatchers.IO) { 
                     val db = AppDatabase.getDatabase(context)
-                    db.installDao.clearPendingInstallationsForGame(gameInstall.game.gameId)
+                    db.installDao.delete(gameInstall.installId)
                 }
                 return true
             }

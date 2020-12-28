@@ -2,6 +2,7 @@ package ua.gardenapple.itchupdater.database.game
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 
@@ -65,4 +66,13 @@ data class Game(
         const val THUMBNAIL_URL = "thumbnail_url"
         const val LAST_UPDATED_TIMESTAMP = "last_timestamp"
     }
+
+    @Ignore
+    val downloadInfo = if (downloadPageUrl != null) {
+        ItchWebsiteParser.DownloadUrl(
+            url = downloadPageUrl,
+            isPermanent = true,
+            isStorePage = (downloadPageUrl == storeUrl)
+        )
+    } else null
 }

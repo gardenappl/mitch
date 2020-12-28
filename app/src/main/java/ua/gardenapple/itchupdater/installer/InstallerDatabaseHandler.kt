@@ -17,7 +17,7 @@ class InstallerDatabaseHandler(val context: Context) :
         val db = AppDatabase.getDatabase(context)
         Log.d(LOGGING_TAG, "onInstallComplete")
 
-        val install = db.installDao.findPendingInstallationBySessionId(installSessionId) ?: return
+        val pendingInstall = db.installDao.findPendingInstallationBySessionId(installSessionId) ?: return
 
         when(status) {
             PackageInstaller.STATUS_FAILURE,
@@ -28,23 +28,19 @@ class InstallerDatabaseHandler(val context: Context) :
             PackageInstaller.STATUS_FAILURE_INVALID,
             PackageInstaller.STATUS_FAILURE_STORAGE ->
             {
-                db.installDao.delete(install)
+                db.installDao.delete(pendingInstall)
             }
             PackageInstaller.STATUS_SUCCESS ->
             {
-                val newInstall = install.copy(
+                val newInstall = pendingInstall.copy(
                     status = Installation.STATUS_INSTALLED,
                     downloadOrInstallId = null,
                     packageName = packageName
                 )
                 Log.d(LOGGING_TAG, "New install: $newInstall")
-                db.installDao.resetAllInstallationsForGame(install.gameId, newInstall)
-
-                val pendingUploads = db.uploadDao.getPendingUploadsForGame(install.gameId)
-                for (upload in pendingUploads) {
-                    upload.isPending = false
-                }
-                db.uploadDao.resetAllUploadsForGame(install.gameId, pendingUploads)
+                db.installDao.deleteFinishedInstallation(packageName)
+                db.installDao.delete(pendingInstall)
+                db.installDao.insert(newInstall)
             }
         }
     }
@@ -54,22 +50,15 @@ class InstallerDatabaseHandler(val context: Context) :
         Log.d(LOGGING_TAG, "onDownloadComplete")
 
         val pendingInstall = db.installDao.findPendingInstallationByDownloadId(downloadId) ?: return
-        if (pendingInstall.status != Installation.STATUS_DOWNLOADING)
-            return
 
         if (isInstallable) {
             pendingInstall.status = Installation.STATUS_READY_TO_INSTALL
             db.installDao.update(pendingInstall)
         } else {
-            val pendingUploads = db.uploadDao.getPendingUploadsForGame(pendingInstall.gameId)
-            for (upload in pendingUploads) {
-                upload.isPending = false
-            }
-            db.uploadDao.resetAllUploadsForGame(pendingInstall.gameId, pendingUploads)
-
-            pendingInstall.downloadOrInstallId = null
+            db.installDao.deleteFinishedInstallation(pendingInstall.uploadId)
             pendingInstall.status = Installation.STATUS_INSTALLED
-            db.installDao.resetAllInstallationsForGame(pendingInstall.gameId, pendingInstall)
+            pendingInstall.downloadOrInstallId = null
+            db.installDao.update(pendingInstall)
         }
     }
 

@@ -19,7 +19,6 @@ import ua.gardenapple.itchupdater.MitchApp
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
-import ua.gardenapple.itchupdater.database.upload.Upload
 import ua.gardenapple.itchupdater.installer.DownloadRequester
 import java.io.IOException
 
@@ -33,8 +32,9 @@ class GameDownloader(val context: Context) {
     /**
      * Has a chance to fail if the user does not have access, or if the uploadId is no longer available
      * (in which case it will perform another update check)
+     * @return true if user has access to uploadId
      */
-    suspend fun startDownload(game: Game, uploadId: Int, downloadKey: String?) {
+    suspend fun startDownload(game: Game, uploadId: Int, downloadKey: String?): Boolean {
         val fileRequestUrl = Uri.parse(game.storeUrl).buildUpon().run {
             appendPath("file")
             appendPath(uploadId.toString())
@@ -54,7 +54,7 @@ class GameDownloader(val context: Context) {
             post(form)
             build()
         }
-        var result: String = withContext(Dispatchers.IO) {
+        val result: String = withContext(Dispatchers.IO) {
             MitchApp.httpClient.newCall(request).execute().use { response ->
                 if (!response.isSuccessful)
                     throw IOException("Unexpected code $response")
@@ -91,30 +91,35 @@ class GameDownloader(val context: Context) {
         val url: String = if (game.downloadPageUrl != null) {
             game.downloadPageUrl
         } else {
-            val storePageDoc = ItchWebsiteUtils.fetchAndParseDocument(game.storeUrl)
+            val storePageDoc = ItchWebsiteUtils.fetchAndParse(game.storeUrl)
             val downloadPageUrl =
-                ItchWebsiteParser.getDownloadUrlFromStorePage(storePageDoc, game.storeUrl, true)
+                ItchWebsiteParser.getDownloadUrl(storePageDoc, game.storeUrl)
             if (downloadPageUrl == null)
                 throw ItchAccessDeniedException("Can't access download page for ${game.name}")
             downloadPageUrl.url
         }
-        val doc = ItchWebsiteUtils.fetchAndParseDocument(url)
+        val doc = ItchWebsiteUtils.fetchAndParse(url)
 
-        val pendingUploads = ItchWebsiteParser.getUploads(game.gameId, doc, true)
-        if(pendingUploads.find { upload -> upload.uploadId == uploadId } == null) {
+        //Temporary download ID
+        val pendingInstall = try {
+            ItchWebsiteParser.getPendingInstallation(doc, uploadId, 0)
+        } catch (e: ItchWebsiteParser.UploadNotFoundException) {
             Log.d(LOGGING_TAG, "Required upload not found, requesting update check...")
             val updateCheckRequest = OneTimeWorkRequestBuilder<UpdateCheckWorker>()
                 .build()
 
             WorkManager.getInstance(context).enqueue(updateCheckRequest)
-            return
+            return false
         }
 
         DownloadRequester.requestDownload(context, null, downloadUrl, contentDisposition, mimeType) {
-            downloadId: Long -> runBlocking(Dispatchers.IO) {
-                updateDatabase(game.gameId, uploadId, downloadId, url, pendingUploads)
+                downloadId ->
+            pendingInstall.downloadOrInstallId = downloadId
+            runBlocking(Dispatchers.IO) {
+                updateDatabase(url, pendingInstall)
             }
         }
+        return true
     }
 
     /**
@@ -122,38 +127,27 @@ class GameDownloader(val context: Context) {
      * handling downloads in some other way.
      */
     suspend fun updateDatabase(
-        gameId: Int,
-        uploadId: Int,
-        downloadId: Long,
         downloadPageUrl: String,
-        pendingUploads: List<Upload>
+        pendingInstall: Installation
     ) {
         val db = AppDatabase.getDatabase(context)
-        Log.d(LOGGING_TAG, "Handling download...")
+        Log.d(LOGGING_TAG, "Updating database based on download...")
         val downloadManager = context.getSystemService(Activity.DOWNLOAD_SERVICE) as DownloadManager
 
-        var game = db.gameDao.getGameById(gameId)
+        var game = db.gameDao.getGameById(pendingInstall.gameId)
         if (game == null) {
             val storeUrl = ItchWebsiteParser.getStoreUrlFromDownloadPage(Uri.parse(downloadPageUrl))
             Log.d(LOGGING_TAG, "Game is null! Fetching $storeUrl...")
-            val storeDoc = ItchWebsiteUtils.fetchAndParseDocument(storeUrl)
+            val storeDoc = ItchWebsiteUtils.fetchAndParse(storeUrl)
             game = ItchWebsiteParser.getGameInfoForStorePage(storeDoc, storeUrl)
             db.gameDao.upsert(game)
         }
 
-        var installation = db.installDao.findPendingInstallation(gameId)
+        //Cancel download for the same uploadId
+        val installation = db.installDao.getPendingInstallation(pendingInstall.uploadId)
         if (installation != null) {
             installation.downloadOrInstallId?.let { downloadManager.remove(it) }
-            db.installDao.delete(installation.internalId)
         }
-        installation = Installation(
-            uploadId = uploadId,
-            gameId = gameId,
-            downloadOrInstallId = downloadId,
-            status = Installation.STATUS_DOWNLOADING
-        )
-        db.uploadDao.clearPendingUploadsForGame(gameId)
-        db.uploadDao.insert(pendingUploads)
-        db.installDao.insert(installation)
+        db.installDao.insert(pendingInstall)
     }
 }

@@ -20,12 +20,12 @@ class UpdateCheckerTests {
         const val LOGGING_TAG: String = "Test"
 
         private lateinit var updateChecker: UpdateChecker
+        private lateinit var db: AppDatabase
 
         @BeforeClass
         @JvmStatic fun setup() {
             val context = InstrumentationRegistry.getInstrumentation().context
-            val db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
-
+            db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
             db.addMitchToDatabase(context)
 
             updateChecker = UpdateChecker(db)
@@ -35,10 +35,31 @@ class UpdateCheckerTests {
 
 
     @Test
-    fun testUpdateCheck_mitch() {
+    fun testUpdateCheck_mitch_itchio() {
+        if (BuildConfig.FLAVOR != FLAVOR_ITCHIO)
+            return //skip
+
         val result: UpdateCheckResult = runBlocking(Dispatchers.IO) {
-            updateChecker.checkUpdates(Game.MITCH_GAME_ID)
+            val game = db.gameDao.getGameById(Game.MITCH_GAME_ID)!!
+            val install = db.installDao.getInstallations(Game.MITCH_GAME_ID)[0]
+            val (updateCheckDoc, downloadUrlInfo) = updateChecker.getDownloadInfo(game)!!
+
+            updateChecker.checkUpdates(game, install, updateCheckDoc, downloadUrlInfo)
         }
         Assert.assertEquals(UpdateCheckResult.UP_TO_DATE, result.code)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun testUpdateCheck_mitch_other() {
+        if (BuildConfig.FLAVOR == FLAVOR_ITCHIO)
+            return //skip
+
+        runBlocking(Dispatchers.IO) {
+            val game = db.gameDao.getGameById(Game.MITCH_GAME_ID)!!
+            val install = db.installDao.getInstallations(Game.MITCH_GAME_ID)[0]
+            val (updateCheckDoc, downloadUrlInfo) = updateChecker.getDownloadInfo(game)!!
+
+            updateChecker.checkUpdates(game, install, updateCheckDoc, downloadUrlInfo)
+        }
     }
 }

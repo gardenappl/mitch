@@ -7,18 +7,10 @@ import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.net.Uri
 import android.util.Log
-import com.bumptech.glide.util.Util
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import ua.gardenapple.itchupdater.MitchApp
 import ua.gardenapple.itchupdater.Utils
 import java.io.File
-import java.io.FileInputStream
-import java.io.IOException
-import java.nio.file.Files
-import java.util.*
 
 class Installer {
     companion object {
@@ -39,7 +31,7 @@ class Installer {
     
     @Throws(IllegalStateException::class)
     suspend fun installFromDownloadId(context: Context, downloadId: Long, apkUri: Uri? = null) = withContext(Dispatchers.IO) {
-        val apkUri = if (apkUri != null) {
+        val actualApkUri = if (apkUri != null) {
             apkUri
         } else {
             val downloadManager =
@@ -69,7 +61,7 @@ class Installer {
         InstallerEvents.notifyApkInstallStart(downloadId, sessionID)
         Log.d(LOGGING_TAG, "Notified")
 
-        install(apkUri, sessionID, context)
+        install(actualApkUri, sessionID, context)
         Log.d(LOGGING_TAG, "Installed")
     }
 

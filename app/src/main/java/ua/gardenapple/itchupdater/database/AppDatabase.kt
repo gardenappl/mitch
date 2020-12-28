@@ -7,27 +7,26 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
-import ua.gardenapple.itchupdater.*
-import ua.gardenapple.itchupdater.database.game.GameDao
+import ua.gardenapple.itchupdater.BuildConfig
+import ua.gardenapple.itchupdater.FLAVOR_FDROID
 import ua.gardenapple.itchupdater.database.game.Game
+import ua.gardenapple.itchupdater.database.game.GameDao
 import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.database.installation.InstallationDao
 import ua.gardenapple.itchupdater.database.updatecheck.Converters
 import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultDao
 import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultModel
-import ua.gardenapple.itchupdater.database.upload.Upload
-import ua.gardenapple.itchupdater.database.upload.UploadDao
+import ua.gardenapple.itchupdater.ioThread
 
 @Database(
-    entities = [Game::class, Upload::class, Installation::class, UpdateCheckResultModel::class],
-    version = 4,
+    entities = [Game::class, Installation::class, UpdateCheckResultModel::class],
+    version = 6,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract val gameDao: GameDao
-    abstract val uploadDao: UploadDao
     abstract val installDao: InstallationDao
     abstract val updateCheckDao: UpdateCheckResultDao
 
@@ -58,34 +57,30 @@ abstract class AppDatabase : RoomDatabase() {
 
                         ioThread {
                             val appDb = getDatabase(context)
+
+                            Log.d(LOGGING_TAG, "Deleting info on Mitch")
+                            appDb.installDao.deleteFinishedInstallation(context.packageName)
+
                             if (BuildConfig.FLAVOR != FLAVOR_FDROID) {
                                 appDb.addMitchToDatabase(context)
-                            } else {
-                                Log.d(LOGGING_TAG, "Deleting info on Mitch")
-                                appDb.uploadDao.clearAllUploadsForGame(Game.MITCH_GAME_ID)
-                                appDb.installDao.clearAllInstallationsForGame(Game.MITCH_GAME_ID)
                             }
 
-                            val mitchInstall = appDb.installDao.findInstallation(Game.MITCH_GAME_ID)
-                            Log.d(LOGGING_TAG, "Mitch installation: $mitchInstall")
-
-                            Log.d(LOGGING_TAG, "Known installs:")
-                            val installs = appDb.installDao.getAllInstallationsSync()
-                            for (install in installs)
-                                Log.d(LOGGING_TAG, "$install")
-
-                            Log.d(LOGGING_TAG, "Known uploads:")
-                            val uploads = appDb.uploadDao.getAllUploadsSync()
-                            for (upload in uploads)
-                                Log.d(LOGGING_TAG, "$upload")
+//                            val mitchInstall = appDb.installDao.findInstallation(Game.MITCH_GAME_ID)
+//                            Log.d(LOGGING_TAG, "Mitch installation: $mitchInstall")
+//
+//                            Log.d(LOGGING_TAG, "Known installs:")
+//                            val installs = appDb.installDao.getAllInstallationsSync()
+//                            for (install in installs)
+//                                Log.d(LOGGING_TAG, "$install")
                         }
                     }
                 })
                 .addMigrations(Migrations.Migration_1_2)
                 .addMigrations(Migrations.Migration_2_3)
                 .addMigrations(Migrations.Migration_3_4)
+                .addMigrations(Migrations.Migration_4_5)
+                .addMigrations(Migrations.Migration_5_6)
                 .build()
-
     }
 
 
@@ -101,24 +96,15 @@ abstract class AppDatabase : RoomDatabase() {
         Log.d(LOGGING_TAG, "Adding game $game")
         gameDao.upsert(game)
 
-        val upload = Upload(
-            uploadId = Upload.MITCH_UPLOAD_ID,
-            gameId = Game.MITCH_GAME_ID,
-            version = BuildConfig.VERSION_NAME,
-            locale = Game.MITCH_LOCALE,
-            name = Upload.MITCH_RELEASE_NAME,
-            fileSize = Upload.MITCH_FILE_SIZE,
-            platforms = Upload.PLATFORM_ANDROID
-        )
-        uploadDao.clearAllUploadsForGame(Game.MITCH_GAME_ID)
-        Log.d(LOGGING_TAG, "Adding upload $upload")
-        uploadDao.insert(upload)
-
-        installDao.clearAllInstallationsForGame(Game.MITCH_GAME_ID)
         val installation = Installation(
             gameId = Game.MITCH_GAME_ID,
-            uploadId = Upload.MITCH_UPLOAD_ID,
-            packageName = context.packageName
+            uploadId = Installation.MITCH_UPLOAD_ID,
+            packageName = context.packageName,
+            locale = Game.MITCH_LOCALE,
+            version = BuildConfig.VERSION_NAME,
+            uploadName = Installation.MITCH_UPLOAD_NAME,
+            fileSize = Installation.MITCH_FILE_SIZE,
+            platformFlags = Installation.PLATFORM_ANDROID
         )
         Log.d(LOGGING_TAG, "Adding install $installation")
         installDao.insert(installation)

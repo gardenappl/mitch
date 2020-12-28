@@ -14,9 +14,9 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.*
 import android.widget.ProgressBar
-import androidx.appcompat.widget.Toolbar
 import androidx.annotation.Keep
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ShareCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
@@ -28,7 +28,6 @@ import kotlinx.android.synthetic.main.dialog_search.view.*
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.Utils
@@ -520,7 +519,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     private class ItchJavaScriptInterface(val fragment: BrowseFragment) {
         @JavascriptInterface
         fun onDownloadLinkClick(uploadId: String) {
-            Log.d(LOGGING_TAG, "Selected upload ID: $uploadId")
             fragment.launch(Dispatchers.IO) {
                 fragment.browseHandler?.setClickedUploadId(uploadId.toInt())
             }

@@ -4,7 +4,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
@@ -83,9 +82,9 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
         handleNotification(resultCode, downloadUrl)
         
         val db = AppDatabase.getDatabase(context)
-        val install = db.installDao.findInstallation(Game.MITCH_GAME_ID)
+        val install = db.installDao.getInstallationByPackageName(context.packageName)!!
         db.updateCheckDao.insert(UpdateCheckResult(
-            installationId = install!!.internalId,
+            installationId = install.internalId,
             code = resultCode,
             newVersionString = versionString,
             downloadPageUrl = downloadUrl?.let {
@@ -112,7 +111,7 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
             UpdateCheckResult.UPDATE_NEEDED -> context.resources.getString(R.string.notification_update_available)
             UpdateCheckResult.EMPTY -> context.resources.getString(R.string.notification_update_empty)
             UpdateCheckResult.ACCESS_DENIED -> context.resources.getString(R.string.notification_update_access_denied)
-            UpdateCheckResult.UNKNOWN -> context.resources.getString(R.string.notification_update_unknown)
+//            UpdateCheckResult.UNKNOWN -> context.resources.getString(R.string.notification_update_unknown)
             else -> context.resources.getString(R.string.notification_update_fail)
         }
         val builder =

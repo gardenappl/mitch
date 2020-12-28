@@ -19,7 +19,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.browse_fragment.*
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.installer.DownloadRequester
-import ua.gardenapple.itchupdater.ItchWebsiteUtils
 
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
@@ -226,7 +225,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             for (index in 0 until menu.size()) {
                 val item = bottomNavigationView.menu.getItem(index)
                 if (item.itemId == itemId) {
-                    item.setChecked(true)
+                    item.isChecked = true
                     break
                 }
             }

@@ -10,18 +10,23 @@ import okhttp3.Request
 import org.json.JSONObject
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import org.jsoup.select.Elements
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.MitchApp
 import ua.gardenapple.itchupdater.database.game.Game
-import ua.gardenapple.itchupdater.database.upload.Upload
+import ua.gardenapple.itchupdater.database.installation.Installation
 import java.io.IOException
-import kotlin.RuntimeException
+import java.lang.IllegalStateException
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ItchWebsiteParser {
+    class UploadNotFoundException(uploadId: Int) : RuntimeException(uploadId.toString())
+    
     data class DownloadUrl(val url: String, val isPermanent: Boolean, val isStorePage: Boolean) {
         val downloadKey: String?
             get() {
-                if(isStorePage || !isPermanent)
+                if (isStorePage || !isPermanent)
                     return null
                 return Uri.parse(url).lastPathSegment
             }
@@ -64,76 +69,97 @@ class ItchWebsiteParser {
                 locale = getLocale(storePageDoc)
             )
         }
+        
+        fun getInstallations(doc: Document): List<Installation> {
+            return parseInstallations(doc, null)
+        }
 
-        fun getUploads(gameId: Int, doc: Document, setPending: Boolean = false): ArrayList<Upload> {
-            val uploadsList = ArrayList<Upload>()
+        fun getPendingInstallation(doc: Document, uploadId: Int, downloadId: Long): Installation {
+            val installList = parseInstallations(doc, uploadId)
+            if (installList.isEmpty())
+                throw UploadNotFoundException(uploadId)
+            else
+                return installList.first().copy(
+                    status = Installation.STATUS_DOWNLOADING,
+                    downloadOrInstallId = downloadId
+                )
+        }
+        
+        private fun parseInstallations(doc: Document, requiredUploadId: Int?): List<Installation> {
+            if (!ItchWebsiteUtils.hasGameDownloadLinks(doc))
+                throw IllegalStateException("Unparse-able game page")
 
-            val uploads = doc.getElementsByClass("upload")
-            if (uploads.isNotEmpty()) {
-                Log.d(LOGGING_TAG, "Found uploads: ${uploads.size}")
-                var uploadNum: Int = 0
+            val uploadDivs: List<Element>
 
-                val locale = getLocale(doc)
-                for (uploadDiv in uploads) {
-                    val icons = uploadDiv.getElementsByClass("icon")
-
-                    var platforms = Upload.PLATFORM_NONE
-
-                    for(icon in icons)
-                    {
-                        if(icon.hasClass("icon-android"))
-                            platforms = platforms or Upload.PLATFORM_ANDROID
-                        else if(icon.hasClass("icon-windows8"))
-                            platforms = platforms or Upload.PLATFORM_WINDOWS
-                        else if(icon.hasClass("icon-apple"))
-                            platforms = platforms or Upload.PLATFORM_MAC
-                        else if(icon.hasClass("icon-tux"))
-                            platforms = platforms or Upload.PLATFORM_LINUX
-                    }
-
-                    val uploadNameDiv = uploadDiv.getElementsByClass("upload_name")[0]
-                    val name = uploadNameDiv.getElementsByClass("name").attr("title")
-                    val fileSize = uploadNameDiv.getElementsByClass("file_size")[0].child(0).html()
-
-                    //These may or may not exist
-                    val uploadId: Int? =
-                        uploadNameDiv.parent().previousElementSibling()?.attr("data-upload_id")
-                            ?.toInt()
-                    var versionName: String? = null
-                    var versionDate: String? = null
-
-                    val buildRow = uploadNameDiv.nextElementSibling()
-                    if (buildRow != null) {
-                        if (buildRow.hasClass("upload_date"))
-                            versionDate = buildRow.child(0).attr("title")
-
-                        var elements = buildRow.getElementsByClass("version_name")
-                        if (elements.isNotEmpty())
-                            versionName = elements[0].html()
-
-                        elements = buildRow.getElementsByClass("version_date")
-                        if (elements.isNotEmpty())
-                            versionDate = elements[0].child(0).attr("title")
-                    }
-
-                    val upload = Upload(
-                        gameId = gameId,
-                        uploadId = uploadId,
-                        name = name,
-                        fileSize = fileSize,
-                        locale = locale,
-                        version = versionName,
-                        uploadTimestamp = versionDate,
-                        isPending = setPending,
-                        platforms = platforms
-                    )
-                    Log.d(LOGGING_TAG, "Found upload: $upload")
-
-                    uploadsList.add(upload)
-                    uploadNum++
+            if (requiredUploadId != null) {
+                val uploadButtons =
+                    doc.getElementsByAttributeValue("data-upload_id", requiredUploadId.toString())
+                if (uploadButtons.isEmpty()) {
+                    if (doc.getElementsByClass("uploads").isNotEmpty())
+                        throw UploadNotFoundException(requiredUploadId)
+                    else
+                        throw IllegalStateException("Unparse-able game page")
                 }
+                uploadDivs = Collections.singletonList(uploadButtons.first().parent())
+            } else {
+                uploadDivs = doc.getElementsByClass("upload_list_widget").first().children()
             }
-            return uploadsList
+            
+            val locale = getLocale(doc)
+            val gameId = ItchWebsiteUtils.getGameId(doc)
+
+            val result = ArrayList<Installation>()
+            
+            for (uploadDiv in uploadDivs) {
+                val icons = uploadDiv.getElementsByClass("icon")
+                var platforms = Installation.PLATFORM_NONE
+
+                for (icon in icons) {
+                    if (icon.hasClass("icon-android"))
+                        platforms = platforms or Installation.PLATFORM_ANDROID
+                    else if (icon.hasClass("icon-windows8"))
+                        platforms = platforms or Installation.PLATFORM_WINDOWS
+                    else if (icon.hasClass("icon-apple"))
+                        platforms = platforms or Installation.PLATFORM_MAC
+                    else if (icon.hasClass("icon-tux"))
+                        platforms = platforms or Installation.PLATFORM_LINUX
+                }
+
+                val uploadNameDiv = uploadDiv.getElementsByClass("upload_name")[0]
+                val name = uploadNameDiv.getElementsByClass("name").attr("title")
+                val fileSize = uploadNameDiv.getElementsByClass("file_size")[0].child(0).html()
+                val uploadId = requiredUploadId ?:
+                    Integer.parseInt(uploadDiv.getElementsByClass("download_btn")[0].attr("data-upload_id"))
+
+                //These may or may not exist
+                var versionName: String? = null
+                var versionDate: String? = null
+
+                val buildRow = uploadNameDiv.nextElementSibling()
+                if (buildRow != null) {
+                    if (buildRow.hasClass("upload_date"))
+                        versionDate = buildRow.child(0).attr("title")
+
+                    var elements = buildRow.getElementsByClass("version_name")
+                    if (elements.isNotEmpty())
+                        versionName = elements[0].html()
+
+                    elements = buildRow.getElementsByClass("version_date")
+                    if (elements.isNotEmpty())
+                        versionDate = elements[0].child(0).attr("title")
+                }
+                result.add(Installation(
+                    gameId = gameId,
+                    uploadId = uploadId,
+                    locale = locale,
+                    version = versionName,
+                    uploadTimestamp = versionDate,
+                    uploadName = name,
+                    fileSize = fileSize,
+                    platformFlags = platforms,
+                ))
+            }
+            return result
         }
 
         fun getStoreUrlFromDownloadPage(downloadUri: Uri): String {
@@ -146,19 +172,19 @@ class ItchWebsiteParser {
 
 
 
-        suspend fun getDownloadUrlFromStorePage(doc: Document, storeUrl: String, doExtraFetches: Boolean): DownloadUrl? = withContext(Dispatchers.IO) {
+        suspend fun getDownloadUrl(doc: Document, storeUrl: String): DownloadUrl? = withContext(Dispatchers.IO) {
             //The game is free and the store page provides download links
             if(doc.getElementsByClass("download_btn").isNotEmpty())
                 return@withContext DownloadUrl(storeUrl, isPermanent = true, isStorePage = true)
 
             //The game has been bought and the store page provides download links
             var elements = doc.getElementsByClass("purchase_banner_inner")
-            if(elements.isNotEmpty()) {
+            if (elements.isNotEmpty()) {
                 Log.d(LOGGING_TAG, "Purchased game")
                 val downloadButtonRows = elements[0].getElementsByClass("key_row").sortedBy {
                     elements = it.getElementsByClass("purchase_price")
 
-                    return@sortedBy if(elements.isNotEmpty()) {
+                    return@sortedBy if (elements.isNotEmpty()) {
                         Log.d(LOGGING_TAG, "Paid: ${elements[0].html().removePrefix("$").replace(".", "")}")
                         elements[0].html().removePrefix("$").replace(".", "").toInt()
                     } else 0
@@ -167,11 +193,8 @@ class ItchWebsiteParser {
                     isPermanent = true, isStorePage = false)
             }
 
-            //The game is free and hasn't been bought but accepts donations (the tricky part)
-            return@withContext if(doExtraFetches)
-                fetchDownloadUrlFromStorePage(storeUrl)
-            else
-                null
+            //The game is free but accepts donations and hasn't been paid for
+            return@withContext fetchDownloadUrlFromStorePage(storeUrl)
         }
 
         /**

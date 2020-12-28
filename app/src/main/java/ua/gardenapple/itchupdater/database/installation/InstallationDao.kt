@@ -7,10 +7,10 @@ import ua.gardenapple.itchupdater.database.installation.Installation.Companion.G
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.INTERNAL_ID
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.PACKAGE_NAME
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS
-import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS_DOWNLOADING
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS_INSTALLED
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS_INSTALLING
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.TABLE_NAME
+import ua.gardenapple.itchupdater.database.installation.Installation.Companion.UPLOAD_ID
 
 @Dao
 abstract class InstallationDao {
@@ -33,14 +33,17 @@ abstract class InstallationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insert(installations: List<Installation>)
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS = $STATUS_INSTALLED LIMIT 1")
-    abstract fun findInstallation(gameId: Int): Installation?
+    @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS = $STATUS_INSTALLED")
+    abstract fun getInstallations(gameId: Int): List<Installation>
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS != $STATUS_INSTALLED LIMIT 1")
-    abstract fun findPendingInstallation(gameId: Int): Installation?
+    @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS != $STATUS_INSTALLED")
+    abstract fun getPendingInstallations(gameId: Int): List<Installation>
 
-    @Query("DELETE FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS != $STATUS_INSTALLED")
-    abstract fun clearPendingInstallationsForGame(gameId: Int)
+    @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS != $STATUS_INSTALLED LIMIT 1")
+    abstract fun getPendingInstallation(uploadId: Int): Installation?
+
+    @Query("DELETE FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS != $STATUS_INSTALLED")
+    abstract fun deletePendingInstallation(uploadId: Int)
 
     @Update
     abstract fun update(vararg installations: Installation)
@@ -54,21 +57,15 @@ abstract class InstallationDao {
     @Query("DELETE FROM $TABLE_NAME WHERE $PACKAGE_NAME = :packageName AND $STATUS = $STATUS_INSTALLED")
     abstract fun deleteFinishedInstallation(packageName: String)
 
-    @Query("DELETE FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS = $STATUS_INSTALLED")
-    abstract fun deleteFinishedInstallation(gameId: Int)
+    @Query("DELETE FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS = $STATUS_INSTALLED")
+    abstract fun deleteFinishedInstallation(uploadId: Int)
 
-    @Query("DELETE FROM $TABLE_NAME WHERE $GAME_ID = :gameId")
-    abstract fun clearAllInstallationsForGame(gameId: Int)
+    @Query("SELECT * FROM $TABLE_NAME WHERE $PACKAGE_NAME = :packageName AND $STATUS = $STATUS_INSTALLED LIMIT 1")
+    abstract fun getInstallationByPackageName(packageName: String): Installation?
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :downloadId AND $STATUS != $STATUS_INSTALLING LIMIT 1")
     abstract fun findPendingInstallationByDownloadId(downloadId: Long): Installation?
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :installSessionId AND $STATUS = $STATUS_INSTALLING LIMIT 1")
     abstract fun findPendingInstallationBySessionId(installSessionId: Int): Installation?
-
-    @Transaction
-    open fun resetAllInstallationsForGame(gameId: Int, newInstall: Installation) {
-        clearAllInstallationsForGame(gameId)
-        insert(newInstall)
-    }
 }

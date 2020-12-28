@@ -8,7 +8,6 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.Utils
-import ua.gardenapple.itchupdater.database.AppDatabase
 
 /**
  * This service gets started after an APK gets installed by an Installer.

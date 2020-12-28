@@ -9,358 +9,182 @@ import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
-import ua.gardenapple.itchupdater.database.upload.Upload
+import java.lang.IllegalArgumentException
 import java.util.*
 
 class UpdateChecker(val db: AppDatabase) {
     companion object {
         private const val LOGGING_TAG: String = "UpdateChecker"
-
-        fun shouldCheck(gameId: Int): Boolean {
-            return !(gameId == Game.MITCH_GAME_ID && BuildConfig.FLAVOR != FLAVOR_ITCHIO)
-        }
     }
 
-    suspend fun checkUpdates(gameId: Int): UpdateCheckResult =
+    fun shouldCheck(installation: Installation): Boolean {
+        return !(installation.gameId == Game.MITCH_GAME_ID && BuildConfig.FLAVOR != FLAVOR_ITCHIO)
+    }
+
+    /**
+     * @return null if access is denied
+     */
+    suspend fun getDownloadInfo(currentGame: Game): Pair<Document, ItchWebsiteParser.DownloadUrl>? =
         withContext(Dispatchers.IO) {
-            if (!shouldCheck(gameId))
-                throw IllegalStateException("Should not be checking updates using itch.io for this")
-            var game = db.gameDao.getGameById(gameId)
-            if (game == null)
-                throw IllegalStateException("Checking update for game ID $gameId with no Game info available")
+            var updateCheckDoc: Document
+            var downloadPageInfo: ItchWebsiteParser.DownloadUrl
 
-            val currentInstall = db.installDao.findInstallation(gameId)
-            if (currentInstall == null || currentInstall.status != Installation.STATUS_INSTALLED)
-                throw IllegalStateException("Checking update for game ${game.name} (ID $gameId) which is not installed")
+            if (currentGame.downloadPageUrl != null) {
+                //Have cached download URL
 
-            logD(game, "Checking updates for ${game.name}")
+                updateCheckDoc = ItchWebsiteUtils.fetchAndParse(currentGame.downloadPageUrl)
+                downloadPageInfo = currentGame.downloadInfo!!
 
-            logD(game, "Current install: $currentInstall")
+                if (!ItchWebsiteUtils.hasGameDownloadLinks(updateCheckDoc)) {
+                    //game info may be out-dated
+                    val storePageDoc = if (downloadPageInfo.isStorePage)
+                        updateCheckDoc
+                    else
+                        ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
 
-//        game = updateStoreInfoIfNecessary(game)
+                    downloadPageInfo =
+                        ItchWebsiteParser.getDownloadUrl(storePageDoc, currentGame.storeUrl)
+                            ?: return@withContext null
 
-            val storePageDoc = ItchWebsiteUtils.fetchAndParseDocument(game.storeUrl)
-            game = ItchWebsiteParser.getGameInfoForStorePage(storePageDoc, game.storeUrl)
+                    if (downloadPageInfo.isPermanent) {
+                        //insert new info
+                        val newGameInfo =
+                            ItchWebsiteParser.getGameInfoForStorePage(
+                                storePageDoc,
+                                currentGame.storeUrl
+                            )
+                        db.gameDao.update(newGameInfo.copy(downloadPageUrl = downloadPageInfo.url))
+                    }
+                    updateCheckDoc = ItchWebsiteUtils.fetchAndParse(downloadPageInfo.url)
+                }
+            } else {
+                //Must get fresh download URL
 
-            var updateCheckUrl = game.downloadPageUrl
-            var downloadPageInfo: ItchWebsiteParser.DownloadUrl? = null
+                val storePageDoc = ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
+                downloadPageInfo =
+                    ItchWebsiteParser.getDownloadUrl(storePageDoc, currentGame.storeUrl)
+                        ?: return@withContext null
+                updateCheckDoc = ItchWebsiteUtils.fetchAndParse(downloadPageInfo.url)
+            }
+            return@withContext Pair(updateCheckDoc, downloadPageInfo)
+        }
 
-            if (updateCheckUrl == null) {
-                downloadPageInfo = ItchWebsiteParser.getDownloadUrlFromStorePage(
-                    storePageDoc,
-                    game.storeUrl,
-                    false
+    suspend fun checkUpdates(
+        currentGame: Game, 
+        currentInstall: Installation,
+        updateCheckDoc: Document,
+        downloadPageInfo: ItchWebsiteParser.DownloadUrl
+    ): UpdateCheckResult =
+        withContext(Dispatchers.IO) {
+            if (!shouldCheck(currentInstall))
+                throw IllegalArgumentException("Should not be checking updates using itch.io for this")
+
+            logD(currentGame, "Checking updates for ${currentGame.name}")
+            logD(currentGame, "Current install: $currentInstall")
+
+            if (!ItchWebsiteUtils.hasGameDownloadLinks(updateCheckDoc)) {
+                return@withContext UpdateCheckResult(
+                    installationId = currentInstall.internalId,
+                    code = UpdateCheckResult.ACCESS_DENIED
                 )
-
-                updateCheckUrl = downloadPageInfo?.url ?: game.storeUrl
             }
 
-            logD(game, "Update check URL: $updateCheckUrl")
+            logD(currentGame, "Update check URL: ${downloadPageInfo.url}")
 
-            if (downloadPageInfo?.isPermanent == true)
-                game = game.copy(downloadPageUrl = downloadPageInfo.url)
-
-            //Received new info about the game, save to database.
-            db.gameDao.update(game)
-
-            var updateCheckDoc = if (downloadPageInfo?.isStorePage == true)
-                storePageDoc
-            else
-                ItchWebsiteUtils.fetchAndParseDocument(updateCheckUrl)
-
-            val result = compareUploads(db, updateCheckDoc, currentInstall, gameId, downloadPageInfo)
-            logD(game, "Update check result: $result")
-
-            if (result.uploadID != null ||
-                (result.code != UpdateCheckResult.ACCESS_DENIED && result.code != UpdateCheckResult.UNKNOWN))
-                return@withContext result
-
-
-
-            logD(game, "Bringing out the big guns")
-
-            downloadPageInfo = ItchWebsiteParser.fetchDownloadUrlFromStorePage(game.storeUrl)
-            if (downloadPageInfo == null)
-                return@withContext UpdateCheckResult(
-                    currentInstall.internalId,
-                    UpdateCheckResult.UNKNOWN
-                )
-
-
-            updateCheckUrl = downloadPageInfo.url
-            updateCheckDoc = ItchWebsiteUtils.fetchAndParseDocument(updateCheckUrl)
-
-            logD(game, "Download page is $updateCheckUrl")
-
-            return@withContext compareUploads(db, updateCheckDoc, currentInstall, gameId, downloadPageInfo)
+            return@withContext compareUploads(updateCheckDoc, currentInstall, currentGame, downloadPageInfo)
         }
 
     private fun compareUploads(
-        db: AppDatabase,
         updateCheckDoc: Document,
         currentInstall: Installation,
-        gameId: Int,
-        downloadPageUrl: ItchWebsiteParser.DownloadUrl?
+        game: Game,
+        downloadPageUrl: ItchWebsiteParser.DownloadUrl
     ): UpdateCheckResult {
-        val fetchedUploads = ItchWebsiteParser.getUploads(gameId, updateCheckDoc)
+        val fetchedInstalls = ItchWebsiteParser.getInstallations(updateCheckDoc)
 
-        if (fetchedUploads.isEmpty())
-            return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.EMPTY)
-            
-        val game = db.gameDao.getGameById(gameId)!!
-
-        logD(game, "Looking for local upload info ${currentInstall.uploadId}")
-        val installedUpload = db.uploadDao.getUploadById(currentInstall.uploadId)!!
-        logD(game, "Found $installedUpload")
-        var suggestedUpload: Upload? = null
-
-        var oneAvailableUpload = false
-        for (upload in fetchedUploads) {
-            if (upload.name == installedUpload.name) {
-                suggestedUpload = upload
+        var oneAvailableInstall = false
+        var suggestedInstall: Installation? = null
+        for (install in fetchedInstalls) {
+            if (install.uploadName == currentInstall.uploadName) {
+                suggestedInstall = install
                 break
             }
-            if (upload.platforms and installedUpload.platforms == installedUpload.platforms) {
-                if (suggestedUpload == null) {
-                    suggestedUpload = upload
-                    oneAvailableUpload = true
-                } else if (oneAvailableUpload) {
-                    suggestedUpload = null
-                    oneAvailableUpload = false
+            if (install.platforms and currentInstall.platforms == currentInstall.platforms) {
+                if (suggestedInstall == null) {
+                    suggestedInstall = install
+                    oneAvailableInstall = true
+                } else if (oneAvailableInstall) {
+                    suggestedInstall = null
+                    oneAvailableInstall = false
                 }
             }
         }
-        logD(game, "Suggested upload: $suggestedUpload")
+        logD(game, "Suggested install: $suggestedInstall")
 
-        //Try different heuristics
-
-        /*
-        Note that just because the upload ID stays the same, it doesn't mean that there wasn't
-        an update. Builds pushed via butler don't change the upload ID.
-         */
-        var allVersionsDifferent = true
-        if (fetchedUploads[0].uploadId != null && currentInstall.gameId != Game.MITCH_GAME_ID) {
-            logD(game, "Checking upload IDs...")
-            for (upload in fetchedUploads) {
-                if (upload.uploadId == currentInstall.uploadId) {
-                    logD(game, "Found same upload ID")
-                    allVersionsDifferent = false
-
-                    if (isSameLocale(installedUpload, upload) && upload.version != installedUpload.version) {
-                        logD(game, "Version tag changed")
-                        return UpdateCheckResult(currentInstall.internalId,
-                            UpdateCheckResult.UPDATE_NEEDED, 
-                            uploadID = upload.uploadId, 
-                            downloadPageUrl = downloadPageUrl,
-                            newVersionString = upload.version,
-                            newTimestamp = upload.uploadTimestamp,
-                            newSize = upload.fileSize
-                        )
-                    } else if (installedUpload.version == null && upload.version == null) {
-                        logD(game, "Version tag unchanged, not a butler upload")
-                        return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
-                    }
-
-                    if (upload.fileSize != installedUpload.fileSize) {
-                        logD(game, "File size changed")
-                        return UpdateCheckResult(currentInstall.internalId,
-                            UpdateCheckResult.UPDATE_NEEDED, 
-                            uploadID = upload.uploadId, 
-                            downloadPageUrl = downloadPageUrl,
-                            newTimestamp = upload.uploadTimestamp,
-                            newSize = upload.fileSize,
-                            newVersionString = upload.version
-                        )
-                    }
-                    if (isSameLocale(installedUpload, upload) && upload.uploadTimestamp != installedUpload.uploadTimestamp &&
-                            installedUpload.uploadTimestamp != null) {
-                        logD(game, "Timestamp changed")
-                        return UpdateCheckResult(currentInstall.internalId,
-                            UpdateCheckResult.UPDATE_NEEDED,
-                            uploadID = upload.uploadId,
-                            downloadPageUrl = downloadPageUrl,
-                            newTimestamp = upload.uploadTimestamp,
-                            newSize = upload.fileSize,
-                            newVersionString = upload.version
-                        )
-                    }
-
-                    logD(game, "Upload with current uploadID has not changed")
-                    suggestedUpload = null
-                    break
-                }
-            }
-            if (allVersionsDifferent) {
-                logD(game, "All upload IDs are different")
-                return UpdateCheckResult(currentInstall.internalId,
-                    UpdateCheckResult.UPDATE_NEEDED, 
-                    uploadID = suggestedUpload?.uploadId,
-                    downloadPageUrl = downloadPageUrl,
-                    newVersionString = suggestedUpload?.version ?: suggestedUpload?.uploadTimestamp,
-                    newSize = suggestedUpload?.fileSize,
-                    newTimestamp = suggestedUpload?.uploadTimestamp
-                )
-            }
-        }
-
-        allVersionsDifferent = true
-        if(installedUpload.gameId == Game.MITCH_GAME_ID && installedUpload.locale == Game.MITCH_LOCALE) {
-            logD(game, "Checking version tags...")
-            logD(game, "Special processing for Mitch")
-            for (upload in fetchedUploads) {
-                if (upload.version!!.contains(installedUpload.version!!)) {
-                    logD(game, "Found same version tag")
-                    allVersionsDifferent = false
-                    break
-                }
-            }
-            if (allVersionsDifferent) {
-                logD(game, "All version tags are different")
-                return UpdateCheckResult(currentInstall.internalId,
-                    UpdateCheckResult.UPDATE_NEEDED, 
-                    uploadID = suggestedUpload?.uploadId, 
-                    downloadPageUrl = downloadPageUrl,
-                    newTimestamp = suggestedUpload?.uploadTimestamp,
-                    newVersionString = suggestedUpload?.version,
-                    newSize = suggestedUpload?.fileSize
-                )
-            }
-        } else if (installedUpload.version != null && isSameLocale(installedUpload, fetchedUploads[0])) {
-            logD(game, "Checking version tags...")
-            for (upload in fetchedUploads) {
-                if (upload.version == installedUpload.version) {
-                    logD(game, "Found same version tag")
-                    allVersionsDifferent = false
-                    break
-                }
-            }
-            if (allVersionsDifferent) {
-                logD(game, "All version tags are different")
-                return UpdateCheckResult(installationId = currentInstall.internalId,
-                    UpdateCheckResult.UPDATE_NEEDED,
-                    uploadID = suggestedUpload?.uploadId, 
-                    downloadPageUrl = downloadPageUrl,
-                    newTimestamp = suggestedUpload?.uploadTimestamp,
-                    newVersionString = suggestedUpload?.version,
-                    newSize = suggestedUpload?.fileSize
-                )
-            }
-        }
-
-        if (installedUpload.uploadTimestamp != null && isSameLocale(installedUpload, fetchedUploads[0])) {
-            logD(game, "Checking timestamps...")
-            allVersionsDifferent = true
-            for (upload in fetchedUploads) {
-                if (upload.uploadTimestamp == installedUpload.uploadTimestamp) {
-                    logD(game, "Found same timestamp")
-                    allVersionsDifferent = false
-                    break
-                }
-                if (upload.uploadTimestamp == null) {
-                    allVersionsDifferent = false
-                    break
-                }
-            }
-            if (allVersionsDifferent) {
-                logD(game, "All timestamps are different")
-                return UpdateCheckResult(currentInstall.internalId,
-                    UpdateCheckResult.UPDATE_NEEDED,
-                    uploadID = suggestedUpload?.uploadId, 
-                    downloadPageUrl = downloadPageUrl,
-                    newTimestamp = suggestedUpload?.uploadTimestamp,
-                    newVersionString = suggestedUpload?.version,
-                    newSize = suggestedUpload?.fileSize
-                )
-            }
-        }
-
-        if(installedUpload.fileSize != Upload.MITCH_FILE_SIZE) {
-            logD(game, "Checking file sizes...")
-            allVersionsDifferent = true
-            for (upload in fetchedUploads) {
-                if (upload.fileSize == installedUpload.fileSize) {
-                    logD(game, "Found same file size")
-                    allVersionsDifferent = false
-                    break
-                }
-            }
-            if (allVersionsDifferent) {
-                logD(game, "All file sizes different")
-                return UpdateCheckResult(currentInstall.internalId,
-                    UpdateCheckResult.UPDATE_NEEDED,
-                    uploadID = suggestedUpload?.uploadId, 
-                    downloadPageUrl = downloadPageUrl,
-                    newTimestamp = suggestedUpload?.uploadTimestamp,
-                    newVersionString = suggestedUpload?.version,
-                    newSize = suggestedUpload?.fileSize
-                )
-            }
-        }
-
-
-        val currentUploads = db.uploadDao.getUploadsForGame(gameId)
-        if (currentUploads.size == fetchedUploads.size) {
-            logD(game, "Same amount of uploads, performing extra checks...")
-
-            var allVersionsSame = true
-            if(installedUpload.gameId == Game.MITCH_GAME_ID && installedUpload.locale == Game.MITCH_LOCALE) {
-                logD(game, "Checking version tags...")
-                logD(game, "Special processing for Mitch")
-                for(upload in fetchedUploads) {
-                    if(!upload.version!!.contains(installedUpload.version!!)) {
-                        logD(game, "Version tags don't match")
-                        allVersionsSame = false
-                        break
-                    }
-                }
-                if (allVersionsSame) {
-                    logD(game, "Version tags all match")
-                    return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
-                }
-            } else if (installedUpload.version != null) {
-                if (isSameLocale(installedUpload, fetchedUploads[0])) {
+        for (install in fetchedInstalls) {
+            // Note that just because the upload ID stays the same, it doesn't mean that there wasn't
+            // an update. Builds pushed via butler don't change the upload ID.
+            if (install.uploadId == currentInstall.uploadId) {
+                logD(game, "Found same uploadId")
+                    
+                if (currentInstall.version != null) {
                     logD(game, "Checking version tags...")
-                    for (i in fetchedUploads.indices) {
-                        if (fetchedUploads[i].version != currentUploads[i].version) {
-                            logD(game, "Version tags don't match")
-                            allVersionsSame = false
-                            break
-                        }
-                    }
-                    if (allVersionsSame) {
-                        logD(game, "Version tags all match")
-                        return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
-                    }
-                }
-            }
+                    val containsCurrentVersion = install.version?.contains(currentInstall.version)
+                    if (containsCurrentVersion == true) {
+                        logD(game, "Found same version tag")
+                        
+                        return UpdateCheckResult(currentInstall.internalId,
+                            code = UpdateCheckResult.UP_TO_DATE)
+                    } else if (containsCurrentVersion == false) {
+                        logD(game, "Version tag changed!")
 
-            if (installedUpload.uploadTimestamp != null) {
-                if (isSameLocale(installedUpload, fetchedUploads[0])) {
-                    logD(game, "Checking timestamps...")
-                    allVersionsSame = true
-                    for (i in fetchedUploads.indices) {
-                        if (fetchedUploads[i].uploadTimestamp != currentUploads[i].uploadTimestamp) {
-                            logD(game, "Timestamps don't match")
-                            allVersionsSame = false
-                            break
-                        }
+                        return UpdateCheckResult(
+                            currentInstall.internalId,
+                            code = UpdateCheckResult.UPDATE_NEEDED,
+                            downloadPageUrl = downloadPageUrl,
+                            uploadID = install.uploadId,
+                            newVersionString = install.version,
+                            newTimestamp = install.uploadTimestamp,
+                            newSize = install.fileSize
+                        )
+                    } else {
+                        throw IllegalStateException("Version tag unknown? This should not happen")
                     }
-                    if (allVersionsSame) {
-                        logD(game, "Timestamps all match")
+                } else {
+                    logD(game, "Current install is not a butler upload")
+                    if (install.version != null) {
+                        logD(game, "Install became a butler upload? Weird but okay")
+
+                        return UpdateCheckResult(
+                            currentInstall.internalId,
+                            code = UpdateCheckResult.UPDATE_NEEDED,
+                            downloadPageUrl = downloadPageUrl,
+                            uploadID = install.uploadId,
+                            newVersionString = install.version,
+                            newTimestamp = install.uploadTimestamp,
+                            newSize = install.fileSize
+                        )
+                    } else {
+                        logD(game, "Nothing changed")
+
                         return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
                     }
                 }
-            } else {
-                logD(game, "Current timestamp is null")
-                return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
             }
         }
-
-        return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UNKNOWN)
+        logD(game, "Didn't find current uploadId")
+        return UpdateCheckResult(currentInstall.internalId,
+            UpdateCheckResult.UPDATE_NEEDED,
+            uploadID = suggestedInstall?.uploadId,
+            downloadPageUrl = downloadPageUrl,
+            newTimestamp = suggestedInstall?.uploadTimestamp,
+            newVersionString = suggestedInstall?.version,
+            newSize = suggestedInstall?.fileSize
+        )
     }
 
-    private fun isSameLocale(upload1: Upload, upload2: Upload): Boolean {
-        return upload1.locale == upload2.locale && upload1.locale != ItchWebsiteParser.UNKNOWN_LOCALE
+    private fun isSameLocale(install1: Installation, install2: Installation): Boolean {
+        return install1.locale == install2.locale && install1.locale != ItchWebsiteParser.UNKNOWN_LOCALE
     }
 
     private fun logD(game: Game, message: String) {

@@ -3,26 +3,25 @@ package ua.gardenapple.itchupdater.client
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ua.gardenapple.itchupdater.*
+import org.jsoup.nodes.Document
+import ua.gardenapple.itchupdater.NOTIFICATION_CHANNEL_ID_INSTALLING
+import ua.gardenapple.itchupdater.NOTIFICATION_TAG_UPDATE_CHECK
+import ua.gardenapple.itchupdater.R
+import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.installer.UpdateNotificationBroadcastReceiver
 import ua.gardenapple.itchupdater.ui.MainActivity
-import java.io.PrintWriter
-import java.io.StringWriter
 
 class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
@@ -38,17 +37,45 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
         var success = true
 
         coroutineScope {
+            //We support multiple install per game, and we don't want to download the
+            //HTML for the same game multiple times
+            val gameCache = HashMap<Int, Game>()
+            val downloadInfoCache = HashMap<Int, Pair<Document, ItchWebsiteParser.DownloadUrl>?>()
+
             for (install in installations) {
-                if (!UpdateChecker.shouldCheck(install.gameId))
+                if (!updateChecker.shouldCheck(install))
                     continue
 
                 launch(Dispatchers.IO) {
-                    val game = db.gameDao.getGameById(install.gameId)!!
                     var result: UpdateCheckResult
+                    val game: Game = if (gameCache.containsKey(install.gameId)) {
+                        gameCache[install.gameId]!!
+                    } else {
+                        val dbGame = db.gameDao.getGameById(install.gameId)!!
+                        gameCache[install.gameId] = dbGame
+                        dbGame
+                    }
 
                     try {
-                        result = updateChecker.checkUpdates(game.gameId)
+                        val downloadInfo = if (downloadInfoCache.containsKey(install.gameId)) {
+                            downloadInfoCache[install.gameId]
+                        } else {
+                            val newDownloadInfo = updateChecker.getDownloadInfo(game)
+                            downloadInfoCache[install.gameId] = newDownloadInfo
+                            newDownloadInfo
+                        }
 
+                        if (downloadInfo == null) {
+                            result = UpdateCheckResult(
+                                install.internalId,
+                                UpdateCheckResult.ACCESS_DENIED
+                            )
+                        } else {
+                            val (updateCheckDoc, downloadUrlInfo) = downloadInfo
+                            result = updateChecker.checkUpdates(
+                                game, install, updateCheckDoc, downloadUrlInfo
+                            )
+                        }
                     } catch (e: Exception) {
                         result = UpdateCheckResult(
                             installationId = install.internalId,
@@ -83,7 +110,7 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
             UpdateCheckResult.UPDATE_NEEDED -> context.resources.getString(R.string.notification_update_available)
             UpdateCheckResult.EMPTY -> context.resources.getString(R.string.notification_update_empty)
             UpdateCheckResult.ACCESS_DENIED -> context.resources.getString(R.string.notification_update_access_denied)
-            UpdateCheckResult.UNKNOWN -> context.resources.getString(R.string.notification_update_unknown)
+//            UpdateCheckResult.UNKNOWN -> context.resources.getString(R.string.notification_update_unknown)
             else -> context.resources.getString(R.string.notification_update_fail)
         }
         val builder =

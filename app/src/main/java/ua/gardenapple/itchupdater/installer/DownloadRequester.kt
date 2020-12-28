@@ -8,10 +8,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import android.util.Log
 import android.webkit.URLUtil
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import ua.gardenapple.itchupdater.PERMISSION_REQUEST_CODE_DOWNLOAD
 import ua.gardenapple.itchupdater.ui.PermissionRequestActivity
 

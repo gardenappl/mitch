@@ -3,10 +3,7 @@ package ua.gardenapple.itchupdater.database.updatecheck
 import androidx.room.*
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.client.UpdateCheckResult
-import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
-import ua.gardenapple.itchupdater.database.upload.Upload
-import java.util.*
 
 @Entity(tableName = UpdateCheckResultModel.TABLE_NAME,
     foreignKeys = [

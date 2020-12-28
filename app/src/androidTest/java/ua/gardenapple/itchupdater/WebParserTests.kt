@@ -6,14 +6,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.database.game.Game
-import ua.gardenapple.itchupdater.database.upload.Upload
+import ua.gardenapple.itchupdater.database.installation.Installation
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -40,20 +38,20 @@ class WebParserTests {
         )
 
         val doc: Document = runBlocking(Dispatchers.IO) {
-            ItchWebsiteUtils.fetchAndParseDocument(game.downloadPageUrl ?: game.storeUrl)
+            ItchWebsiteUtils.fetchAndParse(game.downloadPageUrl ?: game.storeUrl)
         }
 
 //        Log.d(LOGGING_TAG, "HTML: ")
 //        Utils.logLongD(LOGGING_TAG, doc.outerHtml())
 
-        val uploads = ItchWebsiteParser.getUploads(gameId, doc)
-        assertEquals(4, uploads.size)
+        val installs = ItchWebsiteParser.getInstallations(doc)
+        assertEquals(4, installs.size)
 
-        assertEquals("Super Hexagon [Android]", uploads[3].name)
-        assertEquals("01 July 2015 @ 01:00", uploads[3].uploadTimestamp)
-        assertEquals("26 MB", uploads[3].fileSize)
-        assertEquals(74588, uploads[3].uploadId)
-        assertEquals(null, uploads[3].version)
+        assertEquals("Super Hexagon [Android]", installs[3].uploadName)
+        assertEquals("01 July 2015 @ 01:00", installs[3].uploadTimestamp)
+        assertEquals("26 MB", installs[3].fileSize)
+        assertEquals(74588, installs[3].uploadId)
+        assertEquals(null, installs[3].version)
     }
 
     @Test
@@ -67,21 +65,21 @@ class WebParserTests {
         )
 
         val doc: Document = runBlocking(Dispatchers.IO) {
-            ItchWebsiteUtils.fetchAndParseDocument(game.storeUrl)
+            ItchWebsiteUtils.fetchAndParse(getDownloadPage(game.storeUrl)!!.url)
         }
 
 //        Log.d(LOGGING_TAG, "HTML: ")
 //        Utils.logLongD(LOGGING_TAG, doc.outerHtml())
 
-        val uploads = ItchWebsiteParser.getUploads(gameId, doc)
+        val installs = ItchWebsiteParser.getInstallations(doc)
 
-        assertEquals(6, uploads.size)
-        assertEquals(Upload.PLATFORM_ANDROID, uploads[4].platforms)
-        assertEquals("[Android]Mindustry.apk", uploads[4].name)
-        assertEquals(null, uploads[4].uploadTimestamp)
-        assertEquals("33 MB", uploads[4].fileSize)
-        assertEquals(null, uploads[4].uploadId)
-        assert(uploads[4].version!!.contains("103.3"))
+        assertEquals(6, installs.size)
+        assertEquals(Installation.PLATFORM_ANDROID, installs[4].platforms)
+        assertEquals("[Android]Mindustry.apk", installs[4].uploadName)
+        assertEquals("23 December 2020 @ 17:49", installs[4].uploadTimestamp)
+        assertEquals("60 MB", installs[4].fileSize)
+        assertEquals(1615327, installs[4].uploadId)
+        assertTrue(installs[4].version!!.contains("122"))
     }
 
     /**
@@ -131,8 +129,8 @@ class WebParserTests {
         assertNull(url)
     }
 
-    suspend fun getDownloadPage(url: String): ItchWebsiteParser.DownloadUrl? {
-        val doc = ItchWebsiteUtils.fetchAndParseDocument(url)
-        return ItchWebsiteParser.getDownloadUrlFromStorePage(doc, url, true)
+    suspend fun getDownloadPage(storeUrl: String): ItchWebsiteParser.DownloadUrl? {
+        val doc = ItchWebsiteUtils.fetchAndParse(storeUrl)
+        return ItchWebsiteParser.getDownloadUrl(doc, storeUrl)
     }
 }

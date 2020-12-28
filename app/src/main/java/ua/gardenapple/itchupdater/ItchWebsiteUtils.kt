@@ -88,7 +88,7 @@ class ItchWebsiteUtils {
         }
 
 
-        suspend fun fetchAndParseDocument(url: String): Document = withContext(Dispatchers.IO) {
+        suspend fun fetchAndParse(url: String): Document = withContext(Dispatchers.IO) {
             val request = Request.Builder().run {
                 url(url)
                 addHeader("Cookie", CookieManager.getInstance().getCookie(url))
