@@ -4,21 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import ua.gardenapple.itchupdater.database.game.Game.Companion.GAME_ID
 import ua.gardenapple.itchupdater.database.game.Game.Companion.TABLE_NAME
+import ua.gardenapple.itchupdater.database.installation.GameInstallation
 import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.DOWNLOAD_OR_INSTALL_ID
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.INTERNAL_ID
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.PACKAGE_NAME
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.UPLOAD_NAME
-
-data class GameInstallation(
-    @Embedded val game: Game,
-    val status: Int,
-    val downloadOrInstallId: Long,
-    val packageName: String?,
-    val installId: Int,
-    val uploadName: String
-)
 
 @Dao
 abstract class GameDao {

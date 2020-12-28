@@ -37,13 +37,13 @@
                 android:textColor="?colorPrimaryDark"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@+id/authorName"
+                app:layout_constraintBottom_toTopOf="@+id/authorOrSubtitle"
                 app:layout_constraintEnd_toEndOf="@+id/gameThumbnail"
                 app:layout_constraintStart_toStartOf="@+id/gameThumbnail"
                 app:layout_constraintTop_toBottomOf="@+id/gameThumbnail" />
 
         <TextView
-                android:id="@+id/authorName"
+                android:id="@+id/authorOrSubtitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Author"

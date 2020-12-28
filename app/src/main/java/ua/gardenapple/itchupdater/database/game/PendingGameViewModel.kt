@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import ua.gardenapple.itchupdater.database.AppDatabase
+import ua.gardenapple.itchupdater.database.installation.GameInstallation
 
 class PendingGameViewModel(app: Application) : AndroidViewModel(app) {
     private val repository: GameRepository

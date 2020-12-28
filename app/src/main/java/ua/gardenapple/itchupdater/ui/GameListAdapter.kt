@@ -12,6 +12,9 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
@@ -26,8 +29,8 @@ import ua.gardenapple.itchupdater.MitchApp
 import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD_RESULT
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.AppDatabase
-import ua.gardenapple.itchupdater.database.game.GameInstallation
 import ua.gardenapple.itchupdater.database.game.GameRepository
+import ua.gardenapple.itchupdater.database.installation.GameInstallation
 import ua.gardenapple.itchupdater.database.installation.Installation
 
 class GameListAdapter internal constructor(
@@ -48,11 +51,11 @@ class GameListAdapter internal constructor(
         }
 
     inner class GameViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val thumbnailView = itemView.gameThumbnail
-        val gameName = itemView.gameName
-        val authorName = itemView.authorName
-        val progressBarLayout = itemView.progressBarLayout
-        val progressBarLabel = itemView.progressBarLabel
+        val thumbnailView: ImageView = itemView.gameThumbnail
+        val gameName: TextView = itemView.gameName
+        val authorOrSubtitle: TextView = itemView.authorOrSubtitle
+        val progressBarLayout: LinearLayout = itemView.progressBarLayout
+        val progressBarLabel: TextView = itemView.progressBarLabel
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameViewHolder {
@@ -62,9 +65,10 @@ class GameListAdapter internal constructor(
     }
 
     override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
-        val currentGame = gameInstalls[position].game
-        holder.gameName.text = currentGame.name
-        holder.authorName.text = currentGame.author
+        val gameInstall = gameInstalls[position]
+        val game = gameInstalls[position].game
+        holder.gameName.text = game.name
+        holder.authorOrSubtitle.text = gameInstall.librarySubtitle
 
         if (type == GameRepository.Type.Pending) {
             holder.progressBarLayout.visibility = View.VISIBLE
@@ -81,7 +85,7 @@ class GameListAdapter internal constructor(
         }
 
         Glide.with(context)
-            .load(currentGame.thumbnailUrl)
+            .load(game.thumbnailUrl)
             .override(LibraryFragment.THUMBNAIL_WIDTH, LibraryFragment.THUMBNAIL_HEIGHT)
             .into(holder.thumbnailView)
     }

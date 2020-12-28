@@ -20,6 +20,7 @@ import com.bumptech.glide.util.FixedPreloadSizeProvider
 import kotlinx.android.synthetic.main.library_fragment.*
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.game.*
+import ua.gardenapple.itchupdater.database.installation.GameInstallation
 import java.util.*
 
 class LibraryFragment : Fragment() {
