@@ -129,6 +129,7 @@ class UpdateChecker(val db: AppDatabase) {
                     
                 if (currentInstall.version != null) {
                     logD(game, "Checking version tags...")
+
                     val containsCurrentVersion = install.version?.contains(currentInstall.version)
                     if (containsCurrentVersion == true) {
                         logD(game, "Found same version tag")
@@ -152,6 +153,7 @@ class UpdateChecker(val db: AppDatabase) {
                     }
                 } else {
                     logD(game, "Current install is not a butler upload")
+
                     if (install.version != null) {
                         logD(game, "Install became a butler upload? Weird but okay")
 
@@ -169,6 +171,15 @@ class UpdateChecker(val db: AppDatabase) {
 
                         return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
                     }
+                }
+            }
+            if (currentInstall.uploadId == Installation.MITCH_UPLOAD_ID) {
+                logD(game, "Checking version tags for Mitch...")
+
+                if (install.version?.contains(BuildConfig.VERSION_NAME) == true) {
+                    logD(game, "Found same version tag")
+
+                    return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
                 }
             }
         }
