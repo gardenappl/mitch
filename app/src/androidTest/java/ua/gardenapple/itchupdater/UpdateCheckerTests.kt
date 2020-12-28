@@ -17,8 +17,6 @@ import ua.gardenapple.itchupdater.database.game.Game
 @RunWith(AndroidJUnit4::class)
 class UpdateCheckerTests {
     companion object {
-        const val LOGGING_TAG: String = "Test"
-
         private lateinit var updateChecker: UpdateChecker
         private lateinit var db: AppDatabase
 

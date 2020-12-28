@@ -28,7 +28,7 @@ class WebParserTests {
      * This test will only complete successfully if you're logged in to my itch.io account
      */
     @Test
-    fun testGetAndroidUploads_paidGame_noVersioning() {
+    fun testGetInstallations_paidGame_noVersioning() {
         val gameId = 276085
         val game = Game(gameId, name = "Super Hexagon", author = "Terry Cavanagh",
             downloadPageUrl = "https://terrycavanagh.itch.io/super-hexagon/download/nGM_T_fa5YQ4cMcMFQ4AnSn__H_1Aj670uwLHMiL",
@@ -55,7 +55,7 @@ class WebParserTests {
     }
 
     @Test
-    fun testGetAndroidUploads_donationGame_withVersioning() {
+    fun testGetInstallations_donationGame_withVersioning() {
         val gameId = 140169
         val game = Game(gameId, name = "Mindustry", author = "Anuke",
             downloadPageUrl = null,
