@@ -11,12 +11,4 @@
 
 <p>The app is still in development, some features are planned but not yet implemented.</p>
 
-<p><b>Planned features:</b></p>
-
-<ul>
-<li>Dark theme for app (currently there's a white theme, if you set your itch.io account to use the dark theme the app will look odd)</li>
-<li>Some extra features for owners of the famous Bundle for Racial Justice and Equality</li>
-<li>Improvements to UI and stability</li>
-</ul>
-
-<p><b>If you wish to support the app developer, consider <a href="https://gardenapple.itch.io/mitch">paying for this app on itch.io!</a></b></p>
+<p><b>If you wish to support the app developer, consider <a href="https://gardenapple.itch.io/mitch">buying it on itch.io</a></b></p>
