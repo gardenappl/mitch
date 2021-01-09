@@ -263,7 +263,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
             PERMISSION_REQUEST_CODE_DOWNLOAD -> {
-                if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     DownloadRequester.resumeDownload(getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager)
                 }
             }

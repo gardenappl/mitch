@@ -688,6 +688,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
 
         override fun onProgressChanged(view: WebView?, newProgress: Int) {
+            if (progressBar == null)
+                return //for some reason this happens sometimes
+
             if (newProgress < 100 && progressBar.visibility == ProgressBar.GONE)
                 progressBar.visibility = ProgressBar.VISIBLE
 

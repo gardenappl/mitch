@@ -12,10 +12,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
@@ -56,6 +53,7 @@ class GameListAdapter internal constructor(
         val authorOrSubtitle: TextView = itemView.authorOrSubtitle
         val progressBarLayout: LinearLayout = itemView.progressBarLayout
         val progressBarLabel: TextView = itemView.progressBarLabel
+        val overflowMenuButton: ImageButton = itemView.overflowMenu
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameViewHolder {
@@ -71,6 +69,7 @@ class GameListAdapter internal constructor(
         holder.authorOrSubtitle.text = gameInstall.librarySubtitle
 
         if (type == GameRepository.Type.Pending) {
+            holder.overflowMenuButton.visibility = View.INVISIBLE
             holder.progressBarLayout.visibility = View.VISIBLE
 
             holder.progressBarLabel.text = when (gameInstalls[position].status) {
@@ -84,6 +83,8 @@ class GameListAdapter internal constructor(
             }
         }
 
+        holder.overflowMenuButton.setOnClickListener { view -> onCardOverflowClick(view, position) }
+
         Glide.with(context)
             .load(game.thumbnailUrl)
             .override(LibraryFragment.THUMBNAIL_WIDTH, LibraryFragment.THUMBNAIL_HEIGHT)
@@ -91,7 +92,7 @@ class GameListAdapter internal constructor(
     }
 
     override fun getItemCount() = gameInstalls.size
-
+    
     private fun onCardClick(view: View) {
         val position = list.getChildLayoutPosition(view)
         val gameInstall = gameInstalls[position]
@@ -103,20 +104,31 @@ class GameListAdapter internal constructor(
             GlobalScope.launch {
                 MitchApp.installer.installFromDownloadId(context, gameInstall.downloadOrInstallId)
             }
-        } else {
-            PopupMenu(context, view).apply {
-                setOnMenuItemClickListener { menuItem -> onMenuItemClick(menuItem, gameInstall) }
-                inflate(R.menu.game_actions)
-
-                if (type != GameRepository.Type.Installed)
-                    menu.removeItem(R.id.app_info)
-                if (type != GameRepository.Type.Downloads)
-                    menu.removeItem(R.id.remove_from_app)
-                if (type != GameRepository.Type.Pending)
-                    menu.removeItem(R.id.cancel)
-
-                show()
+        } else if (gameInstall.packageName != null) {
+            val launchIntent = context.packageManager.getLaunchIntentForPackage(gameInstall.packageName)
+            if (launchIntent != null) {
+                context.startActivity(launchIntent)
+                return
             }
+        }
+
+    }
+
+    private fun onCardOverflowClick(view: View, position: Int) {
+        val gameInstall = gameInstalls[position]
+
+        PopupMenu(context, view).apply {
+            setOnMenuItemClickListener { menuItem -> onMenuItemClick(menuItem, gameInstall) }
+            inflate(R.menu.game_actions)
+
+            if (type != GameRepository.Type.Installed)
+                menu.removeItem(R.id.app_info)
+            if (type != GameRepository.Type.Downloads)
+                menu.removeItem(R.id.remove_from_app)
+            if (type != GameRepository.Type.Pending)
+                menu.removeItem(R.id.cancel)
+
+            show()
         }
     }
 

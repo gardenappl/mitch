@@ -40,15 +40,19 @@ class InstallerNotificationHandler(val context: Context) : InstallResultListener
                     setContentTitle(packageName)
 
                 setContentText(message)
-                setAutoCancel(true)
-                priority = NotificationCompat.PRIORITY_HIGH
+//                priority = NotificationCompat.PRIORITY_HIGH
                 if (status == PackageInstaller.STATUS_SUCCESS) {
                     val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
-                    val pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, 0)
-                    setContentIntent(pendingIntent)
+                    if (launchIntent != null) {
+                        val pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, 0)
+                        setContentIntent(pendingIntent)
+                        setAutoCancel(true)
+                    }
 
                     val icon = context.packageManager.getApplicationIcon(packageName)
                     setLargeIcon(Utils.drawableToBitmap(icon))
+                } else {
+                    setAutoCancel(true)
                 }
             }
 

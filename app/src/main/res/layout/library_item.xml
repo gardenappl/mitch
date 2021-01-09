@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
@@ -38,8 +39,8 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/authorOrSubtitle"
-                app:layout_constraintEnd_toEndOf="@+id/gameThumbnail"
-                app:layout_constraintStart_toStartOf="@+id/gameThumbnail"
+                app:layout_constraintEnd_toStartOf="@+id/overflowMenu"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/gameThumbnail" />
 
         <TextView
@@ -94,6 +95,19 @@
                     android:textColor="?colorPrimaryDark"
                     android:textStyle="bold" />
         </LinearLayout>
+
+        <ImageButton
+                android:id="@+id/overflowMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="5dp"
+                android:src="@drawable/ic_baseline_more_vert_24"
+                android:tint="?colorPrimaryDark"
+                android:layout_marginBottom="28sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/gameThumbnail" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
