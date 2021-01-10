@@ -21,10 +21,10 @@ class InstallNotificationBroadcastReceiver : BroadcastReceiver() {
         Log.d(LOGGING_TAG, "onReceive")
         val extras = intent.extras!!
 
-        val downloadId = extras.getLong(EXTRA_DOWNLOAD_ID)
+        val downloadId = extras.getInt(EXTRA_DOWNLOAD_ID)
 
         runBlocking {
-            MitchApp.installer.installFromDownloadId(context, downloadId, intent.data!!)
+            MitchApp.installer.install(context, downloadId, intent.data!!)
         }
     }
 

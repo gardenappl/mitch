@@ -7,8 +7,8 @@ import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.net.Uri
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import ua.gardenapple.itchupdater.MitchApp
 import ua.gardenapple.itchupdater.Utils
 import java.io.File
 
@@ -28,40 +28,27 @@ class Installer {
         )
         return pkgInstaller.createSession(params)
     }
-    
-    @Throws(IllegalStateException::class)
-    suspend fun installFromDownloadId(context: Context, downloadId: Long, apkUri: Uri? = null) = withContext(Dispatchers.IO) {
-        val actualApkUri = if (apkUri != null) {
-            apkUri
-        } else {
-            val downloadManager =
-                context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
 
-            val query = DownloadManager.Query()
-            query.setFilterById(downloadId)
-            val cursor = downloadManager.query(query)
-
-            if (cursor.moveToFirst()) {
-                val downloadStatus =
-                    cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
-                val downloadLocalUriString =
-                    cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))
-                if (downloadStatus != DownloadManager.STATUS_SUCCESSFUL)
-                    throw IllegalStateException("Download is not successful!")
-
-                Uri.parse(downloadLocalUriString)
-            } else {
-                throw IllegalStateException("Download not found")
-            }
-        }
-
+    suspend fun install(context: Context, downloadId: Int, uploadId: Int) = withContext(Dispatchers.IO) {
         val sessionID = createSession(context)
         Log.d(LOGGING_TAG, "Created session")
 
         InstallerEvents.notifyApkInstallStart(downloadId, sessionID)
         Log.d(LOGGING_TAG, "Notified")
 
-        install(actualApkUri, sessionID, context)
+        val dir = File(MitchApp.downloadFileManager.pendingPath, uploadId.toString())
+        install(Uri.parse(dir.listFiles()!![0].path), sessionID, context)
+        Log.d(LOGGING_TAG, "Installed")
+    }
+
+    suspend fun install(context: Context, downloadId: Int, apkUri: Uri) = withContext(Dispatchers.IO) {
+        val sessionID = createSession(context)
+        Log.d(LOGGING_TAG, "Created session")
+
+        InstallerEvents.notifyApkInstallStart(downloadId, sessionID)
+        Log.d(LOGGING_TAG, "Notified")
+
+        install(apkUri, sessionID, context)
         Log.d(LOGGING_TAG, "Installed")
     }
 

@@ -7,9 +7,10 @@ import ua.gardenapple.itchupdater.database.game.Game
 data class GameInstallation(
     @Embedded val game: Game,
     val status: Int,
-    val downloadOrInstallId: Long,
+    val downloadOrInstallId: Int,
     val packageName: String?,
     val installId: Int,
+    val uploadId: Int,
     val uploadName: String
 ) {
     @Ignore

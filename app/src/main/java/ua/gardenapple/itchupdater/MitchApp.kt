@@ -10,6 +10,12 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import androidx.work.*
+import com.tonyodev.fetch2.DefaultFetchNotificationManager
+import com.tonyodev.fetch2.Fetch
+import com.tonyodev.fetch2.FetchConfiguration
+import com.tonyodev.fetch2.FetchNotificationManager
+import com.tonyodev.fetch2.util.canPauseDownload
+import com.tonyodev.fetch2okhttp.OkHttpDownloader
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import ua.gardenapple.itchupdater.client.UpdateCheckWorker
@@ -21,7 +27,7 @@ import java.util.concurrent.TimeUnit
 
 const val LOGGING_TAG: String = "Mitch"
 
-const val PERMISSION_REQUEST_CODE_DOWNLOAD = 1
+const val PERMISSION_REQUEST_MOVE_TO_DOWNLOADS = 2
 
 const val NOTIFICATION_CHANNEL_ID_UPDATES = "updates_available"
 const val NOTIFICATION_CHANNEL_ID_INSTALL = "updates"
@@ -45,6 +51,10 @@ class MitchApp : Application() {
 
     companion object {
         lateinit var httpClient: OkHttpClient
+            private set
+        lateinit var fetch: Fetch
+            private set
+        lateinit var downloadFileManager: DownloadFileManager
             private set
 
         val installer: Installer by lazy {
@@ -146,6 +156,20 @@ class MitchApp : Application() {
             ))
             build()
         }
+        val fetchConfig = FetchConfiguration.Builder(this).run {
+            setDownloadConcurrentLimit(3)
+            setHttpDownloader(OkHttpDownloader(httpClient))
+            setAutoRetryMaxAttempts(3)
+            setNotificationManager(object : DefaultFetchNotificationManager(this@MitchApp) {
+                override fun getFetchInstanceForNamespace(namespace: String): Fetch {
+                    return fetch
+                }
+            })
+            build()
+        }
+        fetch = fetchConfig.getNewFetchInstanceFromConfiguration()
+        fetch.addListener(FileDownloadListener(this))
+        downloadFileManager = DownloadFileManager(this, fetch)
     }
 
     private fun registerUpdateCheckTask(requiresUnmetered: Boolean) {

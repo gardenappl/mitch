@@ -80,4 +80,5 @@
     <string name="notification_game_running">itch.io web game is running</string>
     <string name="notification_channel_web_running">Web game is running</string>
     <string name="notification_channel_web_running_desc">Notify when a game is running inside the app\'s web browser</string>
+    <string name="notification_download_error_title">Error while downloading</string>
 </resources>

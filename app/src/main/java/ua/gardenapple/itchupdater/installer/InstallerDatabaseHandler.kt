@@ -3,6 +3,7 @@ package ua.gardenapple.itchupdater.installer
 import android.content.Context
 import android.content.pm.PackageInstaller
 import android.util.Log
+import ua.gardenapple.itchupdater.MitchApp
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
 
@@ -18,6 +19,7 @@ class InstallerDatabaseHandler(val context: Context) :
         Log.d(LOGGING_TAG, "onInstallComplete")
 
         val pendingInstall = db.installDao.findPendingInstallationBySessionId(installSessionId) ?: return
+        MitchApp.downloadFileManager.deletePendingFiles(pendingInstall.uploadId)
 
         when(status) {
             PackageInstaller.STATUS_FAILURE,
@@ -45,7 +47,7 @@ class InstallerDatabaseHandler(val context: Context) :
         }
     }
 
-    override suspend fun onDownloadComplete(downloadId: Long, isInstallable: Boolean) {
+    override suspend fun onDownloadComplete(downloadId: Int, isInstallable: Boolean) {
         val db = AppDatabase.getDatabase(context)
         Log.d(LOGGING_TAG, "onDownloadComplete")
 
@@ -62,7 +64,7 @@ class InstallerDatabaseHandler(val context: Context) :
         }
     }
 
-    override suspend fun onDownloadFailed(downloadId: Long) {
+    override suspend fun onDownloadFailed(downloadId: Int) {
         val db = AppDatabase.getDatabase(context)
         Log.d(LOGGING_TAG, "onDownloadFailed")
 
@@ -70,14 +72,14 @@ class InstallerDatabaseHandler(val context: Context) :
         db.installDao.delete(pendingInstall)
     }
 
-    override suspend fun onInstallStart(downloadId: Long, pendingInstallSessionId: Int) {
+    override suspend fun onInstallStart(downloadId: Int, pendingInstallSessionId: Int) {
         val db = AppDatabase.getDatabase(context)
         Log.d(LOGGING_TAG, "onInstallStart")
 
         val pendingInstall = db.installDao.findPendingInstallationByDownloadId(downloadId) ?: return
 
         pendingInstall.status = Installation.STATUS_INSTALLING
-        pendingInstall.downloadOrInstallId = pendingInstallSessionId.toLong()
+        pendingInstall.downloadOrInstallId = pendingInstallSessionId
         db.installDao.update(pendingInstall)
     }
 }

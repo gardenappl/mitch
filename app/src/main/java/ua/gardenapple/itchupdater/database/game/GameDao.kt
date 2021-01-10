@@ -10,6 +10,7 @@ import ua.gardenapple.itchupdater.database.installation.Installation.Companion.D
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.INTERNAL_ID
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.PACKAGE_NAME
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS
+import ua.gardenapple.itchupdater.database.installation.Installation.Companion.UPLOAD_ID
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.UPLOAD_NAME
 
 @Dao
@@ -23,7 +24,8 @@ abstract class GameDao {
             installations.$DOWNLOAD_OR_INSTALL_ID as downloadOrInstallId,
             installations.$PACKAGE_NAME as packageName,
             installations.$INTERNAL_ID as installId,
-            installations.$UPLOAD_NAME as uploadName
+            installations.$UPLOAD_NAME as uploadName,
+            installations.$UPLOAD_ID as uploadId
         FROM games INNER JOIN installations
         ON games.$GAME_ID = installations.game_id
         WHERE $STATUS = ${Installation.STATUS_INSTALLED} AND
@@ -36,7 +38,8 @@ abstract class GameDao {
             installations.$DOWNLOAD_OR_INSTALL_ID as downloadOrInstallId,
             installations.$PACKAGE_NAME as packageName,
             installations.$INTERNAL_ID as installId,
-            installations.$UPLOAD_NAME as uploadName
+            installations.$UPLOAD_NAME as uploadName,
+            installations.$UPLOAD_ID as uploadId
         FROM games INNER JOIN installations
         ON games.$GAME_ID = installations.game_id
         WHERE $STATUS = ${Installation.STATUS_INSTALLED} AND
@@ -49,7 +52,8 @@ abstract class GameDao {
             installations.$DOWNLOAD_OR_INSTALL_ID as downloadOrInstallId,
             installations.$PACKAGE_NAME as packageName,
             installations.$INTERNAL_ID as installId,
-            installations.$UPLOAD_NAME as uploadName
+            installations.$UPLOAD_NAME as uploadName,
+            installations.$UPLOAD_ID as uploadId
         FROM games INNER JOIN installations
         ON games.$GAME_ID = installations.game_id
         WHERE $STATUS != ${Installation.STATUS_INSTALLED}""")

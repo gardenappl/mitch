@@ -64,7 +64,7 @@ abstract class InstallationDao {
     abstract fun getInstallationByPackageName(packageName: String): Installation?
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :downloadId AND $STATUS != $STATUS_INSTALLING LIMIT 1")
-    abstract fun findPendingInstallationByDownloadId(downloadId: Long): Installation?
+    abstract fun findPendingInstallationByDownloadId(downloadId: Int): Installation?
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :installSessionId AND $STATUS = $STATUS_INSTALLING LIMIT 1")
     abstract fun findPendingInstallationBySessionId(installSessionId: Int): Installation?

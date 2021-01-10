@@ -18,7 +18,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.browse_fragment.*
 import ua.gardenapple.itchupdater.*
-import ua.gardenapple.itchupdater.installer.DownloadRequester
+import ua.gardenapple.itchupdater.installer.DownloadFileManager
 
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
@@ -259,14 +259,14 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         }
     }
 
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        when (requestCode) {
-            PERMISSION_REQUEST_CODE_DOWNLOAD -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    DownloadRequester.resumeDownload(getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager)
-                }
-            }
-        }
-    }
+    //TODO: handle permissions
+//    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+//        when (requestCode) {
+//            PERMISSION_REQUEST_CODE_DOWNLOAD -> {
+//                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    DownloadFileManager.resumeDownload(getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager)
+//                }
+//            }
+//        }
+//    }
 }

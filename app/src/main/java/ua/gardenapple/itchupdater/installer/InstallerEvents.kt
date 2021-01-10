@@ -4,11 +4,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 interface DownloadCompleteListener {
-    suspend fun onDownloadComplete(downloadId: Long, isInstallable: Boolean)
+    suspend fun onDownloadComplete(downloadId: Int, isInstallable: Boolean)
 }
 
 interface DownloadFailListener {
-    suspend fun onDownloadFailed(downloadId: Long)
+    suspend fun onDownloadFailed(downloadId: Int)
 }
 
 interface InstallResultListener {
@@ -16,7 +16,7 @@ interface InstallResultListener {
 }
 
 interface InstallStartListener {
-    suspend fun onInstallStart(downloadId: Long, pendingInstallSessionId: Int)
+    suspend fun onInstallStart(downloadId: Int, pendingInstallSessionId: Int)
 }
 
 class InstallerEvents {
@@ -36,7 +36,7 @@ class InstallerEvents {
             }
         }
 
-        suspend fun notifyApkInstallStart(downloadId: Long, pendingInstallSessionId: Int) {
+        suspend fun notifyApkInstallStart(downloadId: Int, pendingInstallSessionId: Int) {
             coroutineScope {
                 for (listener in installStartListeners) {
                     launch {
@@ -46,7 +46,7 @@ class InstallerEvents {
             }
         }
 
-        suspend fun notifyDownloadComplete(downloadId: Long, isInstallable: Boolean) {
+        suspend fun notifyDownloadComplete(downloadId: Int, isInstallable: Boolean) {
             coroutineScope {
                 for (listener in downloadCompleteListeners) {
                     launch {
@@ -56,7 +56,7 @@ class InstallerEvents {
             }
         }
 
-        suspend fun notifyDownloadFailed(downloadId: Long) {
+        suspend fun notifyDownloadFailed(downloadId: Int) {
             coroutineScope {
                 for (listener in downloadFailListeners) {
                     launch {

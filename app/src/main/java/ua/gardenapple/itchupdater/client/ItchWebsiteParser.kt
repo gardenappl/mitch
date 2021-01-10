@@ -74,7 +74,7 @@ class ItchWebsiteParser {
             return parseInstallations(doc, null)
         }
 
-        fun getPendingInstallation(doc: Document, uploadId: Int, downloadId: Long): Installation {
+        fun getPendingInstallation(doc: Document, uploadId: Int, downloadId: Int): Installation {
             val installList = parseInstallations(doc, uploadId)
             if (installList.isEmpty())
                 throw UploadNotFoundException(uploadId)

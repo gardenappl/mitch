@@ -9,7 +9,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
+import ua.gardenapple.itchupdater.MitchApp
 import ua.gardenapple.itchupdater.database.AppDatabase
+import ua.gardenapple.itchupdater.installer.DownloadFileManager
 
 class ItchBrowseHandler(private val context: Context, private val coroutineScope: CoroutineScope) {
 
@@ -18,10 +20,18 @@ class ItchBrowseHandler(private val context: Context, private val coroutineScope
 
         // ItchBrowseHandler may be re-created on fragment re-attachment,
         // but I want these values to be retained. Making them static is a lazy solution.
+        @Volatile
         private var lastDownloadDoc: Document? = null
+        @Volatile
         private var lastDownloadPageUrl: String? = null
+        @Volatile
         private var clickedUploadId: Int? = null
-        private var currentDownloadId: Long? = null
+        @Volatile
+        private var currentDownloadUrl: String? = null
+        @Volatile
+        private var currentDownloadContentDisposition: String? = null
+        @Volatile
+        private var currentDownloadMimeType: String? = null
     }
 
     suspend fun onPageVisited(doc: Document, url: String) {
@@ -60,29 +70,37 @@ class ItchBrowseHandler(private val context: Context, private val coroutineScope
         tryUpdateDatabase()
     }
 
-    fun onDownloadStarted(downloadId: Long) {
-        currentDownloadId = downloadId
+    fun onDownloadStarted(url: String, contentDisposition: String?, mimeType: String?) {
+        currentDownloadUrl = url
+        currentDownloadContentDisposition = contentDisposition
+        currentDownloadMimeType = mimeType
         tryUpdateDatabase()
     }
 
     private fun tryUpdateDatabase() {
         Log.d(LOGGING_TAG, "Upload ID: $clickedUploadId")
-        Log.d(LOGGING_TAG, "Download ID: $currentDownloadId")
+        Log.d(LOGGING_TAG, "Download URL: $currentDownloadUrl")
         Log.d(LOGGING_TAG, "Download page URL: $lastDownloadPageUrl")
 
         val downloadPageDoc = lastDownloadDoc ?: return
         val uploadId = clickedUploadId ?: return
-        val downloadId = currentDownloadId ?: return
         val downloadPageUrl = lastDownloadPageUrl ?: return
+        currentDownloadUrl?.let { url ->
+            MitchApp.downloadFileManager.requestDownload(uploadId, url,
+                currentDownloadContentDisposition, currentDownloadMimeType) { downloadId ->
+
+                coroutineScope.launch(Dispatchers.IO) {
+                    val downloader = GameDownloader(context)
+                    val pendingInstall =
+                        ItchWebsiteParser.getPendingInstallation(downloadPageDoc, uploadId, downloadId)
+                    downloader.updateDatabase(downloadPageUrl, pendingInstall)
+                }
+            }
+        } ?: return
 
         clickedUploadId = null
-        currentDownloadId = null
-
-        coroutineScope.launch(Dispatchers.IO) {
-            val downloader = GameDownloader(context)
-            val pendingInstall =
-                ItchWebsiteParser.getPendingInstallation(downloadPageDoc, uploadId, downloadId)
-            downloader.updateDatabase(downloadPageUrl, pendingInstall)
-        }
+        currentDownloadUrl = null
+        currentDownloadMimeType = null
+        currentDownloadContentDisposition = null
     }
 }

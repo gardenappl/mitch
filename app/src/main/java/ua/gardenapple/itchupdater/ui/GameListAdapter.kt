@@ -69,7 +69,6 @@ class GameListAdapter internal constructor(
         holder.authorOrSubtitle.text = gameInstall.librarySubtitle
 
         if (type == GameRepository.Type.Pending) {
-            holder.overflowMenuButton.visibility = View.INVISIBLE
             holder.progressBarLayout.visibility = View.VISIBLE
 
             holder.progressBarLabel.text = when (gameInstalls[position].status) {
@@ -102,7 +101,7 @@ class GameListAdapter internal constructor(
             notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD_RESULT, gameInstall.downloadOrInstallId.toInt())
 
             GlobalScope.launch {
-                MitchApp.installer.installFromDownloadId(context, gameInstall.downloadOrInstallId)
+                MitchApp.installer.install(context, gameInstall.downloadOrInstallId, gameInstall.uploadId)
             }
         } else if (gameInstall.packageName != null) {
             val launchIntent = context.packageManager.getLaunchIntentForPackage(gameInstall.packageName)
@@ -166,7 +165,7 @@ class GameListAdapter internal constructor(
                     setPositiveButton(R.string.dialog_remove) { _, _ ->
                         runBlocking(Dispatchers.IO) {
                             val db = AppDatabase.getDatabase(context)
-                            db.installDao.deleteFinishedInstallation(game.gameId)
+                            db.installDao.deleteFinishedInstallation(gameInstall.uploadId)
                         }
                         Toast.makeText(
                             context,
@@ -191,8 +190,7 @@ class GameListAdapter internal constructor(
                         pkgInstaller.abandonSession(gameInstall.downloadOrInstallId.toInt())
                     }
                     Installation.STATUS_DOWNLOADING -> {
-                        val downloadManager = context.getSystemService(Activity.DOWNLOAD_SERVICE) as DownloadManager
-                        downloadManager.remove(gameInstall.downloadOrInstallId)
+                        MitchApp.fetch.cancel(gameInstall.downloadOrInstallId.toInt())
                     }
                 }
                 runBlocking(Dispatchers.IO) { 

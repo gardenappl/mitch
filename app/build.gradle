@@ -114,4 +114,7 @@ dependencies {
     implementation "me.zhanghai.android.materialprogressbar:library:$rootProject.materialProgressBarVersion"
     // Colormath (CSS color parsing)
     implementation "com.github.ajalt:colormath:$rootProject.colormathVersion"
+    //Fetch
+    implementation "androidx.tonyodev.fetch2:xfetch2:$rootProject.fetchAndroidxVersion"
+    implementation "androidx.tonyodev.fetch2okhttp:xfetch2okhttp:$rootProject.fetchAndroidxVersion"
 }

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import ua.gardenapple.itchupdater.MitchApp
 import ua.gardenapple.itchupdater.database.AppDatabase
 
 class UninstallBroadcastReceiver : BroadcastReceiver() {
@@ -25,6 +26,7 @@ class UninstallBroadcastReceiver : BroadcastReceiver() {
 
         runBlocking(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
+            val installation = db.installDao.getInstallationByPackageName(packageName)
             db.installDao.deleteFinishedInstallation(packageName)
         }
     }

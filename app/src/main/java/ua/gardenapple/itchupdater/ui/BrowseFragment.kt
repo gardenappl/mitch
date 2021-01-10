@@ -33,7 +33,6 @@ import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.client.ItchBrowseHandler
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
-import ua.gardenapple.itchupdater.installer.DownloadRequester
 import java.io.ByteArrayInputStream
 import java.io.File
 
@@ -93,15 +92,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         webView.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
             Log.d(LOGGING_TAG, "Requesting download...")
-            requireContext().let {
-                DownloadRequester.requestDownload(it, activity, url, contentDisposition, mimeType) {
-                    downloadId: Long ->
-                    run {
-                        Snackbar.make(view, R.string.toast_download_started, Snackbar.LENGTH_LONG)
-                            .show()
-                        browseHandler!!.onDownloadStarted(downloadId)
-                    }
-                }
+            browseHandler?.let { browseHandler ->
+                Snackbar.make(view, R.string.toast_download_started, Snackbar.LENGTH_LONG)
+                    .show()
+
+                browseHandler.onDownloadStarted(url, contentDisposition, mimeType)
             }
         }
 

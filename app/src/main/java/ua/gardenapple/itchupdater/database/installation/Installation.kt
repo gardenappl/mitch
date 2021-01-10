@@ -60,7 +60,7 @@ data class Installation(
      * installId if [STATUS_INSTALLING]
      */
     @ColumnInfo(name = DOWNLOAD_OR_INSTALL_ID)
-    var downloadOrInstallId: Long? = null,
+    var downloadOrInstallId: Int? = null,
 
     /**
      * Affects timestamps and version strings.
