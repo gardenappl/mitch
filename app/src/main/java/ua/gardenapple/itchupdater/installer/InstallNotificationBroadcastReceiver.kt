@@ -6,6 +6,7 @@ import android.content.Intent
 import android.util.Log
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.MitchApp
+import java.io.File
 
 /**
  * This is an internal receiver which only receives broadcasts when clicking the "Click to install" notification.
@@ -24,7 +25,8 @@ class InstallNotificationBroadcastReceiver : BroadcastReceiver() {
         val downloadId = extras.getInt(EXTRA_DOWNLOAD_ID)
 
         runBlocking {
-            MitchApp.installer.install(context, downloadId, intent.data!!)
+            val apkFile = File(intent.data!!.path!!)
+            MitchApp.installer.install(context, downloadId, apkFile)
         }
     }
 

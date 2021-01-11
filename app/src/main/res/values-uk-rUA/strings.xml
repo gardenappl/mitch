@@ -80,5 +80,5 @@
     <string name="notification_game_running">Запущена веб-гра на itch.io</string>
     <string name="notification_channel_web_running">Запущена веб-гра на itch.io</string>
     <string name="notification_channel_web_running_desc">Сповіщати коли у вбудованому веб-браузері запущена гра</string>
-    <string name="notification_download_error_title">Помилка під час завантаження</string>
+    <string name="notification_download_error">Помилка під час завантаження: %1$s</string>
 </resources>

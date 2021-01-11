@@ -30,34 +30,24 @@ class Installer {
     }
 
     suspend fun install(context: Context, downloadId: Int, uploadId: Int) = withContext(Dispatchers.IO) {
+        install(context, downloadId, MitchApp.downloadFileManager.getPendingFile(uploadId)!!)
+    }
+
+    suspend fun install(context: Context, downloadId: Int, apkFile: File) = withContext(Dispatchers.IO) {
         val sessionID = createSession(context)
         Log.d(LOGGING_TAG, "Created session")
 
-        InstallerEvents.notifyApkInstallStart(downloadId, sessionID)
+        MitchApp.installerDatabaseHandler.onInstallStart(downloadId, sessionID)
         Log.d(LOGGING_TAG, "Notified")
 
-        val dir = File(MitchApp.downloadFileManager.pendingPath, uploadId.toString())
-        install(Uri.parse(dir.listFiles()!![0].path), sessionID, context)
+        doInstall(apkFile, sessionID, context)
         Log.d(LOGGING_TAG, "Installed")
     }
 
-    suspend fun install(context: Context, downloadId: Int, apkUri: Uri) = withContext(Dispatchers.IO) {
-        val sessionID = createSession(context)
-        Log.d(LOGGING_TAG, "Created session")
-
-        InstallerEvents.notifyApkInstallStart(downloadId, sessionID)
-        Log.d(LOGGING_TAG, "Notified")
-
-        install(apkUri, sessionID, context)
-        Log.d(LOGGING_TAG, "Installed")
-    }
-
-    private suspend fun install(apkUri: Uri, sessionId: Int, context: Context) = withContext(Dispatchers.IO) {
+    private suspend fun doInstall(apkFile: File, sessionId: Int, context: Context) = withContext(Dispatchers.IO) {
         val pkgInstaller = context.packageManager.packageInstaller
 
         val session = pkgInstaller.openSession(sessionId)
-
-        val apkFile = File(apkUri.path!!)
 
         try {
             apkFile.inputStream().use { inputStream ->
@@ -72,7 +62,7 @@ class Installer {
         }
 
         val callbackIntent = Intent(context, InstallerService::class.java)
-            .putExtra(InstallerService.EXTRA_APK_NAME, apkUri.lastPathSegment)
+            .putExtra(InstallerService.EXTRA_APK_NAME, apkFile.name)
         val pendingIntent = PendingIntent.getService(
             context, sessionId, callbackIntent, PendingIntent.FLAG_UPDATE_CURRENT
         )

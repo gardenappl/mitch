@@ -52,9 +52,10 @@ class MitchApp : Application() {
     companion object {
         lateinit var httpClient: OkHttpClient
             private set
-        lateinit var fetch: Fetch
-            private set
+        private lateinit var fetch: Fetch
         lateinit var downloadFileManager: DownloadFileManager
+            private set
+        lateinit var installerDatabaseHandler: InstallerDatabaseHandler
             private set
 
         val installer: Installer by lazy {
@@ -136,17 +137,6 @@ class MitchApp : Application() {
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
 
-
-        InstallerEvents.setup()
-        val installerDatabaseHandler = InstallerDatabaseHandler(applicationContext)
-        InstallerEvents.addListener(installerDatabaseHandler as DownloadCompleteListener)
-        InstallerEvents.addListener(installerDatabaseHandler as DownloadFailListener)
-        InstallerEvents.addListener(installerDatabaseHandler as InstallStartListener)
-        InstallerEvents.addListener(installerDatabaseHandler as InstallResultListener)
-        val notificationHandler = InstallerNotificationHandler(applicationContext)
-        InstallerEvents.addListener(notificationHandler)
-
-
         val okHttpCacheDir = File(cacheDir, "OkHttp")
         okHttpCacheDir.mkdirs()
         httpClient = OkHttpClient.Builder().run {
@@ -156,11 +146,11 @@ class MitchApp : Application() {
             ))
             build()
         }
-        val fetchConfig = FetchConfiguration.Builder(this).run {
+        val fetchConfig = FetchConfiguration.Builder(applicationContext).run {
             setDownloadConcurrentLimit(3)
             setHttpDownloader(OkHttpDownloader(httpClient))
             setAutoRetryMaxAttempts(3)
-            setNotificationManager(object : DefaultFetchNotificationManager(this@MitchApp) {
+            setNotificationManager(object : DefaultFetchNotificationManager(applicationContext) {
                 override fun getFetchInstanceForNamespace(namespace: String): Fetch {
                     return fetch
                 }
@@ -168,8 +158,10 @@ class MitchApp : Application() {
             build()
         }
         fetch = fetchConfig.getNewFetchInstanceFromConfiguration()
-        fetch.addListener(FileDownloadListener(this))
-        downloadFileManager = DownloadFileManager(this, fetch)
+        fetch.addListener(FileDownloadListener(applicationContext))
+        downloadFileManager = DownloadFileManager(applicationContext, fetch)
+
+        installerDatabaseHandler = InstallerDatabaseHandler(applicationContext)
     }
 
     private fun registerUpdateCheckTask(requiresUnmetered: Boolean) {

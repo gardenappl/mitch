@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
@@ -83,6 +84,7 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
                             errorReport = Utils.toString(e)
                         )
                         success = false
+                        Log.e(LOGGING_TAG, "Update check error!", e)
                     }
 
                     handleNotification(game, install, result)

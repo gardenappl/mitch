@@ -2,7 +2,9 @@ package ua.gardenapple.itchupdater.client
 
 import android.content.Context
 import android.util.Log
+import android.view.View
 import androidx.preference.PreferenceManager
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -10,11 +12,14 @@ import kotlinx.coroutines.withContext
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.MitchApp
+import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.AppDatabase
-import ua.gardenapple.itchupdater.installer.DownloadFileManager
 
-class ItchBrowseHandler(private val context: Context, private val coroutineScope: CoroutineScope) {
-
+class ItchBrowseHandler(
+    private val view: View,
+    private val context: Context,
+    private val coroutineScope: CoroutineScope
+) {
     companion object {
         private const val LOGGING_TAG = "ItchBrowseHandler"
 
@@ -22,8 +27,8 @@ class ItchBrowseHandler(private val context: Context, private val coroutineScope
         // but I want these values to be retained. Making them static is a lazy solution.
         @Volatile
         private var lastDownloadDoc: Document? = null
-        @Volatile
-        private var lastDownloadPageUrl: String? = null
+//        @Volatile
+//        private var lastDownloadPageUrl: String? = null
         @Volatile
         private var clickedUploadId: Int? = null
         @Volatile
@@ -36,7 +41,7 @@ class ItchBrowseHandler(private val context: Context, private val coroutineScope
 
     suspend fun onPageVisited(doc: Document, url: String) {
         lastDownloadDoc = null
-        lastDownloadPageUrl = null
+//        lastDownloadPageUrl = null
 
         if (ItchWebsiteUtils.isStorePage(doc)) {
             val db = AppDatabase.getDatabase(context)
@@ -49,8 +54,8 @@ class ItchBrowseHandler(private val context: Context, private val coroutineScope
         }
         if (ItchWebsiteUtils.hasGameDownloadLinks(doc)) {
             lastDownloadDoc = doc
-            lastDownloadPageUrl = url
-            tryUpdateDatabase()
+//            lastDownloadPageUrl = url
+            tryStartDownload()
         }
         if (!ItchWebsiteUtils.isStylizedPage(doc)) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -67,36 +72,36 @@ class ItchBrowseHandler(private val context: Context, private val coroutineScope
     fun setClickedUploadId(uploadId: Int) {
         Log.d(LOGGING_TAG, "Set upload ID: $uploadId")
         clickedUploadId = uploadId
-        tryUpdateDatabase()
+        tryStartDownload()
     }
 
     fun onDownloadStarted(url: String, contentDisposition: String?, mimeType: String?) {
         currentDownloadUrl = url
         currentDownloadContentDisposition = contentDisposition
         currentDownloadMimeType = mimeType
-        tryUpdateDatabase()
+        tryStartDownload()
     }
 
-    private fun tryUpdateDatabase() {
+    private fun tryStartDownload() {
         Log.d(LOGGING_TAG, "Upload ID: $clickedUploadId")
         Log.d(LOGGING_TAG, "Download URL: $currentDownloadUrl")
-        Log.d(LOGGING_TAG, "Download page URL: $lastDownloadPageUrl")
+//        Log.d(LOGGING_TAG, "Download page URL: $lastDownloadPageUrl")
 
         val downloadPageDoc = lastDownloadDoc ?: return
         val uploadId = clickedUploadId ?: return
-        val downloadPageUrl = lastDownloadPageUrl ?: return
-        currentDownloadUrl?.let { url ->
-            MitchApp.downloadFileManager.requestDownload(uploadId, url,
-                currentDownloadContentDisposition, currentDownloadMimeType) { downloadId ->
+//        val downloadPageUrl = currentDownloadPageUrl ?: return
+        val downloadUrl = currentDownloadUrl ?: return
+        val contentDisposition = currentDownloadContentDisposition ?: return
+        val mimeType = currentDownloadMimeType ?: return
 
-                coroutineScope.launch(Dispatchers.IO) {
-                    val downloader = GameDownloader(context)
-                    val pendingInstall =
-                        ItchWebsiteParser.getPendingInstallation(downloadPageDoc, uploadId, downloadId)
-                    downloader.updateDatabase(downloadPageUrl, pendingInstall)
-                }
-            }
-        } ?: return
+        Snackbar.make(view, R.string.toast_download_started, Snackbar.LENGTH_LONG)
+            .show()
+
+        coroutineScope.launch(Dispatchers.IO) {
+            val pendingInstall = ItchWebsiteParser.getPendingInstallation(downloadPageDoc, uploadId)
+            MitchApp.downloadFileManager.requestDownload(pendingInstall, downloadUrl,
+                contentDisposition, mimeType)
+        }
 
         clickedUploadId = null
         currentDownloadUrl = null

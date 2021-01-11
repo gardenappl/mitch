@@ -2,7 +2,6 @@ package ua.gardenapple.itchupdater.installer
 
 import android.app.DownloadManager
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -15,8 +14,6 @@ import com.tonyodev.fetch2.FetchListener
 import com.tonyodev.fetch2core.DownloadBlock
 import kotlinx.coroutines.*
 import ua.gardenapple.itchupdater.*
-import ua.gardenapple.itchupdater.database.AppDatabase
-import java.io.File
 
 /**
  * This listener responds to finished file downloads from Fetch.
@@ -48,14 +45,17 @@ class FileDownloadListener(private val context: Context) : FetchListener {
 
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALL).apply {
             setSmallIcon(R.drawable.ic_mitch_notification)
-            if (error != null)
-                setContentTitle(context.resources.getString(R.string.notification_download_error_title))
-            else if (isApk)
-                setContentTitle(context.resources.getString(R.string.notification_install_title))
-            else
-                setContentTitle(context.resources.getString(R.string.notification_download_complete_title))
+            if (error != null) {
+                setContentTitle(downloadLocalUri.lastPathSegment)
+                setContentText(context.resources.getString(R.string.notification_download_error, error.name))
+            } else {
+                if (isApk)
+                    setContentTitle(context.resources.getString(R.string.notification_install_title))
+                else
+                    setContentTitle(context.resources.getString(R.string.notification_download_complete_title))
+                setContentText(downloadLocalUri.lastPathSegment)
+            }
 
-            setContentText(downloadLocalUri.lastPathSegment)
             priority = NotificationCompat.PRIORITY_HIGH
             setContentIntent(pendingIntent)
             setAutoCancel(true)
@@ -70,28 +70,17 @@ class FileDownloadListener(private val context: Context) : FetchListener {
     }
 
     override fun onCancelled(download: Download) {
-        val isApk = download.file.endsWith(".apk")
-
-        GlobalScope.launch {
-            withContext(Dispatchers.IO) {
-                MitchApp.downloadFileManager.deletePendingFiles(download)
-            }
-            InstallerEvents.notifyDownloadComplete(download.id, isApk)
-        }
     }
 
     override fun onCompleted(download: Download) {
         val isApk = download.file.endsWith(".apk")
         createNotification(context, download.fileUri, download.id, isApk)
 
-        GlobalScope.launch {
+        runBlocking(Dispatchers.IO) {
             if (!isApk) {
-                withContext(Dispatchers.IO) {
-                    MitchApp.downloadFileManager.movePendingFiles(download)
-                }
+                MitchApp.downloadFileManager.replacePendingFile(download)
             }
-
-            InstallerEvents.notifyDownloadComplete(download.id, isApk)
+            MitchApp.installerDatabaseHandler.onDownloadComplete(download.id, isApk)
         }
     }
 
@@ -109,11 +98,9 @@ class FileDownloadListener(private val context: Context) : FetchListener {
         val isApk = download.file.endsWith(".apk")
         createNotification(context, download.fileUri, download.id, isApk, error)
 
-        GlobalScope.launch {
-            withContext(Dispatchers.IO) {
-                MitchApp.downloadFileManager.deletePendingFiles(download)
-            }
-            InstallerEvents.notifyDownloadFailed(download.id)
+        runBlocking(Dispatchers.IO) {
+            MitchApp.downloadFileManager.deletePendingFile(download)
+            MitchApp.installerDatabaseHandler.onDownloadFailed(download.id)
         }
     }
 

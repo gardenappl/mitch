@@ -59,12 +59,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        this.browseHandler = ItchBrowseHandler(context, this)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        browseHandler = null
     }
 
     override fun onCreateView(
@@ -73,7 +67,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.browse_fragment, container, false)
-        
+
+        browseHandler = ItchBrowseHandler(view, requireContext(), this)
+
         webView = view.findViewById(R.id.webView)
         chromeClient = MitchWebChromeClient()
 
@@ -93,9 +89,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         webView.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
             Log.d(LOGGING_TAG, "Requesting download...")
             browseHandler?.let { browseHandler ->
-                Snackbar.make(view, R.string.toast_download_started, Snackbar.LENGTH_LONG)
-                    .show()
-
                 browseHandler.onDownloadStarted(url, contentDisposition, mimeType)
             }
         }
@@ -203,6 +196,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
 
         return view
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        browseHandler = null
     }
 
     /**

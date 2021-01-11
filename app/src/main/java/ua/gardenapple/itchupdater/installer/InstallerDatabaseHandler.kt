@@ -3,83 +3,89 @@ package ua.gardenapple.itchupdater.installer
 import android.content.Context
 import android.content.pm.PackageInstaller
 import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.MitchApp
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
 
 
-class InstallerDatabaseHandler(val context: Context) :
-    InstallResultListener, DownloadCompleteListener, InstallStartListener, DownloadFailListener {
+class InstallerDatabaseHandler(val context: Context)  {
     companion object {
         private const val LOGGING_TAG = "InstallDatabaseHandler"
     }
 
-    override suspend fun onInstallResult(installSessionId: Int, packageName: String, apkName: String?, status: Int) {
-        val db = AppDatabase.getDatabase(context)
-        Log.d(LOGGING_TAG, "onInstallComplete")
+    suspend fun onInstallResult(installSessionId: Int, packageName: String, status: Int) =
+        withContext(Dispatchers.IO) {
+            val db = AppDatabase.getDatabase(context)
+            Log.d(LOGGING_TAG, "onInstallComplete")
 
-        val pendingInstall = db.installDao.findPendingInstallationBySessionId(installSessionId) ?: return
-        MitchApp.downloadFileManager.deletePendingFiles(pendingInstall.uploadId)
+            val pendingInstall =
+                db.installDao.findPendingInstallationBySessionId(installSessionId) ?: return@withContext
+            MitchApp.downloadFileManager.deletePendingFile(pendingInstall.uploadId)
 
-        when(status) {
-            PackageInstaller.STATUS_FAILURE,
-            PackageInstaller.STATUS_FAILURE_ABORTED,
-            PackageInstaller.STATUS_FAILURE_BLOCKED,
-            PackageInstaller.STATUS_FAILURE_CONFLICT,
-            PackageInstaller.STATUS_FAILURE_INCOMPATIBLE,
-            PackageInstaller.STATUS_FAILURE_INVALID,
-            PackageInstaller.STATUS_FAILURE_STORAGE ->
-            {
-                db.installDao.delete(pendingInstall)
-            }
-            PackageInstaller.STATUS_SUCCESS ->
-            {
-                val newInstall = pendingInstall.copy(
-                    status = Installation.STATUS_INSTALLED,
-                    downloadOrInstallId = null,
-                    packageName = packageName
-                )
-                Log.d(LOGGING_TAG, "New install: $newInstall")
-                db.installDao.deleteFinishedInstallation(packageName)
-                db.installDao.delete(pendingInstall)
-                db.installDao.insert(newInstall)
+            when (status) {
+                PackageInstaller.STATUS_FAILURE,
+                PackageInstaller.STATUS_FAILURE_ABORTED,
+                PackageInstaller.STATUS_FAILURE_BLOCKED,
+                PackageInstaller.STATUS_FAILURE_CONFLICT,
+                PackageInstaller.STATUS_FAILURE_INCOMPATIBLE,
+                PackageInstaller.STATUS_FAILURE_INVALID,
+                PackageInstaller.STATUS_FAILURE_STORAGE -> {
+                    db.installDao.delete(pendingInstall)
+                }
+                PackageInstaller.STATUS_SUCCESS -> {
+                    val newInstall = pendingInstall.copy(
+                        status = Installation.STATUS_INSTALLED,
+                        downloadOrInstallId = null,
+                        packageName = packageName
+                    )
+                    Log.d(LOGGING_TAG, "New install: $newInstall")
+                    db.installDao.deleteFinishedInstallation(packageName)
+                    db.installDao.delete(pendingInstall)
+                    db.installDao.insert(newInstall)
+                }
             }
         }
-    }
 
-    override suspend fun onDownloadComplete(downloadId: Int, isInstallable: Boolean) {
-        val db = AppDatabase.getDatabase(context)
-        Log.d(LOGGING_TAG, "onDownloadComplete")
+    suspend fun onDownloadComplete(downloadId: Int, isInstallable: Boolean) =
+        withContext(Dispatchers.IO) {
+            val db = AppDatabase.getDatabase(context)
+            Log.d(LOGGING_TAG, "onDownloadComplete")
 
-        val pendingInstall = db.installDao.findPendingInstallationByDownloadId(downloadId) ?: return
+            val pendingInstall =
+                db.installDao.findPendingInstallationByDownloadId(downloadId) ?: return@withContext
 
-        if (isInstallable) {
-            pendingInstall.status = Installation.STATUS_READY_TO_INSTALL
-            db.installDao.update(pendingInstall)
-        } else {
-            db.installDao.deleteFinishedInstallation(pendingInstall.uploadId)
-            pendingInstall.status = Installation.STATUS_INSTALLED
-            pendingInstall.downloadOrInstallId = null
-            db.installDao.update(pendingInstall)
+            if (isInstallable) {
+                pendingInstall.status = Installation.STATUS_READY_TO_INSTALL
+                db.installDao.update(pendingInstall)
+            } else {
+                db.installDao.deleteFinishedInstallation(pendingInstall.uploadId)
+                pendingInstall.status = Installation.STATUS_INSTALLED
+                pendingInstall.downloadOrInstallId = null
+                db.installDao.update(pendingInstall)
+            }
         }
-    }
 
-    override suspend fun onDownloadFailed(downloadId: Int) {
+    suspend fun onDownloadFailed(downloadId: Int) = withContext(Dispatchers.IO) {
         val db = AppDatabase.getDatabase(context)
         Log.d(LOGGING_TAG, "onDownloadFailed")
 
-        val pendingInstall = db.installDao.findPendingInstallationByDownloadId(downloadId) ?: return
+        val pendingInstall =
+            db.installDao.findPendingInstallationByDownloadId(downloadId) ?: return@withContext
         db.installDao.delete(pendingInstall)
     }
 
-    override suspend fun onInstallStart(downloadId: Int, pendingInstallSessionId: Int) {
-        val db = AppDatabase.getDatabase(context)
-        Log.d(LOGGING_TAG, "onInstallStart")
+    suspend fun onInstallStart(downloadId: Int, pendingInstallSessionId: Int) =
+        withContext(Dispatchers.IO) {
+            val db = AppDatabase.getDatabase(context)
+            Log.d(LOGGING_TAG, "onInstallStart")
 
-        val pendingInstall = db.installDao.findPendingInstallationByDownloadId(downloadId) ?: return
+            val pendingInstall =
+                db.installDao.findPendingInstallationByDownloadId(downloadId) ?: return@withContext
 
-        pendingInstall.status = Installation.STATUS_INSTALLING
-        pendingInstall.downloadOrInstallId = pendingInstallSessionId
-        db.installDao.update(pendingInstall)
-    }
+            pendingInstall.status = Installation.STATUS_INSTALLING
+            pendingInstall.downloadOrInstallId = pendingInstallSessionId
+            db.installDao.update(pendingInstall)
+        }
 }

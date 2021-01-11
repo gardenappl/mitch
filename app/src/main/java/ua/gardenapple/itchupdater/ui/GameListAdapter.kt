@@ -166,6 +166,7 @@ class GameListAdapter internal constructor(
                         runBlocking(Dispatchers.IO) {
                             val db = AppDatabase.getDatabase(context)
                             db.installDao.deleteFinishedInstallation(gameInstall.uploadId)
+                            MitchApp.downloadFileManager.deleteDownloadedFile(gameInstall.uploadId)
                         }
                         Toast.makeText(
                             context,
@@ -184,16 +185,16 @@ class GameListAdapter internal constructor(
                 return true
             }
             R.id.cancel -> {
-                when (gameInstall.status) {
-                    Installation.STATUS_INSTALLING -> {
-                        val pkgInstaller = context.packageManager.packageInstaller
-                        pkgInstaller.abandonSession(gameInstall.downloadOrInstallId.toInt())
-                    }
-                    Installation.STATUS_DOWNLOADING -> {
-                        MitchApp.fetch.cancel(gameInstall.downloadOrInstallId.toInt())
-                    }
+                if (gameInstall.status == Installation.STATUS_INSTALLING) {
+                    val pkgInstaller = context.packageManager.packageInstaller
+                    pkgInstaller.abandonSession(gameInstall.downloadOrInstallId)
                 }
-                runBlocking(Dispatchers.IO) { 
+                runBlocking(Dispatchers.IO) {
+                    if (gameInstall.status == Installation.STATUS_DOWNLOADING) {
+                        MitchApp.downloadFileManager.requestCancellation(gameInstall.downloadOrInstallId)
+                    } else {
+                        MitchApp.downloadFileManager.deleteDownloadedFile(gameInstall.uploadId)
+                    }
                     val db = AppDatabase.getDatabase(context)
                     db.installDao.delete(gameInstall.installId)
                 }

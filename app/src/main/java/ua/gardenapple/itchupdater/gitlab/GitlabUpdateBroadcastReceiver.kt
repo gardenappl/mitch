@@ -23,18 +23,15 @@ class GitlabUpdateBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val downloadUrl = intent.getStringExtra(EXTRA_DOWNLOAD_URL)!!
 
-        MitchApp.downloadFileManager.requestDownload(Installation.MITCH_UPLOAD_ID,
-            downloadUrl, null, DownloadFileManager.APK_MIME) {
-                downloadId ->
-            val downloader = GameDownloader(context)
+        runBlocking(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
 
-            val install = db.installDao.getInstallationByPackageName(context.packageName)!!
-            install.downloadOrInstallId = downloadId
-            install.status = Installation.STATUS_DOWNLOADING
-            runBlocking(Dispatchers.IO) {
-                downloader.updateDatabase(null, install)
-            }
+            val install = db.installDao.getInstallationByPackageName(context.packageName)!!.copy(
+                internalId = 0
+            )
+
+            MitchApp.downloadFileManager.requestDownload(install, downloadUrl, null,
+                DownloadFileManager.APK_MIME)
         }
     }
 }

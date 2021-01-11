@@ -102,7 +102,7 @@ class GameDownloader(val context: Context) {
 
         //Temporary download ID
         val pendingInstall = try {
-            ItchWebsiteParser.getPendingInstallation(doc, uploadId, 0)
+            ItchWebsiteParser.getPendingInstallation(doc, uploadId)
         } catch (e: ItchWebsiteParser.UploadNotFoundException) {
             Log.d(LOGGING_TAG, "Required upload not found, requesting update check...")
             val updateCheckRequest = OneTimeWorkRequestBuilder<UpdateCheckWorker>()
@@ -112,41 +112,7 @@ class GameDownloader(val context: Context) {
             return false
         }
 
-        MitchApp.downloadFileManager.requestDownload(uploadId, downloadUrl, contentDisposition, mimeType) {
-                downloadId ->
-            pendingInstall.downloadOrInstallId = downloadId
-            runBlocking(Dispatchers.IO) {
-                updateDatabase(url, pendingInstall)
-            }
-        }
+        MitchApp.downloadFileManager.requestDownload(pendingInstall, downloadUrl, contentDisposition, mimeType)
         return true
-    }
-
-    /**
-     * Note: [startDownload] updates the database on its own. Use this method only if you're
-     * handling downloads in some other way.
-     */
-    suspend fun updateDatabase(
-        downloadPageUrl: String?,
-        pendingInstall: Installation
-    ) {
-        val db = AppDatabase.getDatabase(context)
-        Log.d(LOGGING_TAG, "Updating database based on download...")
-
-        var game = db.gameDao.getGameById(pendingInstall.gameId)
-        if (game == null) {
-            val storeUrl = ItchWebsiteParser.getStoreUrlFromDownloadPage(Uri.parse(downloadPageUrl!!))
-            Log.d(LOGGING_TAG, "Game is null! Fetching $storeUrl...")
-            val storeDoc = ItchWebsiteUtils.fetchAndParse(storeUrl)
-            game = ItchWebsiteParser.getGameInfoForStorePage(storeDoc, storeUrl)
-            db.gameDao.upsert(game)
-        }
-
-        //Cancel download for the same uploadId
-        val installation = db.installDao.getPendingInstallation(pendingInstall.uploadId)
-        if (installation != null) {
-            installation.downloadOrInstallId?.let { MitchApp.fetch.cancel(it.toInt()) }
-        }
-        db.installDao.insert(pendingInstall)
     }
 }
