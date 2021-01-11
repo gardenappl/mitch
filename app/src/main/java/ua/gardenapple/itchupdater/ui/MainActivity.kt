@@ -1,12 +1,15 @@
 package ua.gardenapple.itchupdater.ui
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import android.webkit.URLUtil
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -15,6 +18,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.browse_fragment.*
 import ua.gardenapple.itchupdater.*
+import java.net.URLConnection
 
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
@@ -22,6 +26,8 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     private lateinit var currentFragmentTag: String
 
     companion object {
+        const val EXTRA_SHOULD_OPEN_LIBRARY = "SHOULD_OPEN_LIBRARY"
+        
         private const val ACTIVE_FRAGMENT_KEY: String = "fragment"
 
         const val BROWSE_FRAGMENT_TAG: String = "browse"
@@ -105,6 +111,8 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                 intent.data?.let { ItchWebsiteUtils.isItchWebPage(it) } == true) {
             setActiveFragment(BROWSE_FRAGMENT_TAG)
             browseFragment.webView.loadUrl(intent.data!!.toString())
+        } else if (intent.getBooleanExtra(EXTRA_SHOULD_OPEN_LIBRARY, false)) {
+            setActiveFragment(LIBRARY_FRAGMENT_TAG)
         }
     }
 

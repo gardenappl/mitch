@@ -81,4 +81,11 @@
     <string name="notification_channel_web_running">Запущена веб-игра itch.io</string>
     <string name="notification_channel_web_running_desc">Уведомлять, когда во встроенном браузере запущена игра</string>
     <string name="notification_download_error">Ошибка во время загрузки: %1$s</string>
+    <string name="select_app_for_file">Открыть файл, используя</string>
+    <string name="game_download_delete">Удалить</string>
+    <string name="dialog_game_delete">Вы уверены, что хотите удалить файл %1$s?</string>
+    <string name="dialog_delete">Удалить</string>
+    <string name="dialog_game_delete_done">Файл %1$s был удалён.</string>
+    <string name="dialog_cancel_download_done">Загрузка отменена.</string>
+    <string name="dialog_game_delete_title">Удалить файл?</string>
 </resources>

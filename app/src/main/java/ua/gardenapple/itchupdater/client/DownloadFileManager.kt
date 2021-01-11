@@ -13,7 +13,6 @@ import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
 import java.io.File
-import java.util.function.Function
 
 class DownloadFileManager(private val context: Context, private val fetch: Fetch) {
     companion object {
@@ -78,12 +77,6 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
         dir.deleteRecursively()
     }
 
-    fun deletePendingFile(download: Download) {
-        deletePendingFile(Integer.parseInt(download.extras.getString(
-            DOWNLOAD_EXTRA_UPLOAD_ID,
-            "")))
-    }
-    
     fun replacePendingFile(uploadId: Int, replacedUploadId: Int) {
         if (!shouldHandleFiles(uploadId))
             return
@@ -97,18 +90,21 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
     }
     
     fun replacePendingFile(download: Download) {
-        val uploadId = Integer.parseInt(download.extras.getString(
-            DOWNLOAD_EXTRA_UPLOAD_ID, ""))
+        val uploadId = getUploadId(download)
         val replacedUploadId = Integer.parseInt(download.extras.getString(
             DOWNLOAD_EXTRA_REPLACED_UPLOAD_ID, ""))
         replacePendingFile(uploadId, replacedUploadId)
     }
     
-    fun requestCancellation(downloadId: Int, callback: ((Download) -> Unit)? = null) {
+    fun requestCancellation(downloadId: Int, uploadId: Int, callback: (() -> Unit)? = null) {
         fetch.cancel(downloadId, { download ->
-            deletePendingFile(download)
-            callback?.invoke(download)
-        })
+            deletePendingFile(uploadId)
+            callback?.invoke()
+        }) { error ->
+            Log.e(LOGGING_TAG, "Error while cancelling download: ${error.name}",
+                error.throwable)
+            deletePendingFile(uploadId)
+        }
     }
     
     fun getPendingFile(uploadId: Int): File? {
@@ -121,6 +117,15 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
             return
         val dir = File(uploadsPath, uploadId.toString())
         dir.deleteRecursively()
+    }
+
+    fun getDownloadedFile(uploadId: Int): File? {
+        val dir = File(uploadsPath, uploadId.toString())
+        return dir.listFiles()?.getOrNull(0)
+    }
+    
+    fun getUploadId(download: Download): Int {
+        return Integer.parseInt(download.extras.getString(DOWNLOAD_EXTRA_UPLOAD_ID, ""))
     }
     
     private fun shouldHandleFiles(uploadId: Int): Boolean {

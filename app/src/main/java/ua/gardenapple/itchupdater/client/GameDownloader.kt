@@ -160,7 +160,9 @@ class GameDownloader {
                 if (currentPendingInstall.status == Installation.STATUS_DOWNLOADING) {
                     Log.d(LOGGING_TAG, "Deleting")
                     willStartDownload = true
-                    downloadFileManager.requestCancellation(currentPendingInstall.downloadOrInstallId!!) {
+                    downloadFileManager.requestCancellation(currentPendingInstall.downloadOrInstallId!!,
+                        uploadId) {
+
                         downloadFileManager.startDownload(url, fileName,
                             pendingInstall, replacedUploadId)
                     }

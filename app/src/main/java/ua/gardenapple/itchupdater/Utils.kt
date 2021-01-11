@@ -1,5 +1,7 @@
 package ua.gardenapple.itchupdater
 
+import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.content.res.Resources
@@ -7,22 +9,24 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
+import androidx.core.content.FileProvider
 import com.github.ajalt.colormath.ConvertibleColor
 import com.github.ajalt.colormath.fromCss
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.InputStream
-import java.io.OutputStream
-import java.io.PrintWriter
-import java.io.StringWriter
+import java.io.*
+import java.net.URLConnection
 import kotlin.math.min
 
 class Utils {
     companion object {
+        private const val LOGGING_TAG = "Utils"
         private const val LOG_LIMIT: Int = 1000
 
         /**
@@ -143,6 +147,17 @@ class Utils {
                     }
                 }
                 resources.getColor(id)
+            }
+        }
+        
+        fun getIntentForFile(context: Context, file: File): Intent {
+            return Intent(Intent.ACTION_VIEW).apply {
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                data = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                    FileProvider.getUriForFile(context, FILE_PROVIDER_UPLOADS, file)
+                else
+                    Uri.fromFile(file)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
         }
     }

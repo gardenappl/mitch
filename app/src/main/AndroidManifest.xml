@@ -66,7 +66,7 @@
         <service android:name=".installer.InstallerService" />
         <provider
                 android:name="androidx.core.content.FileProvider"
-                android:authorities="ua.gardenapple.itchupdater.fileprovider"
+                android:authorities="ua.gardenapple.itchupdater.uploadsprovider"
                 android:exported="false"
                 android:grantUriPermissions="true">
             <meta-data

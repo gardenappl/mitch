@@ -14,6 +14,9 @@ import com.tonyodev.fetch2.FetchListener
 import com.tonyodev.fetch2core.DownloadBlock
 import kotlinx.coroutines.*
 import ua.gardenapple.itchupdater.*
+import ua.gardenapple.itchupdater.ui.MainActivity
+import java.io.File
+import java.net.URLConnection
 
 /**
  * This listener responds to finished file downloads from Fetch.
@@ -21,7 +24,7 @@ import ua.gardenapple.itchupdater.*
 class FileDownloadListener(private val context: Context) : FetchListener {
 
     private fun createNotification(context: Context,
-                                   downloadLocalUri: Uri, 
+                                   downloadFile: File,
                                    id: Int,
                                    isApk: Boolean, 
                                    error: Error? = null) {
@@ -29,31 +32,36 @@ class FileDownloadListener(private val context: Context) : FetchListener {
         if (error != null) {
             pendingIntent = null
         } else if (isApk) {
-            val downloadPath = downloadLocalUri.path!!
-            Log.d(LOGGING_TAG, downloadPath)
+            Log.d(LOGGING_TAG, downloadFile.path)
 
             val intent = Intent(context, InstallNotificationBroadcastReceiver::class.java).apply {
-                data = Uri.parse(downloadPath)
+                data = Uri.fromFile(downloadFile)
                 putExtra(InstallNotificationBroadcastReceiver.EXTRA_DOWNLOAD_ID, id)
             }
             pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         } else {
-            val intent = Intent(DownloadManager.ACTION_VIEW_DOWNLOADS)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
+            val fileIntent = Utils.getIntentForFile(context, downloadFile)
+
+            val intent = if (fileIntent.resolveActivity(context.packageManager) == null) {
+                Intent(context, MainActivity::class.java)
+                    .putExtra(MainActivity.EXTRA_SHOULD_OPEN_LIBRARY, true)
+            } else {
+                Intent.createChooser(fileIntent, context.resources.getString(R.string.select_app_for_file))
+            }
+            pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALL).apply {
             setSmallIcon(R.drawable.ic_mitch_notification)
             if (error != null) {
-                setContentTitle(downloadLocalUri.lastPathSegment)
+                setContentTitle(downloadFile.name)
                 setContentText(context.resources.getString(R.string.notification_download_error, error.name))
             } else {
                 if (isApk)
                     setContentTitle(context.resources.getString(R.string.notification_install_title))
                 else
                     setContentTitle(context.resources.getString(R.string.notification_download_complete_title))
-                setContentText(downloadLocalUri.lastPathSegment)
+                setContentText(downloadFile.name)
             }
 
             priority = NotificationCompat.PRIORITY_HIGH
@@ -74,12 +82,15 @@ class FileDownloadListener(private val context: Context) : FetchListener {
 
     override fun onCompleted(download: Download) {
         val isApk = download.file.endsWith(".apk")
-        createNotification(context, download.fileUri, download.id, isApk)
+        val downloadFileManager = MitchApp.downloadFileManager
 
         runBlocking(Dispatchers.IO) {
             if (!isApk) {
-                MitchApp.downloadFileManager.replacePendingFile(download)
+                downloadFileManager.replacePendingFile(download)
             }
+            val uploadId = downloadFileManager.getUploadId(download)
+            createNotification(context, downloadFileManager.getDownloadedFile(uploadId)!!,
+                download.id, isApk)
             MitchApp.installerDatabaseHandler.onDownloadComplete(download.id, isApk)
         }
     }
@@ -96,10 +107,11 @@ class FileDownloadListener(private val context: Context) : FetchListener {
 
     override fun onError(download: Download, error: Error, throwable: Throwable?) {
         val isApk = download.file.endsWith(".apk")
-        createNotification(context, download.fileUri, download.id, isApk, error)
+        createNotification(context, File(download.file), download.id, isApk, error)
 
         runBlocking(Dispatchers.IO) {
-            MitchApp.downloadFileManager.deletePendingFile(download)
+            val uploadId = MitchApp.downloadFileManager.getUploadId(download)
+            MitchApp.downloadFileManager.deletePendingFile(uploadId)
             MitchApp.installerDatabaseHandler.onDownloadFailed(download.id)
         }
     }

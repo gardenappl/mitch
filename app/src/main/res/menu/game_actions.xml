@@ -7,8 +7,8 @@
             android:id="@+id/app_info"
             android:title="@string/game_package_info" />
     <item
-            android:id="@+id/remove_from_app"
-            android:title="@string/game_download_remove" />
+            android:id="@+id/delete"
+            android:title="@string/game_download_delete" />
     <item
             android:id="@+id/cancel"
             android:title="@string/game_cancel_download_or_install" />

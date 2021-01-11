@@ -28,6 +28,8 @@ const val LOGGING_TAG: String = "Mitch"
 
 const val PERMISSION_REQUEST_MOVE_TO_DOWNLOADS = 2
 
+const val FILE_PROVIDER_UPLOADS = "ua.gardenapple.itchupdater.uploadsprovider"
+
 const val NOTIFICATION_CHANNEL_ID_UPDATES = "updates_available"
 const val NOTIFICATION_CHANNEL_ID_INSTALL = "updates"
 const val NOTIFICATION_CHANNEL_ID_INSTALLING = "installing"
