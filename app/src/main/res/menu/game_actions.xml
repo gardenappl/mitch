@@ -2,14 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
             android:id="@+id/go_to_store"
+            android:icon="@drawable/ic_baseline_web_24"
             android:title="@string/game_go_to_store" />
     <item
             android:id="@+id/app_info"
+            android:icon="@drawable/ic_baseline_info_24"
             android:title="@string/game_package_info" />
     <item
             android:id="@+id/delete"
+            android:icon="@drawable/ic_baseline_delete_24"
             android:title="@string/game_download_delete" />
     <item
             android:id="@+id/cancel"
+            android:icon="@drawable/ic_baseline_cancel_24"
             android:title="@string/game_cancel_download_or_install" />
 </menu>

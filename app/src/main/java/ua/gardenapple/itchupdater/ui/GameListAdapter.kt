@@ -1,5 +1,6 @@
 package ua.gardenapple.itchupdater.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
 import android.app.NotificationManager
@@ -10,12 +11,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
@@ -110,7 +110,7 @@ class GameListAdapter internal constructor(
             if (launchIntent != null) {
                 context.startActivity(launchIntent)
             }
-        } else {
+        } else if (gameInstall.status == Installation.STATUS_INSTALLED) {
             val downloadedFile = MitchApp.downloadFileManager.getDownloadedFile(gameInstall.uploadId)
             if (downloadedFile?.exists() == true) {
                 val intent = Utils.getIntentForFile(context, downloadedFile)
@@ -130,35 +130,40 @@ class GameListAdapter internal constructor(
         }
     }
 
+    //TODO: Showing icons in a PopupMenu requires restriced API...
+    @SuppressLint("RestrictedApi")
     private fun onCardOverflowClick(view: View, position: Int) {
         val gameInstall = gameInstalls[position]
 
-        PopupMenu(context, view).apply {
-            setOnMenuItemClickListener { menuItem -> onMenuItemClick(menuItem, gameInstall) }
-            inflate(R.menu.game_actions)
+        val popupMenu = MenuBuilder(context).apply {
+            MenuInflater(context).inflate(R.menu.game_actions, this)
 
             if (type != GameRepository.Type.Installed)
-                menu.removeItem(R.id.app_info)
+                removeItem(R.id.app_info)
             if (type != GameRepository.Type.Downloads)
-                menu.removeItem(R.id.delete)
+                removeItem(R.id.delete)
             if (type != GameRepository.Type.Pending)
-                menu.removeItem(R.id.cancel)
+                removeItem(R.id.cancel)
 
+            setCallback(object : MenuBuilder.Callback {
+                override fun onMenuItemSelected(menu: MenuBuilder, item: MenuItem): Boolean =
+                    onMenuItemClick(item, gameInstall)
+
+                override fun onMenuModeChange(menu: MenuBuilder) {}
+            })
+        }
+        MenuPopupHelper(context, popupMenu, view).apply { 
+            setForceShowIcon(true)
             show()
         }
     }
 
-    private fun onMenuItemClick(item: MenuItem?,
-                                gameInstall: GameInstallation): Boolean {
+    private fun onMenuItemClick(item: MenuItem, gameInstall: GameInstallation): Boolean {
         val game = gameInstall.game
-        when (item?.itemId) {
+        when (item.itemId) {
             R.id.go_to_store -> {
-                val intent = Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(game.storeUrl),
-                    context,
-                    MainActivity::class.java
-                )
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(game.storeUrl),
+                    context, MainActivity::class.java)
                 context.startActivity(intent)
                 return true
             }

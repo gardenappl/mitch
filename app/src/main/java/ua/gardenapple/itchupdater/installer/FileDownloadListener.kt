@@ -83,14 +83,18 @@ class FileDownloadListener(private val context: Context) : FetchListener {
     override fun onCompleted(download: Download) {
         val isApk = download.file.endsWith(".apk")
         val downloadFileManager = MitchApp.downloadFileManager
+        val uploadId = downloadFileManager.getUploadId(download)
 
         runBlocking(Dispatchers.IO) {
-            if (!isApk) {
+
+            val notificationFile: File
+            if (isApk) {
+                notificationFile = downloadFileManager.getPendingFile(uploadId)!!
+            } else {
                 downloadFileManager.replacePendingFile(download)
+                notificationFile = downloadFileManager.getDownloadedFile(uploadId)!!
             }
-            val uploadId = downloadFileManager.getUploadId(download)
-            createNotification(context, downloadFileManager.getDownloadedFile(uploadId)!!,
-                download.id, isApk)
+            createNotification(context, notificationFile, download.id, isApk)
             MitchApp.installerDatabaseHandler.onDownloadComplete(download.id, isApk)
         }
     }

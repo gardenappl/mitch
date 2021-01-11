@@ -151,11 +151,12 @@ class MitchApp : Application() {
             setDownloadConcurrentLimit(3)
             setHttpDownloader(OkHttpDownloader(httpClient))
             setAutoRetryMaxAttempts(3)
-            setNotificationManager(object : DefaultFetchNotificationManager(applicationContext) {
-                override fun getFetchInstanceForNamespace(namespace: String): Fetch {
-                    return fetch
-                }
-            })
+            //TODO: Use Fetch native notifications, when they no longer suck!
+//            setNotificationManager(object : DefaultFetchNotificationManager(applicationContext) {
+//                override fun getFetchInstanceForNamespace(namespace: String): Fetch {
+//                    return fetch
+//                }
+//            })
             build()
         }
         fetch = fetchConfig.getNewFetchInstanceFromConfiguration()
