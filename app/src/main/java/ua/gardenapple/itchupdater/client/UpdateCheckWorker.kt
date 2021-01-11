@@ -87,10 +87,10 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
                         Log.e(LOGGING_TAG, "Update check error!", e)
                     }
 
-                    handleNotification(game, install, result)
                     launch(Dispatchers.IO) {
                         db.updateCheckDao.insert(result)
                     }
+                    handleNotification(game, install, result)
                 }
             }
         }
@@ -134,11 +134,7 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
                 if (result.code == UpdateCheckResult.UPDATE_NEEDED) {
                     if (result.uploadID != null) {
                         val intent = Intent(context, UpdateNotificationBroadcastReceiver::class.java).apply {
-                            putExtra(UpdateNotificationBroadcastReceiver.EXTRA_GAME_ID, game.gameId)
-                            putExtra(UpdateNotificationBroadcastReceiver.EXTRA_UPLOAD_ID, result.uploadID)
-                            val downloadKey = result.downloadPageUrl?.downloadKey
-                            if(downloadKey != null)
-                                putExtra(UpdateNotificationBroadcastReceiver.EXTRA_DOWNLOAD_KEY, downloadKey)
+                            putExtra(UpdateNotificationBroadcastReceiver.EXTRA_INSTALL_ID, result.installationId)
                         }
                         pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
                     } else if (game.downloadPageUrl == null) {

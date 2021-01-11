@@ -99,7 +99,7 @@ class ItchBrowseHandler(
 
         coroutineScope.launch(Dispatchers.IO) {
             val pendingInstall = ItchWebsiteParser.getPendingInstallation(downloadPageDoc, uploadId)
-            MitchApp.downloadFileManager.requestDownload(pendingInstall, downloadUrl,
+            GameDownloader.requestDownload(context, pendingInstall, downloadUrl,
                 contentDisposition, mimeType)
         }
 

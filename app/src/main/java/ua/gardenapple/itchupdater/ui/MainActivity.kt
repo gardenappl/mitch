@@ -1,9 +1,6 @@
 package ua.gardenapple.itchupdater.ui
 
-import android.app.DownloadManager
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
@@ -18,7 +15,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.browse_fragment.*
 import ua.gardenapple.itchupdater.*
-import ua.gardenapple.itchupdater.installer.DownloadFileManager
 
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {

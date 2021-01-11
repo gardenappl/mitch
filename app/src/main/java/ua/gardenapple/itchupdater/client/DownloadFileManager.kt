@@ -1,18 +1,19 @@
-package ua.gardenapple.itchupdater.installer
+package ua.gardenapple.itchupdater.client
 
 import android.content.Context
 import android.util.Log
-import android.webkit.URLUtil
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.Extras
 import kotlinx.coroutines.*
 import ua.gardenapple.itchupdater.*
+import ua.gardenapple.itchupdater.BuildConfig
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
 import java.io.File
+import java.util.function.Function
 
 class DownloadFileManager(private val context: Context, private val fetch: Fetch) {
     companion object {
@@ -27,62 +28,11 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
     private val uploadsPath = File(context.filesDir, "upload")
     private val pendingPath = File(context.filesDir, "pending")
 
-    /**
-     * Request to start downloading file into internal storage.
-     * Once download (and/or installation) is complete,
-     * the files for [replacedUploadId] will be deleted.
-     * @param pendingInstall the [Installation] which we're about to download. Must have internalId = 0
-     * @param url URL of file to download
-     * @param contentDisposition HTTP content disposition header
-     * @param mimeType MIME type
-     * @param replacedUploadId upload to delete
-     */
-    suspend fun requestDownload(
-        pendingInstall: Installation,
-        url: String,
-        contentDisposition: String?,
-        mimeType: String?,
-        replacedUploadId: Int = pendingInstall.uploadId
-    ) {
-        if (pendingInstall.internalId != 0)
-            throw IllegalArgumentException("Pending installation already has internalId!")
-
-        Log.d(LOGGING_TAG, "Content disposition: $contentDisposition")
-        Log.d(LOGGING_TAG, "MIME type: $mimeType")
-        val uploadId = pendingInstall.uploadId
-        val fileName = if (mimeType == "application/octet-stream") {
-            URLUtil.guessFileName(url, contentDisposition, null)
-        } else {
-            URLUtil.guessFileName(url, contentDisposition, mimeType)
-        }
-
-        //cancel download for current pending installation
-        withContext(Dispatchers.IO) {
-            val db = AppDatabase.getDatabase(context)
-            var willStartDownload = false
-
-            db.installDao.getPendingInstallation(uploadId)?.let { currentPendingInstall ->
-                Log.d(LOGGING_TAG, "Already existing install for $uploadId")
-
-                if (currentPendingInstall.status == Installation.STATUS_DOWNLOADING) {
-                    Log.d(LOGGING_TAG, "Deleting")
-                    willStartDownload = true
-                    fetch.cancel(currentPendingInstall.downloadOrInstallId!!, { _: Download ->
-                        startDownload(url, fileName, pendingInstall, replacedUploadId)
-                    })
-                }
-            }
-
-            if (!willStartDownload) {
-                startDownload(url, fileName, pendingInstall, replacedUploadId)
-            }
-        }
-    }
 
     /**
      * All previous downloads for the same uploadId must be cancelled at this point
      */
-    private fun startDownload(
+    internal fun startDownload(
         url: String,
         fileName: String,
         pendingInstall: Installation,
@@ -121,16 +71,23 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
     }
     
     fun deletePendingFile(uploadId: Int) {
+        if (!shouldHandleFiles(uploadId))
+            return
+        
         val dir = File(pendingPath, uploadId.toString())
         dir.deleteRecursively()
     }
 
     fun deletePendingFile(download: Download) {
-        deletePendingFile(Integer.parseInt(download.extras.getString(DOWNLOAD_EXTRA_UPLOAD_ID,
+        deletePendingFile(Integer.parseInt(download.extras.getString(
+            DOWNLOAD_EXTRA_UPLOAD_ID,
             "")))
     }
     
     fun replacePendingFile(uploadId: Int, replacedUploadId: Int) {
+        if (!shouldHandleFiles(uploadId))
+            return
+        
         val replacedPath = File(uploadsPath, replacedUploadId.toString())
         replacedPath.deleteRecursively()
 
@@ -147,9 +104,10 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
         replacePendingFile(uploadId, replacedUploadId)
     }
     
-    fun requestCancellation(downloadId: Int) {
+    fun requestCancellation(downloadId: Int, callback: ((Download) -> Unit)? = null) {
         fetch.cancel(downloadId, { download ->
             deletePendingFile(download)
+            callback?.invoke(download)
         })
     }
     
@@ -159,7 +117,13 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
     }
 
     fun deleteDownloadedFile(uploadId: Int) {
+        if (!shouldHandleFiles(uploadId))
+            return
         val dir = File(uploadsPath, uploadId.toString())
         dir.deleteRecursively()
+    }
+    
+    private fun shouldHandleFiles(uploadId: Int): Boolean {
+        return !(uploadId == Installation.MITCH_UPLOAD_ID && BuildConfig.FLAVOR == FLAVOR_GITLAB)
     }
 }

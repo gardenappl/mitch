@@ -13,11 +13,10 @@ import androidx.work.*
 import com.tonyodev.fetch2.DefaultFetchNotificationManager
 import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2.FetchConfiguration
-import com.tonyodev.fetch2.FetchNotificationManager
-import com.tonyodev.fetch2.util.canPauseDownload
 import com.tonyodev.fetch2okhttp.OkHttpDownloader
 import okhttp3.Cache
 import okhttp3.OkHttpClient
+import ua.gardenapple.itchupdater.client.DownloadFileManager
 import ua.gardenapple.itchupdater.client.UpdateCheckWorker
 import ua.gardenapple.itchupdater.gitlab.GitlabUpdateCheckWorker
 import ua.gardenapple.itchupdater.installer.*

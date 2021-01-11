@@ -10,30 +10,26 @@ import ua.gardenapple.itchupdater.client.GameDownloader
 import ua.gardenapple.itchupdater.database.AppDatabase
 
 /**
- * This is an internal receiver which only receives broadcasts when clicking the "Update available" notification.
+ * This is an internal receiver which only receives broadcasts when clicking
+ * the "Update available" notification, and there is one single uploadId available to install.
  */
 class UpdateNotificationBroadcastReceiver : BroadcastReceiver() {
     companion object {
         private const val LOGGING_TAG = "DownloadNotification"
 
-        const val EXTRA_GAME_ID = "GAME_ID"
-        const val EXTRA_UPLOAD_ID = "UPLOAD_ID"
-        const val EXTRA_DOWNLOAD_KEY = "DOWNLOAD_KEY"
+        const val EXTRA_INSTALL_ID = "INSTALL_ID"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(LOGGING_TAG, "onReceive")
         val extras = intent.extras!!
 
-        val gameId = extras.getInt(EXTRA_GAME_ID)
-        val uploadId = extras.getInt(EXTRA_UPLOAD_ID)
-        val downloadKey = extras.getString(EXTRA_DOWNLOAD_KEY)
+        val installId = extras.getInt(EXTRA_INSTALL_ID)
 
         runBlocking(Dispatchers.IO) {
-            val downloader = GameDownloader(context)
             val db = AppDatabase.getDatabase(context)
-            val game = db.gameDao.getGameById(gameId)!!
-            downloader.startDownload(game, uploadId, downloadKey)
+            val updateCheckResult = db.updateCheckDao.getUpdateCheckResultForInstall(installId)!!
+            GameDownloader.startUpdate(context, updateCheckResult)
         }
     }
 }

@@ -6,10 +6,9 @@ import android.content.Intent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.MitchApp
-import ua.gardenapple.itchupdater.client.GameDownloader
 import ua.gardenapple.itchupdater.database.AppDatabase
-import ua.gardenapple.itchupdater.database.installation.Installation
-import ua.gardenapple.itchupdater.installer.DownloadFileManager
+import ua.gardenapple.itchupdater.client.DownloadFileManager
+import ua.gardenapple.itchupdater.client.GameDownloader
 
 /**
  * This is an internal receiver which only receives broadcasts when clicking the "Update available" notification
@@ -30,7 +29,7 @@ class GitlabUpdateBroadcastReceiver : BroadcastReceiver() {
                 internalId = 0
             )
 
-            MitchApp.downloadFileManager.requestDownload(install, downloadUrl, null,
+            GameDownloader.requestDownload(context, install, downloadUrl, null,
                 DownloadFileManager.APK_MIME)
         }
     }
