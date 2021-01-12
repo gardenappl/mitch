@@ -88,5 +88,7 @@
     <string name="dialog_game_delete_done">%1$s has been deleted.</string>
     <string name="dialog_cancel_download_done">Cancelled download.</string>
     <string name="dialog_game_delete_title">Delete this file?</string>
-    <string name="notification_download_time_remaining">Remaining: $1%d min $2%d sec</string>
+    <string name="dialog_app_delete_title">Remaining: %1$d min %2$d sec</string>
+    <string name="dialog_app_delete">Are you sure you want to delete %1$s?</string>
+    <string name="notification_download_time_remaining">Remaining: %1$d min %2$d sec</string>
 </resources>

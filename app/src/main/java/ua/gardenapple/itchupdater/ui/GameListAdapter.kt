@@ -136,7 +136,7 @@ class GameListAdapter internal constructor(
 
             if (type != GameRepository.Type.Installed)
                 removeItem(R.id.app_info)
-            if (type != GameRepository.Type.Downloads)
+            if (type != GameRepository.Type.Downloads && type != GameRepository.Type.Installed)
                 removeItem(R.id.delete)
             if (type != GameRepository.Type.Pending)
                 removeItem(R.id.cancel)
@@ -177,8 +177,16 @@ class GameListAdapter internal constructor(
                 return true
             }
             R.id.delete -> {
+                if (type == GameRepository.Type.Installed) {
+                    val intent = Intent(Intent.ACTION_DELETE,
+                        Uri.parse("package:${gameInstall.packageName}"))
+                    context.startActivity(intent)
+                    return true
+                }
+
                 val dialog = AlertDialog.Builder(context).apply {
                     setTitle(R.string.dialog_game_delete_title)
+                    
                     runBlocking(Dispatchers.IO) {
                         if (MitchApp.downloadFileManager.getDownloadedFile(
                                 gameInstall.uploadId)?.exists() == true) {
@@ -199,6 +207,7 @@ class GameListAdapter internal constructor(
                             db.installDao.deleteFinishedInstallation(gameInstall.uploadId)
                             MitchApp.downloadFileManager.deleteDownloadedFile(gameInstall.uploadId)
                         }
+
                         Toast.makeText(
                             context,
                             context.getString(R.string.dialog_game_delete_done, gameInstall.uploadName),

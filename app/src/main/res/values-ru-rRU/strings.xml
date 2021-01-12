@@ -88,5 +88,7 @@
     <string name="dialog_game_delete_done">Файл %1$s был удалён.</string>
     <string name="dialog_cancel_download_done">Загрузка отменена.</string>
     <string name="dialog_game_delete_title">Удалить файл?</string>
-    <string name="notification_download_time_remaining">Осталось $1%d мин. $2%d сек.</string>
+    <string name="notification_download_time_remaining">Осталось %1$d мин. %2$d сек.</string>
+    <string name="dialog_app_delete_title">Удалить приложение?</string>
+    <string name="dialog_app_delete">Вы уверены, что хотите удалить %1$s?</string>
 </resources>
