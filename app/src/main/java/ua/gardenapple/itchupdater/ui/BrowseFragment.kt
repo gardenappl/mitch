@@ -563,19 +563,21 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             val blockTrackers = sharedPreferences.getBoolean("preference_block_trackers", true)
 
             if (blockTrackers) {
-                val blockedURLs = arrayOf(
-                    "www.google-analytics.com",
+                arrayOf(
+                    "google-analytics.com",
                     "adservice.google.com",
-                    "pagead2.googlesyndication.com",
-                    "googleads.g.doubleclick.net"
-                )
-                if (blockedURLs.contains(request.url.host))
-                    return WebResourceResponse(
-                        "text/plain",
-                        "utf-8",
-                        ByteArrayInputStream("tracker_blocked".toByteArray())
-                    )
+                    "googlesyndication.com",
+                    "doubleclick.net"
+                ).forEach { trackerHostUrl ->
+                    if (request.url.host?.contains(trackerHostUrl) == true)
+                        return WebResourceResponse(
+                            "text/plain",
+                            "utf-8",
+                            ByteArrayInputStream("tracker_blocked".toByteArray())
+                        )
+                }
             }
+//            Log.d(LOGGING_TAG, request.url.host)
             return null
         }
 
