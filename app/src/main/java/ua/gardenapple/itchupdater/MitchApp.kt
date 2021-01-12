@@ -13,6 +13,7 @@ import androidx.work.*
 import com.tonyodev.fetch2.DefaultFetchNotificationManager
 import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2.FetchConfiguration
+import com.tonyodev.fetch2.Status
 import com.tonyodev.fetch2okhttp.OkHttpDownloader
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -23,8 +24,6 @@ import ua.gardenapple.itchupdater.installer.*
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-
-const val LOGGING_TAG: String = "Mitch"
 
 const val PERMISSION_REQUEST_MOVE_TO_DOWNLOADS = 2
 
@@ -51,6 +50,8 @@ const val FLAVOR_GITLAB = "gitlab"
 class MitchApp : Application() {
 
     companion object {
+        const val LOGGING_TAG: String = "MitchApp"
+
         lateinit var httpClient: OkHttpClient
             private set
         private lateinit var fetch: Fetch
@@ -103,6 +104,7 @@ class MitchApp : Application() {
             notificationManager.createNotificationChannel(channel)
 
 
+            //TODO: update strings
             name = getString(R.string.notification_channel_updates)
             descriptionText = getString(R.string.notification_channel_updates_desc)
             importance = NotificationManager.IMPORTANCE_DEFAULT
@@ -151,16 +153,16 @@ class MitchApp : Application() {
             setDownloadConcurrentLimit(3)
             setHttpDownloader(OkHttpDownloader(httpClient))
             setAutoRetryMaxAttempts(3)
+            enableFileExistChecks(false)
             //TODO: Use Fetch native notifications, when they no longer suck!
-//            setNotificationManager(object : DefaultFetchNotificationManager(applicationContext) {
-//                override fun getFetchInstanceForNamespace(namespace: String): Fetch {
-//                    return fetch
-//                }
-//            })
             build()
         }
         fetch = fetchConfig.getNewFetchInstanceFromConfiguration()
         fetch.addListener(FileDownloadListener(applicationContext))
+        fetch.getDownloads { list ->
+            list.forEach { download -> Log.d(LOGGING_TAG, download.toString()) }
+        }
+        fetch.removeAll()
         downloadFileManager = DownloadFileManager(applicationContext, fetch)
 
         installerDatabaseHandler = InstallerDatabaseHandler(applicationContext)

@@ -16,7 +16,7 @@ import java.io.File
 
 class DownloadFileManager(private val context: Context, private val fetch: Fetch) {
     companion object {
-        private const val LOGGING_TAG = "DownloadRequester"
+        private const val LOGGING_TAG = "DownloadFileManager"
 
         const val APK_MIME = "application/vnd.android.package-archive"
         
@@ -97,14 +97,22 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
     }
     
     fun requestCancellation(downloadId: Int, uploadId: Int, callback: (() -> Unit)? = null) {
-        fetch.cancel(downloadId, { download ->
+        fetch.remove(downloadId, {
             deletePendingFile(uploadId)
             callback?.invoke()
         }) { error ->
-            Log.e(LOGGING_TAG, "Error while cancelling download: ${error.name}",
+            Log.e(LOGGING_TAG, "Error while cancelling/removing download: ${error.name}",
                 error.throwable)
             deletePendingFile(uploadId)
+            callback?.invoke()
         }
+    }
+
+    /**
+     * Remove download from Fetch's internal database
+     */
+    fun removeFetchDownload(downloadId: Int) {
+        fetch.remove(downloadId)
     }
     
     fun getPendingFile(uploadId: Int): File? {

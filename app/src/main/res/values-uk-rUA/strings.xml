@@ -88,4 +88,5 @@
     <string name="dialog_game_delete_done">Файл %1$s видалено.</string>
     <string name="dialog_cancel_download_done">Завантаження скасовано.</string>
     <string name="dialog_game_delete_title">Видалити файл?</string>
+    <string name="notification_download_time_remaining">Залишилося $1%d хв. $2%d с.</string>
 </resources>

@@ -7,8 +7,7 @@ import android.webkit.CookieManager
 import android.webkit.URLUtil
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.FormBody
 import okhttp3.Request
 import org.json.JSONObject
@@ -158,13 +157,15 @@ class GameDownloader {
                 Log.d(LOGGING_TAG, "Already existing install for $uploadId")
 
                 if (currentPendingInstall.status == Installation.STATUS_DOWNLOADING) {
-                    Log.d(LOGGING_TAG, "Deleting")
                     willStartDownload = true
                     downloadFileManager.requestCancellation(currentPendingInstall.downloadOrInstallId!!,
                         uploadId) {
 
-                        downloadFileManager.startDownload(url, fileName,
-                            pendingInstall, replacedUploadId)
+                        runBlocking(Dispatchers.IO) {
+                            db.installDao.delete(currentPendingInstall.internalId)
+                            downloadFileManager.startDownload(url, fileName, pendingInstall,
+                                replacedUploadId)
+                        }
                     }
                 }
             }

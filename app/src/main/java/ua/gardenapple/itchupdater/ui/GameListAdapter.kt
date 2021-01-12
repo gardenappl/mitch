@@ -100,7 +100,7 @@ class GameListAdapter internal constructor(
 
         if (gameInstall.status == Installation.STATUS_READY_TO_INSTALL) {
             val notificationService = context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-            notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD_RESULT, gameInstall.downloadOrInstallId.toInt())
+            notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD_RESULT, gameInstall.downloadOrInstallId)
 
             GlobalScope.launch {
                 MitchApp.installer.install(context, gameInstall.downloadOrInstallId, gameInstall.uploadId)
@@ -224,6 +224,8 @@ class GameListAdapter internal constructor(
                     val pkgInstaller = context.packageManager.packageInstaller
                     pkgInstaller.abandonSession(gameInstall.downloadOrInstallId)
                 }
+                val notificationService = context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
+                notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD_RESULT, gameInstall.downloadOrInstallId)
                 runBlocking(Dispatchers.IO) {
                     if (gameInstall.status == Installation.STATUS_DOWNLOADING) {
                         MitchApp.downloadFileManager.requestCancellation(gameInstall.downloadOrInstallId,
@@ -235,6 +237,9 @@ class GameListAdapter internal constructor(
                     val db = AppDatabase.getDatabase(context)
                     db.installDao.delete(gameInstall.installId)
                 }
+                Toast.makeText(context, context.getString(R.string.dialog_cancel_download_done),
+                    Toast.LENGTH_SHORT
+                ).show()
                 return true
             }
             else -> return false

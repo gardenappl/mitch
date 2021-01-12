@@ -12,6 +12,7 @@ import androidx.core.app.NotificationManagerCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.*
+import ua.gardenapple.itchupdater.database.AppDatabase
 
 /**
  * This service gets started after an APK gets installed by an Installer.
@@ -42,10 +43,13 @@ class InstallerService : Service() {
                 startActivity(confirmationIntent)
             }
             else -> {
-                runBlocking(Dispatchers.IO) {
-                    MitchApp.installerDatabaseHandler.onInstallResult(sessionId, packageName!!, status)
-                }
                 notifyInstallResult(sessionId, packageName!!, apkName, status)
+                runBlocking(Dispatchers.IO) {
+                    val db = AppDatabase.getDatabase(applicationContext)
+                    val install = db.installDao.findPendingInstallationBySessionId(sessionId)!!
+                    MitchApp.downloadFileManager.deletePendingFile(install.uploadId)
+                    MitchApp.installerDatabaseHandler.onInstallResult(sessionId, packageName, status)
+                }
             }
         }
 

@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.text.format.DateUtils
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -22,12 +23,15 @@ import java.net.URLConnection
  * This listener responds to finished file downloads from Fetch.
  */
 class FileDownloadListener(private val context: Context) : FetchListener {
+    companion object {
+        private const val LOGGING_TAG = "FileDownloadListener"
+    }
 
-    private fun createNotification(context: Context,
-                                   downloadFile: File,
-                                   id: Int,
-                                   isApk: Boolean, 
-                                   error: Error? = null) {
+    private fun createResultNotification(context: Context,
+                                         downloadFile: File,
+                                         id: Int,
+                                         isApk: Boolean,
+                                         error: Error? = null) {
         val pendingIntent: PendingIntent?
         if (error != null) {
             pendingIntent = null
@@ -78,6 +82,8 @@ class FileDownloadListener(private val context: Context) : FetchListener {
     }
 
     override fun onCancelled(download: Download) {
+        Log.d(LOGGING_TAG, "Cancelled ID: ${download.id}")
+        MitchApp.downloadFileManager.removeFetchDownload(download.id)
     }
 
     override fun onCompleted(download: Download) {
@@ -86,7 +92,6 @@ class FileDownloadListener(private val context: Context) : FetchListener {
         val uploadId = downloadFileManager.getUploadId(download)
 
         runBlocking(Dispatchers.IO) {
-
             val notificationFile: File
             if (isApk) {
                 notificationFile = downloadFileManager.getPendingFile(uploadId)!!
@@ -94,9 +99,10 @@ class FileDownloadListener(private val context: Context) : FetchListener {
                 downloadFileManager.replacePendingFile(download)
                 notificationFile = downloadFileManager.getDownloadedFile(uploadId)!!
             }
-            createNotification(context, notificationFile, download.id, isApk)
+            createResultNotification(context, notificationFile, download.id, isApk)
             MitchApp.installerDatabaseHandler.onDownloadComplete(download.id, isApk)
         }
+        downloadFileManager.removeFetchDownload(download.id)
     }
 
     override fun onDeleted(download: Download) {
@@ -111,13 +117,14 @@ class FileDownloadListener(private val context: Context) : FetchListener {
 
     override fun onError(download: Download, error: Error, throwable: Throwable?) {
         val isApk = download.file.endsWith(".apk")
-        createNotification(context, File(download.file), download.id, isApk, error)
+        createResultNotification(context, File(download.file), download.id, isApk, error)
 
         runBlocking(Dispatchers.IO) {
             val uploadId = MitchApp.downloadFileManager.getUploadId(download)
             MitchApp.downloadFileManager.deletePendingFile(uploadId)
             MitchApp.installerDatabaseHandler.onDownloadFailed(download.id)
         }
+        MitchApp.downloadFileManager.removeFetchDownload(download.id)
     }
 
     override fun onPaused(download: Download) {
@@ -128,9 +135,25 @@ class FileDownloadListener(private val context: Context) : FetchListener {
         etaInMilliSeconds: Long,
         downloadedBytesPerSecond: Long
     ) {
+        //TODO: allow cancelling downloads through notification
+        val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
+            setOngoing(true)
+            setOnlyAlertOnce(true)
+            priority = NotificationCompat.PRIORITY_LOW
+            setSmallIcon(R.drawable.ic_mitch_notification)
+            setContentTitle(download.fileUri.lastPathSegment)
+            setProgress(100, download.progress, false)
+            setContentInfo(context.resources.getString(R.string.notification_download_time_remaining,
+                etaInMilliSeconds / 60_000, etaInMilliSeconds / 1000))
+        }
+        with(NotificationManagerCompat.from(context)) {
+            notify(NOTIFICATION_TAG_DOWNLOAD_RESULT, download.id, builder.build())
+        }
     }
 
     override fun onQueued(download: Download, waitingOnNetwork: Boolean) {
+        Log.d(LOGGING_TAG, "on Queued, waiting network: $waitingOnNetwork")
+        Log.d(LOGGING_TAG, download.toString())
     }
 
     override fun onRemoved(download: Download) {
@@ -144,6 +167,17 @@ class FileDownloadListener(private val context: Context) : FetchListener {
         downloadBlocks: List<DownloadBlock>,
         totalBlocks: Int
     ) {
+        val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
+            setOngoing(true)
+            setOnlyAlertOnce(true)
+            priority = NotificationCompat.PRIORITY_LOW
+            setSmallIcon(R.drawable.ic_mitch_notification)
+            setContentTitle(download.fileUri.lastPathSegment)
+            setProgress(100, 0, true)
+        }
+        with(NotificationManagerCompat.from(context)) {
+            notify(NOTIFICATION_TAG_DOWNLOAD_RESULT, download.id, builder.build())
+        }
     }
 
     override fun onWaitingNetwork(download: Download) {

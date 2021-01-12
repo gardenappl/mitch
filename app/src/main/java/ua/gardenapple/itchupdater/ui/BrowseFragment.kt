@@ -57,10 +57,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         Log.d(LOGGING_TAG, "onCreate")
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -262,7 +258,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         val mainActivity = activity as? MainActivity ?: return
 
-        if (!isVisible)
+        if (!isVisible && doc != null)
             return
 
         //Log.d(LOGGING_TAG, "Processing UI...")
