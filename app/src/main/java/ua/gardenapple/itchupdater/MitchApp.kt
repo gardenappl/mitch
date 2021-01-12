@@ -69,9 +69,8 @@ class MitchApp : Application() {
         SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
             when (key) {
                 "preference_update_check_if_metered" -> {
-                    //WorkManager.getInstance(applicationContext).cancelAllWorkByTag(UPDATE_CHECK_TASK_TAG)
-                    registerUpdateCheckTask(requiresUnmetered = prefs.getBoolean(key, false))
-                    Log.d(LOGGING_TAG, "Re-registering...")
+                    registerUpdateCheckTask(prefs.getBoolean(key, false),
+                        ExistingPeriodicWorkPolicy.REPLACE)
                 }
                 "preference_theme" -> setThemeFromPreferences(prefs)
                 "current_site_theme" -> {
@@ -136,7 +135,7 @@ class MitchApp : Application() {
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val workOnMetered = sharedPreferences.getBoolean("preference_update_check_if_metered", true)
-        registerUpdateCheckTask(!workOnMetered)
+        registerUpdateCheckTask(!workOnMetered, ExistingPeriodicWorkPolicy.KEEP)
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
 
@@ -168,7 +167,7 @@ class MitchApp : Application() {
         installerDatabaseHandler = InstallerDatabaseHandler(applicationContext)
     }
 
-    private fun registerUpdateCheckTask(requiresUnmetered: Boolean) {
+    private fun registerUpdateCheckTask(requiresUnmetered: Boolean, existingWorkPolicy: ExistingPeriodicWorkPolicy) {
         val constraints = Constraints.Builder().run {
             if(requiresUnmetered)
                 setRequiredNetworkType(NetworkType.UNMETERED)
@@ -186,7 +185,7 @@ class MitchApp : Application() {
         WorkManager.getInstance(applicationContext)
             .enqueueUniquePeriodicWork(
                 UPDATE_CHECK_TASK_TAG,
-                ExistingPeriodicWorkPolicy.REPLACE,
+                existingWorkPolicy,
                 updateCheckRequest
             )
 
@@ -200,7 +199,7 @@ class MitchApp : Application() {
             WorkManager.getInstance(applicationContext)
                 .enqueueUniquePeriodicWork(
                     GITLAB_UPDATE_CHECK_TASK_TAG,
-                    ExistingPeriodicWorkPolicy.REPLACE,
+                    existingWorkPolicy,
                     gitlabUpdateCheckRequest
                 )
         }
