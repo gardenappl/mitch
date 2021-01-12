@@ -48,6 +48,7 @@ class InstallerService : Service() {
                     val db = AppDatabase.getDatabase(applicationContext)
                     val install = db.installDao.findPendingInstallationBySessionId(sessionId)!!
                     MitchApp.downloadFileManager.deletePendingFile(install.uploadId)
+                    MitchApp.downloadFileManager.deleteDownloadedFile(install.uploadId)
                     MitchApp.installerDatabaseHandler.onInstallResult(sessionId, packageName, status)
                 }
             }
