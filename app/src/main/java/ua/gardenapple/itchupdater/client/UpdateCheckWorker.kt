@@ -63,6 +63,7 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
                         } else {
                             val newDownloadInfo = updateChecker.getDownloadInfo(game)
                             downloadInfoCache[install.gameId] = newDownloadInfo
+                            Log.d(LOGGING_TAG, "Download URL for ${game.name}: ${newDownloadInfo?.second}")
                             newDownloadInfo
                         }
 

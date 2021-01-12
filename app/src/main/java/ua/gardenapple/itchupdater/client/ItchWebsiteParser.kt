@@ -30,10 +30,10 @@ class ItchWebsiteParser {
                     return null
                 return Uri.parse(url).lastPathSegment
             }
-
-        override fun toString(): String {
-            return "{ URL: $url, is permanent?: $isPermanent, is store page?: $isStorePage }"
-        }
+//
+//        override fun toString(): String {
+//            return "{ URL: $url, is permanent?: $isPermanent, is store page?: $isStorePage }"
+//        }
     }
 
     companion object {
@@ -99,7 +99,8 @@ class ItchWebsiteParser {
                 }
                 uploadDivs = Collections.singletonList(uploadButtons.first().parent())
             } else {
-                uploadDivs = doc.getElementsByClass("upload_list_widget").first().children()
+                uploadDivs = doc.getElementsByClass("download_btn").first().parent()
+                    .parent().children()
             }
             
             val locale = getLocale(doc)

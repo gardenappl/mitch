@@ -89,8 +89,6 @@ class UpdateChecker(val db: AppDatabase) {
                 )
             }
 
-            logD(currentGame, "Update check URL: ${downloadPageInfo.url}")
-
             return@withContext compareUploads(updateCheckDoc, currentInstall, currentGame, downloadPageInfo)
         }
 
