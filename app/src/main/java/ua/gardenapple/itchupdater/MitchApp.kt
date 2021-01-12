@@ -103,7 +103,6 @@ class MitchApp : Application() {
             notificationManager.createNotificationChannel(channel)
 
 
-            //TODO: update strings
             name = getString(R.string.notification_channel_updates)
             descriptionText = getString(R.string.notification_channel_updates_desc)
             importance = NotificationManager.IMPORTANCE_DEFAULT

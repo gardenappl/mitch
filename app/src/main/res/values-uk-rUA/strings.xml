@@ -3,9 +3,9 @@
     <string name="nav_settings">Налаштування</string>
     <string name="nav_website_view">Сайт</string>
     <string name="notification_channel_install">Встановлення додатків</string>
-    <string name="notification_channel_install_desc">Сповіщати коли додаток з itch.io готовий до встановлення</string>
-    <string name="notification_channel_updates">Оновлення додатків</string>
-    <string name="notification_channel_updates_desc">Сповіщати коли для додатка з itch.io доступне оновлення</string>
+    <string name="notification_channel_install_desc">Сповіщати коли додаток з itch.io потребує встановлення</string>
+    <string name="notification_channel_updates">Оновлення ігор</string>
+    <string name="notification_channel_updates_desc">Сповіщати коли для гри з itch.io доступне оновлення</string>
     <string name="notification_download_complete_title">Завантаження завершено</string>
     <string name="notification_install_title">Натисніть, щоб встановити</string>
     <string name="settings_block_trackers">Захист від стеження</string>
@@ -13,8 +13,8 @@
     <string name="settings_category_browse">Браузинг</string>
     <string name="settings_category_updater">Встановлення та оновлення</string>
     <string name="settings_update_check_mode">Режим перевірки оновлень</string>
-    <string name="notification_channel_installing">Процес встановлення додатків</string>
-    <string name="notification_channel_installing_desc">Показувати інформацію про процес встановлення додатків.</string>
+    <string name="notification_channel_installing">Процес завантаження чи встановлення</string>
+    <string name="notification_channel_installing_desc">Показувати інформацію про процес завантаження чи встановлення ігор.</string>
     <string name="notification_installing">Додаток встановлюється</string>
     <string name="notification_install_complete_title">Додаток встановлено</string>
     <string name="notification_install_cancelled_title">Зупинили встановлення</string>
