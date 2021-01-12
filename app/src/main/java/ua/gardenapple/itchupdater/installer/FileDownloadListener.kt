@@ -90,10 +90,8 @@ class FileDownloadListener(private val context: Context) : FetchListener {
                 etaInMilliSeconds / 60_000, etaInMilliSeconds / 1000))
 
             val cancelIntent = Intent(context, DownloadCancelBroadcastReceiver::class.java).apply {
-                Log.d(LOGGING_TAG, "Putting download ID: ${download.id}")
                 putExtra(DownloadCancelBroadcastReceiver.EXTRA_DOWNLOAD_ID, download.id)
                 val uploadId = MitchApp.downloadFileManager.getUploadId(download)
-                Log.d(LOGGING_TAG, "Putting download ID: $uploadId")
                 putExtra(DownloadCancelBroadcastReceiver.EXTRA_UPLOAD_ID, uploadId)
             }
             val cancelPendingIntent = PendingIntent.getBroadcast(context, 0, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT)

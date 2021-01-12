@@ -54,7 +54,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(LOGGING_TAG, "onCreate")
     }
 
     override fun onAttach(context: Context) {
@@ -231,7 +230,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     override fun onDestroy() {
         super.onDestroy()
 
-        Log.d(LOGGING_TAG, "Destroying fragment")
         requireContext().stopService(Intent(context, WebViewForegroundService::class.java))
 
         cancel()
@@ -518,7 +516,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         @JavascriptInterface
         fun onHtmlLoaded(html: String, url: String) {
-            Log.d(LOGGING_TAG, url)
             if(fragment.activity !is MainActivity)
                 return
 
@@ -619,9 +616,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             private set
 
         override fun onShowCustomView(view: View, callback: CustomViewCallback) {
-            Log.d(LOGGING_TAG, "onShowCustomView")
             if (customView != null) {
-                Log.d(LOGGING_TAG, "return")
                 return
             }
 
@@ -659,9 +654,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
 
         override fun onHideCustomView() {
-            Log.d(LOGGING_TAG, "onHideCustomView")
             if (customView == null) {
-                Log.d(LOGGING_TAG, "return")
                 return
             }
 

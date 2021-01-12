@@ -155,10 +155,6 @@ class MitchApp : Application() {
         }
         fetch = fetchConfig.getNewFetchInstanceFromConfiguration()
         fetch.addListener(FileDownloadListener(applicationContext))
-        fetch.getDownloads { list ->
-            list.forEach { download -> Log.d(LOGGING_TAG, download.toString()) }
-        }
-        fetch.removeAll()
         downloadFileManager = DownloadFileManager(applicationContext, fetch)
 
         installerDatabaseHandler = InstallerDatabaseHandler(applicationContext)
