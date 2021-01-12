@@ -10,10 +10,8 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import androidx.work.*
-import com.tonyodev.fetch2.DefaultFetchNotificationManager
 import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2.FetchConfiguration
-import com.tonyodev.fetch2.Status
 import com.tonyodev.fetch2okhttp.OkHttpDownloader
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -30,13 +28,13 @@ const val PERMISSION_REQUEST_MOVE_TO_DOWNLOADS = 2
 const val FILE_PROVIDER_UPLOADS = "ua.gardenapple.itchupdater.uploadsprovider"
 
 const val NOTIFICATION_CHANNEL_ID_UPDATES = "updates_available"
-const val NOTIFICATION_CHANNEL_ID_INSTALL = "updates"
+const val NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED = "updates"
 const val NOTIFICATION_CHANNEL_ID_INSTALLING = "installing"
 const val NOTIFICATION_CHANNEL_ID_WEB_RUNNING = "web_running"
 
 const val NOTIFICATION_ID_SELF_UPDATE_CHECK = 999_999_999
 const val NOTIFICATION_TAG_UPDATE_CHECK = "UpdateCheck"
-const val NOTIFICATION_TAG_DOWNLOAD_RESULT = "DownloadResult"
+const val NOTIFICATION_TAG_DOWNLOAD = "DownloadResult"
 const val NOTIFICATION_TAG_INSTALL_RESULT = "InstallResult"
 
 const val UPDATE_CHECK_TASK_TAG = "update_check"
@@ -94,7 +92,7 @@ class MitchApp : Application() {
             var descriptionText = getString(R.string.notification_channel_install_desc)
             var importance = NotificationManager.IMPORTANCE_HIGH
             var channel =
-                NotificationChannel(NOTIFICATION_CHANNEL_ID_INSTALL, name, importance).apply {
+                NotificationChannel(NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED, name, importance).apply {
                     description = descriptionText
                 }
             // Register the channel with the system

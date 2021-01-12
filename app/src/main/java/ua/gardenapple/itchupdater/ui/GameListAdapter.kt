@@ -5,19 +5,16 @@ import android.app.Activity
 import android.app.DownloadManager
 import android.app.NotificationManager
 import android.content.ActivityNotFoundException
-import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
-import androidx.appcompat.widget.PopupMenu
-import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.library_item.view.*
@@ -30,7 +27,6 @@ import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.GameRepository
 import ua.gardenapple.itchupdater.database.installation.GameInstallation
 import ua.gardenapple.itchupdater.database.installation.Installation
-import java.net.URLConnection
 
 class GameListAdapter internal constructor(
     val context: Context,
@@ -100,7 +96,7 @@ class GameListAdapter internal constructor(
 
         if (gameInstall.status == Installation.STATUS_READY_TO_INSTALL) {
             val notificationService = context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-            notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD_RESULT, gameInstall.downloadOrInstallId)
+            notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, gameInstall.downloadOrInstallId)
 
             GlobalScope.launch {
                 MitchApp.installer.install(context, gameInstall.downloadOrInstallId, gameInstall.uploadId)
@@ -225,9 +221,10 @@ class GameListAdapter internal constructor(
                     pkgInstaller.abandonSession(gameInstall.downloadOrInstallId)
                 }
                 val notificationService = context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-                notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD_RESULT, gameInstall.downloadOrInstallId)
+                notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, gameInstall.downloadOrInstallId)
                 runBlocking(Dispatchers.IO) {
                     if (gameInstall.status == Installation.STATUS_DOWNLOADING) {
+                        Log.d(LOGGING_TAG, "Cancelling ${gameInstall.downloadOrInstallId}")
                         MitchApp.downloadFileManager.requestCancellation(gameInstall.downloadOrInstallId,
                             gameInstall.uploadId)
 

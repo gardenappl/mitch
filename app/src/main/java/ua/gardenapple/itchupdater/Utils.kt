@@ -160,5 +160,12 @@ class Utils {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
         }
+        
+        fun getInt(bundle: Bundle, key: String): Int? {
+            return if (bundle.containsKey(key))
+                bundle.getInt(key)
+            else
+                null
+        }
     }
 }

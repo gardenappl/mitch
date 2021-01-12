@@ -64,7 +64,7 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
                     priority = NotificationCompat.PRIORITY_HIGH
                 }
             with(NotificationManagerCompat.from(context)) {
-                notify(NOTIFICATION_TAG_DOWNLOAD_RESULT, 0, builder.build())
+                notify(NOTIFICATION_TAG_DOWNLOAD, 0, builder.build())
             }
         })
     }

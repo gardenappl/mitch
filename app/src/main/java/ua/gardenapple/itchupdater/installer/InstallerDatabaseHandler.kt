@@ -22,7 +22,6 @@ class InstallerDatabaseHandler(val context: Context)  {
 
             val pendingInstall =
                 db.installDao.findPendingInstallationBySessionId(installSessionId) ?: return@withContext
-            MitchApp.downloadFileManager.deletePendingFile(pendingInstall.uploadId)
 
             when (status) {
                 PackageInstaller.STATUS_FAILURE,

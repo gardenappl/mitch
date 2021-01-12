@@ -50,6 +50,9 @@
                 android:name=".installer.InstallNotificationBroadcastReceiver"
                 android:exported="false" />
         <receiver
+                android:name=".installer.DownloadCancelBroadcastReceiver"
+                android:exported="false" />
+        <receiver
                 android:name=".installer.UpdateNotificationBroadcastReceiver"
                 android:exported="false" />
         <receiver
