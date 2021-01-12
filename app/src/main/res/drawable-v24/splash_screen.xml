@@ -3,5 +3,7 @@
     <item android:drawable="?colorAccent" />
     <item
             android:drawable="@drawable/ic_launcher_foreground"
-            android:gravity="center" />
+            android:gravity="center"
+            android:width="150dp"
+            android:height="150dp"/>
 </layer-list>
