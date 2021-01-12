@@ -26,7 +26,6 @@ class UninstallBroadcastReceiver : BroadcastReceiver() {
 
         runBlocking(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
-            val installation = db.installDao.getInstallationByPackageName(packageName)
             db.installDao.deleteFinishedInstallation(packageName)
         }
     }
