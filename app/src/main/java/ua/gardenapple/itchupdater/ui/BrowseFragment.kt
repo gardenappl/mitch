@@ -57,14 +57,17 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         Log.d(LOGGING_TAG, "onCreate")
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        browseHandler = ItchBrowseHandler(context, this)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.browse_fragment, container, false)
-
-        browseHandler = ItchBrowseHandler(view, requireContext(), this)
 
         webView = view.findViewById(R.id.webView)
         chromeClient = MitchWebChromeClient()
@@ -194,11 +197,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         return view
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        browseHandler = null
-    }
-
     /**
      * @return true if the user can't go back in the web history
      */
@@ -216,6 +214,14 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         return true
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        val webViewState = Bundle()
+        webView.saveState(webViewState)
+        outState.putBundle(WEB_VIEW_STATE_KEY, webViewState)
+
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onPause() {
         super.onPause()
 
@@ -229,6 +235,12 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         requireContext().stopService(Intent(context, WebViewForegroundService::class.java))
 
         cancel()
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+
+        browseHandler = null
     }
 
     val isWebFullscreen: Boolean
@@ -491,15 +503,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 """, null
             )
         }
-    }
-
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        val webViewState = Bundle()
-        webView.saveState(webViewState)
-        outState.putBundle(WEB_VIEW_STATE_KEY, webViewState)
-
-        super.onSaveInstanceState(outState)
     }
 
 

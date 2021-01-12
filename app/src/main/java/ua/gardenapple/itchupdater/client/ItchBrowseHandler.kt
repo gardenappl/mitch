@@ -3,6 +3,7 @@ package ua.gardenapple.itchupdater.client
 import android.content.Context
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -16,7 +17,6 @@ import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.AppDatabase
 
 class ItchBrowseHandler(
-    private val view: View,
     private val context: Context,
     private val coroutineScope: CoroutineScope
 ) {
@@ -94,7 +94,7 @@ class ItchBrowseHandler(
         val contentDisposition = currentDownloadContentDisposition ?: return
         val mimeType = currentDownloadMimeType ?: return
 
-        Snackbar.make(view, R.string.toast_download_started, Snackbar.LENGTH_LONG)
+        Toast.makeText(context, R.string.toast_download_started, Toast.LENGTH_LONG)
             .show()
 
         coroutineScope.launch(Dispatchers.IO) {
