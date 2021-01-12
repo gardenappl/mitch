@@ -1,14 +1,14 @@
-<p><b>Mitch</b> is an unofficial mobile client for <a href="https://itch.io">itch.io</a>, the indie game storefront. The app allows you to install Android games from the store and keep them updated. Thus, this can act as an alternative to the Google Play Store for indie game developers and enthusiasts.</p>
+Mitch is an unofficial mobile client for itch.io, the indie game storefront. The app allows you to install Android games from the store and keep them updated. Thus, this can act as an alternative to the Google Play Store for indie game developers and enthusiasts.
 
-<ul>
-<li>Download games from itch.io and keep them updated</li>
-<li>Support for APK downloads as well as HTML5 games</li>
-<li>itch.io account is not required</li>
-<li>Blocks trackers and analytics by default (F-Droid version only)</li>
-<li>Beautiful Material UI adapts to custom color schemes set by game developers</li>
-<li>Full functionality of itch.io's mobile website</li>
-</ul>
 
-<p>The app is still in development, some features are planned but not yet implemented.</p>
+* Download games from itch.io and keep them updated
+* Support for APK downloads as well as other games
+* Supports HTML5 games inside built-in browser
+* itch.io account is not required
+* Blocks trackers and analytics by default (F-Droid version only)
+* Beautiful Material UI adapts to custom color schemes set by game developers
+* Full functionality of itch.io's mobile website
 
-<p><b>If you wish to support the app developer, consider <a href="https://gardenapple.itch.io/mitch">buying it on itch.io</a></b></p>
+The app is still in development, some features are planned but not yet implemented.
+
+If you wish to support the app developer, consider buying it on itch.io: https://gardenapple.itch.io/mitch
