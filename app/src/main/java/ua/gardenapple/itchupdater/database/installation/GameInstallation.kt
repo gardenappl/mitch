@@ -1,5 +1,6 @@
 package ua.gardenapple.itchupdater.database.installation
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Ignore
 import ua.gardenapple.itchupdater.database.game.Game
@@ -11,7 +12,8 @@ data class GameInstallation(
     val packageName: String?,
     val installId: Int,
     val uploadId: Int,
-    val uploadName: String
+    val uploadName: String,
+    val externalFileName: String?
 ) {
     @Ignore
     val librarySubtitle = if (packageName != null)

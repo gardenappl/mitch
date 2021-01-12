@@ -32,7 +32,7 @@
     <string name="game_package_info_fail">Ваша система не дает возможность просматривать эту информацию.</string>
     <string name="dialog_cancel">Отмена</string>
     <string name="dialog_yes">Да</string>
-    <string name="dialog_game_remove">Вы точно хотите убрать %1$s из вашей коллекции Mitch? Вы перестанете получать уведомления о новых версиях.\n\Это действие не удалит загруженные файлы.</string>
+    <string name="dialog_game_remove">Вы точно хотите убрать %1$s из вашей коллекции Mitch? Загруженные файлы останутся в папке "Загрузки".\n\nВы больше не будете получать уведомления для новых версий этого файла.</string>
     <string name="dialog_remove">Убрать</string>
     <string name="dialog_game_remove_done">Вы убрали %1$s из вашей коллекции Mitch.</string>
     <string name="notification_update_access_denied">Доступ запрещен (вы войшли в свой аккаунт?)</string>
@@ -91,4 +91,6 @@
     <string name="notification_download_time_remaining">Осталось %1$d мин. %2$d сек.</string>
     <string name="dialog_app_delete_title">Удалить приложение?</string>
     <string name="dialog_app_delete">Вы уверены, что хотите удалить %1$s?</string>
+    <string name="game_move_to_downloads">Переместить в папку Загрузки</string>
+    <string name="dialog_game_remove_title">Перестать получать обновления?</string>
 </resources>

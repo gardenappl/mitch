@@ -17,15 +17,17 @@ import okhttp3.Cache
 import okhttp3.OkHttpClient
 import ua.gardenapple.itchupdater.client.DownloadFileManager
 import ua.gardenapple.itchupdater.client.UpdateCheckWorker
+import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.gitlab.GitlabUpdateCheckWorker
 import ua.gardenapple.itchupdater.installer.*
 import java.io.File
 import java.util.concurrent.TimeUnit
 
 
+const val PERMISSION_REQUEST_DOWNLOADS_VIEW_INTENT = 1
 const val PERMISSION_REQUEST_MOVE_TO_DOWNLOADS = 2
 
-const val FILE_PROVIDER_UPLOADS = "ua.gardenapple.itchupdater.uploadsprovider"
+const val FILE_PROVIDER = "ua.gardenapple.itchupdater.fileprovider"
 
 const val NOTIFICATION_CHANNEL_ID_UPDATES = "updates_available"
 const val NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED = "updates"
@@ -57,6 +59,8 @@ class MitchApp : Application() {
             private set
         lateinit var installerDatabaseHandler: InstallerDatabaseHandler
             private set
+        lateinit var externalFileManager: ExternalFileManager
+            private set
 
         val installer: Installer by lazy {
             Installer()
@@ -84,6 +88,8 @@ class MitchApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        
+        AppDatabase.getDatabase(applicationContext) //don't lazy load the database
 
         setThemeFromPreferences(PreferenceManager.getDefaultSharedPreferences(this))
 
@@ -158,6 +164,7 @@ class MitchApp : Application() {
         downloadFileManager = DownloadFileManager(applicationContext, fetch)
 
         installerDatabaseHandler = InstallerDatabaseHandler(applicationContext)
+        externalFileManager = ExternalFileManager()
     }
 
     private fun registerUpdateCheckTask(requiresUnmetered: Boolean, existingWorkPolicy: ExistingPeriodicWorkPolicy) {

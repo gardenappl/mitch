@@ -41,7 +41,7 @@ class FileDownloadListener(private val context: Context) : FetchListener {
             }
             pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         } else {
-            val fileIntent = Utils.getIntentForFile(context, downloadFile)
+            val fileIntent = Utils.getIntentForFile(context, downloadFile, FILE_PROVIDER)
 
             val intent = if (fileIntent.resolveActivity(context.packageManager) == null) {
                 Intent(context, MainActivity::class.java)

@@ -36,7 +36,7 @@
     <string name="game_download_delete">Delete</string>
     <string name="game_package_info_fail">Your system cannot show app info.</string>
     <string name="dialog_game_delete">Are you sure you want to delete the file %1$s?</string>
-    <string name="dialog_game_remove">Are you sure you want to remove %1$s from your Mitch library? You will no longer receive notifications when a new version is released.\n\nThis will not delete the downloaded file.</string>
+    <string name="dialog_game_remove">Are you sure you want to remove %1$s from your Mitch library? The file will stay in your Downloads folder.\n\nYou will no longer receive notifications for new versions of this file.</string>
     <string name="dialog_remove">Remove</string>
     <string name="dialog_delete">Delete</string>
     <string name="dialog_cancel">Cancel</string>
@@ -88,7 +88,9 @@
     <string name="dialog_game_delete_done">%1$s has been deleted.</string>
     <string name="dialog_cancel_download_done">Cancelled download.</string>
     <string name="dialog_game_delete_title">Delete this file?</string>
-    <string name="dialog_app_delete_title">Remaining: %1$d min %2$d sec</string>
+    <string name="dialog_game_remove_title">Stop receiving updates?</string>
+    <string name="dialog_app_delete_title">Delete this app?</string>
     <string name="dialog_app_delete">Are you sure you want to delete %1$s?</string>
     <string name="notification_download_time_remaining">Remaining: %1$d min %2$d sec</string>
+    <string name="game_move_to_downloads">Move to Downloads folder</string>
 </resources>

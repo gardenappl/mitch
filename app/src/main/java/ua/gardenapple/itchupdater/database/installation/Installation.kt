@@ -69,8 +69,8 @@ data class Installation(
     val locale: String = ItchWebsiteParser.UNKNOWN_LOCALE,
 
     /**
-    * Nullable because the version string is not available for some projects.
-    */
+     * Nullable because the version string is not available for some projects.
+     */
     @ColumnInfo(name = VERSION)
     val version: String? = null,
 
@@ -84,17 +84,23 @@ data class Installation(
     val fileSize: String,
 
     /**
-    * Nullable because the build timestamp is not available for some projects.
-    */
+     * Nullable because the build timestamp is not available for some projects.
+     */
     @ColumnInfo(name = TIMESTAMP)
     val uploadTimestamp: String? = null,
 
     /**
-    * A bitmask of platforms which this upload supports
-    */
+     * A bitmask of platforms which this upload supports
+     */
     @ColumnInfo(name = PLATFORMS)
     @Deprecated(message = "Use 'platforms' field instead")
-    val platformFlags: Int = PLATFORM_NONE
+    val platformFlags: Int = PLATFORM_NONE,
+
+    /**
+     * Path to file in public Downloads/ folder, if it has been moved there
+     */
+    @ColumnInfo(name = EXTERNAL_FILE_NAME)
+    val externalFileName: String? = null
 ) {
     companion object {
         const val TABLE_NAME = "installations"
@@ -115,6 +121,7 @@ data class Installation(
         const val TIMESTAMP = "timestamp"
         const val LOCALE = "locale"
         const val PLATFORMS = "platforms"
+        const val EXTERNAL_FILE_NAME = "external_file_name"
 
         const val STATUS_INSTALLED = 0
         const val STATUS_DOWNLOADING = 1

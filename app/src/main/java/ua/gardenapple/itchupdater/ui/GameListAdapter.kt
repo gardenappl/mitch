@@ -29,7 +29,7 @@ import ua.gardenapple.itchupdater.database.installation.GameInstallation
 import ua.gardenapple.itchupdater.database.installation.Installation
 
 class GameListAdapter internal constructor(
-    val context: Context,
+    private val activity: Activity,
     val list: RecyclerView,
     val type: GameRepository.Type
 ) : RecyclerView.Adapter<GameListAdapter.GameViewHolder>() {
@@ -37,6 +37,8 @@ class GameListAdapter internal constructor(
     companion object {
         private const val LOGGING_TAG = "GameListAdapter"
     }
+    
+    private val context: Context = activity
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     var gameInstalls = emptyList<GameInstallation>() // Cached copy of games
@@ -106,10 +108,17 @@ class GameListAdapter internal constructor(
             if (launchIntent != null) {
                 context.startActivity(launchIntent)
             }
+        } else if (gameInstall.externalFileName != null) {
+            MitchApp.externalFileManager.getViewIntent(activity, gameInstall.externalFileName) { intent ->
+                //TODO: Message if file is missing
+                if (intent != null)
+                    context.startActivity(Intent.createChooser(intent, context.resources.getString(R.string.select_app_for_file)))
+            }
+
         } else if (gameInstall.status == Installation.STATUS_INSTALLED) {
             val downloadedFile = MitchApp.downloadFileManager.getDownloadedFile(gameInstall.uploadId)
             if (downloadedFile?.exists() == true) {
-                val intent = Utils.getIntentForFile(context, downloadedFile)
+                val intent = Utils.getIntentForFile(context, downloadedFile, FILE_PROVIDER)
                 if (intent.resolveActivity(context.packageManager) == null) {
                     //TODO: suggest to move to Downloads folder, that's why strings are not localized.
                     Toast.makeText(context, "No app found that can open this file", Toast.LENGTH_LONG)
@@ -136,8 +145,13 @@ class GameListAdapter internal constructor(
 
             if (type != GameRepository.Type.Installed)
                 removeItem(R.id.app_info)
-            if (type != GameRepository.Type.Downloads && type != GameRepository.Type.Installed)
+            if (!(type == GameRepository.Type.Downloads && gameInstall.externalFileName == null))
+                removeItem(R.id.move_to_downloads)
+            if (!((type == GameRepository.Type.Downloads && gameInstall.externalFileName == null) ||
+                        type == GameRepository.Type.Installed))
                 removeItem(R.id.delete)
+            if (!(type == GameRepository.Type.Downloads && gameInstall.externalFileName != null))
+                removeItem(R.id.remove)
             if (type != GameRepository.Type.Pending)
                 removeItem(R.id.cancel)
 
@@ -176,6 +190,21 @@ class GameListAdapter internal constructor(
                 }
                 return true
             }
+            R.id.move_to_downloads -> {
+                runBlocking(Dispatchers.IO) {
+                    //TODO: Do NOT block UI for this!
+                    MitchApp.externalFileManager.moveToDownloads(activity, gameInstall.uploadId) { externalName ->
+                        runBlocking(Dispatchers.IO) {
+                            val db = AppDatabase.getDatabase(context)
+                            val install = db.installDao.getInstallationById(gameInstall.installId)!!
+                            db.installDao.update(install.copy(
+                                externalFileName = externalName
+                            ))
+                        }
+                    }
+                }
+                return true
+            }
             R.id.delete -> {
                 if (type == GameRepository.Type.Installed) {
                     val intent = Intent(Intent.ACTION_DELETE,
@@ -211,6 +240,33 @@ class GameListAdapter internal constructor(
                         Toast.makeText(
                             context,
                             context.getString(R.string.dialog_game_delete_done, gameInstall.uploadName),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    setNegativeButton(R.string.dialog_cancel) { _, _ ->
+                        //no-op
+                    }
+
+                    create()
+                }
+                dialog.show()
+                return true
+            }
+            R.id.remove -> {
+                val dialog = AlertDialog.Builder(context).apply {
+                    setTitle(R.string.dialog_game_remove_title)
+                    setMessage(context.getString(R.string.dialog_game_remove, gameInstall.uploadName))
+
+                    setPositiveButton(R.string.dialog_remove) { _, _ ->
+                        runBlocking(Dispatchers.IO) {
+                            val db = AppDatabase.getDatabase(context)
+                            db.installDao.deleteFinishedInstallation(gameInstall.uploadId)
+                        }
+
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.dialog_game_remove_done, gameInstall.uploadName),
                             Toast.LENGTH_SHORT
                         ).show()
                     }

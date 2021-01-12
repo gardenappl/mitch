@@ -32,7 +32,7 @@
     <string name="game_package_info_fail">Ваша система не дає можливість переглядати таку інформацію.</string>
     <string name="dialog_cancel">Скасувати</string>
     <string name="dialog_yes">Так</string>
-    <string name="dialog_game_remove">Ви точно хочете прибрати %1$s із вашої колекції Mitch? Ви більше не будете отримувати сповіщення щодо оновлень.\n\nЗавантажені файли залишаться на вашому пристрої.</string>
+    <string name="dialog_game_remove">Ви точно хочете прибрати %1$s із вашої колекції Mitch? Завантажений файл залишиться в папці "Завантаження".\n\nВи більше не будете отримувати сповіщення щодо оновлень.</string>
     <string name="dialog_remove">Прибрати</string>
     <string name="dialog_game_remove_done">Ви прибрали %1$s із вашої колекції Mitch.</string>
     <string name="notification_update_access_denied">Доступ заблоковано (ви ввійшли у свій акаунт?)</string>
@@ -91,4 +91,6 @@
     <string name="notification_download_time_remaining">Залишилося %1$d хв. %2$d с.</string>
     <string name="dialog_app_delete_title">Видалити додаток?</string>
     <string name="dialog_app_delete">Ви впевнені, що хочете видалити %1$s?</string>
+    <string name="game_move_to_downloads">Перемістити в папку Завантаження</string>
+    <string name="dialog_game_remove_title">Перестати отримувати оновлення?</string>
 </resources>

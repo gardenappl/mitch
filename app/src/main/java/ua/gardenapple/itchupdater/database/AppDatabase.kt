@@ -20,7 +20,7 @@ import ua.gardenapple.itchupdater.ioThread
 
 @Database(
     entities = [Game::class, Installation::class, UpdateCheckResultModel::class],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -80,6 +80,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(Migrations.Migration_3_4)
                 .addMigrations(Migrations.Migration_4_5)
                 .addMigrations(Migrations.Migration_5_6)
+                .addMigrations(Migrations.Migration_6_7)
                 .build()
     }
 

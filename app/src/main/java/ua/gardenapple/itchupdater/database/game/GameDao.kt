@@ -7,6 +7,7 @@ import ua.gardenapple.itchupdater.database.game.Game.Companion.TABLE_NAME
 import ua.gardenapple.itchupdater.database.installation.GameInstallation
 import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.DOWNLOAD_OR_INSTALL_ID
+import ua.gardenapple.itchupdater.database.installation.Installation.Companion.EXTERNAL_FILE_NAME
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.INTERNAL_ID
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.PACKAGE_NAME
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS
@@ -25,7 +26,8 @@ abstract class GameDao {
             installations.$PACKAGE_NAME as packageName,
             installations.$INTERNAL_ID as installId,
             installations.$UPLOAD_NAME as uploadName,
-            installations.$UPLOAD_ID as uploadId
+            installations.$UPLOAD_ID as uploadId,
+            installations.$EXTERNAL_FILE_NAME as externalFileName
         FROM games INNER JOIN installations
         ON games.$GAME_ID = installations.game_id
         WHERE $STATUS = ${Installation.STATUS_INSTALLED} AND
@@ -39,7 +41,8 @@ abstract class GameDao {
             installations.$PACKAGE_NAME as packageName,
             installations.$INTERNAL_ID as installId,
             installations.$UPLOAD_NAME as uploadName,
-            installations.$UPLOAD_ID as uploadId
+            installations.$UPLOAD_ID as uploadId,
+            installations.$EXTERNAL_FILE_NAME as externalFileName
         FROM games INNER JOIN installations
         ON games.$GAME_ID = installations.game_id
         WHERE $STATUS = ${Installation.STATUS_INSTALLED} AND
@@ -53,7 +56,8 @@ abstract class GameDao {
             installations.$PACKAGE_NAME as packageName,
             installations.$INTERNAL_ID as installId,
             installations.$UPLOAD_NAME as uploadName,
-            installations.$UPLOAD_ID as uploadId
+            installations.$UPLOAD_ID as uploadId,
+            installations.$EXTERNAL_FILE_NAME as externalFileName
         FROM games INNER JOIN installations
         ON games.$GAME_ID = installations.game_id
         WHERE $STATUS != ${Installation.STATUS_INSTALLED}""")

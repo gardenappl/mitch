@@ -131,7 +131,7 @@ class Utils {
         @ColorInt
         @Suppress("DEPRECATION")
         fun getColor(resources: Resources, @ColorRes id: Int, theme: Resources.Theme): Int {
-            return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 resources.getColor(id, theme)
             } else {
                 val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
@@ -150,11 +150,11 @@ class Utils {
             }
         }
         
-        fun getIntentForFile(context: Context, file: File): Intent {
+        fun getIntentForFile(context: Context, file: File, fileProvider: String): Intent {
             return Intent(Intent.ACTION_VIEW).apply {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 data = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                    FileProvider.getUriForFile(context, FILE_PROVIDER_UPLOADS, file)
+                    FileProvider.getUriForFile(context, fileProvider, file)
                 else
                     Uri.fromFile(file)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

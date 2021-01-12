@@ -2,6 +2,7 @@ package ua.gardenapple.itchupdater.ui
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -263,14 +264,15 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         }
     }
 
-    //TODO: handle permissions
-//    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-//        when (requestCode) {
-//            PERMISSION_REQUEST_CODE_DOWNLOAD -> {
-//                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    DownloadFileManager.resumeDownload(getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager)
-//                }
-//            }
-//        }
-//    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSION_REQUEST_MOVE_TO_DOWNLOADS ->
+                if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
+                    MitchApp.externalFileManager.resumeMoveToDownloads()
+            PERMISSION_REQUEST_DOWNLOADS_VIEW_INTENT ->
+                if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
+                    MitchApp.externalFileManager.resumeGetViewIntent(this)
+        }
+    }
 }
