@@ -82,8 +82,9 @@ class InstallerService : Service() {
                 if (status == PackageInstaller.STATUS_SUCCESS) {
                     val appInfo = context.packageManager.getApplicationInfo(packageName, 0)
                     setContentTitle(context.packageManager.getApplicationLabel(appInfo))
-                } else
+                } else {
                     setContentTitle(apkName)
+                }
 
                 setContentText(message)
 //                priority = NotificationCompat.PRIORITY_HIGH

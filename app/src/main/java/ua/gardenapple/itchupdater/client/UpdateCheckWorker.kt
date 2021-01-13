@@ -123,13 +123,16 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
         val builder =
             NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
                 setSmallIcon(R.drawable.ic_mitch_notification)
-                setContentTitle(game.name)
                 setContentText(message)
                 setAutoCancel(true)
 
                 if (install.packageName != null) {
-                    val icon = context.packageManager.getApplicationIcon(install.packageName)
+                    val info = context.packageManager.getApplicationInfo(install.packageName, 0)
+                    val icon = context.packageManager.getApplicationIcon(info)
+                    setContentTitle(context.packageManager.getApplicationLabel(info))
                     setLargeIcon(Utils.drawableToBitmap(icon))
+                } else {
+                    setContentTitle(install.uploadName)
                 }
 
                 priority = NotificationCompat.PRIORITY_LOW
