@@ -43,4 +43,4 @@ cd mitch
 gradlew.bat build
 ```
 
-Instead of using the `build` task (which builds every variant of the app and can take a while), consider building only one flavor (using `assembleFdroid`, `assembleGitlab`, `assembleItchio`) or only one type (`assembleDebug` or `assembleRelease`)
+Instead of using the `build` task (which builds every variant of the app and can take a while), consider building only one flavor: replace `build` with `assembleFdroidRelease`, `assembleGitlabRelease` or `assembleItchioRelease`.
