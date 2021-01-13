@@ -106,8 +106,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
         if (intent.action == Intent.ACTION_VIEW &&
                 intent.data?.let { ItchWebsiteUtils.isItchWebPage(it) } == true) {
-            setActiveFragment(BROWSE_FRAGMENT_TAG)
-            browseFragment.webView.loadUrl(intent.data!!.toString())
+            browseUrl(intent.data.toString())
         } else if (intent.getBooleanExtra(EXTRA_SHOULD_OPEN_LIBRARY, false)) {
             setActiveFragment(LIBRARY_FRAGMENT_TAG)
         }
@@ -199,6 +198,11 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         onFragmentSet(newFragmentTag, resetNavBar)
 
         return true
+    }
+
+    fun browseUrl(url: String) {
+        setActiveFragment(BROWSE_FRAGMENT_TAG)
+        browseFragment.webView.loadUrl(url)
     }
 
     private fun onFragmentSet(newFragmentTag: String, resetNavBar: Boolean) {

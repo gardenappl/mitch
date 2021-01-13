@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
+import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import androidx.work.*
@@ -46,7 +47,7 @@ const val FLAVOR_FDROID = "fdroid"
 const val FLAVOR_ITCHIO = "itchio"
 const val FLAVOR_GITLAB = "gitlab"
 
-//TODO: Catch exceptions in a nice way
+//TODO: Catch all app's exceptions in a nice way
 class Mitch : Application() {
 
     companion object {
@@ -88,7 +89,7 @@ class Mitch : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        
+
         AppDatabase.getDatabase(applicationContext) //don't lazy load the database
 
         setThemeFromPreferences(PreferenceManager.getDefaultSharedPreferences(this))
@@ -156,7 +157,6 @@ class Mitch : Application() {
             setHttpDownloader(OkHttpDownloader(httpClient))
             setAutoRetryMaxAttempts(3)
             enableFileExistChecks(false)
-            //TODO: Use Fetch native notifications, when they no longer suck!
             build()
         }
         fetch = fetchConfig.getNewFetchInstanceFromConfiguration()

@@ -192,9 +192,13 @@ class GameListAdapter internal constructor(
         val game = gameInstall.game
         when (item.itemId) {
             R.id.go_to_store -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(game.storeUrl),
-                    context, MainActivity::class.java)
-                context.startActivity(intent)
+                if (activity is MainActivity) {
+                    activity.browseUrl(game.storeUrl)
+                } else {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(game.storeUrl),
+                        context, MainActivity::class.java)
+                    context.startActivity(intent)
+                }
                 return true
             }
             R.id.app_info -> {
