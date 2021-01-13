@@ -18,10 +18,7 @@ import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.library_item.view.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.GameRepository
@@ -110,22 +107,44 @@ class GameListAdapter internal constructor(
             }
         } else if (gameInstall.externalFileName != null) {
             MitchApp.externalFileManager.getViewIntent(activity, gameInstall.externalFileName) { intent ->
-                //TODO: Message if file is missing
-                if (intent != null)
-                    context.startActivity(Intent.createChooser(intent, context.resources.getString(R.string.select_app_for_file)))
+                if (intent != null) {
+                    context.startActivity(Intent.createChooser(intent,
+                        context.resources.getString(R.string.select_app_for_file)))
+                    return@getViewIntent
+                }
+                //File is missing
+                val dialog = AlertDialog.Builder(context).apply {
+                setTitle(R.string.dialog_missing_file_title)
+                setMessage(context.getString(R.string.dialog_missing_file,
+                    gameInstall.externalFileName, gameInstall.uploadName))
+
+                setPositiveButton(R.string.dialog_remove) { _, _ ->
+                    runBlocking(Dispatchers.IO) {
+                        val db = AppDatabase.getDatabase(context)
+                        db.installDao.deleteFinishedInstallation(gameInstall.uploadId)
+                    }
+
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.popup_game_removed, gameInstall.uploadName),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                setNegativeButton(R.string.dialog_cancel) { _, _ ->
+                    //no-op
+                }
+
+                create()
+            }
+                dialog.show()
             }
 
         } else if (gameInstall.status == Installation.STATUS_INSTALLED) {
             val downloadedFile = MitchApp.downloadFileManager.getDownloadedFile(gameInstall.uploadId)
             if (downloadedFile?.exists() == true) {
                 val intent = Utils.getIntentForFile(context, downloadedFile, FILE_PROVIDER)
-                if (intent.resolveActivity(context.packageManager) == null) {
-                    //TODO: suggest to move to Downloads folder, that's why strings are not localized.
-                    Toast.makeText(context, "No app found that can open this file", Toast.LENGTH_LONG)
-                        .show()
-                } else {
-                    context.startActivity(Intent.createChooser(intent, context.resources.getString(R.string.select_app_for_file)))
-                }
+                context.startActivity(Intent.createChooser(intent, context.resources.getString(R.string.select_app_for_file)))
             } else {
                 //Should only happen for older versions of Mitch
                 val intent = Intent(DownloadManager.ACTION_VIEW_DOWNLOADS)
@@ -191,15 +210,38 @@ class GameListAdapter internal constructor(
                 return true
             }
             R.id.move_to_downloads -> {
-                runBlocking(Dispatchers.IO) {
-                    //TODO: Do NOT block UI for this!
-                    MitchApp.externalFileManager.moveToDownloads(activity, gameInstall.uploadId) { externalName ->
-                        runBlocking(Dispatchers.IO) {
-                            val db = AppDatabase.getDatabase(context)
-                            val install = db.installDao.getInstallationById(gameInstall.installId)!!
-                            db.installDao.update(install.copy(
-                                externalFileName = externalName
-                            ))
+                Toast.makeText(
+                    context,
+                    context.resources.getString(R.string.popup_moving_to_downloads),
+                    Toast.LENGTH_LONG
+                ).show()
+                GlobalScope.launch(Dispatchers.IO) {
+                    try {
+                        MitchApp.externalFileManager.moveToDownloads(activity, gameInstall.uploadId) { externalName ->
+                            GlobalScope.launch(Dispatchers.IO) {
+                                val db = AppDatabase.getDatabase(context)
+                                val install =
+                                    db.installDao.getInstallationById(gameInstall.installId)!!
+                                db.installDao.update(install.copy(
+                                    externalFileName = externalName
+                                ))
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(
+                                        context,
+                                        context.resources.getString(R.string.popup_moved_to_downloads,
+                                            externalName),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        }
+                    } catch(e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                context,
+                                context.resources.getString(R.string.popup_move_to_download_error),
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
                 }
@@ -239,7 +281,7 @@ class GameListAdapter internal constructor(
 
                         Toast.makeText(
                             context,
-                            context.getString(R.string.dialog_game_delete_done, gameInstall.uploadName),
+                            context.getString(R.string.popup_game_deleted, gameInstall.uploadName),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -266,7 +308,7 @@ class GameListAdapter internal constructor(
 
                         Toast.makeText(
                             context,
-                            context.getString(R.string.dialog_game_remove_done, gameInstall.uploadName),
+                            context.getString(R.string.popup_game_removed, gameInstall.uploadName),
                             Toast.LENGTH_SHORT
                         ).show()
                     }

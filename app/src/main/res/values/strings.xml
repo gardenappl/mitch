@@ -41,7 +41,7 @@
     <string name="dialog_delete">Delete</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_yes">Yes</string>
-    <string name="dialog_game_remove_done">%1$s has been removed from Mitch.</string>
+    <string name="popup_game_removed">%1$s has been removed from Mitch.</string>
     <string name="notification_update_up_to_date">Up to date</string>
     <string name="notification_update_available">Update available</string>
     <string name="notification_update_unknown">Unable to process updates</string>
@@ -52,7 +52,7 @@
     <string name="browser_search">Website search</string>
     <string name="browser_share">Share link</string>
     <string name="search_games_hint">Search for games or creators</string>
-    <string name="toast_download_started">Download started</string>
+    <string name="popup_download_started">Download started</string>
     <string name="menu_game_collection">Add to collection</string>
     <string name="menu_game_devlog">Devlog</string>
     <string name="menu_game_rate">Rate or Review</string>
@@ -79,13 +79,13 @@
     <string name="library_item_installing">Installing…</string>
     <string name="library_item_ready_to_install">Press to install</string>
     <string name="game_cancel_download_or_install">Cancel</string>
-    <string name="toast_download_or_install_cancelled">Cancelled</string>
+    <string name="popup_download_or_install_cancelled">Cancelled</string>
     <string name="notification_game_running">itch.io web game is running</string>
     <string name="notification_channel_web_running">Web game is running</string>
     <string name="notification_channel_web_running_desc">Notify when a game is running inside the app\'s web browser</string>
     <string name="notification_download_error">Error while downloading: %1$s</string>
     <string name="select_app_for_file">Open this file using</string>
-    <string name="dialog_game_delete_done">%1$s has been deleted.</string>
+    <string name="popup_game_deleted">%1$s has been deleted.</string>
     <string name="dialog_cancel_download_done">Cancelled download.</string>
     <string name="dialog_game_delete_title">Delete this file?</string>
     <string name="dialog_game_remove_title">Stop receiving updates?</string>
@@ -93,4 +93,9 @@
     <string name="dialog_app_delete">Are you sure you want to delete %1$s?</string>
     <string name="notification_download_time_remaining">Remaining: %1$d min %2$d sec</string>
     <string name="game_move_to_downloads">Move to Downloads folder</string>
+    <string name="dialog_missing_file_title">File not found</string>
+    <string name="dialog_missing_file">The file %1$s was either moved or deleted from the Downloads folder.\n\nWould you like to remove it from the Mitch app? You will no longer receive updates for %2$s.</string>
+    <string name="popup_moved_to_downloads">Moved file %1$s to Downloads folder.</string>
+    <string name="popup_moving_to_downloads">Moving file to Download folder…</string>
+    <string name="popup_move_to_download_error">Error while moving to Download folder</string>
 </resources>

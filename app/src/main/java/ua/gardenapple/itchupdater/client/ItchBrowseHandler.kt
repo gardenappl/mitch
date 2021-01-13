@@ -2,17 +2,14 @@ package ua.gardenapple.itchupdater.client
 
 import android.content.Context
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.preference.PreferenceManager
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
-import ua.gardenapple.itchupdater.MitchApp
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.AppDatabase
 
@@ -94,7 +91,7 @@ class ItchBrowseHandler(
         val contentDisposition = currentDownloadContentDisposition ?: return
         val mimeType = currentDownloadMimeType ?: return
 
-        Toast.makeText(context, R.string.toast_download_started, Toast.LENGTH_LONG)
+        Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_LONG)
             .show()
 
         coroutineScope.launch(Dispatchers.IO) {

@@ -34,7 +34,7 @@
     <string name="dialog_yes">Да</string>
     <string name="dialog_game_remove">Вы точно хотите убрать %1$s из вашей коллекции Mitch? Загруженные файлы останутся в папке "Загрузки".\n\nВы больше не будете получать уведомления для новых версий этого файла.</string>
     <string name="dialog_remove">Убрать</string>
-    <string name="dialog_game_remove_done">Вы убрали %1$s из вашей коллекции Mitch.</string>
+    <string name="popup_game_removed">Вы убрали %1$s из вашей коллекции Mitch.</string>
     <string name="notification_update_access_denied">Доступ запрещен (вы войшли в свой аккаунт?)</string>
     <string name="notification_update_available">Доступно обновление</string>
     <string name="notification_update_empty">Больше не доступно для загрузки</string>
@@ -47,7 +47,7 @@
     <string name="browser_search">Поиск на сайте</string>
     <string name="browser_share">Поделиться ссылкой</string>
     <string name="search_games_hint">Поиск игр или создателей</string>
-    <string name="toast_download_started">Загрузка началась</string>
+    <string name="popup_download_started">Загрузка началась</string>
     <string name="nav_website_view">Сайт</string>
     <string name="menu_game_collection">Добавить в коллекцию</string>
     <string name="menu_game_devlog">Дневник разработчика</string>
@@ -76,7 +76,7 @@
     <string name="library_item_installing">Устанавливается…</string>
     <string name="library_item_ready_to_install">Нажмите, чтобы установить</string>
     <string name="game_cancel_download_or_install">Отменить</string>
-    <string name="toast_download_or_install_cancelled">Отменено</string>
+    <string name="popup_download_or_install_cancelled">Отменено</string>
     <string name="notification_game_running">Запущена веб-игра itch.io</string>
     <string name="notification_channel_web_running">Запущена веб-игра itch.io</string>
     <string name="notification_channel_web_running_desc">Уведомлять, когда во встроенном браузере запущена игра</string>
@@ -85,7 +85,7 @@
     <string name="game_download_delete">Удалить</string>
     <string name="dialog_game_delete">Вы уверены, что хотите удалить файл %1$s?</string>
     <string name="dialog_delete">Удалить</string>
-    <string name="dialog_game_delete_done">Файл %1$s был удалён.</string>
+    <string name="popup_game_deleted">Файл %1$s был удалён.</string>
     <string name="dialog_cancel_download_done">Загрузка отменена.</string>
     <string name="dialog_game_delete_title">Удалить файл?</string>
     <string name="notification_download_time_remaining">Осталось %1$d мин. %2$d сек.</string>
@@ -93,4 +93,9 @@
     <string name="dialog_app_delete">Вы уверены, что хотите удалить %1$s?</string>
     <string name="game_move_to_downloads">Переместить в папку Загрузки</string>
     <string name="dialog_game_remove_title">Перестать получать обновления?</string>
+    <string name="dialog_missing_file_title">Файл не найден</string>
+    <string name="dialog_missing_file">Файл %1$s был либо перемещён, либо удалён из папки загрузок.\n\nВы хотите удалить его из приложения Mitch? Вы перестанете получать обновления для %2$s.</string>
+    <string name="popup_moved_to_downloads">Файл %1$s перемещён в папку загрузок.</string>
+    <string name="popup_moving_to_downloads">Перемещаем файл в папку загрузок…</string>
+    <string name="popup_move_to_download_error">Ошибка во время перемещения в папку загрузок</string>
 </resources>
