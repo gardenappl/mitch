@@ -7,22 +7,26 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 
-/* def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def shouldSign = keystorePropertiesFile.canRead()
 
 def keystoreProperties = new Properties()
 
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile)) */
+if (shouldSign)
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 
 android {
-    /* signingConfigs {
-        sign {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+    if (shouldSign) {
+        signingConfigs {
+            sign {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            }
         }
-    } */
+    }
     compileSdkVersion 29
     defaultConfig {
         applicationId "ua.gardenapple.itchupdater"
@@ -31,7 +35,8 @@ android {
         versionCode 13
         versionName "1.2.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        //signingConfig signingConfigs.sign
+        if (shouldSign)
+            signingConfig signingConfigs.sign
     }
     buildTypes {
         release {
