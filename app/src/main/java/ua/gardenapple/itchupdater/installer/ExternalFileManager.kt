@@ -57,8 +57,11 @@ class ExternalFileManager {
         var i = 0
         while (true) {
             try {
-                val newFile = file.copyTo(File(downloadsDir, "$attemptBaseName.$extension"))
-                file.delete()
+                var newFile = File(downloadsDir, "$attemptBaseName.$extension")
+                if (!file.renameTo(newFile)) {
+                    newFile = file.copyTo(newFile)
+                    file.delete()
+                }
                 callback(newFile.name)
                 return
             } catch (e: FileAlreadyExistsException) {
