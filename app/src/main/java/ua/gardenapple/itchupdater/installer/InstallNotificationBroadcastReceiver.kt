@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import kotlinx.coroutines.runBlocking
-import ua.gardenapple.itchupdater.MitchApp
+import ua.gardenapple.itchupdater.Mitch
 import java.io.File
 
 /**
@@ -26,7 +26,7 @@ class InstallNotificationBroadcastReceiver : BroadcastReceiver() {
 
         runBlocking {
             val apkFile = File(intent.data!!.path!!)
-            MitchApp.installer.install(context, downloadId, apkFile)
+            Mitch.installer.install(context, downloadId, apkFile)
         }
     }
 

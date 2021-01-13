@@ -98,7 +98,7 @@ class GameListAdapter internal constructor(
             notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, gameInstall.downloadOrInstallId)
 
             GlobalScope.launch {
-                MitchApp.installer.install(context, gameInstall.downloadOrInstallId, gameInstall.uploadId)
+                Mitch.installer.install(context, gameInstall.downloadOrInstallId, gameInstall.uploadId)
             }
         } else if (gameInstall.packageName != null) {
             val launchIntent = context.packageManager.getLaunchIntentForPackage(gameInstall.packageName)
@@ -106,7 +106,7 @@ class GameListAdapter internal constructor(
                 context.startActivity(launchIntent)
             }
         } else if (gameInstall.externalFileName != null) {
-            MitchApp.externalFileManager.getViewIntent(activity, gameInstall.externalFileName) { intent ->
+            Mitch.externalFileManager.getViewIntent(activity, gameInstall.externalFileName) { intent ->
                 if (intent != null) {
                     context.startActivity(Intent.createChooser(intent,
                         context.resources.getString(R.string.select_app_for_file)))
@@ -141,7 +141,7 @@ class GameListAdapter internal constructor(
             }
 
         } else if (gameInstall.status == Installation.STATUS_INSTALLED) {
-            val downloadedFile = MitchApp.downloadFileManager.getDownloadedFile(gameInstall.uploadId)
+            val downloadedFile = Mitch.fileManager.getDownloadedFile(gameInstall.uploadId)
             if (downloadedFile?.exists() == true) {
                 val intent = Utils.getIntentForFile(context, downloadedFile, FILE_PROVIDER)
                 context.startActivity(Intent.createChooser(intent, context.resources.getString(R.string.select_app_for_file)))
@@ -175,8 +175,9 @@ class GameListAdapter internal constructor(
                 removeItem(R.id.cancel)
 
             setCallback(object : MenuBuilder.Callback {
-                override fun onMenuItemSelected(menu: MenuBuilder, item: MenuItem): Boolean =
-                    onMenuItemClick(item, gameInstall)
+                override fun onMenuItemSelected(menu: MenuBuilder, item: MenuItem): Boolean {
+                    return onMenuItemClick(item, gameInstall)
+                }
 
                 override fun onMenuModeChange(menu: MenuBuilder) {}
             })
@@ -199,25 +200,20 @@ class GameListAdapter internal constructor(
             R.id.app_info -> {
                 try {
                     val packageUri = Uri.parse("package:${gameInstall.packageName}")
-                    val intent =
-                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri)
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri)
                     context.startActivity(intent)
                 } catch (e: ActivityNotFoundException) {
-                    val toast =
-                        Toast.makeText(context, R.string.game_package_info_fail, Toast.LENGTH_LONG)
-                    toast.show()
+                    Toast.makeText(context, R.string.game_package_info_fail, Toast.LENGTH_LONG)
+                        .show()
                 }
                 return true
             }
             R.id.move_to_downloads -> {
-                Toast.makeText(
-                    context,
-                    context.resources.getString(R.string.popup_moving_to_downloads),
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(context, R.string.popup_moving_to_downloads, Toast.LENGTH_LONG)
+                    .show()
                 GlobalScope.launch(Dispatchers.IO) {
                     try {
-                        MitchApp.externalFileManager.moveToDownloads(activity, gameInstall.uploadId) { externalName ->
+                        Mitch.externalFileManager.moveToDownloads(activity, gameInstall.uploadId) { externalName ->
                             GlobalScope.launch(Dispatchers.IO) {
                                 val db = AppDatabase.getDatabase(context)
                                 val install =
@@ -237,11 +233,8 @@ class GameListAdapter internal constructor(
                         }
                     } catch(e: Exception) {
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(
-                                context,
-                                context.resources.getString(R.string.popup_move_to_download_error),
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Toast.makeText(context, R.string.popup_move_to_download_error, Toast.LENGTH_LONG)
+                                .show()
                         }
                     }
                 }
@@ -259,7 +252,7 @@ class GameListAdapter internal constructor(
                     setTitle(R.string.dialog_game_delete_title)
                     
                     runBlocking(Dispatchers.IO) {
-                        if (MitchApp.downloadFileManager.getDownloadedFile(
+                        if (Mitch.fileManager.getDownloadedFile(
                                 gameInstall.uploadId)?.exists() == true) {
                             setMessage(context.getString(R.string.dialog_game_delete, gameInstall.uploadName))
                         } else {
@@ -276,7 +269,7 @@ class GameListAdapter internal constructor(
                         runBlocking(Dispatchers.IO) {
                             val db = AppDatabase.getDatabase(context)
                             db.installDao.deleteFinishedInstallation(gameInstall.uploadId)
-                            MitchApp.downloadFileManager.deleteDownloadedFile(gameInstall.uploadId)
+                            Mitch.fileManager.deleteDownloadedFile(gameInstall.uploadId)
                         }
 
                         Toast.makeText(
@@ -332,11 +325,11 @@ class GameListAdapter internal constructor(
                 runBlocking(Dispatchers.IO) {
                     if (gameInstall.status == Installation.STATUS_DOWNLOADING) {
                         Log.d(LOGGING_TAG, "Cancelling ${gameInstall.downloadOrInstallId}")
-                        MitchApp.downloadFileManager.requestCancellation(gameInstall.downloadOrInstallId,
+                        Mitch.fileManager.requestCancellation(gameInstall.downloadOrInstallId,
                             gameInstall.uploadId)
 
                     } else {
-                        MitchApp.downloadFileManager.deleteDownloadedFile(gameInstall.uploadId)
+                        Mitch.fileManager.deleteDownloadedFile(gameInstall.uploadId)
                     }
                     val db = AppDatabase.getDatabase(context)
                     db.installDao.delete(gameInstall.installId)

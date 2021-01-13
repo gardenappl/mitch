@@ -1,4 +1,4 @@
-package ua.gardenapple.itchupdater.client
+package ua.gardenapple.itchupdater.files
 
 import android.content.Context
 import android.util.Log
@@ -91,8 +91,8 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
     
     fun replacePendingFile(download: Download) {
         val uploadId = getUploadId(download)
-        val replacedUploadId = Integer.parseInt(download.extras.getString(
-            DOWNLOAD_EXTRA_REPLACED_UPLOAD_ID, ""))
+        val replacedUploadId =
+            Integer.parseInt(download.extras.getString(DOWNLOAD_EXTRA_REPLACED_UPLOAD_ID, ""))
         replacePendingFile(uploadId, replacedUploadId)
     }
     

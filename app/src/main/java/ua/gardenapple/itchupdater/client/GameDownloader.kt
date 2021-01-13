@@ -12,9 +12,8 @@ import okhttp3.FormBody
 import okhttp3.Request
 import org.json.JSONObject
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
-import ua.gardenapple.itchupdater.MitchApp
+import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.database.AppDatabase
-import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 import java.io.IOException
 
@@ -60,7 +59,7 @@ class GameDownloader {
                 build()
             }
             val result: String = withContext(Dispatchers.IO) {
-                MitchApp.httpClient.newCall(request).execute().use { response ->
+                Mitch.httpClient.newCall(request).execute().use { response ->
                     if (!response.isSuccessful)
                         throw IOException("Unexpected code $response")
 
@@ -84,7 +83,7 @@ class GameDownloader {
             var contentDisposition: String? = null
 
             withContext(Dispatchers.IO) {
-                MitchApp.httpClient.newCall(request).execute().use { response ->
+                Mitch.httpClient.newCall(request).execute().use { response ->
                     if (!response.isSuccessful)
                         throw IOException("Unexpected response $response")
 
@@ -149,7 +148,7 @@ class GameDownloader {
             }
 
             val db = AppDatabase.getDatabase(context)
-            val downloadFileManager = MitchApp.downloadFileManager
+            val downloadFileManager = Mitch.fileManager
             var willStartDownload = false
 
             //cancel download for current pending installation

@@ -1,16 +1,13 @@
 package ua.gardenapple.itchupdater.ui
 
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
-import android.webkit.URLUtil
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -19,7 +16,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.browse_fragment.*
 import ua.gardenapple.itchupdater.*
-import java.net.URLConnection
 
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
@@ -269,10 +265,10 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         when (requestCode) {
             PERMISSION_REQUEST_MOVE_TO_DOWNLOADS ->
                 if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
-                    MitchApp.externalFileManager.resumeMoveToDownloads()
+                    Mitch.externalFileManager.resumeMoveToDownloads()
             PERMISSION_REQUEST_DOWNLOADS_VIEW_INTENT ->
                 if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
-                    MitchApp.externalFileManager.resumeGetViewIntent(this)
+                    Mitch.externalFileManager.resumeGetViewIntent(this)
         }
     }
 }

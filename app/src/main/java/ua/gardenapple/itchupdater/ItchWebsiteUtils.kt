@@ -95,7 +95,7 @@ class ItchWebsiteUtils {
                 build()
             }
             var html = ""
-            MitchApp.httpClient.newCall(request).execute().use { response ->
+            Mitch.httpClient.newCall(request).execute().use { response ->
                 if (!response.isSuccessful)
                     throw IOException("Unexpected response $response")
                 html = response.body!!.string()

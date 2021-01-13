@@ -49,7 +49,7 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
 
         try {
             val releasesData = JSONArray(withContext(Dispatchers.IO) {
-                MitchApp.httpClient.newCall(request).execute().use { response ->
+                Mitch.httpClient.newCall(request).execute().use { response ->
                     if (!response.isSuccessful)
                         throw IOException("Unexpected response $response")
                     return@use response.body!!.string()

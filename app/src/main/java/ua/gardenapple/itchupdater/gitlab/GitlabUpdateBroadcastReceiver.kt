@@ -5,9 +5,8 @@ import android.content.Context
 import android.content.Intent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import ua.gardenapple.itchupdater.MitchApp
 import ua.gardenapple.itchupdater.database.AppDatabase
-import ua.gardenapple.itchupdater.client.DownloadFileManager
+import ua.gardenapple.itchupdater.files.DownloadFileManager
 import ua.gardenapple.itchupdater.client.GameDownloader
 
 /**

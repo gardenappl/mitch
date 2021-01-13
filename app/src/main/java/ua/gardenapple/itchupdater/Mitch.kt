@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
-import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import androidx.work.*
@@ -15,9 +14,10 @@ import com.tonyodev.fetch2.FetchConfiguration
 import com.tonyodev.fetch2okhttp.OkHttpDownloader
 import okhttp3.Cache
 import okhttp3.OkHttpClient
-import ua.gardenapple.itchupdater.client.DownloadFileManager
+import ua.gardenapple.itchupdater.files.DownloadFileManager
 import ua.gardenapple.itchupdater.client.UpdateCheckWorker
 import ua.gardenapple.itchupdater.database.AppDatabase
+import ua.gardenapple.itchupdater.files.ExternalFileManager
 import ua.gardenapple.itchupdater.gitlab.GitlabUpdateCheckWorker
 import ua.gardenapple.itchupdater.installer.*
 import java.io.File
@@ -47,7 +47,7 @@ const val FLAVOR_ITCHIO = "itchio"
 const val FLAVOR_GITLAB = "gitlab"
 
 //TODO: Catch exceptions in a nice way
-class MitchApp : Application() {
+class Mitch : Application() {
 
     companion object {
         const val LOGGING_TAG: String = "MitchApp"
@@ -55,9 +55,9 @@ class MitchApp : Application() {
         lateinit var httpClient: OkHttpClient
             private set
         private lateinit var fetch: Fetch
-        lateinit var downloadFileManager: DownloadFileManager
+        lateinit var fileManager: DownloadFileManager
             private set
-        lateinit var installerDatabaseHandler: InstallerDatabaseHandler
+        lateinit var databaseHandler: InstallerDatabaseHandler
             private set
         lateinit var externalFileManager: ExternalFileManager
             private set
@@ -161,9 +161,9 @@ class MitchApp : Application() {
         }
         fetch = fetchConfig.getNewFetchInstanceFromConfiguration()
         fetch.addListener(FileDownloadListener(applicationContext))
-        downloadFileManager = DownloadFileManager(applicationContext, fetch)
+        fileManager = DownloadFileManager(applicationContext, fetch)
 
-        installerDatabaseHandler = InstallerDatabaseHandler(applicationContext)
+        databaseHandler = InstallerDatabaseHandler(applicationContext)
         externalFileManager = ExternalFileManager()
     }
 

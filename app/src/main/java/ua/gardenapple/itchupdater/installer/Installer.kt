@@ -1,14 +1,12 @@
 package ua.gardenapple.itchupdater.installer
 
-import android.app.DownloadManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
-import android.net.Uri
 import android.util.Log
 import kotlinx.coroutines.*
-import ua.gardenapple.itchupdater.MitchApp
+import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.Utils
 import java.io.File
 
@@ -30,14 +28,14 @@ class Installer {
     }
 
     suspend fun install(context: Context, downloadId: Int, uploadId: Int) = withContext(Dispatchers.IO) {
-        install(context, downloadId, MitchApp.downloadFileManager.getPendingFile(uploadId)!!)
+        install(context, downloadId, Mitch.fileManager.getPendingFile(uploadId)!!)
     }
 
     suspend fun install(context: Context, downloadId: Int, apkFile: File) = withContext(Dispatchers.IO) {
         val sessionID = createSession(context)
         Log.d(LOGGING_TAG, "Created session")
 
-        MitchApp.installerDatabaseHandler.onInstallStart(downloadId, sessionID)
+        Mitch.databaseHandler.onInstallStart(downloadId, sessionID)
         Log.d(LOGGING_TAG, "Notified")
 
         doInstall(apkFile, sessionID, context)

@@ -8,7 +8,7 @@ import android.content.Intent
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import ua.gardenapple.itchupdater.MitchApp
+import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD
 import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.AppDatabase
@@ -36,7 +36,7 @@ class DownloadCancelBroadcastReceiver : BroadcastReceiver() {
         notificationManager.cancel(NOTIFICATION_TAG_DOWNLOAD, downloadId)
 
         runBlocking(Dispatchers.IO) {
-            MitchApp.downloadFileManager.requestCancellation(downloadId, uploadId)
+            Mitch.fileManager.requestCancellation(downloadId, uploadId)
 
             val db = AppDatabase.getDatabase(context)
             db.installDao.deletePendingInstallation(uploadId)

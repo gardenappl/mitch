@@ -91,7 +91,7 @@ class FileDownloadListener(private val context: Context) : FetchListener {
 
             val cancelIntent = Intent(context, DownloadCancelBroadcastReceiver::class.java).apply {
                 putExtra(DownloadCancelBroadcastReceiver.EXTRA_DOWNLOAD_ID, download.id)
-                val uploadId = MitchApp.downloadFileManager.getUploadId(download)
+                val uploadId = Mitch.fileManager.getUploadId(download)
                 putExtra(DownloadCancelBroadcastReceiver.EXTRA_UPLOAD_ID, uploadId)
             }
             val cancelPendingIntent = PendingIntent.getBroadcast(context, 0, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -107,12 +107,12 @@ class FileDownloadListener(private val context: Context) : FetchListener {
 
     override fun onCancelled(download: Download) {
         Log.d(LOGGING_TAG, "Cancelled ID: ${download.id}")
-        MitchApp.downloadFileManager.removeFetchDownload(download.id)
+        Mitch.fileManager.removeFetchDownload(download.id)
     }
 
     override fun onCompleted(download: Download) {
         val isApk = download.file.endsWith(".apk")
-        val downloadFileManager = MitchApp.downloadFileManager
+        val downloadFileManager = Mitch.fileManager
         val uploadId = downloadFileManager.getUploadId(download)
 
         runBlocking(Dispatchers.IO) {
@@ -124,7 +124,7 @@ class FileDownloadListener(private val context: Context) : FetchListener {
                 notificationFile = downloadFileManager.getDownloadedFile(uploadId)!!
             }
             createResultNotification(context, notificationFile, download.id, isApk)
-            MitchApp.installerDatabaseHandler.onDownloadComplete(download.id, isApk)
+            Mitch.databaseHandler.onDownloadComplete(download.id, isApk)
         }
         downloadFileManager.removeFetchDownload(download.id)
     }
@@ -142,11 +142,11 @@ class FileDownloadListener(private val context: Context) : FetchListener {
         createResultNotification(context, File(download.file), download.id, isApk, error)
 
         runBlocking(Dispatchers.IO) {
-            val uploadId = MitchApp.downloadFileManager.getUploadId(download)
-            MitchApp.downloadFileManager.deletePendingFile(uploadId)
-            MitchApp.installerDatabaseHandler.onDownloadFailed(download.id)
+            val uploadId = Mitch.fileManager.getUploadId(download)
+            Mitch.fileManager.deletePendingFile(uploadId)
+            Mitch.databaseHandler.onDownloadFailed(download.id)
         }
-        MitchApp.downloadFileManager.removeFetchDownload(download.id)
+        Mitch.fileManager.removeFetchDownload(download.id)
     }
 
     override fun onPaused(download: Download) {}

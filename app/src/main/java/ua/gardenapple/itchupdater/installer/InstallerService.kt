@@ -2,7 +2,6 @@ package ua.gardenapple.itchupdater.installer
 
 import android.app.PendingIntent
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.os.IBinder
@@ -47,9 +46,9 @@ class InstallerService : Service() {
                 runBlocking(Dispatchers.IO) {
                     val db = AppDatabase.getDatabase(applicationContext)
                     val install = db.installDao.findPendingInstallationBySessionId(sessionId)!!
-                    MitchApp.downloadFileManager.deletePendingFile(install.uploadId)
-                    MitchApp.downloadFileManager.deleteDownloadedFile(install.uploadId)
-                    MitchApp.installerDatabaseHandler.onInstallResult(sessionId, packageName, status)
+                    Mitch.fileManager.deletePendingFile(install.uploadId)
+                    Mitch.fileManager.deleteDownloadedFile(install.uploadId)
+                    Mitch.databaseHandler.onInstallResult(sessionId, packageName, status)
                 }
             }
         }

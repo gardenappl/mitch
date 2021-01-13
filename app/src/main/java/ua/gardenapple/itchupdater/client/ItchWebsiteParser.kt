@@ -10,9 +10,8 @@ import okhttp3.Request
 import org.json.JSONObject
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import org.jsoup.select.Elements
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
-import ua.gardenapple.itchupdater.MitchApp
+import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 import java.io.IOException
@@ -221,7 +220,7 @@ class ItchWebsiteParser {
                 build()
             }
             val result: String =
-                MitchApp.httpClient.newCall(request).execute().use { response ->
+                Mitch.httpClient.newCall(request).execute().use { response ->
                     if (!response.isSuccessful)
                         throw IOException("Unexpected code $response")
 
