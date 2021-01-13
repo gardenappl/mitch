@@ -9,10 +9,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.NOTIFICATION_CHANNEL_ID_INSTALLING
 import ua.gardenapple.itchupdater.NOTIFICATION_TAG_UPDATE_CHECK
@@ -44,6 +41,8 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
             val downloadInfoCache = HashMap<Int, Pair<Document, ItchWebsiteParser.DownloadUrl>?>()
 
             for (install in installations) {
+                if (!isActive)
+                    return@coroutineScope Result.failure()
                 if (!updateChecker.shouldCheck(install))
                     continue
 
@@ -63,7 +62,10 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
                         } else {
                             val newDownloadInfo = updateChecker.getDownloadInfo(game)
                             downloadInfoCache[install.gameId] = newDownloadInfo
-                            Log.d(LOGGING_TAG, "Download URL for ${game.name}: ${newDownloadInfo?.second}")
+                            Log.d(
+                                LOGGING_TAG,
+                                "Download URL for ${game.name}: ${newDownloadInfo?.second}"
+                            )
                             newDownloadInfo
                         }
 
@@ -78,6 +80,8 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
                                 game, install, updateCheckDoc, downloadUrlInfo
                             )
                         }
+                    } catch (e: CancellationException) {
+                        return@launch
                     } catch (e: Exception) {
                         result = UpdateCheckResult(
                             installationId = install.internalId,
