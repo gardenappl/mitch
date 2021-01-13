@@ -10,9 +10,9 @@ if [ "$(git status --porcelain | wc --lines)" -ne 0 ]; then
     exit 1
 fi
 
-if [ "$(git rev-parse main)" -ne "$(git rev-parse origin/main" ]; then
+if [ "$(git rev-parse main)" != "$(git rev-parse origin/main)" ]; then
     echo "Error: main branch not sync with origin/main!"
     exit 1
 fi
 
-#butler push build-release/itchio/release/app-itchio-release.apk gardenapple/mitch:android --userversion $1
+butler push build-release/itchio/release/app-itchio-release.apk gardenapple/mitch:android --userversion $1
