@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
+import android.util.Log
 import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
@@ -89,8 +90,6 @@ class Mitch : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
-        AppDatabase.getDatabase(applicationContext) //don't lazy load the database
 
         setThemeFromPreferences(PreferenceManager.getDefaultSharedPreferences(this))
 

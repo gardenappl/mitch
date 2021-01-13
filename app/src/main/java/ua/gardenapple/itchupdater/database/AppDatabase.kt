@@ -16,7 +16,6 @@ import ua.gardenapple.itchupdater.database.installation.InstallationDao
 import ua.gardenapple.itchupdater.database.updatecheck.Converters
 import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultDao
 import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultModel
-import ua.gardenapple.itchupdater.ioThread
 
 @Database(
     entities = [Game::class, Installation::class, UpdateCheckResultModel::class],
@@ -29,7 +28,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val gameDao: GameDao
     abstract val installDao: InstallationDao
     abstract val updateCheckDao: UpdateCheckResultDao
-
 
     /**
      * Singleton database
@@ -44,26 +42,27 @@ abstract class AppDatabase : RoomDatabase() {
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
             }
-
-
+        
         private fun buildDatabase(context: Context): AppDatabase =
             Room.databaseBuilder(
                 context.applicationContext,
                 AppDatabase::class.java, "app_database"
             )
-                .addCallback(object : Callback() {
-                    override fun onOpen(db: SupportSQLiteDatabase) {
-                        Log.d(LOGGING_TAG, "Opening database...")
+                .addMigrations(Migrations.Migration_1_2)
+                .addMigrations(Migrations.Migration_2_3)
+                .addMigrations(Migrations.Migration_3_4)
+                .addMigrations(Migrations.Migration_4_5)
+                .addMigrations(Migrations.Migration_5_6)
+                .addMigrations(Migrations.Migration_6_7)
+                .build()
+                .also { appDb ->
+                    appDb.runInTransaction {
+                        Log.d(LOGGING_TAG, "Deleting info on Mitch")
+                        appDb.installDao.deleteFinishedInstallation(context.packageName)
 
-                        ioThread {
-                            val appDb = getDatabase(context)
-
-                            Log.d(LOGGING_TAG, "Deleting info on Mitch")
-                            appDb.installDao.deleteFinishedInstallation(context.packageName)
-
-                            if (BuildConfig.FLAVOR != FLAVOR_FDROID) {
-                                appDb.addMitchToDatabase(context)
-                            }
+                        if (BuildConfig.FLAVOR != FLAVOR_FDROID) {
+                            appDb.addMitchToDatabase(context)
+                        }
 
 //                            val mitchInstall = appDb.installDao.findInstallation(Game.MITCH_GAME_ID)
 //                            Log.d(LOGGING_TAG, "Mitch installation: $mitchInstall")
@@ -72,16 +71,9 @@ abstract class AppDatabase : RoomDatabase() {
 //                            val installs = appDb.installDao.getAllInstallationsSync()
 //                            for (install in installs)
 //                                Log.d(LOGGING_TAG, "$install")
-                        }
+                        Log.d(LOGGING_TAG, "Opened database.")
                     }
-                })
-                .addMigrations(Migrations.Migration_1_2)
-                .addMigrations(Migrations.Migration_2_3)
-                .addMigrations(Migrations.Migration_3_4)
-                .addMigrations(Migrations.Migration_4_5)
-                .addMigrations(Migrations.Migration_5_6)
-                .addMigrations(Migrations.Migration_6_7)
-                .build()
+                }
     }
 
 

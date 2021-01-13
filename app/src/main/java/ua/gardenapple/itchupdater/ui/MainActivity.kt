@@ -15,7 +15,11 @@ import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.browse_fragment.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.*
+import ua.gardenapple.itchupdater.database.AppDatabase
+import ua.gardenapple.itchupdater.database.game.Game
 
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
@@ -33,6 +37,13 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        //Force database to fully initialize while splash screen is on
+        runBlocking(Dispatchers.IO) {
+            val db = AppDatabase.getDatabase(this@MainActivity)
+            if (!db.isOpen)
+                db.gameDao.getGameById(Game.MITCH_GAME_ID)
+        }
+        
         //Initially set to SplashScreenTheme during loading, this sets the proper theme
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
