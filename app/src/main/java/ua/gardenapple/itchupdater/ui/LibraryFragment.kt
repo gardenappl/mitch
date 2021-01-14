@@ -186,28 +186,31 @@ class LibraryFragment : Fragment(), CoroutineScope by MainScope() {
             val db = AppDatabase.getDatabase(requireContext())
             db.updateCheckDao.getNotUpToDateResultsSync()
         }
+        
+        _binding?.let { binding ->
 
-        if (results.count { result -> result.code == UpdateCheckResult.ERROR } > 0)
-            binding.updateCheckInfo.setText(R.string.library_error)
-        else if (results.isNotEmpty())
-            binding.updateCheckInfo.text = requireContext().resources.getQuantityString(
-                R.plurals.library_updates_available,
-                results.size,
-                results.size
-            )
-        else
-            binding.updateCheckInfo.setText(R.string.library_all_up_to_date)
+            if (results.count { result -> result.code == UpdateCheckResult.ERROR } > 0)
+                binding.updateCheckInfo.setText(R.string.library_error)
+            else if (results.isNotEmpty())
+                binding.updateCheckInfo.text = requireContext().resources.getQuantityString(
+                    R.plurals.library_updates_available,
+                    results.size,
+                    results.size
+                )
+            else
+                binding.updateCheckInfo.setText(R.string.library_all_up_to_date)
 
 
-        val timestamp = sharedPrefs.getLong(PREF_LAST_UPDATE_CHECK, 0)
-        if (timestamp > 0) {
-            val instant = Instant.ofEpochMilli(timestamp)
-            binding.updateCheckTimestamp.text = requireContext().resources.getString(
-                R.string.library_last_update_check_time,
-                Mitch.prettyTime.format(instant)
-            )
-        } else {
-            binding.updateCheckTimestamp.text = ""
+            val timestamp = sharedPrefs.getLong(PREF_LAST_UPDATE_CHECK, 0)
+            if (timestamp > 0) {
+                val instant = Instant.ofEpochMilli(timestamp)
+                binding.updateCheckTimestamp.text = requireContext().resources.getString(
+                    R.string.library_last_update_check_time,
+                    Mitch.prettyTime.format(instant)
+                )
+            } else {
+                binding.updateCheckTimestamp.text = ""
+            }
         }
     }
 

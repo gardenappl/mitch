@@ -13,6 +13,7 @@ import ua.gardenapple.itchupdater.client.UpdateCheckResult
 import ua.gardenapple.itchupdater.client.UpdateChecker
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
+import ua.gardenapple.itchupdater.database.installation.Installation
 
 @RunWith(AndroidJUnit4::class)
 class UpdateCheckerTests {
@@ -39,7 +40,7 @@ class UpdateCheckerTests {
 
         val result: UpdateCheckResult = runBlocking(Dispatchers.IO) {
             val game = db.gameDao.getGameById(Game.MITCH_GAME_ID)!!
-            val install = db.installDao.getInstallations(Game.MITCH_GAME_ID)[0]
+            val install = db.installDao.getInstallations(Installation.MITCH_UPLOAD_ID)[0]
             val (updateCheckDoc, downloadUrlInfo) = updateChecker.getDownloadInfo(game)!!
 
             updateChecker.checkUpdates(game, install, updateCheckDoc, downloadUrlInfo)
@@ -54,7 +55,7 @@ class UpdateCheckerTests {
 
         runBlocking(Dispatchers.IO) {
             val game = db.gameDao.getGameById(Game.MITCH_GAME_ID)!!
-            val install = db.installDao.getInstallations(Game.MITCH_GAME_ID)[0]
+            val install = db.installDao.getInstallations(Installation.MITCH_UPLOAD_ID)[0]
             val (updateCheckDoc, downloadUrlInfo) = updateChecker.getDownloadInfo(game)!!
 
             updateChecker.checkUpdates(game, install, updateCheckDoc, downloadUrlInfo)

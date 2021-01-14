@@ -33,17 +33,14 @@ abstract class InstallationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insert(installations: List<Installation>)
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS = $STATUS_INSTALLED")
-    abstract fun getInstallations(gameId: Int): List<Installation>
+    @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS = $STATUS_INSTALLED")
+    abstract fun getInstallations(uploadId: Int): List<Installation>
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS != $STATUS_INSTALLED")
-    abstract fun getPendingInstallations(gameId: Int): List<Installation>
+    @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS != $STATUS_INSTALLED")
+    abstract fun getPendingInstallations(uploadId: Int): List<Installation>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS != $STATUS_INSTALLED")
     abstract fun getPendingInstallation(uploadId: Int): Installation?
-
-    @Query("DELETE FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS != $STATUS_INSTALLED")
-    abstract fun deletePendingInstallation(uploadId: Int)
 
     @Update
     abstract fun update(vararg installations: Installation)
@@ -53,6 +50,9 @@ abstract class InstallationDao {
 
     @Delete
     abstract fun delete(installation: Installation)
+
+    @Delete
+    abstract fun delete(installations: List<Installation>)
 
     @Query("DELETE FROM $TABLE_NAME WHERE $PACKAGE_NAME = :packageName AND $STATUS = $STATUS_INSTALLED")
     abstract fun deleteFinishedInstallation(packageName: String)
