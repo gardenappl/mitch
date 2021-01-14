@@ -13,18 +13,20 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.browse_fragment.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
+import ua.gardenapple.itchupdater.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
     private lateinit var browseFragment: BrowseFragment
     private lateinit var currentFragmentTag: String
+
+    lateinit var binding: ActivityMainBinding
+    private set
 
     companion object {
         const val EXTRA_SHOULD_OPEN_LIBRARY = "SHOULD_OPEN_LIBRARY"
@@ -47,10 +49,11 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         //Initially set to SplashScreenTheme during loading, this sets the proper theme
         setTheme(R.style.AppTheme_NoActionBar)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         //Add app bar, hidden by default
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar!!.hide()
 
 
@@ -153,11 +156,13 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             intArrayOf() to foregroundColor
         )
 
-        bottomNavigationView.setBackgroundColor(backgroundColor)
-        bottomNavigationView.itemBackground = ColorDrawable(backgroundColor)
-        bottomNavigationView.itemIconTintList = itemColorStateList
-        bottomNavigationView.itemTextColor = itemColorStateList
-        mainLayout.setBackgroundColor(backgroundMainColor)
+        binding.bottomNavigationView.apply {
+            setBackgroundColor(backgroundColor)
+            itemBackground = ColorDrawable(backgroundColor)
+            itemIconTintList = itemColorStateList
+            itemTextColor = itemColorStateList
+        }
+        binding.mainLayout.setBackgroundColor(backgroundMainColor)
 
         //Handle system bar color
         if (browseFragment.isVisible) {
@@ -228,18 +233,18 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
         if (newFragmentTag == BROWSE_FRAGMENT_TAG) {
             browseFragment.updateUI()
-            speedDial.show()
+            binding.speedDial.show()
         } else {
-            speedDial.hide()
+            binding.speedDial.hide()
         }
     }
 
     private fun navBarSelectItem(itemId: Int) {
-        bottomNavigationView.post {
-            val menu = bottomNavigationView.menu
+        binding.bottomNavigationView.post {
+            val menu = binding.bottomNavigationView.menu
             
             for (index in 0 until menu.size()) {
-                val item = bottomNavigationView.menu.getItem(index)
+                val item = binding.bottomNavigationView.menu.getItem(index)
                 if (item.itemId == itemId) {
                     item.isChecked = true
                     break

@@ -94,6 +94,7 @@
                     android:layout_height="wrap_content"
                     android:visibility="gone"
                     android:orientation="horizontal"
+                    android:scrollbarAlwaysDrawHorizontalTrack="true"
                     tools:listitem="@layout/library_item"
                     tools:itemCount="1" />
 
@@ -112,6 +113,7 @@
                     android:id="@+id/installed_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:scrollbarAlwaysDrawHorizontalTrack="true"
                     tools:listitem="@layout/library_item"
                     tools:itemCount="1" />
 
@@ -130,6 +132,7 @@
                     android:id="@+id/downloads_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:scrollbarAlwaysDrawHorizontalTrack="true"
                     tools:listitem="@layout/library_item"
                     tools:itemCount="1" />
         </LinearLayout>

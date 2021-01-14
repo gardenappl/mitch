@@ -21,10 +21,8 @@ import androidx.core.app.ShareCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
 import com.leinardi.android.speeddial.SpeedDialActionItem
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.browse_fragment.*
-import kotlinx.android.synthetic.main.dialog_search.view.*
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -33,6 +31,7 @@ import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.client.ItchBrowseHandler
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
+import ua.gardenapple.itchupdater.databinding.BrowseFragmentBinding
 import java.io.ByteArrayInputStream
 import java.io.File
 
@@ -43,7 +42,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         private const val LOGGING_TAG = "BrowseFragment"
         private const val WEB_VIEW_STATE_KEY: String = "WebView"
     }
-
+    
+    private var _binding: BrowseFragmentBinding? = null
+    private val binding get() = _binding!!
+    
     private lateinit var chromeClient: MitchWebChromeClient
     lateinit var webView: MitchWebView
         private set
@@ -61,8 +63,15 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.browse_fragment, container, false)
+    ): View {
+        super.onCreateView(inflater, container, savedInstanceState)
+
+        _binding = BrowseFragmentBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         webView = view.findViewById(R.id.webView)
         chromeClient = MitchWebChromeClient()
@@ -82,15 +91,13 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         webView.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
             Log.d(LOGGING_TAG, "Requesting download...")
-            browseHandler?.let { browseHandler ->
-                browseHandler.onDownloadStarted(url, contentDisposition, mimeType)
-            }
+            browseHandler?.onDownloadStarted(url, contentDisposition, mimeType)
         }
 
 
         //Set up FAB buttons
         //(colors don't matter too much as they will be set by updateUI() anyway)
-        val speedDialView = (activity as MainActivity).speedDial
+        val speedDialView = (activity as MainActivity).binding.speedDial
         speedDialView.clearActionItems()
         speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_reload, R.drawable.ic_baseline_refresh_24)
             .setLabel(R.string.browser_reload)
@@ -141,7 +148,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     val viewInflated: View = LayoutInflater.from(context)
                         .inflate(R.layout.dialog_search, getView() as ViewGroup?, false)
 
-                    val input = viewInflated.input
+                    val input = viewInflated.findViewById<TextInputEditText>(R.id.input)
 
                     //Show keyboard automatically
                     input.post {
@@ -188,8 +195,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         } else {
             webView.loadUrl(ItchWebsiteUtils.getMainBrowsePage(requireContext()))
         }
-
-        return view
     }
 
     /**
@@ -237,6 +242,12 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         browseHandler = null
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        _binding = null
+    }
+
     val isWebFullscreen: Boolean
         get() = chromeClient.customViewCallback != null
 
@@ -269,10 +280,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         //Log.d(LOGGING_TAG, "Processing UI...")
 
-        val navBar = mainActivity.bottomNavigationView
-        val fab = mainActivity.speedDial
+        val navBar = mainActivity.binding.bottomNavigationView
+        val fab = mainActivity.binding.speedDial
         val supportAppBar = mainActivity.supportActionBar!!
-        val appBar = mainActivity.toolbar
+        val appBar = mainActivity.binding.toolbar
 
         fab.show()
 
@@ -357,7 +368,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 .create()
             fab.replaceActionItem(actionItem, newActionItem)
         }
-        progressBar.progressDrawable.setTint(accentColor)
+        binding.progressBar.progressDrawable.setTint(accentColor)
         appBar.setBackgroundColor(bgColor)
         appBar.setTitleTextColor(fgColor)
         appBar.overflowIcon?.setTint(fgColor)
@@ -628,22 +639,23 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 requireContext().startService(foregroundServiceIntent)
             }
 
-            val mainActivity = activity as? MainActivity
-            mainActivity?.bottomNavigationView?.visibility = View.GONE
-            mainActivity?.speedDial?.visibility = View.GONE
-            mainActivity?.toolbar?.visibility = View.GONE
             webView.visibility = View.GONE
+            
+            (activity as? MainActivity)?.apply {
+                binding.bottomNavigationView.visibility = View.GONE
+                binding.speedDial.visibility = View.GONE
+                binding.toolbar.visibility = View.GONE
 
 
-            if (mainActivity?.fragmentContainer != null) {
-                mainActivity.fragmentContainer.addView(view)
+                binding.fragmentContainer.addView(view)
 
-                originalUiVisibility = mainActivity.fragmentContainer.systemUiVisibility
-                mainActivity.fragmentContainer.systemUiVisibility =
+                originalUiVisibility = binding.root.systemUiVisibility
+                binding.root.systemUiVisibility =
                     View.SYSTEM_UI_FLAG_FULLSCREEN or
                             View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
                             View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
             }
+            
 
             view.keepScreenOn = true
 
@@ -658,11 +670,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
             requireContext().stopService(Intent(context, WebViewForegroundService::class.java))
 
-            val mainActivity = activity as? MainActivity
             webView.visibility = View.VISIBLE
-
-            mainActivity?.fragmentContainer?.removeView(customView)
-            mainActivity?.fragmentContainer?.systemUiVisibility = originalUiVisibility
+            (activity as? MainActivity)?.apply {
+                binding.fragmentContainer.removeView(customView)
+                binding.root.systemUiVisibility = originalUiVisibility
+            }
 
             customView = null
             customViewCallback = null
@@ -671,9 +683,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
 
         override fun onProgressChanged(view: WebView?, newProgress: Int) {
-            if (progressBar == null)
-                return //for some reason this happens sometimes
+            if (_binding == null)
+                return
 
+            val progressBar = binding.progressBar
+            
             if (newProgress < 100 && progressBar.visibility == ProgressBar.GONE)
                 progressBar.visibility = ProgressBar.VISIBLE
 

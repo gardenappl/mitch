@@ -17,7 +17,6 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.library_item.view.*
 import kotlinx.coroutines.*
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
@@ -45,12 +44,12 @@ class GameListAdapter internal constructor(
         }
 
     inner class GameViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val thumbnailView: ImageView = itemView.gameThumbnail
-        val gameName: TextView = itemView.gameName
-        val authorOrSubtitle: TextView = itemView.authorOrSubtitle
-        val progressBarLayout: LinearLayout = itemView.progressBarLayout
-        val progressBarLabel: TextView = itemView.progressBarLabel
-        val overflowMenuButton: ImageButton = itemView.overflowMenu
+        val thumbnailView: ImageView = itemView.findViewById(R.id.gameThumbnail)
+        val gameName: TextView = itemView.findViewById(R.id.gameName)
+        val authorOrSubtitle: TextView = itemView.findViewById(R.id.authorOrSubtitle)
+        val progressBarLayout: LinearLayout = itemView.findViewById(R.id.progressBarLayout)
+        val progressBarLabel: TextView = itemView.findViewById(R.id.progressBarLabel)
+        val overflowMenuButton: ImageButton = itemView.findViewById(R.id.overflowMenu)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameViewHolder {
