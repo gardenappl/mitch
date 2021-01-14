@@ -228,6 +228,12 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         CookieManager.getInstance().flush()
     }
 
+    override fun onResume() {
+        super.onResume()
+        
+        chromeClient.onResume()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
@@ -628,6 +634,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             if (customView != null) {
                 return
             }
+            Log.d(LOGGING_TAG, "Show custom view")
 
             val foregroundServiceIntent = Intent(context, WebViewForegroundService::class.java)
             foregroundServiceIntent.putExtra(WebViewForegroundService.EXTRA_ORIGINAL_INTENT,
@@ -667,6 +674,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             if (customView == null) {
                 return
             }
+            Log.d(LOGGING_TAG, "Hide custom view")
 
             requireContext().stopService(Intent(context, WebViewForegroundService::class.java))
 
@@ -695,6 +703,15 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
             if (newProgress == 100)
                 progressBar.visibility = ProgressBar.GONE
+        }
+        
+        fun onResume() {
+            if (customView != null) {
+                binding.root.systemUiVisibility =
+                    View.SYSTEM_UI_FLAG_FULLSCREEN or
+                            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            }
         }
     }
 }
