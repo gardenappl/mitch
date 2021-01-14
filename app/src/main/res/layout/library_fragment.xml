@@ -1,70 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<ScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <LinearLayout
-            android:id="@+id/libraryLayout"
+    <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/updateCheckBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:orientation="vertical">
+            android:alpha="0.75"
+            app:liftOnScroll="true">
 
-        <TextView
-                android:id="@+id/pending_label"
+        <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:paddingTop="20dp"
-                android:text="@string/library_category_pending"
-                android:textColor="?colorPrimaryDark"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:visibility="gone" />
+                android:background="@android:color/transparent"
+                android:orientation="horizontal">
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/pending_list"
+
+            <TextView
+                    android:id="@+id/updateCheckInfo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="?colorPrimaryDark"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:paddingHorizontal="15dp"
+                    android:paddingTop="5dp"
+                    app:layout_constraintEnd_toStartOf="@id/goToUpdateCheck"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                    android:id="@+id/updateCheckTimestamp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:paddingHorizontal="15dp"
+                    android:paddingBottom="5dp"
+                    app:layout_constraintTop_toBottomOf="@id/updateCheckInfo"
+                    app:layout_constraintStart_toStartOf="@id/updateCheckInfo"
+                    app:layout_constraintEnd_toEndOf="@id/updateCheckInfo"/>
+
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/goToUpdateCheck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:text="@string/library_button_check_updates"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/updateCheckInfo"
+                    app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+                android:id="@+id/libraryLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                tools:listitem="@layout/library_item" />
+                android:orientation="vertical"
+                android:paddingVertical="10dp">
 
-        <TextView
-                android:id="@+id/installed_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:paddingTop="20dp"
-                android:text="@string/library_category_installed"
-                android:textColor="?colorPrimaryDark"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+            <TextView
+                    android:id="@+id/pending_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:paddingTop="20dp"
+                    android:text="@string/library_category_pending"
+                    android:textColor="?colorPrimaryDark"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/installed_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:listitem="@layout/library_item" />
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/pending_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:orientation="horizontal"
+                    tools:listitem="@layout/library_item"
+                    tools:itemCount="1" />
 
-        <TextView
-                android:id="@+id/downloads_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:paddingTop="20dp"
-                android:text="@string/library_category_downloads"
-                android:textColor="?colorPrimaryDark"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+            <TextView
+                    android:id="@+id/installed_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:paddingTop="20dp"
+                    android:text="@string/library_category_installed"
+                    android:textColor="?colorPrimaryDark"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/downloads_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:listitem="@layout/library_item" />
-    </LinearLayout>
-</ScrollView>
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/installed_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:listitem="@layout/library_item"
+                    tools:itemCount="1" />
+
+            <TextView
+                    android:id="@+id/downloads_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:paddingTop="20dp"
+                    android:text="@string/library_category_downloads"
+                    android:textColor="?colorPrimaryDark"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/downloads_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:listitem="@layout/library_item"
+                    tools:itemCount="1" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

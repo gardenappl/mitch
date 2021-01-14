@@ -98,4 +98,14 @@
     <string name="popup_moved_to_downloads">Файл %1$s перемещён в папку загрузок.</string>
     <string name="popup_moving_to_downloads">Перемещаем файл в папку загрузок…</string>
     <string name="popup_move_to_download_error">Ошибка во время перемещения в папку загрузок</string>
+    <string name="library_all_up_to_date">Всё обновлено</string>
+    <string name="library_last_update_check_time">Последняя проверка: %s</string>
+    <string name="library_button_check_updates">Проверить</string>
+    <string name="library_button_go_to_updates">Обновить ➡</string>
+    <string name="library_error">Ошибка во время проверки обновлений</string>
+    <plurals name="library_updates_available">
+        <item quantity="one">%d обновление доступно!</item>
+        <item quantity="few">%d обновления доступно!</item>
+        <item quantity="many">%d обновлений доступно!</item>
+    </plurals>
 </resources>

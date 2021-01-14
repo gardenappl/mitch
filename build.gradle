@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.4.10'
+    ext.kotlin_version = '1.4.21'
     repositories {
         google()
         jcenter()
@@ -30,6 +30,8 @@ task clean(type: Delete) {
 }
 
 ext {
+    desugarVersion = '1.1.1'
+
     roomVersion = '2.2.6'
     archLifecycleVersion = '2.2.0'
     androidxArchVersion = '2.1.0'
@@ -50,4 +52,5 @@ ext {
     materialProgressBarVersion = '1.6.1'
     colormathVersion = '1.4.1'
     fetchAndroidxVersion = '3.1.6'
+    prettyTimeVersion = '5.0.0.Final'
 }

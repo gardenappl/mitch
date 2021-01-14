@@ -1,30 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
 
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
+    <ImageView
+            android:id="@+id/gameThumbnail"
+            android:layout_width="63dp"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="?colorPrimary" />
 
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+    <ImageView
+            android:id="@+id/appIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="@id/updateCheckUploadInfo2"
+            app:layout_constraintEnd_toStartOf="@id/updateCheckGameName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="?colorPrimary" />
 
-                <TextView
-                        android:id="@+id/updateCheckGameName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Game name, possibly very long" />
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
+
+    <TextView
+            android:id="@+id/updateCheckGameName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:singleLine="true"
+            android:text="Game name, possibly very long dasjsdlkagjlskdajglsadjglksadjglksadghsdg"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/updateButton"
+            app:layout_constraintStart_toEndOf="@+id/gameThumbnail"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+            android:id="@+id/updateCheckUploadInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="[Android] Upload Name | 69420 KB"
+            app:layout_constraintEnd_toStartOf="@id/updateButton"
+            app:layout_constraintStart_toEndOf="@+id/gameThumbnail"
+            app:layout_constraintTop_toBottomOf="@+id/updateCheckGameName" />
+
+    <TextView
+            android:id="@+id/updateCheckUploadInfo2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Version 1.2 -> Version 1.4"
+            app:layout_constraintEnd_toStartOf="@id/updateButton"
+            app:layout_constraintStart_toEndOf="@+id/gameThumbnail"
+            app:layout_constraintTop_toBottomOf="@+id/updateCheckUploadInfo" />
+
+    <Button
+            android:id="@+id/updateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/updateCheckUploadInfo2"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

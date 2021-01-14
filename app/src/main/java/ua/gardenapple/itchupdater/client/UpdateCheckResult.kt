@@ -9,7 +9,7 @@ data class UpdateCheckResult(
      */
     val uploadID: Int? = null,
     /**
-     * Only used if [code] == [UPDATE_NEEDED]
+     * Only used if [code] == [UPDATE_AVAILABLE]
      */
     val downloadPageUrl: ItchWebsiteParser.DownloadUrl? = null,
 
@@ -26,7 +26,7 @@ data class UpdateCheckResult(
         const val UP_TO_DATE = 0
 //        const val UNKNOWN = 1
         const val ACCESS_DENIED = 2
-        const val UPDATE_NEEDED = 3
+        const val UPDATE_AVAILABLE = 3
         const val EMPTY = 4
         const val ERROR = 5
     }
@@ -39,7 +39,7 @@ data class UpdateCheckResult(
         sb.append(when (code) {
             UP_TO_DATE -> "Up to date"
             ACCESS_DENIED -> "Access denied"
-            UPDATE_NEEDED -> "Update needed"
+            UPDATE_AVAILABLE -> "Update needed"
             EMPTY -> "Empty"
             ERROR -> "Error"
             else -> "Unknown"

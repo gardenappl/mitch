@@ -16,6 +16,7 @@ import com.tonyodev.fetch2.FetchConfiguration
 import com.tonyodev.fetch2okhttp.OkHttpDownloader
 import okhttp3.Cache
 import okhttp3.OkHttpClient
+import org.ocpsoft.prettytime.PrettyTime
 import ua.gardenapple.itchupdater.files.DownloadFileManager
 import ua.gardenapple.itchupdater.client.UpdateCheckWorker
 import ua.gardenapple.itchupdater.database.AppDatabase
@@ -48,6 +49,9 @@ const val FLAVOR_FDROID = "fdroid"
 const val FLAVOR_ITCHIO = "itchio"
 const val FLAVOR_GITLAB = "gitlab"
 
+const val PREF_LAST_UPDATE_CHECK = "ua.gardenapple.itchupdater.lastupdatecheck"
+const val PREF_UPDATE_CHECKING = "ua.gardenapple.itchupdater.updatechecking"
+
 //TODO: Catch all app's exceptions in a nice way
 class Mitch : Application() {
 
@@ -66,6 +70,9 @@ class Mitch : Application() {
 
         val installer: Installer by lazy {
             Installer()
+        }
+        val prettyTime: PrettyTime by lazy {
+            PrettyTime()
         }
     }
 

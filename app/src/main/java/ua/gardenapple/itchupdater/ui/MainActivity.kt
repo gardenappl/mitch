@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         }
         
         //Initially set to SplashScreenTheme during loading, this sets the proper theme
-        setTheme(R.style.AppTheme)
+        setTheme(R.style.AppTheme_NoActionBar)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 

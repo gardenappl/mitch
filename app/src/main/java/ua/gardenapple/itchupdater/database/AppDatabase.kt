@@ -64,6 +64,8 @@ abstract class AppDatabase : RoomDatabase() {
                             appDb.addMitchToDatabase(context)
                         }
 
+                        appDb.installDao.getPendingInstallations(Game.MITCH_GAME_ID)
+
 //                            val mitchInstall = appDb.installDao.findInstallation(Game.MITCH_GAME_ID)
 //                            Log.d(LOGGING_TAG, "Mitch installation: $mitchInstall")
 //

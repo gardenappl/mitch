@@ -52,10 +52,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     private var currentDoc: Document? = null
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         browseHandler = ItchBrowseHandler(context, this)

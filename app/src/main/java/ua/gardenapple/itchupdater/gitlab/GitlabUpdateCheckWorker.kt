@@ -36,7 +36,10 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
         val RELEASE_DESC_PATTERN = Regex("""\[\S+\]\(/?(\S+)\)""")
     }
 
-    override suspend fun doWork(): Result = coroutineScope {
+    override suspend fun doWork(): Result {
+        if (BuildConfig.FLAVOR != FLAVOR_GITLAB)
+            return Result.failure()
+
         val request = Request.Builder().run {
             url(VERSION_CHECK_URL)
             build()
@@ -68,7 +71,7 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
                     RELEASE_DESC_PATTERN.matchEntire(latestRelease["description"] as String)
                 val relativeUrl = descriptionMatch!!.groupValues[1]
 
-                resultCode = UpdateCheckResult.UPDATE_NEEDED
+                resultCode = UpdateCheckResult.UPDATE_AVAILABLE
                 downloadUrl = Uri.withAppendedPath(REPO_URL, relativeUrl)
                 errorString = null
             }
@@ -93,7 +96,7 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
             errorReport = errorString
         ))
         
-        return@coroutineScope if (resultCode == UpdateCheckResult.ERROR)
+        return if (resultCode == UpdateCheckResult.ERROR)
             Result.success()
         else
             Result.failure()
@@ -108,7 +111,7 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
             return
 
         val message = when (resultCode) {
-            UpdateCheckResult.UPDATE_NEEDED -> context.resources.getString(R.string.notification_update_available)
+            UpdateCheckResult.UPDATE_AVAILABLE -> context.resources.getString(R.string.notification_update_available)
             UpdateCheckResult.EMPTY -> context.resources.getString(R.string.notification_update_empty)
             UpdateCheckResult.ACCESS_DENIED -> context.resources.getString(R.string.notification_update_access_denied)
 //            UpdateCheckResult.UNKNOWN -> context.resources.getString(R.string.notification_update_unknown)
@@ -128,7 +131,7 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
 
                 val pendingIntent: PendingIntent
 
-                if (resultCode == UpdateCheckResult.UPDATE_NEEDED) {
+                if (resultCode == UpdateCheckResult.UPDATE_AVAILABLE) {
                     val intent = Intent(context, GitlabUpdateBroadcastReceiver::class.java)
                     intent.putExtra(GitlabUpdateBroadcastReceiver.EXTRA_DOWNLOAD_URL, downloadUrl.toString())
 

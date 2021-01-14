@@ -7,19 +7,18 @@ import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.*
 import org.jsoup.nodes.Document
-import ua.gardenapple.itchupdater.NOTIFICATION_CHANNEL_ID_INSTALLING
-import ua.gardenapple.itchupdater.NOTIFICATION_TAG_UPDATE_CHECK
-import ua.gardenapple.itchupdater.R
-import ua.gardenapple.itchupdater.Utils
+import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.installer.UpdateNotificationBroadcastReceiver
 import ua.gardenapple.itchupdater.ui.MainActivity
+import java.time.Instant
 
 class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
@@ -100,6 +99,12 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
             }
         }
 
+        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+        sharedPrefs.edit().run { 
+            this.putLong(PREF_LAST_UPDATE_CHECK, Instant.now().toEpochMilli())
+            commit()
+        }
+
         if (success)
             Result.success()
         else
@@ -114,7 +119,7 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
             return
 
         val message = when (result.code) {
-            UpdateCheckResult.UPDATE_NEEDED -> context.resources.getString(R.string.notification_update_available)
+            UpdateCheckResult.UPDATE_AVAILABLE -> context.resources.getString(R.string.notification_update_available)
             UpdateCheckResult.EMPTY -> context.resources.getString(R.string.notification_update_empty)
             UpdateCheckResult.ACCESS_DENIED -> context.resources.getString(R.string.notification_update_access_denied)
 //            UpdateCheckResult.UNKNOWN -> context.resources.getString(R.string.notification_update_unknown)
@@ -139,7 +144,7 @@ class UpdateCheckWorker(val context: Context, params: WorkerParameters) :
 
                 val pendingIntent: PendingIntent
 
-                if (result.code == UpdateCheckResult.UPDATE_NEEDED) {
+                if (result.code == UpdateCheckResult.UPDATE_AVAILABLE) {
                     if (result.uploadID != null) {
                         val intent = Intent(context, UpdateNotificationBroadcastReceiver::class.java).apply {
                             putExtra(UpdateNotificationBroadcastReceiver.EXTRA_INSTALL_ID, result.installationId)

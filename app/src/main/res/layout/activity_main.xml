@@ -50,6 +50,7 @@
             android:layout_gravity="bottom|end"
             app:layout_constraintBottom_toBottomOf="@+id/fragmentContainer"
             app:layout_constraintEnd_toEndOf="@+id/fragmentContainer"
-            app:sdMainFabClosedSrc="@drawable/ic_baseline_more_vert_24" />
+            app:sdMainFabClosedSrc="@drawable/ic_baseline_more_vert_24"
+            app:sdMainFabClosedIconColor="@color/colorPrimary"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

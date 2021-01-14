@@ -139,7 +139,7 @@ class UpdateChecker(val db: AppDatabase) {
 
                         return UpdateCheckResult(
                             currentInstall.internalId,
-                            code = UpdateCheckResult.UPDATE_NEEDED,
+                            code = UpdateCheckResult.UPDATE_AVAILABLE,
                             downloadPageUrl = downloadPageUrl,
                             uploadID = install.uploadId,
                             newVersionString = install.version,
@@ -157,7 +157,7 @@ class UpdateChecker(val db: AppDatabase) {
 
                         return UpdateCheckResult(
                             currentInstall.internalId,
-                            code = UpdateCheckResult.UPDATE_NEEDED,
+                            code = UpdateCheckResult.UPDATE_AVAILABLE,
                             downloadPageUrl = downloadPageUrl,
                             uploadID = install.uploadId,
                             newVersionString = install.version,
@@ -183,7 +183,7 @@ class UpdateChecker(val db: AppDatabase) {
         }
         logD(game, "Didn't find current uploadId")
         return UpdateCheckResult(currentInstall.internalId,
-            UpdateCheckResult.UPDATE_NEEDED,
+            UpdateCheckResult.UPDATE_AVAILABLE,
             uploadID = suggestedInstall?.uploadId,
             downloadPageUrl = downloadPageUrl,
             newTimestamp = suggestedInstall?.uploadTimestamp,
