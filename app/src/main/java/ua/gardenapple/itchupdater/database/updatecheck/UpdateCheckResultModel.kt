@@ -5,6 +5,7 @@ import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.client.UpdateCheckResult
 import ua.gardenapple.itchupdater.database.installation.Installation
 
+//TODO: flag to display loading bar in UI instead of Upload button
 @Entity(tableName = UpdateCheckResultModel.TABLE_NAME,
     foreignKeys = [
         ForeignKey(

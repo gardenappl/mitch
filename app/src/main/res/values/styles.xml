@@ -13,7 +13,10 @@
         <item name="android:actionBarStyle">@style/AppTheme.ActionBar</item>
         <item name="actionBarStyle">@style/AppTheme.ActionBar</item>
 
-        <item name="alertDialogTheme">@style/AlertDialogStyle</item>
+        <item name="dialogTheme">@style/DialogStyle</item>
+        <item name="alertDialogTheme">@style/DialogStyle</item>
+        <!-- Needed for WebView alert dialog -->
+        <item name="materialButtonStyle">@style/DialogButtonStyle</item>
     </style>
     
     <style name="AppTheme.NoActionBar" parent="AppTheme">
@@ -36,11 +39,19 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="AlertDialogStyle" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+    <style name="DialogStyle" parent="Theme.MaterialComponents.DayNight.Dialog">
         <item name="android:windowTitleStyle">@style/AppTheme.TitleTextStyle</item>
         <item name="colorPrimary">@color/colorBackground</item>
         <item name="colorPrimaryDark">@color/colorForeground</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="buttonBarButtonStyle">@style/DialogButtonStyle</item>
+        <item name="buttonStyle">@style/DialogButtonStyle</item>
+        <item name="materialButtonStyle">@style/DialogButtonStyle</item>
+    </style>
+    
+    <style name="DialogButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">?colorAccent</item>
+        <item name="android:letterSpacing">0</item>
     </style>
 
     <style name="SplashScreenTheme" parent="AppTheme">

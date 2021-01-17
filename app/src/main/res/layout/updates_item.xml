@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -10,84 +9,86 @@
         android:layout_margin="5dp"
         android:clickable="true"
         android:focusable="true"
+        android:background="?colorPrimary"
         android:foreground="?android:attr/selectableItemBackground"
         app:cardElevation="1dp">
 
-<androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <ImageView
-            android:id="@+id/gameThumbnail"
-            android:layout_width="63dp"
-            android:layout_height="50dp"
-            android:scaleType="fitCenter"
-            android:visibility="invisible"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="?colorPrimary" />
+        <ImageView
+                android:id="@+id/gameThumbnail"
+                android:layout_width="63dp"
+                android:layout_height="50dp"
+                android:scaleType="fitCenter"
+                android:visibility="invisible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="?colorPrimary" />
 
-    <ImageView
-            android:id="@+id/appIcon"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:scaleType="fitCenter"
-            app:layout_constraintBottom_toBottomOf="@id/updateCheckUploadInfo2"
-            app:layout_constraintEnd_toStartOf="@id/updateCheckGameName"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="?colorPrimary" />
+        <ImageView
+                android:id="@+id/appIcon"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="@id/updateCheckUploadInfo2"
+                app:layout_constraintEnd_toStartOf="@id/updateCheckGameName"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="?colorPrimary" />
 
 
-    <TextView
-            android:id="@+id/updateCheckGameName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:ellipsize="marquee"
-            android:singleLine="true"
-            android:text="Game name, possibly very long dasjsdlkagjlskdajglsadjglksadjglksadghsdg"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@id/updateButton"
-            app:layout_constraintStart_toEndOf="@+id/gameThumbnail"
-            app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+                android:id="@+id/updateCheckGameName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:text="Game name, possibly very long dasjsdlkagjlskdajglsadjglksadjglksadghsdg"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="?colorPrimaryDark"
+                app:layout_constraintEnd_toStartOf="@id/updateButton"
+                app:layout_constraintStart_toEndOf="@+id/gameThumbnail"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-            android:id="@+id/updateCheckUploadInfo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:ellipsize="middle"
-            android:text="[Android] Upload Name | 69420 KB"
-            app:layout_constraintEnd_toStartOf="@id/updateButton"
-            app:layout_constraintStart_toEndOf="@+id/gameThumbnail"
-            app:layout_constraintTop_toBottomOf="@+id/updateCheckGameName" />
+        <TextView
+                android:id="@+id/updateCheckUploadInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="middle"
+                android:singleLine="true"
+                android:text="694 kB · [Android] Upload Name"
+                app:layout_constraintEnd_toStartOf="@id/updateButton"
+                app:layout_constraintStart_toEndOf="@+id/gameThumbnail"
+                app:layout_constraintTop_toBottomOf="@+id/updateCheckGameName" />
 
-    <TextView
-            android:id="@+id/updateCheckUploadInfo2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:ellipsize="marquee"
-            android:text="Version 1.2 -> Version 1.4"
-            app:layout_constraintEnd_toStartOf="@id/updateButton"
-            app:layout_constraintStart_toEndOf="@+id/gameThumbnail"
-            app:layout_constraintTop_toBottomOf="@+id/updateCheckUploadInfo" />
+        <TextView
+                android:id="@+id/updateCheckUploadInfo2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:text="Version 1.2 -> Version 1.4"
+                app:layout_constraintEnd_toStartOf="@id/updateButton"
+                app:layout_constraintStart_toEndOf="@+id/gameThumbnail"
+                app:layout_constraintTop_toBottomOf="@+id/updateCheckUploadInfo" />
 
-    <com.google.android.material.button.MaterialButton
-            android:id="@+id/updateButton"
-            style="@style/FilledButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:text="@string/updates_do_update"
-            android:visibility="gone"
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/updateButton"
+                style="@style/FilledButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="@string/updates_do_update"
+                android:visibility="gone"
 
-            app:layout_constraintBottom_toBottomOf="@id/updateCheckUploadInfo2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="visible" />
+                app:layout_constraintBottom_toBottomOf="@id/updateCheckUploadInfo2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

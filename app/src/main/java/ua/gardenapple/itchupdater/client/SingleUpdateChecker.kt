@@ -52,7 +52,7 @@ class SingleUpdateChecker(val db: AppDatabase) {
                             ItchWebsiteParser.getGameInfoForStorePage(
                                 storePageDoc,
                                 currentGame.storeUrl
-                            )
+                            )!!
                         db.gameDao.update(newGameInfo.copy(downloadPageUrl = downloadPageInfo.url))
                     }
                     updateCheckDoc = ItchWebsiteUtils.fetchAndParse(downloadPageInfo.url)

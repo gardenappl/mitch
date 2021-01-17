@@ -82,9 +82,9 @@ class ItchWebsiteUtils {
         /**
          * @return If htmlDoc is a store page or download page, will return the associated gameID. Otherwise, the behavior is undefined.
          */
-        fun getGameId(htmlDoc: Document): Int {
-            return htmlDoc.head().getElementsByAttributeValue("name", "itch:path")[0].attr("content")
-                .substringAfter("games/").toInt()
+        fun getGameId(htmlDoc: Document): Int? {
+            return htmlDoc.head().getElementsByAttributeValue("name", "itch:path").first()?.attr("content")
+                ?.substringAfter("games/")?.toInt()
         }
 
 

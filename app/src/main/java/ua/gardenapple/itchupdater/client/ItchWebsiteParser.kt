@@ -40,18 +40,17 @@ class ItchWebsiteParser {
         const val UNKNOWN_LOCALE = "Unknown"
         const val ENGLISH_LOCALE = "en"
 
-        fun getGameInfoForStorePage(storePageDoc: Document, gamePageUrl: String): Game {
+        fun getGameInfoForStorePage(storePageDoc: Document, gamePageUrl: String): Game? {
+            val gameId: Int = ItchWebsiteUtils.getGameId(storePageDoc) ?: return null
+            val name: String = getGameName(storePageDoc)
+
             val thumbnails = storePageDoc.head().getElementsByAttributeValue("property", "og:image")
             var thumbnailUrl = ""
-            if(thumbnails.isNotEmpty()) {
+            if (thumbnails.isNotEmpty()) {
                 thumbnailUrl = thumbnails[0].attr("content")
             } else {
                 Log.d(LOGGING_TAG, "No thumbnail!")
             }
-
-
-            val gameId: Int = ItchWebsiteUtils.getGameId(storePageDoc)
-            val name: String = getGameName(storePageDoc)
 
             val infoTable = getInfoTable(storePageDoc)
 
@@ -103,7 +102,7 @@ class ItchWebsiteParser {
             }
             
             val locale = getLocale(doc)
-            val gameId = ItchWebsiteUtils.getGameId(doc)
+            val gameId = ItchWebsiteUtils.getGameId(doc)!!
 
             val result = ArrayList<Installation>()
             

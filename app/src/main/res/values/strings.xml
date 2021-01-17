@@ -36,7 +36,7 @@
     <string name="game_download_delete">Delete</string>
     <string name="game_package_info_fail">Your system cannot show app info.</string>
     <string name="dialog_game_delete">Are you sure you want to delete the file %1$s?</string>
-    <string name="dialog_game_remove">Are you sure you want to remove %1$s from your Mitch library? The file will stay in your Downloads folder.\n\nYou will no longer receive notifications for new versions of this file.</string>
+    <string name="dialog_game_remove">The file %1$s will stay in your Downloads folder.</string>
     <string name="dialog_remove">Remove</string>
     <string name="dialog_delete">Delete</string>
     <string name="dialog_cancel">Cancel</string>
@@ -108,7 +108,9 @@
         <item quantity="other">%d updates available!</item>
     </plurals>
     <string name="updates_do_update">Update</string>
-    <string name="updates_size_and_name">%1$s | %2$s</string>
+    <string name="updates_size_and_name">%1$s · %2$s</string>
     <string name="updates_version_change">%1$s → %2$s</string>
     <string name="updates_multiple">Multiple versions available</string>
+    <string name="library_no_apps">No apps installed.</string>
+    <string name="library_no_downloads">Nothing downloaded.</string>
 </resources>

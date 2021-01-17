@@ -321,7 +321,11 @@ class GameListAdapter internal constructor(
             R.id.cancel -> {
                 if (gameInstall.status == Installation.STATUS_INSTALLING) {
                     val pkgInstaller = context.packageManager.packageInstaller
-                    pkgInstaller.abandonSession(gameInstall.downloadOrInstallId)
+                    try {
+                        pkgInstaller.abandonSession(gameInstall.downloadOrInstallId)
+                    } catch (e: SecurityException) {
+                        Log.e(LOGGING_TAG, "Could not cancel", e)
+                    }
                 }
                 val notificationService = context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
                 notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, gameInstall.downloadOrInstallId)

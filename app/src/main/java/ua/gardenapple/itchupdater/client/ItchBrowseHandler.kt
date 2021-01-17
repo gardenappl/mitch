@@ -42,11 +42,11 @@ class ItchBrowseHandler(
 
         if (ItchWebsiteUtils.isStorePage(doc)) {
             val db = AppDatabase.getDatabase(context)
-            val game = ItchWebsiteParser.getGameInfoForStorePage(doc, url)
-
-            withContext(Dispatchers.IO) {
-                Log.d(LOGGING_TAG, "Adding game $game")
-                db.gameDao.upsert(game)
+            ItchWebsiteParser.getGameInfoForStorePage(doc, url)?.let { game ->
+                withContext(Dispatchers.IO) {
+                    Log.d(LOGGING_TAG, "Adding game $game")
+                    db.gameDao.upsert(game)
+                }
             }
         }
         if (ItchWebsiteUtils.hasGameDownloadLinks(doc)) {

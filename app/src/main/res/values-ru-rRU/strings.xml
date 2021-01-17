@@ -32,7 +32,7 @@
     <string name="game_package_info_fail">Ваша система не дает возможность просматривать эту информацию.</string>
     <string name="dialog_cancel">Отмена</string>
     <string name="dialog_yes">Да</string>
-    <string name="dialog_game_remove">Вы точно хотите убрать %1$s из вашей коллекции Mitch? Загруженные файлы останутся в папке "Загрузки".\n\nВы больше не будете получать уведомления для новых версий этого файла.</string>
+    <string name="dialog_game_remove">Файл %1$s останется в папке загрузок.</string>
     <string name="dialog_remove">Убрать</string>
     <string name="popup_game_removed">Вы убрали %1$s из вашей коллекции Mitch.</string>
     <string name="notification_update_access_denied">Доступ запрещен (вы войшли в свой аккаунт?)</string>
@@ -109,7 +109,9 @@
         <item quantity="many">%d обновлений доступно!</item>
     </plurals>
     <string name="updates_do_update">Обновить</string>
-    <string name="updates_size_and_name">%1$s | %2$s</string>
+    <string name="updates_size_and_name">%1$s · %2$s</string>
     <string name="updates_version_change">%1$s → %2$s</string>
     <string name="updates_multiple">Доступно несколько версий</string>
+    <string name="library_no_apps">Нет установленых приложений.</string>
+    <string name="library_no_downloads">Ничего не загружено.</string>
 </resources>

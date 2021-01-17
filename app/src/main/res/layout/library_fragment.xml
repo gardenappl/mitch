@@ -1,76 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/libraryLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingVertical="10dp">
 
-    <LinearLayout
-            android:id="@+id/libraryLayout"
+    <TextView
+            android:id="@+id/pending_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingVertical="10dp">
+            android:padding="10dp"
+            android:paddingTop="20dp"
+            android:text="@string/library_category_pending"
+            android:textColor="?colorPrimaryDark"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
 
-        <TextView
-                android:id="@+id/pending_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:paddingTop="20dp"
-                android:text="@string/library_category_pending"
-                android:textColor="?colorPrimaryDark"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:visibility="gone" />
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/pending_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:scrollbarAlwaysDrawHorizontalTrack="true"
+            android:visibility="gone"
+            tools:itemCount="1"
+            tools:listitem="@layout/library_item" />
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/pending_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:scrollbarAlwaysDrawHorizontalTrack="true"
-                android:visibility="gone"
-                tools:itemCount="1"
-                tools:listitem="@layout/library_item" />
+    <TextView
+            android:id="@+id/installed_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:paddingTop="20dp"
+            android:text="@string/library_category_installed"
+            android:textColor="?colorPrimaryDark"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    
+    <TextView
+            android:id="@+id/installed_nothing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/library_no_apps"
+            android:layout_margin="10dp"
+            android:padding="0dp"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
-        <TextView
-                android:id="@+id/installed_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:paddingTop="20dp"
-                android:text="@string/library_category_installed"
-                android:textColor="?colorPrimaryDark"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/installed_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbarAlwaysDrawHorizontalTrack="true"
+            tools:itemCount="1"
+            tools:listitem="@layout/library_item"
+            tools:visibility="gone"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/installed_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbarAlwaysDrawHorizontalTrack="true"
-                tools:itemCount="1"
-                tools:listitem="@layout/library_item" />
+    <TextView
+            android:id="@+id/downloads_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:paddingTop="20dp"
+            android:text="@string/library_category_downloads"
+            android:textColor="?colorPrimaryDark"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-        <TextView
-                android:id="@+id/downloads_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:paddingTop="20dp"
-                android:text="@string/library_category_downloads"
-                android:textColor="?colorPrimaryDark"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+    <TextView
+            android:id="@+id/downloads_nothing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/library_no_downloads"
+            android:layout_margin="10dp"
+            android:padding="0dp"
+            android:visibility="gone" />
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/downloads_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbarAlwaysDrawHorizontalTrack="true"
-                tools:itemCount="1"
-                tools:listitem="@layout/library_item" />
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/downloads_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbarAlwaysDrawHorizontalTrack="true"
+            tools:itemCount="1"
+            tools:listitem="@layout/library_item" />
+</LinearLayout>

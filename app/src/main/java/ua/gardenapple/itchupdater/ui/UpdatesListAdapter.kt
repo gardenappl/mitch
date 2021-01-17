@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.view.*
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.*
@@ -69,10 +70,11 @@ class UpdatesListAdapter internal constructor(
         }
 
 
-
         if (updateCheckResult.uploadID != null) {
             binding.updateButton.visibility = View.VISIBLE
             binding.updateButton.setOnClickListener { _ ->
+                Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_LONG)
+                    .show()
                 GlobalScope.launch(Dispatchers.IO) {
                     GameDownloader.startUpdate(context, updateCheckResult)
 

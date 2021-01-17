@@ -50,7 +50,6 @@ class InstallerService : Service() {
             }
             else -> {
                 notifyInstallResult(sessionId, packageName!!, apkName, status)
-                //TODO: BroadcastReceiver for Mitch update
                 runBlocking(Dispatchers.IO) {
                     val db = AppDatabase.getDatabase(applicationContext)
                     val install = db.installDao.findPendingInstallationBySessionId(sessionId)!!

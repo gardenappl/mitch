@@ -64,9 +64,7 @@ class LibraryFragment : Fragment() {
 
         pendingViewModel = ViewModelProvider(this).get(PendingGameViewModel::class.java)
         pendingViewModel.pendingGames.observe(viewLifecycleOwner, { gameInstalls ->
-            gameInstalls?.let {
-                pendingAdapter.gameInstalls = gameInstalls
-            }
+            gameInstalls?.let { pendingAdapter.gameInstalls = gameInstalls }
             view.post {
                 _binding?.let { binding ->
                     if (gameInstalls?.isNotEmpty() == true) {
@@ -98,6 +96,17 @@ class LibraryFragment : Fragment() {
         downloadsViewModel = ViewModelProvider(this).get(GameDownloadsViewModel::class.java)
         downloadsViewModel.gameDownloads.observe(viewLifecycleOwner, { gameInstalls ->
             gameInstalls?.let { downloadsAdapter.gameInstalls = gameInstalls }
+            view.post {
+                _binding?.let { binding ->
+                    if (gameInstalls?.isNotEmpty() == true) {
+                        binding.downloadsNothing.visibility = View.VISIBLE
+                        binding.downloadsNothing.visibility = View.GONE
+                    } else {
+                        binding.downloadsNothing.visibility = View.GONE
+                        binding.downloadsNothing.visibility = View.VISIBLE
+                    }
+                }
+            }
         })
 
 
@@ -118,6 +127,17 @@ class LibraryFragment : Fragment() {
         installedViewModel = ViewModelProvider(this).get(InstalledGameViewModel::class.java)
         installedViewModel.installedGames.observe(viewLifecycleOwner, Observer { gameInstalls ->
             gameInstalls?.let { installedAdapter.gameInstalls = gameInstalls }
+            view.post {
+                _binding?.let { binding ->
+                    if (gameInstalls?.isNotEmpty() == true) {
+                        binding.installedList.visibility = View.VISIBLE
+                        binding.installedNothing.visibility = View.GONE
+                    } else {
+                        binding.installedList.visibility = View.GONE
+                        binding.installedNothing.visibility = View.VISIBLE
+                    }
+                }
+            }
         })
 
         return view

@@ -31,7 +31,7 @@ android {
         applicationId "ua.gardenapple.itchupdater"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 17
+        versionCode 18
         versionName "1.2.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         if (shouldSign) {
