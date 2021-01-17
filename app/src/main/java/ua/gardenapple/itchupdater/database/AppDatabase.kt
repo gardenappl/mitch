@@ -64,13 +64,6 @@ abstract class AppDatabase : RoomDatabase() {
                             appDb.addMitchToDatabase(context)
                         }
 
-                        val pendingInstalls =
-                            appDb.installDao.getPendingInstallations(Installation.MITCH_UPLOAD_ID)
-
-                        appDb.installDao.delete(pendingInstalls.filter { install ->
-                            install.status == Installation.STATUS_INSTALLING
-                        })
-
 //                            val mitchInstall = appDb.installDao.findInstallation(Game.MITCH_GAME_ID)
 //                            Log.d(LOGGING_TAG, "Mitch installation: $mitchInstall")
 //
@@ -78,7 +71,6 @@ abstract class AppDatabase : RoomDatabase() {
 //                            val installs = appDb.installDao.getAllInstallationsSync()
 //                            for (install in installs)
 //                                Log.d(LOGGING_TAG, "$install")
-                        Log.d(LOGGING_TAG, "Opened database.")
                     }
                 }
     }

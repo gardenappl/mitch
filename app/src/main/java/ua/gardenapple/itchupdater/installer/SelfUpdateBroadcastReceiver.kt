@@ -7,25 +7,28 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.database.AppDatabase
+import ua.gardenapple.itchupdater.database.installation.Installation
 
-class UninstallBroadcastReceiver : BroadcastReceiver() {
+class SelfUpdateBroadcastReceiver : BroadcastReceiver() {
     companion object {
-        private const val LOGGING_TAG = "UninstallReceiver"
+        private const val LOGGING_TAG = "SelfUpdateReceiver"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(LOGGING_TAG, "onReceive")
-        if (intent.action != Intent.ACTION_PACKAGE_FULLY_REMOVED)
+        if (intent.action != Intent.ACTION_MY_PACKAGE_REPLACED)
             throw RuntimeException("Wrong action type!")
 
-        Log.d(LOGGING_TAG, "Data: ${intent.data}")
-
-        val packageName = intent.data!!.schemeSpecificPart
-        Log.d(LOGGING_TAG, "Package name: $packageName")
-
+        Log.d(LOGGING_TAG, "Mitch updated!")
+            
         runBlocking(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
-            db.installDao.deleteFinishedInstallation(packageName)
+            val mitchPendingInstalls =
+                db.installDao.getPendingInstallations(Installation.MITCH_UPLOAD_ID)
+
+            db.installDao.delete(mitchPendingInstalls.filter { install ->
+                install.status == Installation.STATUS_INSTALLING
+            })
         }
     }
 }

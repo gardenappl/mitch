@@ -34,7 +34,14 @@ class InstallerService : Service() {
         val sessionId = intent.getIntExtra(PackageInstaller.EXTRA_SESSION_ID, -1)
         val apkName = intent.getStringExtra(EXTRA_APK_NAME)!!
 
-        when(status) {
+        //InstallerService shouldn't receive intent for Mitch anyway,
+        //this is handled by SelfUpdateBroadcastReceiver
+        if (status == PackageInstaller.STATUS_SUCCESS && packageName == applicationContext.packageName) {
+            stopSelf()
+            return START_STICKY
+        }
+
+        when (status) {
             PackageInstaller.STATUS_PENDING_USER_ACTION -> {
                 val confirmationIntent = intent.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
                 confirmationIntent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
