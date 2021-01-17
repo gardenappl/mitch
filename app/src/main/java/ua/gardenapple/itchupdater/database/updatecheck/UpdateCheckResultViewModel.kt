@@ -9,10 +9,6 @@ import ua.gardenapple.itchupdater.database.AppDatabase
 class UpdateCheckResultViewModel(app: Application) : AndroidViewModel(app) {
     private val repository: UpdateCheckResultRepository =
         UpdateCheckResultRepository(AppDatabase.getDatabase(app).updateCheckDao)
-    
-    fun observeAvailableUpdates(owner: LifecycleOwner, observer: (List<UpdateCheckResult>) -> Unit) {
-        repository.availableUpdates.observe(owner) { updateCheckResultModels ->
-            observer(updateCheckResultModels.map(Converters::toResult))
-        }
-    }
+
+    val availableUpdates = repository.availableUpdates
 }

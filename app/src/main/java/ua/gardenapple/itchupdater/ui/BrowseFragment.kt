@@ -344,12 +344,12 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         //Colors adapt to game theme
 
-        val defaultAccentColor = Utils.getColor(resources, R.color.colorAccent, requireContext().theme)
-        val defaultWhiteColor = Utils.getColor(resources, R.color.colorPrimary, requireContext().theme)
-        val defaultBlackColor = Utils.getColor(resources, R.color.colorPrimaryDark, requireContext().theme)
+        val defaultAccentColor = Utils.getColor(requireContext(), R.color.colorAccent)
+        val defaultWhiteColor = Utils.getColor(requireContext(), R.color.colorPrimary)
+        val defaultBlackColor = Utils.getColor(requireContext(), R.color.colorPrimaryDark)
 
-        val defaultBgColor = Utils.getColor(resources, R.color.colorBackground, requireContext().theme)
-        val defaultFgColor = Utils.getColor(resources, R.color.colorForeground, requireContext().theme)
+        val defaultBgColor = Utils.getColor(requireContext(), R.color.colorBackground)
+        val defaultFgColor = Utils.getColor(requireContext(), R.color.colorForeground)
 
         val gameThemeBgColor = doc?.run { ItchWebsiteUtils.getBackgroundUIColor(doc) }
         val gameThemeButtonColor = doc?.run { ItchWebsiteUtils.getAccentUIColor(doc) }
@@ -402,7 +402,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     private fun addAppBarActions(appBar: Toolbar, doc: Document) {
         appBar.menu.clear()
 
-        val navbarItems = doc.getElementById("user_tools").children()
+        val navbarItems = doc.getElementById("user_tools")?.children() ?: return
 
         while (navbarItems.isNotEmpty()) {
             val item = navbarItems.last()

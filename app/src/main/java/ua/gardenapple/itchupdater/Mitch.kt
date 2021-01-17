@@ -6,8 +6,6 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
-import android.util.Log
-import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import androidx.work.*
@@ -18,10 +16,9 @@ import okhttp3.Cache
 import okhttp3.OkHttpClient
 import org.ocpsoft.prettytime.PrettyTime
 import ua.gardenapple.itchupdater.files.DownloadFileManager
-import ua.gardenapple.itchupdater.client.UpdateCheckWorker
-import ua.gardenapple.itchupdater.database.AppDatabase
+import ua.gardenapple.itchupdater.client.UpdateChecker
 import ua.gardenapple.itchupdater.files.ExternalFileManager
-import ua.gardenapple.itchupdater.gitlab.GitlabUpdateCheckWorker
+import ua.gardenapple.itchupdater.gitlab.GitlabUpdateChecker
 import ua.gardenapple.itchupdater.installer.*
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -181,7 +178,7 @@ class Mitch : Application() {
                 setRequiredNetworkType(NetworkType.CONNECTED)
             build()
         }
-        val updateCheckRequest = PeriodicWorkRequestBuilder<UpdateCheckWorker>(1, TimeUnit.DAYS).run {
+        val updateCheckRequest = PeriodicWorkRequestBuilder<UpdateChecker.Worker>(1, TimeUnit.DAYS).run {
             //addTag(UPDATE_CHECK_TASK_TAG)
             setConstraints(constraints)
             //setInitialDelay(1, TimeUnit.MINUTES)
@@ -197,7 +194,7 @@ class Mitch : Application() {
 
         if (BuildConfig.FLAVOR == FLAVOR_GITLAB) {
             val gitlabUpdateCheckRequest =
-                PeriodicWorkRequestBuilder<GitlabUpdateCheckWorker>(1, TimeUnit.DAYS).run {
+                PeriodicWorkRequestBuilder<GitlabUpdateChecker.Worker>(1, TimeUnit.DAYS).run {
                     setConstraints(constraints)
                     build()
                 }

@@ -3,7 +3,7 @@ Mitch is an unofficial mobile client for itch.io, the indie game storefront. The
 
 * Download games from itch.io and keep them updated
 * Support for APK downloads as well as other games
-* Supports HTML5 games inside built-in browser
+* Can run HTML5 games inside built-in browser
 * itch.io account is not required
 * Blocks trackers and analytics by default (F-Droid version only)
 * Beautiful Material UI adapts to custom color schemes set by game developers

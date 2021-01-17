@@ -10,7 +10,7 @@ import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import ua.gardenapple.itchupdater.client.UpdateCheckResult
-import ua.gardenapple.itchupdater.client.UpdateChecker
+import ua.gardenapple.itchupdater.client.SingleUpdateChecker
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
@@ -18,7 +18,7 @@ import ua.gardenapple.itchupdater.database.installation.Installation
 @RunWith(AndroidJUnit4::class)
 class UpdateCheckerTests {
     companion object {
-        private lateinit var updateChecker: UpdateChecker
+        private lateinit var updateChecker: SingleUpdateChecker
         private lateinit var db: AppDatabase
 
         @BeforeClass
@@ -27,7 +27,7 @@ class UpdateCheckerTests {
             db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
             db.addMitchToDatabase(context)
 
-            updateChecker = UpdateChecker(db)
+            updateChecker = SingleUpdateChecker(db)
         }
     }
 

@@ -153,7 +153,7 @@ class GameListAdapter internal constructor(
         }
     }
 
-    //TODO: Showing icons in a PopupMenu requires restriced API...
+    //TODO: Showing icons in a PopupMenu requires restricted API...
     @SuppressLint("RestrictedApi")
     private fun onCardOverflowClick(view: View, position: Int) {
         val gameInstall = gameInstalls[position]

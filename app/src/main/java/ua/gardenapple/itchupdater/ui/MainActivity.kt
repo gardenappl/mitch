@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         const val BROWSE_FRAGMENT_TAG: String = "browse"
         const val LIBRARY_FRAGMENT_TAG: String = "library"
         const val SETTINGS_FRAGMENT_TAG: String = "settings"
+        const val UPDATES_FRAGMENT_TAG: String = "updates"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,6 +83,14 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             }
         }
 
+        if (currentFragmentTag == UPDATES_FRAGMENT_TAG &&
+            supportFragmentManager.findFragmentByTag(UPDATES_FRAGMENT_TAG) == null) {
+            supportFragmentManager.beginTransaction().apply {
+                add(R.id.fragmentContainer, SettingsFragment(), SETTINGS_FRAGMENT_TAG)
+                commit()
+            }
+        }
+
         if (currentFragmentTag == SETTINGS_FRAGMENT_TAG &&
                 supportFragmentManager.findFragmentByTag(SETTINGS_FRAGMENT_TAG) == null) {
             supportFragmentManager.beginTransaction().apply {
@@ -95,6 +104,8 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                 BROWSE_FRAGMENT_TAG
             else if (supportFragmentManager.findFragmentByTag(LIBRARY_FRAGMENT_TAG)?.isVisible == true)
                 LIBRARY_FRAGMENT_TAG
+            else if (supportFragmentManager.findFragmentByTag(UPDATES_FRAGMENT_TAG)?.isVisible == true)
+                UPDATES_FRAGMENT_TAG
             else if (supportFragmentManager.findFragmentByTag(SETTINGS_FRAGMENT_TAG)?.isVisible == true)
                 SETTINGS_FRAGMENT_TAG
             else
@@ -146,10 +157,10 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
-        val backgroundColor = Utils.getColor(resources, R.color.colorBackground, theme)
-        val backgroundMainColor = Utils.getColor(resources, R.color.colorBackgroundMain, theme)
-        val foregroundColor = Utils.getColor(resources, R.color.colorForeground, theme)
-        val accentColor = Utils.getColor(resources, R.color.colorAccent, theme)
+        val backgroundColor = Utils.getColor(this, R.color.colorBackground)
+        val backgroundMainColor = Utils.getColor(this, R.color.colorBackgroundMain)
+        val foregroundColor = Utils.getColor(this, R.color.colorForeground)
+        val accentColor = Utils.getColor(this, R.color.colorAccent)
 
         val itemColorStateList = Utils.colorStateListOf(
             intArrayOf(android.R.attr.state_selected) to accentColor,
@@ -257,6 +268,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         return when (tag) {
             BROWSE_FRAGMENT_TAG -> R.id.navigation_website_view
             LIBRARY_FRAGMENT_TAG -> R.id.navigation_library
+            UPDATES_FRAGMENT_TAG -> R.id.navigation_updates
             SETTINGS_FRAGMENT_TAG -> R.id.navigation_settings
             else -> throw IllegalArgumentException()
         }
@@ -266,6 +278,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         return when (itemId) {
             R.id.navigation_website_view -> BROWSE_FRAGMENT_TAG
             R.id.navigation_library -> LIBRARY_FRAGMENT_TAG
+            R.id.navigation_updates -> UPDATES_FRAGMENT_TAG
             R.id.navigation_settings -> SETTINGS_FRAGMENT_TAG
             else -> throw IllegalArgumentException()
         }
@@ -275,6 +288,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         return when (tag) {
             BROWSE_FRAGMENT_TAG -> BrowseFragment::class.java
             LIBRARY_FRAGMENT_TAG -> LibraryFragment::class.java
+            UPDATES_FRAGMENT_TAG -> UpdatesFragment::class.java
             SETTINGS_FRAGMENT_TAG -> SettingsFragment::class.java
             else -> throw IllegalArgumentException()
         }

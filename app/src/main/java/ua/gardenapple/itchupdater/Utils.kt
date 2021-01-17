@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
+import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import com.github.ajalt.colormath.ConvertibleColor
 import com.github.ajalt.colormath.fromCss
@@ -126,27 +127,27 @@ class Utils {
         }
 
         /**
-         * Similar to ActivityCompat.getColor, except also aware of light/dark themes
+         * Similar to ContextCompat.getColor, except also aware of light/dark themes
          */
         @ColorInt
         @Suppress("DEPRECATION")
-        fun getColor(resources: Resources, @ColorRes id: Int, theme: Resources.Theme): Int {
+        fun getColor(context: Context, @ColorRes id: Int): Int {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                resources.getColor(id, theme)
+                context.getColor(id)
             } else {
-                val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                val nightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
                 if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
                     when (id) {
-                        R.color.colorBackground -> resources.getColor(R.color.colorPrimaryDark)
-                        R.color.colorForeground -> resources.getColor(R.color.colorPrimary)
+                        R.color.colorBackground -> context.resources.getColor(R.color.colorPrimaryDark)
+                        R.color.colorForeground -> context.resources.getColor(R.color.colorPrimary)
                     }
                 } else {
                     when (id) {
-                        R.color.colorBackground -> resources.getColor(R.color.colorPrimary)
-                        R.color.colorForeground -> resources.getColor(R.color.colorPrimaryDark)
+                        R.color.colorBackground -> context.resources.getColor(R.color.colorPrimary)
+                        R.color.colorForeground -> context.resources.getColor(R.color.colorPrimaryDark)
                     }
                 }
-                resources.getColor(id)
+                context.resources.getColor(id)
             }
         }
         

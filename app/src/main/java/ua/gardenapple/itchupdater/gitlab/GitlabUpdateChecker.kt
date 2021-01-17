@@ -7,6 +7,8 @@ import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
+import androidx.work.ListenableWorker.Result
+import androidx.work.Worker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.*
 import okhttp3.Request
@@ -15,6 +17,7 @@ import org.json.JSONObject
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.client.UpdateCheckResult
+import ua.gardenapple.itchupdater.client.UpdateChecker
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.ui.MainActivity
@@ -23,9 +26,7 @@ import java.io.IOException
 /**
  * Check if an update is available for the GitLab build and provide notification.
  */
-class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
-    CoroutineWorker(context, params) {
-
+class GitlabUpdateChecker(private val context: Context) {
     companion object {
         private const val LOGGING_TAG = "SelfUpdaterWorker"
 
@@ -36,7 +37,7 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
         val RELEASE_DESC_PATTERN = Regex("""\[\S+\]\(/?(\S+)\)""")
     }
 
-    override suspend fun doWork(): Result {
+    suspend fun checkUpdate(): Result {
         if (BuildConfig.FLAVOR != FLAVOR_GITLAB)
             return Result.failure()
 
@@ -150,6 +151,14 @@ class GitlabUpdateCheckWorker(val context: Context, params: WorkerParameters) :
 
         with(NotificationManagerCompat.from(context)) {
             notify(NOTIFICATION_ID_SELF_UPDATE_CHECK, builder.build())
+        }
+    }
+
+    inner class Worker(appContext: Context, params: WorkerParameters)
+        : CoroutineWorker(appContext, params) {
+
+        override suspend fun doWork(): Result {
+            return GitlabUpdateChecker(applicationContext).checkUpdate()
         }
     }
 }

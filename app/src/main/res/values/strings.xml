@@ -98,13 +98,17 @@
     <string name="popup_moved_to_downloads">Moved file %1$s to Downloads folder.</string>
     <string name="popup_moving_to_downloads">Moving file to Download folder…</string>
     <string name="popup_move_to_download_error">Error while moving to Download folder</string>
-    <string name="library_all_up_to_date">Everything up to date</string>
-    <string name="library_last_update_check_time">Last checked %s</string>
-    <string name="library_button_check_updates">Refresh</string>
-    <string name="library_button_go_to_updates">Update ➡</string>
-    <string name="library_error">Error while checking updates</string>
-    <plurals name="library_updates_available">
+    <string name="updates_all_up_to_date">Everything up to date</string>
+    <string name="updates_last_check_time">Last checked %s</string>
+    <string name="updates_pull_to_refresh">Pull down to refresh</string>
+    <string name="nav_updates">Updates</string>
+    <string name="updates_error">Error while checking updates</string>
+    <plurals name="updates_available">
         <item quantity="one">%d update available!</item>
         <item quantity="other">%d updates available!</item>
     </plurals>
+    <string name="updates_do_update">Update</string>
+    <string name="updates_size_and_name">%1$s | %2$s</string>
+    <string name="updates_version_change">%1$s → %2$s</string>
+    <string name="updates_multiple">Multiple versions available</string>
 </resources>

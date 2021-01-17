@@ -40,6 +40,7 @@ ext {
     workVersion = '2.4.0'
     appcompatVersion = '1.2.0'
     constraintLayoutVersion = '2.0.4'
+    swipeRefreshLayoutVersion = '1.0.0'
     preferenceVersion = '1.1.1'
     junitVersion = '4.13.1'
     androidxJunitVersion = '1.1.2'

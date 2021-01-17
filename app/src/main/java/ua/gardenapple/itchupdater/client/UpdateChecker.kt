@@ -1,202 +1,196 @@
 package ua.gardenapple.itchupdater.client
 
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.preference.PreferenceManager
+import androidx.work.CoroutineWorker
+import androidx.work.ListenableWorker.Result
+import androidx.work.WorkerParameters
 import kotlinx.coroutines.*
 import org.jsoup.nodes.Document
-import ua.gardenapple.itchupdater.BuildConfig
-import ua.gardenapple.itchupdater.FLAVOR_ITCHIO
-import ua.gardenapple.itchupdater.ItchWebsiteUtils
+import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
-import java.lang.IllegalArgumentException
-import java.util.*
+import ua.gardenapple.itchupdater.installer.UpdateNotificationBroadcastReceiver
+import ua.gardenapple.itchupdater.ui.MainActivity
+import java.time.Instant
 
-class UpdateChecker(val db: AppDatabase) {
+class UpdateChecker(private val context: Context) {
     companion object {
-        private const val LOGGING_TAG: String = "UpdateChecker"
+        private const val LOGGING_TAG = "UpdateCheckWorker"
     }
 
-    fun shouldCheck(installation: Installation): Boolean {
-        return !(installation.gameId == Game.MITCH_GAME_ID && BuildConfig.FLAVOR != FLAVOR_ITCHIO)
+    suspend fun checkUpdates(): Result = withContext(Dispatchers.IO) {
+        val db = AppDatabase.getDatabase(context)
+        val installations = db.installDao.getFinishedInstallationsSync()
+        val updateChecker = SingleUpdateChecker(db)
+        var success = true
+
+        coroutineScope {
+            //We support multiple install per game, and we don't want to download the
+            //HTML for the same game multiple times
+            val gameCache = HashMap<Int, Game>()
+            val downloadInfoCache = HashMap<Int, Pair<Document, ItchWebsiteParser.DownloadUrl>?>()
+
+            for (install in installations) {
+                if (!isActive)
+                    return@coroutineScope Result.failure()
+                if (!updateChecker.shouldCheck(install))
+                    continue
+
+                launch(Dispatchers.IO) {
+                    var result: UpdateCheckResult
+                    val game: Game = if (gameCache.containsKey(install.gameId)) {
+                        gameCache[install.gameId]!!
+                    } else {
+                        val dbGame = db.gameDao.getGameById(install.gameId)!!
+                        gameCache[install.gameId] = dbGame
+                        dbGame
+                    }
+
+                    try {
+                        val downloadInfo = if (downloadInfoCache.containsKey(install.gameId)) {
+                            downloadInfoCache[install.gameId]
+                        } else {
+                            val newDownloadInfo = updateChecker.getDownloadInfo(game)
+                            downloadInfoCache[install.gameId] = newDownloadInfo
+                            Log.d(LOGGING_TAG, "Download URL for ${game.name}: ${newDownloadInfo?.second}")
+                            newDownloadInfo
+                        }
+
+                        if (downloadInfo == null) {
+                            result = UpdateCheckResult(
+                                install.internalId,
+                                UpdateCheckResult.ACCESS_DENIED
+                            )
+                        } else {
+                            val (updateCheckDoc, downloadUrlInfo) = downloadInfo
+                            result = updateChecker.checkUpdates(
+                                game, install, updateCheckDoc, downloadUrlInfo
+                            )
+                        }
+                    } catch (e: CancellationException) {
+                        return@launch
+                    } catch (e: Exception) {
+                        result = UpdateCheckResult(
+                            installationId = install.internalId,
+                            code = UpdateCheckResult.ERROR,
+                            errorReport = Utils.toString(e)
+                        )
+                        success = false
+                        Log.e(LOGGING_TAG, "Update check error!", e)
+                    }
+
+                    launch(Dispatchers.IO) {
+                        db.updateCheckDao.insert(result)
+                    }
+                    handleNotification(game, install, result)
+                }
+            }
+        }
+
+        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+        sharedPrefs.edit().run {
+            this.putLong(PREF_LAST_UPDATE_CHECK, Instant.now().toEpochMilli())
+            commit()
+        }
+
+        if (success)
+            Result.success()
+        else
+            Result.failure()
     }
 
     /**
-     * @return null if access is denied
+     * @param result the result of the update check
      */
-    suspend fun getDownloadInfo(currentGame: Game): Pair<Document, ItchWebsiteParser.DownloadUrl>? =
-        withContext(Dispatchers.IO) {
-            var updateCheckDoc: Document
-            var downloadPageInfo: ItchWebsiteParser.DownloadUrl
+    private fun handleNotification(game: Game, install: Installation, result: UpdateCheckResult) {
+        if(result.code == UpdateCheckResult.UP_TO_DATE)
+            return
 
-            if (currentGame.downloadPageUrl != null) {
-                //Have cached download URL
+        val message = when (result.code) {
+            UpdateCheckResult.UPDATE_AVAILABLE -> context.resources.getString(R.string.notification_update_available)
+            UpdateCheckResult.EMPTY -> context.resources.getString(R.string.notification_update_empty)
+            UpdateCheckResult.ACCESS_DENIED -> context.resources.getString(R.string.notification_update_access_denied)
+//            UpdateCheckResult.UNKNOWN -> context.resources.getString(R.string.notification_update_unknown)
+            else -> context.resources.getString(R.string.notification_update_fail)
+        }
+        val builder =
+            NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
+                setSmallIcon(R.drawable.ic_mitch_notification)
+                setContentText(message)
+                setAutoCancel(true)
 
-                updateCheckDoc = ItchWebsiteUtils.fetchAndParse(currentGame.downloadPageUrl)
-                downloadPageInfo = currentGame.downloadInfo!!
-
-                if (!ItchWebsiteUtils.hasGameDownloadLinks(updateCheckDoc)) {
-                    //game info may be out-dated
-                    val storePageDoc = if (downloadPageInfo.isStorePage)
-                        updateCheckDoc
-                    else
-                        ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
-
-                    downloadPageInfo =
-                        ItchWebsiteParser.getDownloadUrl(storePageDoc, currentGame.storeUrl)
-                            ?: return@withContext null
-
-                    if (downloadPageInfo.isPermanent) {
-                        //insert new info
-                        val newGameInfo =
-                            ItchWebsiteParser.getGameInfoForStorePage(
-                                storePageDoc,
-                                currentGame.storeUrl
-                            )
-                        db.gameDao.update(newGameInfo.copy(downloadPageUrl = downloadPageInfo.url))
-                    }
-                    updateCheckDoc = ItchWebsiteUtils.fetchAndParse(downloadPageInfo.url)
+                if (install.packageName != null) {
+                    val info = context.packageManager.getApplicationInfo(install.packageName, 0)
+                    val icon = context.packageManager.getApplicationIcon(info)
+                    setContentTitle(context.packageManager.getApplicationLabel(info))
+                    setLargeIcon(Utils.drawableToBitmap(icon))
+                } else {
+                    setContentTitle(install.uploadName)
                 }
-            } else {
-                //Must get fresh download URL
 
-                val storePageDoc = ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
-                downloadPageInfo =
-                    ItchWebsiteParser.getDownloadUrl(storePageDoc, currentGame.storeUrl)
-                        ?: return@withContext null
-                updateCheckDoc = ItchWebsiteUtils.fetchAndParse(downloadPageInfo.url)
-            }
-            return@withContext Pair(updateCheckDoc, downloadPageInfo)
-        }
+                priority = NotificationCompat.PRIORITY_LOW
 
-    suspend fun checkUpdates(
-        currentGame: Game, 
-        currentInstall: Installation,
-        updateCheckDoc: Document,
-        downloadPageInfo: ItchWebsiteParser.DownloadUrl
-    ): UpdateCheckResult =
-        withContext(Dispatchers.IO) {
-            if (!shouldCheck(currentInstall))
-                throw IllegalArgumentException("Should not be checking updates using itch.io for this")
+                val pendingIntent: PendingIntent
 
-            logD(currentGame, "Checking updates for ${currentGame.name}")
-            logD(currentGame, "Current install: $currentInstall")
-
-            if (!ItchWebsiteUtils.hasGameDownloadLinks(updateCheckDoc)) {
-                return@withContext UpdateCheckResult(
-                    installationId = currentInstall.internalId,
-                    code = UpdateCheckResult.ACCESS_DENIED
-                )
-            }
-
-            return@withContext compareUploads(updateCheckDoc, currentInstall, currentGame, downloadPageInfo)
-        }
-
-    private fun compareUploads(
-        updateCheckDoc: Document,
-        currentInstall: Installation,
-        game: Game,
-        downloadPageUrl: ItchWebsiteParser.DownloadUrl
-    ): UpdateCheckResult {
-        val fetchedInstalls = ItchWebsiteParser.getInstallations(updateCheckDoc)
-
-        var oneAvailableInstall = false
-        var suggestedInstall: Installation? = null
-        for (install in fetchedInstalls) {
-            if (install.uploadName == currentInstall.uploadName) {
-                suggestedInstall = install
-                break
-            }
-            if (install.platforms and currentInstall.platforms == currentInstall.platforms) {
-                if (suggestedInstall == null) {
-                    suggestedInstall = install
-                    oneAvailableInstall = true
-                } else if (oneAvailableInstall) {
-                    suggestedInstall = null
-                    oneAvailableInstall = false
-                }
-            }
-        }
-        logD(game, "Suggested install: $suggestedInstall")
-
-        for (install in fetchedInstalls) {
-            // Note that just because the upload ID stays the same, it doesn't mean that there wasn't
-            // an update. Builds pushed via butler don't change the upload ID.
-            if (install.uploadId == currentInstall.uploadId) {
-                logD(game, "Found same uploadId")
-                    
-                if (currentInstall.version != null) {
-                    logD(game, "Checking version tags...")
-
-                    val containsCurrentVersion = install.version?.contains(currentInstall.version)
-                    if (containsCurrentVersion == true) {
-                        logD(game, "Found same version tag")
-                        
-                        return UpdateCheckResult(currentInstall.internalId,
-                            code = UpdateCheckResult.UP_TO_DATE)
-                    } else if (containsCurrentVersion == false) {
-                        logD(game, "Version tag changed!")
-
-                        return UpdateCheckResult(
-                            currentInstall.internalId,
-                            code = UpdateCheckResult.UPDATE_AVAILABLE,
-                            downloadPageUrl = downloadPageUrl,
-                            uploadID = install.uploadId,
-                            newVersionString = install.version,
-                            newTimestamp = install.uploadTimestamp,
-                            newSize = install.fileSize
+                if (result.code == UpdateCheckResult.UPDATE_AVAILABLE) {
+                    if (result.uploadID != null) {
+                        val intent = Intent(context, UpdateNotificationBroadcastReceiver::class.java).apply {
+                            putExtra(UpdateNotificationBroadcastReceiver.EXTRA_INSTALL_ID, result.installationId)
+                        }
+                        pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+                    } else if (game.downloadPageUrl == null) {
+                        val activityIntent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(game.storeUrl).run {
+                                val builder = this.buildUpon()
+                                builder.appendPath("purchase")
+                                builder.build()
+                            },
+                            context,
+                            MainActivity::class.java
                         )
+                        pendingIntent = PendingIntent.getActivity(context, 0, activityIntent, 0)
                     } else {
-                        throw IllegalStateException("Version tag unknown? This should not happen")
+                        val activityIntent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(game.downloadPageUrl),
+                            context,
+                            MainActivity::class.java
+                        )
+                        pendingIntent = PendingIntent.getActivity(context, 0, activityIntent, 0)
                     }
                 } else {
-                    logD(game, "Current install is not a butler upload")
-
-                    if (install.version != null) {
-                        logD(game, "Install became a butler upload? Weird but okay")
-
-                        return UpdateCheckResult(
-                            currentInstall.internalId,
-                            code = UpdateCheckResult.UPDATE_AVAILABLE,
-                            downloadPageUrl = downloadPageUrl,
-                            uploadID = install.uploadId,
-                            newVersionString = install.version,
-                            newTimestamp = install.uploadTimestamp,
-                            newSize = install.fileSize
-                        )
-                    } else {
-                        logD(game, "Nothing changed")
-
-                        return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
-                    }
+                    val activityIntent = Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(game.storeUrl),
+                        context,
+                        MainActivity::class.java
+                    )
+                    pendingIntent = PendingIntent.getActivity(context, 0, activityIntent, 0)
                 }
-            }
-            if (currentInstall.uploadId == Installation.MITCH_UPLOAD_ID) {
-                logD(game, "Checking version tags for Mitch...")
 
-                if (install.version?.contains(BuildConfig.VERSION_NAME) == true) {
-                    logD(game, "Found same version tag")
-
-                    return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
-                }
+                setContentIntent(pendingIntent)
             }
+
+        with(NotificationManagerCompat.from(context)) {
+            notify(NOTIFICATION_TAG_UPDATE_CHECK, install.internalId, builder.build())
         }
-        logD(game, "Didn't find current uploadId")
-        return UpdateCheckResult(currentInstall.internalId,
-            UpdateCheckResult.UPDATE_AVAILABLE,
-            uploadID = suggestedInstall?.uploadId,
-            downloadPageUrl = downloadPageUrl,
-            newTimestamp = suggestedInstall?.uploadTimestamp,
-            newVersionString = suggestedInstall?.version,
-            newSize = suggestedInstall?.fileSize
-        )
     }
 
-    private fun isSameLocale(install1: Installation, install2: Installation): Boolean {
-        return install1.locale == install2.locale && install1.locale != ItchWebsiteParser.UNKNOWN_LOCALE
-    }
 
-    private fun logD(game: Game, message: String) {
-        Log.d(LOGGING_TAG, "(${game.name}) $message")
+    inner class Worker(appContext: Context, params: WorkerParameters)
+        : CoroutineWorker(appContext, params) {
+
+        override suspend fun doWork(): Result {
+            return UpdateChecker(applicationContext).checkUpdates()
+        }
     }
 }

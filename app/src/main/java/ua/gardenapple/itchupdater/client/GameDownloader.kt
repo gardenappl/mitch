@@ -96,11 +96,8 @@ class GameDownloader {
                 game.downloadPageUrl
             } else {
                 val storePageDoc = ItchWebsiteUtils.fetchAndParse(game.storeUrl)
-                val downloadPageUrl =
-                    ItchWebsiteParser.getDownloadUrl(storePageDoc, game.storeUrl)
-                if (downloadPageUrl == null)
-                    throw ItchAccessDeniedException("Can't access download page for ${game.name}")
-                downloadPageUrl.url
+                ItchWebsiteParser.getDownloadUrl(storePageDoc, game.storeUrl)?.url
+                    ?: throw ItchAccessDeniedException("Can't access download page for ${game.name}")
             }
             val doc = ItchWebsiteUtils.fetchAndParse(url)
 
@@ -108,10 +105,7 @@ class GameDownloader {
                 ItchWebsiteParser.getPendingInstallation(doc, uploadId)
             } catch (e: ItchWebsiteParser.UploadNotFoundException) {
                 Log.d(LOGGING_TAG, "Required upload not found, requesting update check...")
-                val updateCheckRequest = OneTimeWorkRequestBuilder<UpdateCheckWorker>()
-                    .build()
-
-                WorkManager.getInstance(context).enqueue(updateCheckRequest)
+                UpdateChecker(context).checkUpdates()
                 return false
             }
 

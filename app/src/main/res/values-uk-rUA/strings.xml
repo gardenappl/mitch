@@ -98,14 +98,18 @@
     <string name="popup_moved_to_downloads">Файл %1$s перемістили в папку завантажень.</string>
     <string name="popup_moving_to_downloads">Переміщуємо файл у папку завантажень…</string>
     <string name="popup_move_to_download_error">Помилка під час переміщення в папку завантажень</string>
-    <string name="library_all_up_to_date">Все оновлено</string>
-    <string name="library_last_update_check_time">Остання перевірка: %s</string>
-    <string name="library_button_check_updates">Перевірити</string>
-    <string name="library_button_go_to_updates">Оновити ➡</string>
-    <string name="library_error">Помилка під час перевірки оновлень</string>
-    <plurals name="library_updates_available">
+    <string name="updates_all_up_to_date">Оновлень немає</string>
+    <string name="updates_last_check_time">Остання перевірка: %s</string>
+    <string name="updates_pull_to_refresh">Потягніть униз, щоб перевірити</string>
+    <string name="nav_updates">Оновлення</string>
+    <string name="updates_error">Помилка під час перевірки оновлень</string>
+    <plurals name="updates_available">
         <item quantity="one">%d оновлення доступне!</item>
         <item quantity="few">%d оновлення доступні!</item>
         <item quantity="many">%d оновлень доступні!</item>
     </plurals>
+    <string name="updates_do_update">Оновити</string>
+    <string name="updates_size_and_name">%1$s | %2$s</string>
+    <string name="updates_version_change">%1$s → %2$s</string>
+    <string name="updates_multiple">Доступні декілька версій</string>
 </resources>

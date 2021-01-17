@@ -43,12 +43,13 @@ class InstallerService : Service() {
             }
             else -> {
                 notifyInstallResult(sessionId, packageName!!, apkName, status)
+                //TODO: BroadcastReceiver for Mitch update
                 runBlocking(Dispatchers.IO) {
                     val db = AppDatabase.getDatabase(applicationContext)
                     val install = db.installDao.findPendingInstallationBySessionId(sessionId)!!
                     Mitch.fileManager.deletePendingFile(install.uploadId)
                     Mitch.fileManager.deleteDownloadedFile(install.uploadId)
-                    Mitch.databaseHandler.onInstallResult(sessionId, packageName, status)
+                    Mitch.databaseHandler.onInstallResult(install, packageName, status)
                 }
             }
         }

@@ -14,13 +14,10 @@ class InstallerDatabaseHandler(val context: Context)  {
         private const val LOGGING_TAG = "InstallDatabaseHandler"
     }
 
-    suspend fun onInstallResult(installSessionId: Int, packageName: String, status: Int) =
+    suspend fun onInstallResult(pendingInstall: Installation, packageName: String, status: Int) =
         withContext(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
             Log.d(LOGGING_TAG, "onInstallComplete")
-
-            val pendingInstall =
-                db.installDao.findPendingInstallationBySessionId(installSessionId) ?: return@withContext
 
             when (status) {
                 PackageInstaller.STATUS_FAILURE,
@@ -46,6 +43,7 @@ class InstallerDatabaseHandler(val context: Context)  {
             }
         }
 
+    //TODO: delete old uploadId(s)
     suspend fun onDownloadComplete(downloadId: Int, isInstallable: Boolean) =
         withContext(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
