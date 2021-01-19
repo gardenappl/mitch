@@ -28,7 +28,7 @@ class UpdateNotificationBroadcastReceiver : BroadcastReceiver() {
 
         runBlocking(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
-            val updateCheckResult = db.updateCheckDao.getUpdateCheckResultForInstall(installId)!!
+            val updateCheckResult = db.updateCheckDao.getUpdateCheckResult(installId)!!
             GameDownloader.startUpdate(context, updateCheckResult)
         }
     }

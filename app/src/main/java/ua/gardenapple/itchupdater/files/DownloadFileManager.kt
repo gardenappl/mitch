@@ -13,6 +13,7 @@ import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
 import java.io.File
+import java.util.*
 
 class DownloadFileManager(private val context: Context, private val fetch: Fetch) {
     companion object {
@@ -21,7 +22,6 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
         const val APK_MIME = "application/vnd.android.package-archive"
         
         const val DOWNLOAD_EXTRA_UPLOAD_ID = "uploadId"
-        const val DOWNLOAD_EXTRA_REPLACED_UPLOAD_ID = "uploadIdReplaced"
     }
 
     private val uploadsPath = File(context.filesDir, "upload")
@@ -36,20 +36,13 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
     /**
      * All previous downloads for the same uploadId must be cancelled at this point
      */
-    internal fun startDownload(
-        url: String,
-        fileName: String,
-        pendingInstall: Installation,
-        replacedUploadId: Int
-    ) {
+    internal fun startDownload(url: String, fileName: String, pendingInstall: Installation) {
         val uploadId = pendingInstall.uploadId
         deletePendingFile(uploadId)
         val request = Request(url, "$pendingPath/$uploadId/$fileName").apply {
             this.networkType = NetworkType.ALL
-            this.extras = Extras(mapOf(
-                DOWNLOAD_EXTRA_UPLOAD_ID to uploadId.toString(),
-                DOWNLOAD_EXTRA_REPLACED_UPLOAD_ID to replacedUploadId.toString()
-            ))
+            this.extras =
+                Extras(Collections.singletonMap(DOWNLOAD_EXTRA_UPLOAD_ID, uploadId.toString()))
         }
 
         fetch.enqueue(request, { updatedRequest ->
@@ -81,24 +74,18 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
         val dir = File(pendingPath, uploadId.toString())
         dir.deleteRecursively()
     }
-
-    fun replacePendingFile(uploadId: Int, replacedUploadId: Int) {
-        if (!shouldHandleFiles(uploadId))
-            return
-        
-        val replacedPath = File(uploadsPath, replacedUploadId.toString())
-        replacedPath.deleteRecursively()
-
-        val pendingPath = File(pendingPath, uploadId.toString())
-        val newPath = File(uploadsPath, uploadId.toString())
-        pendingPath.renameTo(newPath)
-    }
     
     fun replacePendingFile(download: Download) {
         val uploadId = getUploadId(download)
-        val replacedUploadId =
-            Integer.parseInt(download.extras.getString(DOWNLOAD_EXTRA_REPLACED_UPLOAD_ID, ""))
-        replacePendingFile(uploadId, replacedUploadId)
+
+        if (!shouldHandleFiles(uploadId))
+            return
+
+        val newPath = File(uploadsPath, uploadId.toString())
+        newPath.deleteRecursively()
+
+        val pendingPath = File(pendingPath, uploadId.toString())
+        pendingPath.renameTo(newPath)
     }
     
     fun requestCancellation(downloadId: Int, uploadId: Int, callback: (() -> Unit)? = null) {

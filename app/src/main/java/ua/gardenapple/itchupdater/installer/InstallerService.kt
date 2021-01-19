@@ -56,6 +56,11 @@ class InstallerService : Service() {
                     Mitch.fileManager.deletePendingFile(install.uploadId)
                     Installations.deleteOutdatedInstalls(applicationContext, install)
                     Mitch.databaseHandler.onInstallResult(install, packageName, status)
+
+                    db.updateCheckDao.getUpdateCheckResultForUpload(install.uploadId)?.let {
+                        it.isInstalling = false
+                        db.updateCheckDao.insert(it)
+                    }
                 }
             }
         }

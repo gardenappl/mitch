@@ -83,9 +83,10 @@ class SingleUpdateChecker(val db: AppDatabase) {
             logD(currentGame, "Current install: $currentInstall")
 
             if (!ItchWebsiteUtils.hasGameDownloadLinks(updateCheckDoc)) {
+                logD(currentGame, "No download links!")
                 return@withContext UpdateCheckResult(
                     installationId = currentInstall.internalId,
-                    code = UpdateCheckResult.ACCESS_DENIED
+                    code = UpdateCheckResult.EMPTY
                 )
             }
 
@@ -142,6 +143,7 @@ class SingleUpdateChecker(val db: AppDatabase) {
                             code = UpdateCheckResult.UPDATE_AVAILABLE,
                             downloadPageUrl = downloadPageUrl,
                             uploadID = install.uploadId,
+                            newUploadName = install.uploadName,
                             newVersionString = install.version,
                             newTimestamp = install.uploadTimestamp,
                             newSize = install.fileSize
@@ -160,6 +162,7 @@ class SingleUpdateChecker(val db: AppDatabase) {
                             code = UpdateCheckResult.UPDATE_AVAILABLE,
                             downloadPageUrl = downloadPageUrl,
                             uploadID = install.uploadId,
+                            newUploadName = install.uploadName,
                             newVersionString = install.version,
                             newTimestamp = install.uploadTimestamp,
                             newSize = install.fileSize
@@ -186,6 +189,7 @@ class SingleUpdateChecker(val db: AppDatabase) {
             UpdateCheckResult.UPDATE_AVAILABLE,
             uploadID = suggestedInstall?.uploadId,
             downloadPageUrl = downloadPageUrl,
+            newUploadName = suggestedInstall?.uploadName,
             newTimestamp = suggestedInstall?.uploadTimestamp,
             newVersionString = suggestedInstall?.version,
             newSize = suggestedInstall?.fileSize

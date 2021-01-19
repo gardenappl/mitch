@@ -36,11 +36,9 @@ class DownloadCancelBroadcastReceiver : BroadcastReceiver() {
         notificationManager.cancel(NOTIFICATION_TAG_DOWNLOAD, downloadId)
 
         runBlocking(Dispatchers.IO) {
-            Mitch.fileManager.requestCancellation(downloadId, uploadId)
-
             val db = AppDatabase.getDatabase(context)
             val install = db.installDao.getPendingInstallationByDownloadId(downloadId)!!
-            db.installDao.delete(install)
+            Installations.cancelPending(context, install)
         }
     }
 }

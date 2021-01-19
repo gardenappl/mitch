@@ -7,7 +7,6 @@ class InstallUpdateCheckResult(
     @Embedded
     private val updateCheckResultModel: UpdateCheckResultModel,
     val gameName: String,
-    val uploadName: String,
     val currentVersion: String?,
     val packageName: String?,
     val thumbnailUrl: String?,

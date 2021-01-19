@@ -95,7 +95,7 @@ class GameListAdapter internal constructor(
 
         if (gameInstall.status == Installation.STATUS_READY_TO_INSTALL) {
             val notificationService = context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-            notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, gameInstall.downloadOrInstallId)
+            notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, gameInstall.downloadOrInstallId!!)
 
             GlobalScope.launch {
                 Mitch.installer.install(context, gameInstall.downloadOrInstallId, gameInstall.uploadId)
@@ -329,27 +329,14 @@ class GameListAdapter internal constructor(
                 return true
             }
             R.id.cancel -> {
-                if (gameInstall.status == Installation.STATUS_INSTALLING) {
-                    val pkgInstaller = context.packageManager.packageInstaller
-                    try {
-                        pkgInstaller.abandonSession(gameInstall.downloadOrInstallId)
-                    } catch (e: SecurityException) {
-                        Log.e(LOGGING_TAG, "Could not cancel", e)
-                    }
-                }
-                val notificationService = context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-                notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, gameInstall.downloadOrInstallId)
-                runBlocking(Dispatchers.IO) {
-                    if (gameInstall.status == Installation.STATUS_DOWNLOADING) {
-                        Log.d(LOGGING_TAG, "Cancelling ${gameInstall.downloadOrInstallId}")
-                        Mitch.fileManager.requestCancellation(gameInstall.downloadOrInstallId,
-                            gameInstall.uploadId)
-
-                    } else {
-                        Mitch.fileManager.deleteDownloadedFile(gameInstall.uploadId)
-                    }
-                    val db = AppDatabase.getDatabase(context)
-                    db.installDao.delete(gameInstall.installId)
+                runBlocking {
+                    Installations.cancelPending(
+                        context,
+                        gameInstall.status,
+                        gameInstall.downloadOrInstallId!!,
+                        gameInstall.uploadId,
+                        gameInstall.installId
+                    )
                 }
                 Toast.makeText(context, context.getString(R.string.dialog_cancel_download_done),
                     Toast.LENGTH_SHORT

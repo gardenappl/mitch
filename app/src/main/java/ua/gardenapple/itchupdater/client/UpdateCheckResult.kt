@@ -13,6 +13,7 @@ data class UpdateCheckResult(
      */
     val downloadPageUrl: ItchWebsiteParser.DownloadUrl? = null,
 
+    val newUploadName: String? = null,
     val newVersionString: String? = null,
     val newSize: String? = null,
     val newTimestamp: String? = null,
@@ -20,7 +21,12 @@ data class UpdateCheckResult(
     /**
      * Set to null unless [code] is equal to [UpdateCheckResult.ERROR]
      */
-    val errorReport: String? = null
+    val errorReport: String? = null,
+    
+    /**
+     * Used for UI
+     */
+    var isInstalling: Boolean = false
 ) {
     companion object {
         const val UP_TO_DATE = 0
@@ -29,46 +35,5 @@ data class UpdateCheckResult(
         const val UPDATE_AVAILABLE = 3
         const val EMPTY = 4
         const val ERROR = 5
-    }
-
-    override fun toString(): String {
-        val sb = StringBuilder()
-        sb.append("{ Installation ID: ")
-        sb.append(installationId)
-        sb.append(", ")
-        sb.append(when (code) {
-            UP_TO_DATE -> "Up to date"
-            ACCESS_DENIED -> "Access denied"
-            UPDATE_AVAILABLE -> "Update needed"
-            EMPTY -> "Empty"
-            ERROR -> "Error"
-            else -> "Unknown"
-        })
-        if (uploadID != null) {
-            sb.append(", new upload ID: ")
-            sb.append(uploadID)
-        }
-        if (downloadPageUrl != null) {
-            sb.append(", download page: ")
-            sb.append(downloadPageUrl)
-        }
-        if (newVersionString != null) {
-            sb.append(", new version: ")
-            sb.append(newVersionString)
-        }
-        if (newTimestamp != null) {
-            sb.append(", new timestamp: ")
-            sb.append(newTimestamp)
-        }
-        if (newSize != null) {
-            sb.append(", new size: ")
-            sb.append(newSize)
-        }
-        sb.append(" }")
-        if (errorReport != null) {
-            sb.append(", ERROR: ")
-            sb.append(errorReport)
-        }
-        return sb.toString()
     }
 }

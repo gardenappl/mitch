@@ -6,13 +6,13 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import ua.gardenapple.itchupdater.client.UpdateCheckResult
-import ua.gardenapple.itchupdater.client.UpdateCheckResult.Companion.UPDATE_AVAILABLE
 import ua.gardenapple.itchupdater.client.UpdateCheckResult.Companion.UP_TO_DATE
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultModel.Companion.CODE
 import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultModel.Companion.INSTALLATION_ID
 import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultModel.Companion.TABLE_NAME
+import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultModel.Companion.UPLOAD_ID
 
 @Dao
 abstract class UpdateCheckResultDao {
@@ -25,7 +25,6 @@ abstract class UpdateCheckResultDao {
 
     @Query("""
         SELECT update_check_results.*,
-            installations.${Installation.UPLOAD_NAME} as uploadName,
             installations.${Installation.VERSION} as currentVersion,
             installations.${Installation.PACKAGE_NAME} as packageName,
             games.${Game.NAME} as gameName,
@@ -38,9 +37,16 @@ abstract class UpdateCheckResultDao {
     abstract fun getNotUpToDateResults(): LiveData<List<InstallUpdateCheckResult>>
     
     @Query("SELECT * FROM $TABLE_NAME WHERE $INSTALLATION_ID = :installId")
-    protected abstract fun getUpdateCheckResultModelForInstall(installId: Int): UpdateCheckResultModel?
+    protected abstract fun getUpdateCheckResultModel(installId: Int): UpdateCheckResultModel?
 
-    fun getUpdateCheckResultForInstall(installId: Int): UpdateCheckResult? {
-        return getUpdateCheckResultModelForInstall(installId)?.let { Converters.toResult(it) }
+    fun getUpdateCheckResult(installId: Int): UpdateCheckResult? {
+        return getUpdateCheckResultModel(installId)?.let { Converters.toResult(it) }
+    }
+    
+    @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId")
+    protected abstract fun getUpdateCheckResultModelForUpload(uploadId: Int): UpdateCheckResultModel?
+
+    fun getUpdateCheckResultForUpload(uploadId: Int): UpdateCheckResult? {
+        return getUpdateCheckResultModelForUpload(uploadId)?.let { Converters.toResult(it) }
     }
 }

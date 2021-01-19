@@ -172,8 +172,9 @@ class ItchWebsiteParser {
             return "https://${gamePageUri.host}"
         }
 
-
-
+        /**
+         * @return null if user does not have access
+         */
         suspend fun getDownloadUrl(doc: Document, storeUrl: String): DownloadUrl? = withContext(Dispatchers.IO) {
             //The game is free and the store page provides download links
             if(doc.getElementsByClass("download_btn").isNotEmpty())

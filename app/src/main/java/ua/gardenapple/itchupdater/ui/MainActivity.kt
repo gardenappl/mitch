@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
@@ -29,6 +30,8 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     private set
 
     companion object {
+        const val LOGGING_TAG = "MainActivity"
+        
         const val EXTRA_SHOULD_OPEN_LIBRARY = "SHOULD_OPEN_LIBRARY"
         
         private const val ACTIVE_FRAGMENT_KEY: String = "fragment"
@@ -83,8 +86,8 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             }
         }
 
-        if (currentFragmentTag == UPDATES_FRAGMENT_TAG &&
-            supportFragmentManager.findFragmentByTag(UPDATES_FRAGMENT_TAG) == null) {
+        if (currentFragmentTag == UPDATES_FRAGMENT_TAG && 
+                supportFragmentManager.findFragmentByTag(UPDATES_FRAGMENT_TAG) == null) {
             supportFragmentManager.beginTransaction().apply {
                 add(R.id.fragmentContainer, SettingsFragment(), SETTINGS_FRAGMENT_TAG)
                 commit()
@@ -138,6 +141,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     }
 
     override fun onBackPressed() {
+        Log.d(LOGGING_TAG, "onBackPressed")
         if (browseFragment.isVisible) {
             val cantGoBack = browseFragment.onBackPressed()
             if (cantGoBack)
@@ -150,7 +154,13 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        Log.d(LOGGING_TAG, "onSaveInstanceState: $currentFragmentTag")
         outState.putString(ACTIVE_FRAGMENT_KEY, currentFragmentTag)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(LOGGING_TAG, "onResume: $currentFragmentTag")
     }
 
     // Handle light/dark theme changes

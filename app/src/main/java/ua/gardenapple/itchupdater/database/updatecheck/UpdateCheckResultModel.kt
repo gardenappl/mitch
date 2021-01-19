@@ -5,7 +5,6 @@ import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.client.UpdateCheckResult
 import ua.gardenapple.itchupdater.database.installation.Installation
 
-//TODO: flag to display loading bar in UI instead of Upload button
 @Entity(tableName = UpdateCheckResultModel.TABLE_NAME,
     foreignKeys = [
         ForeignKey(
@@ -25,6 +24,9 @@ data class UpdateCheckResultModel(
     
     @ColumnInfo(name = CODE)
     val code: Int,
+
+    @ColumnInfo(name = UPLOAD_NAME)
+    val uploadName: String?,
     
     @ColumnInfo(name = TIMESTAMP)
     val timestamp: String?,
@@ -45,7 +47,10 @@ data class UpdateCheckResultModel(
     val downloadPageIsStorePage: Boolean = false,
 
     @ColumnInfo(name = DOWNLOAD_IS_PERMANENT)
-    val downloadPageIsPermanent: Boolean = false
+    val downloadPageIsPermanent: Boolean = false,
+    
+    @ColumnInfo(name = IS_INSTALLING)
+    val isInstalling: Boolean = false
 ) {
     companion object {
         const val TABLE_NAME = "update_check_results"
@@ -55,10 +60,12 @@ data class UpdateCheckResultModel(
         const val TIMESTAMP = "timestamp"
         const val VERSION = "version"
         const val FILE_SIZE = "file_size"
+        const val UPLOAD_NAME = "upload_name"
         const val UPLOAD_ID = "upload_id"
         const val DOWNLOAD_URL = "download_url"
         const val DOWNLOAD_IS_STORE_PAGE = "download_is_store_page"
         const val DOWNLOAD_IS_PERMANENT = "download_is_permanent"
+        const val IS_INSTALLING = "is_installing"
     }
 }
 
@@ -70,6 +77,7 @@ class Converters {
             return UpdateCheckResult(
                 installationId = model.installId,
                 code = model.code,
+                newUploadName = model.uploadName,
                 newTimestamp = model.timestamp,
                 newSize = model.fileSize,
                 newVersionString = model.versionString,
@@ -78,7 +86,8 @@ class Converters {
                     ItchWebsiteParser.DownloadUrl(
                         it, model.downloadPageIsPermanent, model.downloadPageIsStorePage
                     )
-                }
+                },
+                isInstalling = model.isInstalling
             )
         }
 
@@ -88,13 +97,15 @@ class Converters {
             return UpdateCheckResultModel(
                 installId = result.installationId,
                 code = result.code,
+                uploadName = result.newUploadName,
                 timestamp = result.newTimestamp,
                 versionString = result.newVersionString,
                 fileSize = result.newSize,
                 uploadID = result.uploadID,
                 downloadPageUrl = result.downloadPageUrl?.url,
                 downloadPageIsStorePage = result.downloadPageUrl?.isStorePage == true,
-                downloadPageIsPermanent = result.downloadPageUrl?.isPermanent == true
+                downloadPageIsPermanent = result.downloadPageUrl?.isPermanent == true,
+                isInstalling = result.isInstalling
             )
         }
     }

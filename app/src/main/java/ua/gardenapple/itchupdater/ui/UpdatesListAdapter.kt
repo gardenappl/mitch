@@ -71,23 +71,31 @@ class UpdatesListAdapter internal constructor(
 
 
         if (updateCheckResult.uploadID != null) {
-            binding.updateButton.visibility = View.VISIBLE
-            binding.updateButton.setOnClickListener { _ ->
-                Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_LONG)
-                    .show()
-                GlobalScope.launch(Dispatchers.IO) {
-                    GameDownloader.startUpdate(context, updateCheckResult)
+            if (updateCheckResult.isInstalling) {
+                binding.updateButton.visibility = View.INVISIBLE
+                binding.updateProgressBar.visibility = View.VISIBLE
+            } else {
+                binding.updateButton.visibility = View.VISIBLE
+                binding.updateProgressBar.visibility = View.INVISIBLE
 
-                    val notificationManager =
-                        context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-                    notificationManager.cancel(NOTIFICATION_TAG_UPDATE_CHECK, updateCheckResult.installationId)
+                binding.updateButton.setOnClickListener { _ ->
+                    Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_LONG)
+                        .show()
+                    GlobalScope.launch(Dispatchers.IO) {
+                        GameDownloader.startUpdate(context, updateCheckResult)
+
+                        val notificationManager =
+                            context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
+                        notificationManager.cancel(NOTIFICATION_TAG_UPDATE_CHECK, updateCheckResult.installationId)
+                    }
                 }
             }
             binding.updateCheckUploadInfo.text = context.getString(
                 R.string.updates_size_and_name,
                 updateCheckResult.newSize,
-                availableUpdate.uploadName
+                updateCheckResult.newUploadName
             )
+            binding.updateCheckUploadInfo2.visibility = View.VISIBLE
             binding.updateCheckUploadInfo2.text =
                 if (availableUpdate.currentVersion == null) {
                     updateCheckResult.newTimestamp
@@ -103,6 +111,8 @@ class UpdatesListAdapter internal constructor(
             binding.updateCheckUploadInfo2.visibility = View.INVISIBLE
 
             binding.updateButton.visibility = View.VISIBLE
+            binding.updateProgressBar.visibility = View.INVISIBLE
+
             binding.updateButton.setOnClickListener { _ ->
                 val url = if (updateCheckResult.downloadPageUrl?.isPermanent == true)
                     updateCheckResult.downloadPageUrl.url
@@ -112,12 +122,17 @@ class UpdatesListAdapter internal constructor(
                 if (activity is MainActivity) {
                     activity.browseUrl(url)
                 } else {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url),
-                        context, MainActivity::class.java)
+                    val intent = Intent(
+                        Intent.ACTION_VIEW, Uri.parse(url),
+                        context, MainActivity::class.java
+                    )
                     context.startActivity(intent)
                 }
             }
         } else {
+            binding.updateButton.visibility = View.GONE
+            binding.updateProgressBar.visibility = View.INVISIBLE
+
             binding.updateCheckUploadInfo.text = when (updateCheckResult.code) {
                 UpdateCheckResult.ERROR -> context.resources.getString(R.string.notification_update_fail)
                 UpdateCheckResult.ACCESS_DENIED -> context.resources.getString(R.string.notification_update_access_denied)

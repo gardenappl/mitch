@@ -26,10 +26,27 @@ class GameDownloader {
 
         /**
          * Has a chance to fail if the user does not have access, or if the uploadId is no longer available
-         * (in which case it will perform another update check)
-         * @return true if user has access to uploadId
+         * (in which case it might perform another update check)
          */
-        suspend fun startUpdate(context: Context, update: UpdateCheckResult): Boolean {
+        suspend fun startUpdate(context: Context, update: UpdateCheckResult) {
+            when (doUpdate(context, update)) {
+                UpdateCheckResult.EMPTY,
+                UpdateCheckResult.ACCESS_DENIED ->
+                    UpdateChecker(context).checkUpdates()
+            }
+        }
+
+        /**
+         * Has a chance to fail if the user does not have access, or if the uploadId is no longer available
+         * @return [UpdateCheckResult.EMPTY] if uploadId is not found, otherwise [UpdateCheckResult.ACCESS_DENIED] or [UpdateCheckResult.UPDATE_AVAILABLE]
+         */
+        private suspend fun doUpdate(context: Context, update: UpdateCheckResult): Int {
+            update.isInstalling = true
+            withContext(Dispatchers.IO) {
+                val db = AppDatabase.getDatabase(context)
+                db.updateCheckDao.insert(update)
+            }
+
             val uploadId = update.uploadID!!
             val game = withContext(Dispatchers.IO) {
                 val db = AppDatabase.getDatabase(context)
@@ -69,6 +86,10 @@ class GameDownloader {
             }
 
             val jsonObject = JSONObject(result)
+            Log.d(LOGGING_TAG, jsonObject.toString())
+            if (!jsonObject.has("url"))
+                return UpdateCheckResult.EMPTY
+
             val downloadUrl = jsonObject.getString("url")
 
             Log.d(LOGGING_TAG, "Download URL: $downloadUrl")
@@ -92,25 +113,27 @@ class GameDownloader {
                 }
             }
 
-            val url: String = if (game.downloadPageUrl != null) {
-                game.downloadPageUrl
+            val url: String
+            if (game.downloadPageUrl != null) {
+                url = game.downloadPageUrl
             } else {
                 val storePageDoc = ItchWebsiteUtils.fetchAndParse(game.storeUrl)
-                ItchWebsiteParser.getDownloadUrl(storePageDoc, game.storeUrl)?.url
-                    ?: throw ItchAccessDeniedException("Can't access download page for ${game.name}")
+                url = ItchWebsiteParser.getDownloadUrl(storePageDoc, game.storeUrl)?.url
+                    ?: return UpdateCheckResult.ACCESS_DENIED.also {
+                        Log.d(LOGGING_TAG, "Access denied to downloadUrl for ${game.storeUrl}")
+                    }
             }
+
             val doc = ItchWebsiteUtils.fetchAndParse(url)
 
             val pendingInstall = try {
                 ItchWebsiteParser.getPendingInstallation(doc, uploadId)
             } catch (e: ItchWebsiteParser.UploadNotFoundException) {
-                Log.d(LOGGING_TAG, "Required upload not found, requesting update check...")
-                UpdateChecker(context).checkUpdates()
-                return false
+                return UpdateCheckResult.EMPTY
             }
 
             requestDownload(context, pendingInstall, downloadUrl, contentDisposition, mimeType)
-            return true
+            return UpdateCheckResult.UPDATE_AVAILABLE
         }
 
         /**
@@ -127,8 +150,7 @@ class GameDownloader {
             pendingInstall: Installation,
             url: String,
             contentDisposition: String?,
-            mimeType: String?,
-            replacedUploadId: Int = pendingInstall.uploadId
+            mimeType: String?
         ) = withContext(Dispatchers.IO) {
 
             if (pendingInstall.internalId != 0)
@@ -158,15 +180,14 @@ class GameDownloader {
 
                         runBlocking(Dispatchers.IO) {
                             db.installDao.delete(currentPendingInstall.internalId)
-                            downloadFileManager.startDownload(url, fileName, pendingInstall,
-                                replacedUploadId)
+                            downloadFileManager.startDownload(url, fileName, pendingInstall)
                         }
                     }
                 }
             }
 
             if (!willStartDownload) {
-                downloadFileManager.startDownload(url, fileName, pendingInstall, replacedUploadId)
+                downloadFileManager.startDownload(url, fileName, pendingInstall)
             }
         }
     }
