@@ -154,7 +154,7 @@ class GitlabUpdateChecker(private val context: Context) {
         }
     }
 
-    inner class Worker(appContext: Context, params: WorkerParameters)
+    class Worker(appContext: Context, params: WorkerParameters)
         : CoroutineWorker(appContext, params) {
 
         override suspend fun doWork(): Result {
