@@ -64,6 +64,8 @@ class GameListAdapter internal constructor(
         val game = gameInstalls[position].game
         holder.gameName.text = game.name
         holder.authorOrSubtitle.text = gameInstall.librarySubtitle
+        //Required for marquee animation
+        holder.authorOrSubtitle.isSelected = true
 
         if (type == GameRepository.Type.Pending) {
             holder.progressBarLayout.visibility = View.VISIBLE

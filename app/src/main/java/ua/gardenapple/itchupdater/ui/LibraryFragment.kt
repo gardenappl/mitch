@@ -21,7 +21,6 @@ import ua.gardenapple.itchupdater.database.installation.GameInstallation
 import ua.gardenapple.itchupdater.databinding.LibraryFragmentBinding
 import java.util.*
 
-//TODO: marquee
 class LibraryFragment : Fragment() {
     private var _binding: LibraryFragmentBinding? = null
     // This property is only valid between onCreateView and

@@ -51,6 +51,9 @@ class UpdatesListAdapter internal constructor(
         val binding = holder.binding
 
         binding.updateCheckGameName.text = availableUpdate.gameName
+        //Required for marquee animation
+        binding.updateCheckGameName.isSelected = true
+        binding.updateCheckUploadInfo.isSelected = true
 
         if (availableUpdate.packageName != null) {
             binding.appIcon.visibility = View.VISIBLE
