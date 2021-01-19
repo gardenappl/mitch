@@ -82,8 +82,6 @@ class UpdatesListAdapter internal constructor(
                 binding.updateProgressBar.visibility = View.INVISIBLE
 
                 binding.updateButton.setOnClickListener { _ ->
-                    Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_LONG)
-                        .show()
                     GlobalScope.launch(Dispatchers.IO) {
                         GameDownloader.startUpdate(context, updateCheckResult)
 
