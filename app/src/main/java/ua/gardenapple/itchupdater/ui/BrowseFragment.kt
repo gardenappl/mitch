@@ -483,7 +483,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             (activity as MainActivity).setActiveFragment(MainActivity.LIBRARY_FRAGMENT_TAG, true)
             true
         }
-        appBar.menu.add(Menu.NONE, 11, 11, R.string.nav_settings).setOnMenuItemClickListener {
+        appBar.menu.add(Menu.NONE, 11, 11, R.string.nav_updates).setOnMenuItemClickListener {
+            (activity as MainActivity).setActiveFragment(MainActivity.UPDATES_FRAGMENT_TAG, true)
+            true
+        }
+        appBar.menu.add(Menu.NONE, 12, 12, R.string.nav_settings).setOnMenuItemClickListener {
             (activity as MainActivity).setActiveFragment(MainActivity.SETTINGS_FRAGMENT_TAG, true)
             true
         }
