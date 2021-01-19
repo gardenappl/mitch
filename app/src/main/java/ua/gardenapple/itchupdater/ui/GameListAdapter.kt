@@ -126,11 +126,13 @@ class GameListAdapter internal constructor(
                         db.installDao.deleteFinishedInstallation(gameInstall.uploadId)
                     }
 
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.popup_game_removed, gameInstall.uploadName),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    view.post {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.popup_game_removed, gameInstall.uploadName),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
 
                 setNegativeButton(R.string.dialog_cancel) { _, _ ->
@@ -282,12 +284,15 @@ class GameListAdapter internal constructor(
                     }
 
                     setPositiveButton(R.string.dialog_delete) { _, _ ->
-                        GlobalScope.launch {
+                        GlobalScope.launch(Dispatchers.Main) {
                             Installations.deleteFinishedInstall(context, gameInstall.uploadId)
 
                             Toast.makeText(
                                 context,
-                                context.getString(R.string.popup_game_deleted, gameInstall.uploadName),
+                                context.getString(
+                                        R.string.popup_game_deleted,
+                                        gameInstall.uploadName
+                                    ),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -308,7 +313,7 @@ class GameListAdapter internal constructor(
                     setMessage(context.getString(R.string.dialog_game_remove, gameInstall.externalFileName))
 
                     setPositiveButton(R.string.dialog_remove) { _, _ ->
-                        GlobalScope.launch {
+                        GlobalScope.launch(Dispatchers.Main) {
                             Installations.deleteFinishedInstall(context, gameInstall.uploadId)
                             Toast.makeText(
                                 context,
@@ -331,7 +336,7 @@ class GameListAdapter internal constructor(
                 return true
             }
             R.id.cancel -> {
-                runBlocking {
+                GlobalScope.launch(Dispatchers.Main) {
                     Installations.cancelPending(
                         context,
                         gameInstall.status,
@@ -339,10 +344,12 @@ class GameListAdapter internal constructor(
                         gameInstall.uploadId,
                         gameInstall.installId
                     )
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.dialog_cancel_download_done),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-                Toast.makeText(context, context.getString(R.string.dialog_cancel_download_done),
-                    Toast.LENGTH_SHORT
-                ).show()
                 return true
             }
             else -> return false
