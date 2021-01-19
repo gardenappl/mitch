@@ -92,7 +92,7 @@ class UpdatesFragment : Fragment(), CoroutineScope by MainScope() {
             GlobalScope.launch {
                 UpdateChecker(requireContext()).checkUpdates()
                 GitlabUpdateChecker(requireContext()).checkUpdate()
-                binding.root.isRefreshing = false
+                _binding?.root?.isRefreshing = false
             }
         }
 
