@@ -39,7 +39,7 @@ class DownloadCancelBroadcastReceiver : BroadcastReceiver() {
             Mitch.fileManager.requestCancellation(downloadId, uploadId)
 
             val db = AppDatabase.getDatabase(context)
-            val install = db.installDao.findPendingInstallationByDownloadId(downloadId)!!
+            val install = db.installDao.getPendingInstallationByDownloadId(downloadId)!!
             db.installDao.delete(install)
         }
     }

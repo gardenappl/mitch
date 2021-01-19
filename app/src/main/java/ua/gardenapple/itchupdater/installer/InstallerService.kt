@@ -52,9 +52,9 @@ class InstallerService : Service() {
                 notifyInstallResult(sessionId, packageName!!, apkName, status)
                 runBlocking(Dispatchers.IO) {
                     val db = AppDatabase.getDatabase(applicationContext)
-                    val install = db.installDao.findPendingInstallationBySessionId(sessionId)!!
+                    val install = db.installDao.getPendingInstallationBySessionId(sessionId)!!
                     Mitch.fileManager.deletePendingFile(install.uploadId)
-                    Mitch.fileManager.deleteDownloadedFile(install.uploadId)
+                    Installations.deleteOutdatedInstalls(applicationContext, install)
                     Mitch.databaseHandler.onInstallResult(install, packageName, status)
                 }
             }
@@ -96,7 +96,6 @@ class InstallerService : Service() {
                 setContentText(message)
 //                priority = NotificationCompat.PRIORITY_HIGH
                 if (status == PackageInstaller.STATUS_SUCCESS) {
-                    
                     context.packageManager.getLaunchIntentForPackage(packageName)?.also { intent ->
                         val pendingIntent =
                             PendingIntent.getActivity(context, 0, intent, 0)

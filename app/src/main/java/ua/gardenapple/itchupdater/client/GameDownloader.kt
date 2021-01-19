@@ -134,6 +134,8 @@ class GameDownloader {
             if (pendingInstall.internalId != 0)
                 throw IllegalArgumentException("Pending installation already has internalId!")
 
+            Log.d(LOGGING_TAG, "Downloading, pending install: $pendingInstall")
+
             val uploadId = pendingInstall.uploadId
             val fileName = if (mimeType == "application/octet-stream") {
                 URLUtil.guessFileName(url, contentDisposition, null)

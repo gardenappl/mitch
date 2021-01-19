@@ -16,6 +16,7 @@ import ua.gardenapple.itchupdater.database.installation.Installation.Companion.S
  * When a user clicks the download button, the data from the page is saved as a "pending" Installation.
  * It may be stored alongside the old Installation.
  * Then, once the download/installation is complete, the pending Installation becomes a regular Installation.
+ * Also, any Installations on this device which are not in [availableUploadIds] get deleted
  */
 @Entity(tableName = Installation.TABLE_NAME,
     foreignKeys = [
@@ -33,7 +34,7 @@ import ua.gardenapple.itchupdater.database.installation.Installation.Companion.S
 data class Installation(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = INTERNAL_ID)
-    var internalId: Int = 0,
+    var internalId: Int,
 
     @ColumnInfo(name = GAME_ID)
     val gameId: Int,
@@ -44,15 +45,25 @@ data class Installation(
      */
     @ColumnInfo(name = UPLOAD_ID)
     val uploadId: Int,
+    
+    /**
+     * Encoded as a string for the purposes of SQL, please don't use this constructor directly.
+     *
+     * Array of other upload Ids which are available alongside this install.
+     * Any local installs whose uploadIds are not in this array will be deleted.
+     * If set to null, only install with same [uploadId] is deleted
+     */
+    @ColumnInfo(name = AVAILABLE_UPLOAD_IDS)
+    val availableUploadIdsString: String?,
 
     /**
      * Set to null for downloads which are not installable.
      */
     @ColumnInfo(name = PACKAGE_NAME)
-    val packageName: String? = null,
+    val packageName: String?,
 
     @ColumnInfo(name = STATUS)
-    var status: Int = STATUS_INSTALLED,
+    var status: Int,
 
     /**
      * null if [STATUS_INSTALLED]
@@ -60,19 +71,19 @@ data class Installation(
      * installId if [STATUS_INSTALLING]
      */
     @ColumnInfo(name = DOWNLOAD_OR_INSTALL_ID)
-    var downloadOrInstallId: Int? = null,
+    var downloadOrInstallId: Int?,
 
     /**
      * Affects timestamps and version strings.
      */
     @ColumnInfo(name = LOCALE)
-    val locale: String = ItchWebsiteParser.UNKNOWN_LOCALE,
+    val locale: String,
 
     /**
      * Nullable because the version string is not available for some projects.
      */
     @ColumnInfo(name = VERSION)
-    val version: String? = null,
+    val version: String?,
 
     @ColumnInfo(name = UPLOAD_NAME)
     val uploadName: String,
@@ -87,21 +98,53 @@ data class Installation(
      * Nullable because the build timestamp is not available for some projects.
      */
     @ColumnInfo(name = TIMESTAMP)
-    val uploadTimestamp: String? = null,
+    val uploadTimestamp: String?,
 
     /**
      * A bitmask of platforms which this upload supports
      */
     @ColumnInfo(name = PLATFORMS)
     @Deprecated(message = "Use 'platforms' field instead")
-    val platformFlags: Int = PLATFORM_NONE,
+    val platformFlags: Int,
 
     /**
      * Path to file in public Downloads/ folder, if it has been moved there
      */
     @ColumnInfo(name = EXTERNAL_FILE_NAME)
-    val externalFileName: String? = null
+    val externalFileName: String?
 ) {
+    constructor(
+        internalId: Int = 0,
+        gameId: Int,
+        uploadId: Int,
+        availableUploadIds: List<Int>?,
+        packageName: String? = null,
+        status: Int = STATUS_INSTALLED,
+        downloadOrInstallId: Int? = null,
+        locale: String = ItchWebsiteParser.UNKNOWN_LOCALE,
+        version: String? = null,
+        uploadName: String,
+        fileSize: String,
+        uploadTimestamp: String? = null,
+        platformFlags: Int = PLATFORM_NONE,
+        externalFileName: String? = null
+    ) : this(
+        internalId = internalId,
+        gameId = gameId,
+        uploadId = uploadId,
+        availableUploadIdsString = availableUploadIds?.joinToString(separator = ","),
+        packageName = packageName,
+        status = status,
+        downloadOrInstallId = downloadOrInstallId,
+        locale = locale,
+        version = version,
+        uploadName = uploadName,
+        fileSize = fileSize,
+        uploadTimestamp = uploadTimestamp,
+        platformFlags = platformFlags,
+        externalFileName = externalFileName
+    )
+
     companion object {
         const val TABLE_NAME = "installations"
 
@@ -122,6 +165,7 @@ data class Installation(
         const val LOCALE = "locale"
         const val PLATFORMS = "platforms"
         const val EXTERNAL_FILE_NAME = "external_file_name"
+        const val AVAILABLE_UPLOAD_IDS = "available_uploads"
 
         const val STATUS_INSTALLED = 0
         const val STATUS_DOWNLOADING = 1
@@ -134,15 +178,20 @@ data class Installation(
         const val PLATFORM_LINUX = 4
         const val PLATFORM_ANDROID = 8
     }
-    
-    //For backwards compatibility
+
+
     @Ignore
-    val platforms: Int
-    init {
-        @Suppress("DEPRECATION")
-        platforms = if (packageName != null)
-            platformFlags or PLATFORM_ANDROID
-        else
-            platformFlags
-    }
+    val availableUploadIds: List<Int>? =
+        availableUploadIdsString?.split(',')?.map { uploadIdString ->
+            Integer.parseInt(uploadIdString)
+        }
+
+
+    //TODO: this was only used as a backwards compatibility measure with older versions of Mitch.
+    @Ignore
+    @Suppress("DEPRECATION")
+    val platforms: Int = if (packageName != null)
+        platformFlags or PLATFORM_ANDROID
+    else
+        platformFlags
 }

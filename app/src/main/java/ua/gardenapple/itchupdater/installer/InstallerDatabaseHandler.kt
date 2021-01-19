@@ -36,27 +36,20 @@ class InstallerDatabaseHandler(val context: Context)  {
                         packageName = packageName
                     )
                     Log.d(LOGGING_TAG, "New install: $newInstall")
-                    db.installDao.deleteFinishedInstallation(packageName)
                     db.installDao.delete(pendingInstall)
                     db.installDao.insert(newInstall)
                 }
             }
         }
 
-    //TODO: delete old uploadId(s)
-    suspend fun onDownloadComplete(downloadId: Int, isInstallable: Boolean) =
+    suspend fun onDownloadComplete(pendingInstall: Installation, isInstallable: Boolean) =
         withContext(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
-            Log.d(LOGGING_TAG, "onDownloadComplete")
-
-            val pendingInstall =
-                db.installDao.findPendingInstallationByDownloadId(downloadId) ?: return@withContext
 
             if (isInstallable) {
                 pendingInstall.status = Installation.STATUS_READY_TO_INSTALL
                 db.installDao.update(pendingInstall)
             } else {
-                db.installDao.deleteFinishedInstallation(pendingInstall.uploadId)
                 pendingInstall.status = Installation.STATUS_INSTALLED
                 pendingInstall.downloadOrInstallId = null
                 db.installDao.update(pendingInstall)
@@ -68,7 +61,7 @@ class InstallerDatabaseHandler(val context: Context)  {
         Log.d(LOGGING_TAG, "onDownloadFailed")
 
         val pendingInstall =
-            db.installDao.findPendingInstallationByDownloadId(downloadId) ?: return@withContext
+            db.installDao.getPendingInstallationByDownloadId(downloadId) ?: return@withContext
         db.installDao.delete(pendingInstall)
     }
 
@@ -78,7 +71,7 @@ class InstallerDatabaseHandler(val context: Context)  {
             Log.d(LOGGING_TAG, "onInstallStart")
 
             val pendingInstall =
-                db.installDao.findPendingInstallationByDownloadId(downloadId) ?: return@withContext
+                db.installDao.getPendingInstallationByDownloadId(downloadId) ?: return@withContext
 
             pendingInstall.status = Installation.STATUS_INSTALLING
             pendingInstall.downloadOrInstallId = pendingInstallSessionId

@@ -19,7 +19,7 @@ import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultModel
 
 @Database(
     entities = [Game::class, Installation::class, UpdateCheckResultModel::class],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -54,6 +54,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(Migrations.Migration_4_5)
                 .addMigrations(Migrations.Migration_5_6)
                 .addMigrations(Migrations.Migration_6_7)
+                .addMigrations(Migrations.Migration_7_8)
                 .build()
                 .also { appDb ->
                     appDb.runInTransaction {
@@ -91,6 +92,7 @@ abstract class AppDatabase : RoomDatabase() {
         val installation = Installation(
             gameId = Game.MITCH_GAME_ID,
             uploadId = Installation.MITCH_UPLOAD_ID,
+            availableUploadIds = null,
             packageName = context.packageName,
             locale = Game.MITCH_LOCALE,
             version = BuildConfig.VERSION_NAME,

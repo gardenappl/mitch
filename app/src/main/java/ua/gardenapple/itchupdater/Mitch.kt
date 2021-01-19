@@ -165,6 +165,7 @@ class Mitch : Application() {
         fetch = fetchConfig.getNewFetchInstanceFromConfiguration()
         fetch.addListener(FileDownloadListener(applicationContext))
         fileManager = DownloadFileManager(applicationContext, fetch)
+        fileManager.setup()
 
         databaseHandler = InstallerDatabaseHandler(applicationContext)
         externalFileManager = ExternalFileManager()

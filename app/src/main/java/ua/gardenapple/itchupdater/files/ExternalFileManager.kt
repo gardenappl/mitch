@@ -18,7 +18,7 @@ class ExternalFileManager {
     }
 
     private var lastUploadId: Int = 0
-    private lateinit var moveToDownloadsCallback: (String) -> Unit
+    private lateinit var moveToDownloadsCallback: (String?) -> Unit
     
     private lateinit var lastExternalFileName: String
     private lateinit var getViewIntentCallback: (Intent?) -> Unit
@@ -29,7 +29,7 @@ class ExternalFileManager {
      * @param uploadId downlaoded file to move
      * @param callback function which receives the new file name: it should be usable with [getViewIntent]
      */
-    fun moveToDownloads(activity: Activity, uploadId: Int, callback: (String) -> Unit) {
+    fun moveToDownloads(activity: Activity, uploadId: Int, callback: (String?) -> Unit) {
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                 PackageManager.PERMISSION_GRANTED) {
             doMoveToDownloads(uploadId, callback)
@@ -46,8 +46,12 @@ class ExternalFileManager {
         doMoveToDownloads(lastUploadId, moveToDownloadsCallback)
     }
     
-    private fun doMoveToDownloads(uploadId: Int, callback: (String) -> Unit) {
-        val file = Mitch.fileManager.getDownloadedFile(uploadId)!!
+    private fun doMoveToDownloads(uploadId: Int, callback: (String?) -> Unit) {
+        val file = Mitch.fileManager.getDownloadedFile(uploadId)
+        if (file?.exists() != true) {
+            callback(null)
+            return
+        }
         val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         var attemptBaseName = file.nameWithoutExtension
         val extension = file.extension

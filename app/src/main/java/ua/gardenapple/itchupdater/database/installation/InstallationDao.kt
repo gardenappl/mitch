@@ -27,14 +27,14 @@ abstract class InstallationDao {
     @Query("SELECT * FROM $TABLE_NAME WHERE $STATUS = $STATUS_INSTALLED")
     abstract fun getFinishedInstallationsSync(): List<Installation>
 
+    @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS = $STATUS_INSTALLED")
+    abstract fun getFinishedInstallationsForGame(gameId: Int): List<Installation>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insert(vararg installations: Installation)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insert(installations: List<Installation>)
-
-    @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS = $STATUS_INSTALLED")
-    abstract fun getInstallations(uploadId: Int): List<Installation>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS != $STATUS_INSTALLED")
     abstract fun getPendingInstallations(uploadId: Int): List<Installation>
@@ -67,8 +67,8 @@ abstract class InstallationDao {
     abstract fun getInstallationById(internalId: Int): Installation?
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :downloadId AND $STATUS != $STATUS_INSTALLING")
-    abstract fun findPendingInstallationByDownloadId(downloadId: Int): Installation?
+    abstract fun getPendingInstallationByDownloadId(downloadId: Int): Installation?
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :installSessionId AND $STATUS = $STATUS_INSTALLING")
-    abstract fun findPendingInstallationBySessionId(installSessionId: Int): Installation?
+    abstract fun getPendingInstallationBySessionId(installSessionId: Int): Installation?
 }

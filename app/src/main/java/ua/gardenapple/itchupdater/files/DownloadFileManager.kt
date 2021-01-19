@@ -27,6 +27,11 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
     private val uploadsPath = File(context.filesDir, "upload")
     private val pendingPath = File(context.filesDir, "pending")
 
+    
+    fun setup() {
+        uploadsPath.mkdirs()
+        pendingPath.mkdirs()
+    }
 
     /**
      * All previous downloads for the same uploadId must be cancelled at this point

@@ -13,6 +13,7 @@ import com.tonyodev.fetch2.FetchListener
 import com.tonyodev.fetch2core.DownloadBlock
 import kotlinx.coroutines.*
 import ua.gardenapple.itchupdater.*
+import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.ui.MainActivity
 import java.io.File
 
@@ -116,6 +117,10 @@ class FileDownloadListener(private val context: Context) : FetchListener {
         val uploadId = downloadFileManager.getUploadId(download)
 
         runBlocking(Dispatchers.IO) {
+            val db = AppDatabase.getDatabase(context)
+            val pendingInstall = db.installDao.getPendingInstallationByDownloadId(download.id)!!
+            Installations.deleteOutdatedInstalls(context, pendingInstall)
+
             val notificationFile: File
             if (isApk) {
                 notificationFile = downloadFileManager.getPendingFile(uploadId)!!
@@ -124,7 +129,7 @@ class FileDownloadListener(private val context: Context) : FetchListener {
                 notificationFile = downloadFileManager.getDownloadedFile(uploadId)!!
             }
             createResultNotification(context, notificationFile, download.id, isApk)
-            Mitch.databaseHandler.onDownloadComplete(download.id, isApk)
+            Mitch.databaseHandler.onDownloadComplete(pendingInstall, isApk)
         }
         downloadFileManager.removeFetchDownload(download.id)
     }

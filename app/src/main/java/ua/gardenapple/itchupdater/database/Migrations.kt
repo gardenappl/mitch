@@ -103,5 +103,11 @@ class Migrations {
                 database.execSQL("ALTER TABLE installations ADD COLUMN external_file_name TEXT DEFAULT NULL")
             }
         }
+
+        val Migration_7_8 = object : Migration(7, 8) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE installations ADD COLUMN available_uploads TEXT DEFAULT NULL")
+            }
+        }
     }
 }

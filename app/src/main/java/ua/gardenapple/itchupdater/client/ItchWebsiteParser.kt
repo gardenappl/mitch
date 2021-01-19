@@ -85,20 +85,25 @@ class ItchWebsiteParser {
                 throw IllegalStateException("Unparse-able game page")
 
             val uploadDivs: List<Element>
+            val uploadButtons = doc.getElementsByAttribute("data-upload_id")
+            val uploadIds = uploadButtons.map { element ->
+                Integer.parseInt(element.attr("data-upload_id"))
+            }
 
             if (requiredUploadId != null) {
-                val uploadButtons =
-                    doc.getElementsByAttributeValue("data-upload_id", requiredUploadId.toString())
-                if (uploadButtons.isEmpty()) {
+                val uploadButton = uploadButtons.find { element ->
+                    element.attr("data-upload_id") == requiredUploadId.toString()
+                }
+                        
+                if (uploadButton == null) {
                     if (doc.getElementsByClass("uploads").isNotEmpty())
                         throw UploadNotFoundException(requiredUploadId)
                     else
                         throw IllegalStateException("Unparse-able game page")
                 }
-                uploadDivs = Collections.singletonList(uploadButtons.first().parent())
+                uploadDivs = Collections.singletonList(uploadButton.parent())
             } else {
-                uploadDivs = doc.getElementsByClass("download_btn").first().parent()
-                    .parent().children()
+                uploadDivs = uploadButtons.first().parent().parent().children()
             }
             
             val locale = getLocale(doc)
@@ -147,6 +152,7 @@ class ItchWebsiteParser {
                 result.add(Installation(
                     gameId = gameId,
                     uploadId = uploadId,
+                    availableUploadIds = uploadIds,
                     locale = locale,
                     version = versionName,
                     uploadTimestamp = versionDate,
@@ -256,7 +262,7 @@ class ItchWebsiteParser {
 
             if (doc.body().hasClass("locale_en"))
                 return ENGLISH_LOCALE
-            throw RuntimeException("Could not determine locale of web page")
+            return UNKNOWN_LOCALE
         }
 
         private fun getTimestamp(infoTable: Element): String? {

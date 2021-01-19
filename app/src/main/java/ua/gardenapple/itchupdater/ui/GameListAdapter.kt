@@ -23,6 +23,7 @@ import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.GameRepository
 import ua.gardenapple.itchupdater.database.installation.GameInstallation
 import ua.gardenapple.itchupdater.database.installation.Installation
+import ua.gardenapple.itchupdater.installer.Installations
 
 class GameListAdapter internal constructor(
     private val activity: Activity,
@@ -217,6 +218,19 @@ class GameListAdapter internal constructor(
                 GlobalScope.launch(Dispatchers.IO) {
                     try {
                         Mitch.externalFileManager.moveToDownloads(activity, gameInstall.uploadId) { externalName ->
+                            if (externalName == null) {
+                                Log.e(LOGGING_TAG, "externalName is null! " +
+                                        "This should only happen with old downloads")
+
+                                GlobalScope.launch(Dispatchers.Main) {
+                                    Toast.makeText(
+                                        context,
+                                        R.string.popup_move_to_download_error,
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+
                             GlobalScope.launch(Dispatchers.IO) {
                                 val db = AppDatabase.getDatabase(context)
                                 val install =
@@ -235,6 +249,7 @@ class GameListAdapter internal constructor(
                             }
                         }
                     } catch(e: Exception) {
+                        Log.e(LOGGING_TAG, "Error while moving: ", e)
                         withContext(Dispatchers.Main) {
                             Toast.makeText(context, R.string.popup_move_to_download_error, Toast.LENGTH_LONG)
                                 .show()
@@ -252,34 +267,28 @@ class GameListAdapter internal constructor(
                 }
 
                 val dialog = AlertDialog.Builder(context).apply {
-                    setTitle(R.string.dialog_game_delete_title)
-                    
                     runBlocking(Dispatchers.IO) {
                         if (Mitch.fileManager.getDownloadedFile(
                                 gameInstall.uploadId)?.exists() == true) {
+                            setTitle(R.string.dialog_game_delete_title)
                             setMessage(context.getString(R.string.dialog_game_delete, gameInstall.uploadName))
                         } else {
                             //this should only be possible in old versions of Mitch
-                            setMessage("""This file is from an older version of Mitch. This means it won't actually be deleted, instead it will stay in your Download folder.
-                                |
-                                |You'll stop receiving update notifications for this file, but if you want to delete it, you'll have to do it manually.
-                                |Sorry for the confusion, this shouldn't happen with files downloaded on newer versions.
-                            """.trimMargin())
+                            setTitle(R.string.dialog_game_remove_title)
+                            setMessage(context.getString(R.string.dialog_game_remove, gameInstall.uploadName))
                         }
                     }
 
                     setPositiveButton(R.string.dialog_delete) { _, _ ->
-                        runBlocking(Dispatchers.IO) {
-                            val db = AppDatabase.getDatabase(context)
-                            db.installDao.deleteFinishedInstallation(gameInstall.uploadId)
-                            Mitch.fileManager.deleteDownloadedFile(gameInstall.uploadId)
-                        }
+                        GlobalScope.launch {
+                            Installations.deleteFinishedInstall(context, gameInstall.uploadId)
 
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.popup_game_deleted, gameInstall.uploadName),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.popup_game_deleted, gameInstall.uploadName),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
 
                     setNegativeButton(R.string.dialog_cancel) { _, _ ->
@@ -294,19 +303,20 @@ class GameListAdapter internal constructor(
             R.id.remove -> {
                 val dialog = AlertDialog.Builder(context).apply {
                     setTitle(R.string.dialog_game_remove_title)
-                    setMessage(context.getString(R.string.dialog_game_remove, gameInstall.uploadName))
+                    setMessage(context.getString(R.string.dialog_game_remove, gameInstall.externalFileName))
 
                     setPositiveButton(R.string.dialog_remove) { _, _ ->
-                        runBlocking(Dispatchers.IO) {
-                            val db = AppDatabase.getDatabase(context)
-                            db.installDao.deleteFinishedInstallation(gameInstall.uploadId)
+                        GlobalScope.launch {
+                            Installations.deleteFinishedInstall(context, gameInstall.uploadId)
+                            Toast.makeText(
+                                context,
+                                context.getString(
+                                    R.string.popup_game_removed,
+                                    gameInstall.uploadName
+                                ),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
-
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.popup_game_removed, gameInstall.uploadName),
-                            Toast.LENGTH_SHORT
-                        ).show()
                     }
 
                     setNegativeButton(R.string.dialog_cancel) { _, _ ->
