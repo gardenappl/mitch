@@ -114,4 +114,5 @@
     <string name="updates_multiple">Доступні декілька версій</string>
     <string name="library_no_apps">Встановлених додатків немає.</string>
     <string name="library_no_downloads">Завантажень немає.</string>
+    <string name="dialog_dont_show_again">Не показувати це знову</string>
 </resources>

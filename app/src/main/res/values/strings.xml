@@ -113,4 +113,5 @@
     <string name="updates_multiple">Multiple versions available</string>
     <string name="library_no_apps">No apps installed.</string>
     <string name="library_no_downloads">Nothing downloaded.</string>
+    <string name="dialog_dont_show_again">Don\'t show this again</string>
 </resources>

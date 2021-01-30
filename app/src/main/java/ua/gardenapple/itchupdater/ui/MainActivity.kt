@@ -7,12 +7,15 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -20,6 +23,8 @@ import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.databinding.ActivityMainBinding
+import ua.gardenapple.itchupdater.databinding.DialogDeprecateBinding
+import java.time.Instant
 
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
@@ -138,6 +143,44 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         } else if (intent.getBooleanExtra(EXTRA_SHOULD_OPEN_LIBRARY, false)) {
             setActiveFragment(LIBRARY_FRAGMENT_TAG)
         }
+
+        if (BuildConfig.FLAVOR == FLAVOR_FDROID)
+            return
+
+        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
+        if (sharedPrefs.getBoolean(PREF_DONT_SHOW_DEPRECATION_DIALOG, false))
+            return
+        
+        val dialog = AlertDialog.Builder(this).apply {
+            setTitle("Announcement")
+            val binding = DialogDeprecateBinding.inflate(LayoutInflater.from(context))
+            //TODO: remove dialog for Gitlab
+            //TODO: remove dialog for itch.io
+            if (BuildConfig.FLAVOR == FLAVOR_GITLAB)
+                binding.textView.text = "The GitLab version of Mitch will be deprecated next month. Please switch to F-Droid instead."
+            else if (BuildConfig.FLAVOR == FLAVOR_ITCHIO)
+                binding.textView.text = "The itch.io version of Mitch will cost $2, starting next Saturday (February 6th). If you want to keep using Mitch for free, consider switching to F-Droid."
+            else
+                binding.textView.text = "Ayy lmao, if you see this, this is a bug"
+
+            setView(binding.root)
+            setNegativeButton(android.R.string.cancel) { _, _ ->
+                sharedPrefs.edit().run {
+                    this.putBoolean(PREF_DONT_SHOW_DEPRECATION_DIALOG, binding.dontShowAgain.isChecked)
+                    apply()
+                }
+            }
+            setPositiveButton("Read more") { _, _ ->
+                browseUrl("https://gardenapple.itch.io/mitch/devlog/217402/f-droid-release-and-paid-version")
+
+                sharedPrefs.edit().run {
+                    this.putBoolean(PREF_DONT_SHOW_DEPRECATION_DIALOG, binding.dontShowAgain.isChecked)
+                    apply()
+                }
+            }
+            create()
+        }
+        dialog.show()
     }
 
     override fun onBackPressed() {

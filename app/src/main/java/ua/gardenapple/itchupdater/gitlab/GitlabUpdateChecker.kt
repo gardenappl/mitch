@@ -26,6 +26,7 @@ import java.io.IOException
 /**
  * Check if an update is available for the GitLab build and provide notification.
  */
+@Deprecated("users should switch to F-Droid")
 class GitlabUpdateChecker(private val context: Context) {
     companion object {
         private const val LOGGING_TAG = "SelfUpdaterWorker"

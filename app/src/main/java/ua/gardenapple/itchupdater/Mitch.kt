@@ -47,6 +47,7 @@ const val FLAVOR_ITCHIO = "itchio"
 const val FLAVOR_GITLAB = "gitlab"
 
 const val PREF_LAST_UPDATE_CHECK = "ua.gardenapple.itchupdater.lastupdatecheck"
+const val PREF_DONT_SHOW_DEPRECATION_DIALOG = "ua.gardenapple.itchupdater.dontshowdeprecation"
 const val PREF_UPDATE_CHECKING = "ua.gardenapple.itchupdater.updatechecking"
 
 //TODO: Catch all app's exceptions in a nice way

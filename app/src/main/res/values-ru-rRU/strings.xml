@@ -114,4 +114,5 @@
     <string name="updates_multiple">Доступно несколько версий</string>
     <string name="library_no_apps">Нет установленых приложений.</string>
     <string name="library_no_downloads">Ничего не загружено.</string>
+    <string name="dialog_dont_show_again">Не показывать это снова</string>
 </resources>

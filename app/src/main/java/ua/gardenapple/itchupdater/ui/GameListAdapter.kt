@@ -116,31 +116,34 @@ class GameListAdapter internal constructor(
                 }
                 //File is missing
                 val dialog = AlertDialog.Builder(context).apply {
-                setTitle(R.string.dialog_missing_file_title)
-                setMessage(context.getString(R.string.dialog_missing_file,
+                    setTitle(R.string.dialog_missing_file_title)
+                    setMessage(context.getString(R.string.dialog_missing_file,
                     gameInstall.externalFileName, gameInstall.uploadName))
 
-                setPositiveButton(R.string.dialog_remove) { _, _ ->
-                    runBlocking(Dispatchers.IO) {
-                        val db = AppDatabase.getDatabase(context)
-                        db.installDao.deleteFinishedInstallation(gameInstall.uploadId)
+                    setPositiveButton(R.string.dialog_remove) { _, _ ->
+                        runBlocking(Dispatchers.IO) {
+                            val db = AppDatabase.getDatabase(context)
+                            db.installDao.deleteFinishedInstallation(gameInstall.uploadId)
+                        }
+
+                        view.post {
+                            Toast.makeText(
+                                context,
+                                context.getString(
+                                    R.string.popup_game_removed,
+                                    gameInstall.uploadName
+                                ),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
 
-                    view.post {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.popup_game_removed, gameInstall.uploadName),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    setNegativeButton(R.string.dialog_cancel) { _, _ ->
+                        //no-op
                     }
-                }
 
-                setNegativeButton(R.string.dialog_cancel) { _, _ ->
-                    //no-op
+                    create()
                 }
-
-                create()
-            }
                 dialog.show()
             }
 
