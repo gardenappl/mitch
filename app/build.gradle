@@ -31,8 +31,9 @@ android {
         applicationId "ua.gardenapple.itchupdater"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 19
-        versionName "1.2.7"
+        versionCode 20
+        //If we reach x.y.10, do x.y.010 instead
+        versionName "1.2.8"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         if (shouldSign) {
             signingConfig signingConfigs.sign
