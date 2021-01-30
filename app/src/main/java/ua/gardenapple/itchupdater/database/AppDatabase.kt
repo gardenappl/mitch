@@ -84,7 +84,7 @@ abstract class AppDatabase : RoomDatabase() {
             name = "Mitch",
             author = "gardenapple",
             storeUrl = Game.MITCH_STORE_PAGE,
-            thumbnailUrl = "https://img.itch.zone/aW1nLzQzMzIxOTQucG5n/original/QCV8Wx.png",
+            thumbnailUrl = "https://img.itch.zone/aW1nLzUwODcyNjUucG5n/315x250%23c/bSv0D9.png",
             locale = Game.MITCH_LOCALE
         )
         Log.d(LOGGING_TAG, "Adding game $game")
