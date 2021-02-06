@@ -19,6 +19,7 @@ import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.installer.UpdateNotificationBroadcastReceiver
 import ua.gardenapple.itchupdater.ui.MainActivity
+import java.net.SocketTimeoutException
 import java.time.Instant
 
 class UpdateChecker(private val context: Context) {
@@ -76,6 +77,8 @@ class UpdateChecker(private val context: Context) {
                             )
                         }
                     } catch (e: CancellationException) {
+                        return@launch
+                    } catch (e: SocketTimeoutException) {
                         return@launch
                     } catch (e: Exception) {
                         result = UpdateCheckResult(
