@@ -3,4 +3,7 @@
     <color name="colorBackground">@color/colorPrimaryDark</color>
     <color name="colorBackgroundMain">#000</color>
     <color name="colorForeground">@color/colorPrimary</color>
+    <color name="colorForegroundSecondary">#ccc</color>
+
+    <bool name="defaultStatusBarLight">false</bool>
 </resources>

@@ -6,4 +6,7 @@
     <color name="colorBackground">@color/colorPrimary</color>
     <color name="colorBackgroundMain">@color/colorBackground</color>
     <color name="colorForeground">@color/colorPrimaryDark</color>
+    <color name="colorForegroundSecondary">#aaa</color>
+
+    <bool name="defaultStatusBarLight">true</bool>
 </resources>

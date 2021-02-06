@@ -18,6 +18,7 @@ import androidx.annotation.Keep
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ShareCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
@@ -32,6 +33,7 @@ import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.client.ItchBrowseHandler
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.databinding.BrowseFragmentBinding
+import ua.gardenapple.itchupdater.databinding.DialogWebPromptBinding
 import java.io.ByteArrayInputStream
 import java.io.File
 
@@ -614,7 +616,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         override fun onPageFinished(view: WebView, url: String) {
             view.evaluateJavascript("""
                     {
-                        //local scope variables only
                         let downloadButtons = document.getElementsByClassName("download_btn");
                         for (var downloadButton of downloadButtons) {
                             let uploadId = downloadButton.getAttribute("data-upload_id");
@@ -716,6 +717,82 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                             View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
                             View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
             }
+        }
+
+        override fun onJsAlert(
+            view: WebView?,
+            url: String?,
+            message: String?,
+            result: JsResult?
+        ): Boolean {
+            val dialog = AlertDialog.Builder(requireContext()).apply {
+                setTitle(resources.getString(R.string.dialog_web_alert, url))
+                setMessage(message)
+                setPositiveButton(android.R.string.ok) { _, _ ->
+                    result!!.confirm()
+                }
+                setCancelable(false)
+
+                create()
+            }
+            dialog.show()
+            return true
+        }
+
+        override fun onJsConfirm(
+            view: WebView?,
+            url: String?,
+            message: String?,
+            result: JsResult?
+        ): Boolean {
+            val dialog = AlertDialog.Builder(requireContext()).apply {
+                setTitle(resources.getString(R.string.dialog_web_prompt, url))
+                setMessage(message)
+                setPositiveButton(android.R.string.ok) { _, _ ->
+                    result!!.confirm()
+                }
+                setNegativeButton(android.R.string.cancel) { _, _ ->
+                    result!!.cancel()
+                }
+                setOnCancelListener { 
+                    result!!.cancel()
+                }
+
+                create()
+            }
+            dialog.show()
+            return true
+        }
+
+        override fun onJsPrompt(
+            view: WebView?,
+            url: String?,
+            message: String?,
+            defaultValue: String?,
+            result: JsPromptResult?
+        ): Boolean {
+            val binding = DialogWebPromptBinding.inflate(layoutInflater)
+
+            val dialog = AlertDialog.Builder(requireContext()).apply {
+                setTitle(resources.getString(R.string.dialog_web_prompt, url))
+                binding.message.text = message
+                binding.input.setText(defaultValue)
+                setView(binding.root)
+
+                setPositiveButton(android.R.string.ok) { _, _ ->
+                    result!!.confirm(binding.message.text.toString())
+                }
+                setNegativeButton(android.R.string.cancel) { _, _ ->
+                    result!!.cancel()
+                }
+                setOnCancelListener {
+                    result!!.cancel()
+                }
+
+                create()
+            }
+            dialog.show()
+            return true
         }
     }
 }

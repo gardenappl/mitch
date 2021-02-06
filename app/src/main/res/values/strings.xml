@@ -114,4 +114,6 @@
     <string name="library_no_apps">No apps installed.</string>
     <string name="library_no_downloads">Nothing downloaded.</string>
     <string name="dialog_dont_show_again">Don\'t show this again</string>
+    <string name="dialog_web_prompt">Web page at %s asks:</string>
+    <string name="dialog_web_alert">Web page at %s says:</string>
 </resources>

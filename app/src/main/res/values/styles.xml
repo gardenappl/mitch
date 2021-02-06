@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
@@ -6,17 +6,23 @@
         <item name="colorPrimary">@color/colorBackground</item>
         <item name="colorPrimaryDark">@color/colorForeground</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorSecondary">@color/colorForegroundSecondary</item>
         <item name="android:fontFamily">@font/lato</item>
         
         <item name="android:windowBackground">@color/colorBackgroundMain</item>
 
         <item name="android:actionBarStyle">@style/AppTheme.ActionBar</item>
         <item name="actionBarStyle">@style/AppTheme.ActionBar</item>
+        
+        <item name="android:statusBarColor">@color/colorBackground</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">@bool/defaultStatusBarLight</item>
 
         <item name="dialogTheme">@style/DialogStyle</item>
         <item name="alertDialogTheme">@style/DialogStyle</item>
         <!-- Needed for WebView alert dialog -->
         <item name="materialButtonStyle">@style/DialogButtonStyle</item>
+        
+        <item name="textInputStyle">@style/TextInputStyle</item>
     </style>
     
     <style name="AppTheme.NoActionBar" parent="AppTheme">
@@ -44,19 +50,31 @@
         <item name="colorPrimary">@color/colorBackground</item>
         <item name="colorPrimaryDark">@color/colorForeground</item>
         <item name="colorAccent">@color/colorAccent</item>
+
         <item name="buttonBarButtonStyle">@style/DialogButtonStyle</item>
         <item name="buttonStyle">@style/DialogButtonStyle</item>
         <item name="materialButtonStyle">@style/DialogButtonStyle</item>
+
+        <item name="android:buttonBarButtonStyle">@style/DialogButtonStyle</item>
+        <item name="android:buttonStyle">@style/DialogButtonStyle</item>
+
+        <item name="buttonBarPositiveButtonStyle">@style/DialogButtonStyle</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/DialogButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/DialogButtonStyle</item>
+        <item name="android:buttonBarNeutralButtonStyle">@style/DialogButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/DialogButtonStyle</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/DialogButtonStyle</item>
     </style>
     
     <style name="DialogButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">?colorAccent</item>
+        <item name="android:textColor">@color/colorAccent</item>
         <item name="android:letterSpacing">0</item>
     </style>
 
     <style name="SplashScreenTheme" parent="AppTheme">
         <item name="android:windowBackground">@drawable/splash_screen</item>
         <item name="android:statusBarColor">@color/colorAccent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
     </style>
 
 <!--    <style name="BorderedButtonStyle" parent="Widget.MaterialComponents.Button.OutlinedButton">-->
@@ -77,5 +95,15 @@
         <item name="android:textColor">?colorPrimary</item>
         <item name="textAllCaps">false</item>
         <item name="android:letterSpacing">0</item>
+    </style>
+
+    <style name="TextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <!-- The color of the label when it is collapsed and the text field is active -->
+        <item name="hintTextColor">@color/colorForegroundSecondary</item>
+        <!-- The color of the label in all other text field states (such as resting and disabled) -->
+        <item name="android:textColorHint">@color/colorForegroundSecondary</item>
+        
+        <item name="android:textCursorDrawable">@color/colorForeground</item>
+        <item name="android:textColor">@color/colorForeground</item>
     </style>
 </resources>

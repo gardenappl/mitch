@@ -115,4 +115,6 @@
     <string name="library_no_apps">Встановлених додатків немає.</string>
     <string name="library_no_downloads">Завантажень немає.</string>
     <string name="dialog_dont_show_again">Не показувати це знову</string>
+    <string name="dialog_web_prompt">Веб-сторінка за адресою %s запитує:</string>
+    <string name="dialog_web_alert">Веб-сторіна за адресою %s пише:</string>
 </resources>

@@ -115,4 +115,6 @@
     <string name="library_no_apps">Нет установленых приложений.</string>
     <string name="library_no_downloads">Ничего не загружено.</string>
     <string name="dialog_dont_show_again">Не показывать это снова</string>
+    <string name="dialog_web_prompt">Веб-страница по адресу %s спрашивает:</string>
+    <string name="dialog_web_alert">Веб-страница по адресу %s пишет:</string>
 </resources>
