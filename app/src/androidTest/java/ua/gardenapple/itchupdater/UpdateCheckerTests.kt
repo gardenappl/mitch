@@ -40,7 +40,7 @@ class UpdateCheckerTests {
 
         val result: UpdateCheckResult = runBlocking(Dispatchers.IO) {
             val game = db.gameDao.getGameById(Game.MITCH_GAME_ID)!!
-            val install = db.installDao.getInstallations(Installation.MITCH_UPLOAD_ID)[0]
+            val install = db.installDao.getFinishedInstallationsForGame(Game.MITCH_GAME_ID)[0]
             val (updateCheckDoc, downloadUrlInfo) = updateChecker.getDownloadInfo(game)!!
 
             updateChecker.checkUpdates(game, install, updateCheckDoc, downloadUrlInfo)
@@ -49,15 +49,16 @@ class UpdateCheckerTests {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun testUpdateCheck_mitch_other() {
-        if (BuildConfig.FLAVOR == FLAVOR_ITCHIO)
+    fun testUpdateCheck_mitch_fdroid() {
+        if (BuildConfig.FLAVOR != FLAVOR_FDROID)
             return //skip
 
         runBlocking(Dispatchers.IO) {
             val game = db.gameDao.getGameById(Game.MITCH_GAME_ID)!!
-            val install = db.installDao.getInstallations(Installation.MITCH_UPLOAD_ID)[0]
+            val install = db.installDao.getFinishedInstallationsForGame(Game.MITCH_GAME_ID)[0]
             val (updateCheckDoc, downloadUrlInfo) = updateChecker.getDownloadInfo(game)!!
 
+            //should crash
             updateChecker.checkUpdates(game, install, updateCheckDoc, downloadUrlInfo)
         }
     }

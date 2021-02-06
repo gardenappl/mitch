@@ -76,10 +76,10 @@ class WebParserTests {
         assertEquals(6, installs.size)
         assertEquals(Installation.PLATFORM_ANDROID, installs[4].platforms)
         assertEquals("[Android]Mindustry.apk", installs[4].uploadName)
-        assertEquals("23 December 2020 @ 17:49", installs[4].uploadTimestamp)
+        assertEquals("21 January 2021 @ 14:00", installs[4].uploadTimestamp)
         assertEquals("60 MB", installs[4].fileSize)
         assertEquals(1615327, installs[4].uploadId)
-        assertTrue(installs[4].version!!.contains("122"))
+        assertTrue(installs[4].version!!.contains("123.1"))
     }
 
     /**
