@@ -144,7 +144,8 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             setActiveFragment(LIBRARY_FRAGMENT_TAG)
         }
 
-        if (BuildConfig.FLAVOR == FLAVOR_FDROID)
+        //TODO: remove dialog for Gitlab
+        if (BuildConfig.FLAVOR != FLAVOR_GITLAB)
             return
 
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
@@ -154,14 +155,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         val dialog = AlertDialog.Builder(this).apply {
             setTitle("Announcement")
             val binding = DialogDeprecateBinding.inflate(LayoutInflater.from(context))
-            //TODO: remove dialog for Gitlab
-            //TODO: remove dialog for itch.io
-            if (BuildConfig.FLAVOR == FLAVOR_GITLAB)
-                binding.textView.text = "The GitLab version of Mitch will be deprecated next month. Please switch to F-Droid instead."
-            else if (BuildConfig.FLAVOR == FLAVOR_ITCHIO)
-                binding.textView.text = "The itch.io version of Mitch will cost $2, starting next Saturday (February 6th). If you want to keep using Mitch for free, consider switching to F-Droid."
-            else
-                binding.textView.text = "Ayy lmao, if you see this, this is a bug"
+            binding.textView.text = "The GitLab version of Mitch will be deprecated next month, on March 1st. Please switch to F-Droid instead."
 
             setView(binding.root)
             setNegativeButton(android.R.string.cancel) { _, _ ->
