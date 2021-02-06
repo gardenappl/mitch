@@ -70,7 +70,7 @@ class GitlabUpdateChecker(private val context: Context) {
                 errorString = null
             } else {
                 val descriptionMatch =
-                    RELEASE_DESC_PATTERN.matchEntire(latestRelease["description"] as String)
+                    RELEASE_DESC_PATTERN.find(latestRelease["description"] as String)
                 val relativeUrl = descriptionMatch!!.groupValues[1]
 
                 resultCode = UpdateCheckResult.UPDATE_AVAILABLE
