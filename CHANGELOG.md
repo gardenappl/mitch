@@ -1,1 +1,3 @@
-See [itch.io devlog](https://gardenapple.itch.io/mitch/devlog)
+## Changelog
+
+See [the Mitch devlog on itch.io](https://gardenapple.itch.io/mitch/devlog).
