@@ -13,15 +13,16 @@
 
 The app is still in development, some features are planned but not yet implemented.
 
-**If you wish to support this app, consider [buying it on itch.io](https://gardenapple.itch.io/mitch)**
-
 ## Installing
 
-There are a few ways to get this app:
+**Mitch is available on F-Droid**:
+<a href="https://f-droid.org/packages/ua.gardenapple.itchupdater"><br> <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80px"></a>
 
-* Get the APK from [GitLab releases](https://gitlab.com/gardenappl/mitch/-/releases)
-* Get the APK from [itch.io](https://gardenapple.itch.io/mitch)
-* Compiling from source
+There are other ways to get this app:
+
+* **Buy the APK from [itch.io](https://gardenapple.itch.io/mitch)**
+* Get the APK from [GitLab releases](https://gitlab.com/gardenappl/mitch/-/releases) (will be deprecated soon, in favor of F-Droid)
+* Compile from source
 
 ## Compiling from source
 
