@@ -36,6 +36,7 @@ class InstallerDatabaseHandler(val context: Context)  {
                         packageName = packageName
                     )
                     Log.d(LOGGING_TAG, "New install: $newInstall")
+                    Installations.deleteOutdatedInstalls(context, pendingInstall)
                     db.installDao.delete(pendingInstall)
                     db.installDao.insert(newInstall)
                 }

@@ -119,12 +119,12 @@ class FileDownloadListener(private val context: Context) : FetchListener {
         runBlocking(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
             val pendingInstall = db.installDao.getPendingInstallationByDownloadId(download.id)!!
-            Installations.deleteOutdatedInstalls(context, pendingInstall)
 
             val notificationFile: File
             if (isApk) {
                 notificationFile = downloadFileManager.getPendingFile(uploadId)!!
             } else {
+                Installations.deleteOutdatedInstalls(context, pendingInstall)
                 downloadFileManager.replacePendingFile(download)
                 notificationFile = downloadFileManager.getDownloadedFile(uploadId)!!
             }
