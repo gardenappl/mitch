@@ -528,7 +528,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     private class ItchJavaScriptInterface(val fragment: BrowseFragment) {
         @JavascriptInterface
         fun onDownloadLinkClick(uploadId: String) {
-            fragment.launch(Dispatchers.IO) {
+            fragment.launch(Dispatchers.Main) {
                 fragment.browseHandler?.setClickedUploadId(uploadId.toInt())
             }
         }
