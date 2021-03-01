@@ -21,7 +21,6 @@ The app is still in development, some features are planned but not yet implement
 There are other ways to get this app:
 
 * **Buy the APK from [itch.io](https://gardenapple.itch.io/mitch)**
-* Get the APK from [GitLab releases](https://gitlab.com/gardenappl/mitch/-/releases) (will be deprecated soon, in favor of F-Droid)
 * Compile from source
 
 ## Compiling from source
@@ -44,4 +43,4 @@ cd mitch
 gradlew.bat build
 ```
 
-Instead of using the `build` task (which builds every variant of the app and can take a while), consider building only one flavor: replace `build` with `assembleFdroidRelease`, `assembleGitlabRelease` or `assembleItchioRelease`.
+Instead of using the `build` task (which builds every variant of the app and can take a while), consider building only one flavor: replace `build` with `assembleFdroidRelease` or `assembleItchioRelease`.

@@ -18,7 +18,6 @@ import ua.gardenapple.itchupdater.client.UpdateChecker
 import ua.gardenapple.itchupdater.database.updatecheck.InstallUpdateCheckResult
 import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultViewModel
 import ua.gardenapple.itchupdater.databinding.UpdatesFragmentBinding
-import ua.gardenapple.itchupdater.gitlab.GitlabUpdateChecker
 import java.util.*
 
 
@@ -91,7 +90,6 @@ class UpdatesFragment : Fragment(), CoroutineScope by MainScope() {
         binding.root.setOnRefreshListener {
             GlobalScope.launch {
                 UpdateChecker(requireContext()).checkUpdates()
-                GitlabUpdateChecker(requireContext()).checkUpdate()
                 _binding?.root?.isRefreshing = false
             }
         }

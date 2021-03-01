@@ -18,7 +18,6 @@ import org.ocpsoft.prettytime.PrettyTime
 import ua.gardenapple.itchupdater.files.DownloadFileManager
 import ua.gardenapple.itchupdater.client.UpdateChecker
 import ua.gardenapple.itchupdater.files.ExternalFileManager
-import ua.gardenapple.itchupdater.gitlab.GitlabUpdateChecker
 import ua.gardenapple.itchupdater.installer.*
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -47,7 +46,7 @@ const val FLAVOR_ITCHIO = "itchio"
 const val FLAVOR_GITLAB = "gitlab"
 
 const val PREF_LAST_UPDATE_CHECK = "ua.gardenapple.itchupdater.lastupdatecheck"
-const val PREF_DONT_SHOW_DEPRECATION_DIALOG = "ua.gardenapple.itchupdater.dontshowdeprecation"
+//const val PREF_DONT_SHOW_DEPRECATION_DIALOG = "ua.gardenapple.itchupdater.dontshowdeprecation"
 const val PREF_UPDATE_CHECKING = "ua.gardenapple.itchupdater.updatechecking"
 
 //TODO: Catch all app's exceptions in a nice way
@@ -193,21 +192,6 @@ class Mitch : Application() {
                 existingWorkPolicy,
                 updateCheckRequest
             )
-
-        if (BuildConfig.FLAVOR == FLAVOR_GITLAB) {
-            val gitlabUpdateCheckRequest =
-                PeriodicWorkRequestBuilder<GitlabUpdateChecker.Worker>(1, TimeUnit.DAYS).run {
-                    setConstraints(constraints)
-                    build()
-                }
-
-            WorkManager.getInstance(applicationContext)
-                .enqueueUniquePeriodicWork(
-                    GITLAB_UPDATE_CHECK_TASK_TAG,
-                    existingWorkPolicy,
-                    gitlabUpdateCheckRequest
-                )
-        }
     }
 
     private fun setThemeFromPreferences(prefs: SharedPreferences) {

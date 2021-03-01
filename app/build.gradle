@@ -51,8 +51,6 @@ android {
     }
     flavorDimensions "platform"
     productFlavors {
-        gitlab {
-        }
         fdroid {
         }
         itchio {
