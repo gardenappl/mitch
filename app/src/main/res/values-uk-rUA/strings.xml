@@ -117,4 +117,6 @@
     <string name="dialog_dont_show_again">Не показувати це знову</string>
     <string name="dialog_web_prompt">Веб-сторінка за адресою %s запитує:</string>
     <string name="dialog_web_alert">Веб-сторіна за адресою %s пише:</string>
+    <string name="library_category_owned">Ви володієте</string>
+    <string name="library_category_owned_see">Переглянути →</string>
 </resources>

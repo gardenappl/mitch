@@ -1,5 +1,6 @@
 package ua.gardenapple.itchupdater.ui
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -48,7 +49,6 @@ class LibraryFragment : Fragment() {
         _binding = LibraryFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
 
-
         val pendingAdapter = GameListAdapter(requireActivity(), binding.pendingList, GameRepository.Type.Pending)
         binding.pendingList.adapter = pendingAdapter
         binding.pendingList.layoutManager =
@@ -70,9 +70,11 @@ class LibraryFragment : Fragment() {
                     if (gameInstalls?.isNotEmpty() == true) {
                         binding.pendingList.visibility = View.VISIBLE
                         binding.pendingLabel.visibility = View.VISIBLE
+                        binding.pendingDivider.visibility = View.VISIBLE
                     } else {
                         binding.pendingList.visibility = View.GONE
                         binding.pendingLabel.visibility = View.GONE
+                        binding.pendingDivider.visibility = View.GONE
                     }
                 }
             }
@@ -139,6 +141,12 @@ class LibraryFragment : Fragment() {
                 }
             }
         })
+
+        // Owned items
+        binding.ownedButton.setOnClickListener { 
+            val intent = Intent(requireContext(), OwnedGamesActivity::class.java)
+            startActivity(intent)
+        }
 
         return view
     }

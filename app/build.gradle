@@ -32,7 +32,6 @@ android {
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 21
-        //If we reach x.y.10, do x.y.010 instead
         versionName "1.2.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         if (shouldSign) {

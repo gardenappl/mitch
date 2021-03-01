@@ -564,11 +564,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     inner class MitchWebViewClient : WebViewClient() {
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-            val uri = request.url
-            if (ItchWebsiteUtils.isItchWebPage(uri))
+            if (ItchWebsiteUtils.isItchWebPage(request.url))
                 return false
             else {
-                val intent = Intent(Intent.ACTION_VIEW, uri)
+                val intent = Intent(Intent.ACTION_VIEW, request.url)
                 startActivity(intent)
                 return true
             }

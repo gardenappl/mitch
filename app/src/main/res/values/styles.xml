@@ -77,16 +77,16 @@
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
     </style>
 
-<!--    <style name="BorderedButtonStyle" parent="Widget.MaterialComponents.Button.OutlinedButton">-->
-<!--        <item name="cornerRadius">3dp</item>-->
-<!--        <item name="strokeColor">?colorAccent</item>-->
-<!--        <item name="strokeWidth">2dp</item>-->
-<!--        <item name="android:textColor">?colorAccent</item>-->
-<!--        <item name="colorButtonNormal">?colorAccent</item>-->
-<!--        <item name="textAllCaps">false</item>-->
-<!--        <item name="android:letterSpacing">0</item>-->
-<!--        <item name="rippleColor">?colorAccent</item>-->
-<!--    </style>-->
+    <style name="BorderedButtonStyle" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="cornerRadius">3dp</item>
+        <item name="strokeColor">?colorAccent</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="android:textColor">?colorAccent</item>
+        <item name="colorButtonNormal">?colorAccent</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="rippleColor">?colorAccent</item>
+    </style>
 
     <style name="FilledButtonStyle" parent="Widget.MaterialComponents.Button">
         <item name="backgroundTint">?colorAccent</item>

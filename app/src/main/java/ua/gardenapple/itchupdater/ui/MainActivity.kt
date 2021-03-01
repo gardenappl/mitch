@@ -210,10 +210,10 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
      * @return true if the current fragment has changed
      */
     fun setActiveFragment(newFragmentTag: String, resetNavBar: Boolean = true): Boolean {
-        supportFragmentManager.beginTransaction().apply {
-            if (newFragmentTag == currentFragmentTag)
-                return false
+        if (newFragmentTag == currentFragmentTag)
+            return false
 
+        supportFragmentManager.beginTransaction().apply {
             setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
             if (currentFragmentTag == BROWSE_FRAGMENT_TAG)
                 hide(browseFragment)
