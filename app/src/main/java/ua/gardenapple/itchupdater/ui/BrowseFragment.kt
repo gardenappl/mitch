@@ -535,7 +535,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         @JavascriptInterface
         fun onHtmlLoaded(html: String, url: String) {
-            if(fragment.activity !is MainActivity)
+            if (fragment.activity !is MainActivity)
                 return
 
 //            Log.d(LOGGING_TAG, "HTML:")

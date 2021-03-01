@@ -80,15 +80,8 @@ class Mitch : Application() {
                     registerUpdateCheckTask(prefs.getBoolean(key, false),
                         ExistingPeriodicWorkPolicy.REPLACE)
                 }
-                "preference_theme" -> setThemeFromPreferences(prefs)
-                "current_site_theme" -> {
-                    if (prefs.getString("preference_theme", "site") == "site") {
-                        when (prefs.getString(key, "light")) {
-                            "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                            "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                        }
-                    }
-                }
+                "preference_theme",
+                "current_site_theme" -> setThemeFromPreferences(prefs)
             }
         }
 

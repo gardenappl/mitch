@@ -18,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
-import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.databinding.ActivityMainBinding
 
 
@@ -30,8 +29,8 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     private set
 
     companion object {
-        const val LOGGING_TAG = "MainActivity"
-        
+        private const val LOGGING_TAG = "MainActivity"
+
         const val EXTRA_SHOULD_OPEN_LIBRARY = "SHOULD_OPEN_LIBRARY"
         
         private const val ACTIVE_FRAGMENT_KEY: String = "fragment"
@@ -47,7 +46,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         runBlocking(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(this@MainActivity)
             if (!db.isOpen)
-                db.gameDao.getGameById(Game.MITCH_GAME_ID)
+                db.installDao.getInstallationByPackageName(packageName)
         }
         
         //Initially set to SplashScreenTheme during loading, this sets the proper theme
@@ -237,6 +236,9 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         return true
     }
 
+    /**
+     * Should not be used directly, use [StartActivity] instead
+     */
     fun browseUrl(url: String) {
         setActiveFragment(BROWSE_FRAGMENT_TAG)
         browseFragment.webView.loadUrl(url)

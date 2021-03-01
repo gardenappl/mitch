@@ -42,7 +42,7 @@ class LibraryFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
         _binding = LibraryFragmentBinding.inflate(inflater, container, false)
