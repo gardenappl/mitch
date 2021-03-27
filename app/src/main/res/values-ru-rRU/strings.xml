@@ -119,4 +119,7 @@
     <string name="dialog_web_alert">Веб-страница по адресу %s пишет:</string>
     <string name="library_category_owned">Вы владеете</string>
     <string name="library_category_owned_see">Показать все →</string>
+    <string name="platform_android">Android</string>
+    <string name="library_install">Установить</string>
+    <string name="library_download">Скачать</string>
 </resources>

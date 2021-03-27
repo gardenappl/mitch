@@ -118,4 +118,7 @@
     <string name="dialog_web_alert">Web page at %s says:</string>
     <string name="library_category_owned">Owned items</string>
     <string name="library_category_owned_see">View →</string>
+    <string name="platform_android">Android</string>
+    <string name="library_install">Install</string>
+    <string name="library_download">Download</string>
 </resources>

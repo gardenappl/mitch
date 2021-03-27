@@ -236,9 +236,6 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         return true
     }
 
-    /**
-     * Should not be used directly, use [StartActivity] instead
-     */
     fun browseUrl(url: String) {
         setActiveFragment(BROWSE_FRAGMENT_TAG)
         browseFragment.webView.loadUrl(url)

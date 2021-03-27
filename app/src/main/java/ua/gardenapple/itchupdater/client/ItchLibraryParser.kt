@@ -3,16 +3,15 @@ package ua.gardenapple.itchupdater.client
 import android.util.Log
 import android.webkit.CookieManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import okhttp3.HttpUrl
 import okhttp3.Request
 import org.json.JSONObject
 import org.jsoup.Jsoup
-import org.ocpsoft.prettytime.PrettyTime
 import ua.gardenapple.itchupdater.Mitch
 import java.io.IOException
 import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ItchLibraryParser {
     companion object {
@@ -20,11 +19,15 @@ class ItchLibraryParser {
         
         private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
         private val thumbnailCssPattern = Regex("""background-image:\s+url\('([^']*)'\)""")
+        
+        const val PAGE_SIZE = 50
 
         /**
-         * @return null if user is not logged in and has no access, otherwise a list of items (if size == 50, should request next page)
+         * @return null if user is not logged in and has no access, otherwise a list of items (if size == [PAGE_SIZE], should request next page)
          */
         suspend fun parsePage(page: Int): List<ItchLibraryItem>? = withContext(Dispatchers.IO) {
+            Log.d(LOGGING_TAG, "Parse page $page")
+
             val request = Request.Builder().run {
                 url("https://itch.io/my-purchases?format=json&page=$page")
                 addHeader("Cookie", CookieManager.getInstance().getCookie("https://itch.io"))

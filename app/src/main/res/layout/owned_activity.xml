@@ -21,11 +21,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
-        <LinearLayout
-                android:id="@+id/items"
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/owned_items_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"/>
+                tools:listitem="@layout/owned_item"/>
     </ScrollView>
 
 
