@@ -15,14 +15,15 @@ import java.net.URLEncoder
 
 class ItchWebsiteUtils {
     companion object {
+        val LOGIN_PAGE_URI = Uri.parse("https://itch.io/login")
+
         private val gameBgColorPattern = Regex("root[{]--itchio_ui_bg: (#?\\w+);")
         private val gameButtonColorPattern = Regex("--itchio_button_color: (#?\\w+);")
         private val gameButtonFgColorPattern = Regex("--itchio_button_fg_color: (#?\\w+);")
 
         private val userBgColorPattern = Regex("--itchio_gray_back: (#?\\w+);")
         private val userFgColorPattern = Regex("--itchio_border_radius: ?\\w+;color:(#?\\w+);")
-
-
+        
 
         fun isItchWebPage(uri: Uri): Boolean {
             return uri.host != null && (uri.host == "itch.io" ||

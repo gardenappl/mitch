@@ -27,6 +27,7 @@
                 android:visibility="invisible"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:srcCompat="?colorPrimary" />
 
         <ImageView
@@ -81,6 +82,7 @@
                 android:ellipsize="start"
                 android:singleLine="true"
                 android:text="Version 1.2 -> Version 1.4"
+                android:paddingBottom="5dp"
                 app:layout_constraintEnd_toStartOf="@id/updateButton"
                 app:layout_constraintStart_toEndOf="@+id/gameThumbnail"
                 app:layout_constraintTop_toBottomOf="@+id/updateCheckUploadInfo" />

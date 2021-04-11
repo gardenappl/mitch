@@ -121,4 +121,7 @@
     <string name="platform_android">Android</string>
     <string name="library_install">Install</string>
     <string name="library_download">Download</string>
+    <string name="network_request_retry">Retry</string>
+    <string name="library_not_logged_in">You must log in to your itch.io account in order to access owned items</string>
+    <string name="log_in">Log in</string>
 </resources>

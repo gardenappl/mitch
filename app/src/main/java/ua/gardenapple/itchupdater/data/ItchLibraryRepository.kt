@@ -14,7 +14,8 @@ class ItchLibraryRepository {
         return Pager(
             config = PagingConfig(
                 pageSize = ItchLibraryParser.PAGE_SIZE,
-                enablePlaceholders = true
+                enablePlaceholders = false,
+                initialLoadSize = ItchLibraryParser.PAGE_SIZE
             ),
             pagingSourceFactory = { itchLibraryPagingSource }
         ).flow

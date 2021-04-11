@@ -16,17 +16,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize" />
     </com.google.android.material.appbar.AppBarLayout>
-    
+
     <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/owned_items_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:listitem="@layout/owned_item"/>
+                tools:listitem="@layout/owned_item"
+                tools:visibility="gone" />
     </ScrollView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/load_state_constraint_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <include
+                android:id="@+id/load_state_layout"
+                layout="@layout/owned_item_load_state_footer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

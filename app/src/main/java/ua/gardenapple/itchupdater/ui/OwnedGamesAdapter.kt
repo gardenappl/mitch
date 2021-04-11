@@ -47,7 +47,7 @@ class OwnedGamesAdapter(
         }
     }
 
-    inner class OwnedGameHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class OwnedGameHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val thumbnailView: ImageView = itemView.findViewById(R.id.ownedGameThumbnail)
         val infoLayout: ConstraintLayout = itemView.findViewById(R.id.ownedGameInfoLayout)
         val gameName: TextView = itemView.findViewById(R.id.ownedGameName)
@@ -92,7 +92,7 @@ class OwnedGamesAdapter(
 
         holder.itemView.setOnClickListener { _ ->
             val storePageUri = Uri.parse(ItchWebsiteParser.getStoreUrlFromDownloadPage(downloadUri))
-            val intent = Intent(Intent.ACTION_VIEW, storePageUri)
+            val intent = Intent(Intent.ACTION_VIEW, storePageUri, context, MainActivity::class.java)
             context.startActivity(intent)
         }
 //        holder.downloadOrInstallButton.setOnClickListener { _ ->

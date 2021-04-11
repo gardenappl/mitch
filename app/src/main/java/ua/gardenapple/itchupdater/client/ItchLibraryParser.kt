@@ -5,6 +5,7 @@ import android.webkit.CookieManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Request
+import org.json.JSONException
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import ua.gardenapple.itchupdater.Mitch
@@ -30,6 +31,7 @@ class ItchLibraryParser {
 
             val request = Request.Builder().run {
                 url("https://itch.io/my-purchases?format=json&page=$page")
+
                 addHeader("Cookie", CookieManager.getInstance().getCookie("https://itch.io"))
                 get()
                 build()
@@ -44,7 +46,12 @@ class ItchLibraryParser {
 
                     response.body!!.string()
                 }
-            val resultJson = JSONObject(result)
+
+            val resultJson = try {
+                JSONObject(result)
+            } catch (e: JSONException) {
+                return@withContext null
+            }
             
             val itemCount = resultJson.getInt("num_items")
             val items = ArrayList<ItchLibraryItem>(itemCount)

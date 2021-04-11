@@ -2,11 +2,14 @@ package ua.gardenapple.itchupdater.ui
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -18,6 +21,7 @@ import ua.gardenapple.itchupdater.client.ItchLibraryParser
 import ua.gardenapple.itchupdater.data.ItchLibraryRepository
 import ua.gardenapple.itchupdater.data.ItchLibraryViewModel
 import ua.gardenapple.itchupdater.databinding.OwnedActivityBinding
+import ua.gardenapple.itchupdater.databinding.OwnedItemLoadStateFooterBinding
 
 class OwnedGamesActivity : AppCompatActivity() {
 
@@ -62,7 +66,21 @@ class OwnedGamesActivity : AppCompatActivity() {
             }
         }).get(ItchLibraryViewModel::class.java)
 
-        binding.ownedItemsList.adapter = adapter
+        binding.ownedItemsList.adapter = adapter.withLoadStateFooter(
+            OwnedGamesLoadStateAdapter { adapter.retry() }
+        )
+        adapter.addLoadStateListener { loadState ->
+            if (loadState.refresh is LoadState.NotLoading) {
+                binding.ownedItemsList.visibility = View.VISIBLE
+                binding.loadStateConstraintLayout.visibility = View.GONE
+            } else {
+                binding.ownedItemsList.visibility = View.GONE
+                binding.loadStateConstraintLayout.visibility = View.VISIBLE
+                OwnedGamesLoadStateAdapter.bind(binding.loadStateLayout, this, loadState.refresh) {
+                    adapter.retry()
+                }
+            }
+        }
         binding.ownedItemsList.layoutManager = LinearLayoutManager(this)
 
         load(savedInstanceState?.getBoolean(LAST_ANDROID_ONLY_FILTER, DEFAULT_ANDROID_ONLY_FILTER)

@@ -12,6 +12,8 @@ class ItchLibraryPagingSource : PagingSource<Int, ItchLibraryItem>() {
 
     companion object {
         private const val ITCH_LIBRARY_STARTING_PAGE_INDEX = 1
+        
+        private const val LOGGING_TAG = "ItchLibraryPagingSource"
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ItchLibraryItem> {
@@ -20,8 +22,10 @@ class ItchLibraryPagingSource : PagingSource<Int, ItchLibraryItem>() {
         try {
             val items = ItchLibraryParser.parsePage(pageNum)
 
-            if (items == null)
+            if (items == null) {
+                Log.d(LOGGING_TAG, "Not logged in")
                 return LoadResult.Error(ItchAccessDeniedException("No access to owned library, is user logged in?"))
+            }
 
             return LoadResult.Page(
                 data = items,
@@ -29,6 +33,7 @@ class ItchLibraryPagingSource : PagingSource<Int, ItchLibraryItem>() {
                 nextKey = if (items.size == ItchLibraryParser.PAGE_SIZE) pageNum + 1 else null
             )
         } catch (e: IOException) {
+            Log.e(LOGGING_TAG, "Error while loading owned games", e)
             return LoadResult.Error(e)
         }
     }

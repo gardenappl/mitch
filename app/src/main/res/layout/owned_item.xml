@@ -71,6 +71,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="start"
                 android:singleLine="true"
+                android:paddingBottom="5dp"
                 android:text="[A] Android"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

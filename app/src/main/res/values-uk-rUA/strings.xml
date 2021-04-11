@@ -122,4 +122,7 @@
     <string name="platform_android">Android</string>
     <string name="library_install">Встановити</string>
     <string name="library_download">Завантажити</string>
+    <string name="network_request_retry">Спробувати ще раз</string>
+    <string name="library_not_logged_in">Ви повинні увійти в обліковий запис itch.io.</string>
+    <string name="log_in">Увійти</string>
 </resources>
