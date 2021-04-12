@@ -2,6 +2,8 @@ package ua.gardenapple.itchupdater.ui
 
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -10,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -37,9 +40,10 @@ class OwnedGamesActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ItchLibraryViewModel
     private val adapter = OwnedGamesAdapter(this)
-    
     private var loadJob: Job? = null
     private val repository = ItchLibraryRepository()
+
+    private var androidOnlyFilter: Boolean = DEFAULT_ANDROID_ONLY_FILTER
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +74,7 @@ class OwnedGamesActivity : AppCompatActivity() {
             OwnedGamesLoadStateAdapter { adapter.retry() }
         )
         adapter.addLoadStateListener { loadState ->
+            Log.d("ahha", loadState.toString())
             if (loadState.refresh is LoadState.NotLoading) {
                 binding.ownedItemsList.visibility = View.VISIBLE
                 binding.loadStateConstraintLayout.visibility = View.GONE
@@ -83,8 +88,16 @@ class OwnedGamesActivity : AppCompatActivity() {
         }
         binding.ownedItemsList.layoutManager = LinearLayoutManager(this)
 
-        load(savedInstanceState?.getBoolean(LAST_ANDROID_ONLY_FILTER, DEFAULT_ANDROID_ONLY_FILTER)
-            ?: DEFAULT_ANDROID_ONLY_FILTER)
+        androidOnlyFilter =
+            savedInstanceState?.getBoolean(LAST_ANDROID_ONLY_FILTER, DEFAULT_ANDROID_ONLY_FILTER)
+                ?: PreferenceManager.getDefaultSharedPreferences(this).getBoolean(
+                    LAST_ANDROID_ONLY_FILTER, DEFAULT_ANDROID_ONLY_FILTER)
+        load(androidOnlyFilter)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(LAST_ANDROID_ONLY_FILTER, androidOnlyFilter)
     }
 
 
@@ -96,5 +109,28 @@ class OwnedGamesActivity : AppCompatActivity() {
                 adapter.submitData(it)
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.owned_actions, menu)
+        menu.findItem(R.id.only_android).setChecked(androidOnlyFilter)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.only_android -> {
+                androidOnlyFilter = !item.isChecked
+                load(androidOnlyFilter)
+                val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
+                sharedPrefs.edit().run {
+                    putBoolean(LAST_ANDROID_ONLY_FILTER, androidOnlyFilter)
+                    apply()
+                }
+                item.isChecked = androidOnlyFilter
+                return true
+            }
+        }
+        return false
     }
 }

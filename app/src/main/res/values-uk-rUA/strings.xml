@@ -125,4 +125,5 @@
     <string name="network_request_retry">Спробувати ще раз</string>
     <string name="library_not_logged_in">Ви повинні увійти в обліковий запис itch.io.</string>
     <string name="log_in">Увійти</string>
+    <string name="library_options_show_only_android">Тільки Android</string>
 </resources>
