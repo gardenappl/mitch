@@ -1,5 +1,6 @@
 package ua.gardenapple.itchupdater.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -14,10 +15,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.client.ItchLibraryParser
@@ -74,14 +77,25 @@ class OwnedGamesActivity : AppCompatActivity() {
             OwnedGamesLoadStateAdapter { adapter.retry() }
         )
         adapter.addLoadStateListener { loadState ->
-            Log.d("ahha", loadState.toString())
-            if (loadState.refresh is LoadState.NotLoading) {
+            Log.d("ahhaha", loadState.toString())
+
+            showListEmpty(loadState.refresh is LoadState.NotLoading &&
+                    loadState.refresh.endOfPaginationReached && adapter.itemCount == 0)
+
+            binding.noOwnedGames.setText(
+                if (androidOnlyFilter) 
+                    R.string.library_no_android_games 
+                else 
+                    R.string.library_no_games
+            )
+
+            if (loadState.source.refresh is LoadState.NotLoading) {
                 binding.ownedItemsList.visibility = View.VISIBLE
                 binding.loadStateConstraintLayout.visibility = View.GONE
             } else {
                 binding.ownedItemsList.visibility = View.GONE
                 binding.loadStateConstraintLayout.visibility = View.VISIBLE
-                OwnedGamesLoadStateAdapter.bind(binding.loadStateLayout, this, loadState.refresh) {
+                OwnedGamesLoadStateAdapter.bind(binding.loadStateLayout, this, loadState.source.refresh) {
                     adapter.retry()
                 }
             }
@@ -104,9 +118,33 @@ class OwnedGamesActivity : AppCompatActivity() {
     private fun load(androidOnly: Boolean) {
         loadJob?.cancel()
 
-        loadJob = lifecycleScope.launch {
+        loadJob = lifecycleScope.launch(Dispatchers.IO) {
             viewModel.getOwnedItems(androidOnly).collectLatest {
                 adapter.submitData(it)
+            }
+        }
+    }
+    
+    private fun showListEmpty(isEmpty: Boolean) {
+        binding.emptyListConstraintLayout.isVisible = isEmpty
+
+        if (isEmpty) {
+            binding.noOwnedGames.setText(
+                if (androidOnlyFilter)
+                    R.string.library_no_android_games
+                else
+                    R.string.library_no_games
+            )
+            binding.goToStoreButton.setOnClickListener {
+                startActivity(Intent(
+                    Intent.ACTION_VIEW,
+                    if (androidOnlyFilter)
+                        ItchWebsiteUtils.STORE_ANDROID_PAGE_URI
+                    else
+                        ItchWebsiteUtils.STORE_PAGE_URI,
+                    this,
+                    MainActivity::class.java
+                ))
             }
         }
     }

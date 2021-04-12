@@ -7,7 +7,7 @@
         android:padding="8dp">
     <TextView
             android:id="@+id/error_msg"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="?colorPrimaryDark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

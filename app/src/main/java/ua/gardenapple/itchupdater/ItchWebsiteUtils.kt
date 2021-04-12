@@ -15,7 +15,9 @@ import java.net.URLEncoder
 
 class ItchWebsiteUtils {
     companion object {
-        val LOGIN_PAGE_URI = Uri.parse("https://itch.io/login")
+        val LOGIN_PAGE_URI: Uri = Uri.parse("https://itch.io/login")
+        val STORE_ANDROID_PAGE_URI: Uri = Uri.parse("https://itch.io/games/platform-android")
+        val STORE_PAGE_URI: Uri = Uri.parse("https://itch.io/games")
 
         private val gameBgColorPattern = Regex("root[{]--itchio_ui_bg: (#?\\w+);")
         private val gameButtonColorPattern = Regex("--itchio_button_color: (#?\\w+);")
