@@ -77,8 +77,6 @@ class OwnedGamesActivity : AppCompatActivity() {
             OwnedGamesLoadStateAdapter { adapter.retry() }
         )
         adapter.addLoadStateListener { loadState ->
-            Log.d("ahhaha", loadState.toString())
-
             showListEmpty(loadState.refresh is LoadState.NotLoading &&
                     loadState.refresh.endOfPaginationReached && adapter.itemCount == 0)
 

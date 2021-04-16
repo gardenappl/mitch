@@ -140,7 +140,6 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     }
 
     override fun onBackPressed() {
-        Log.d(LOGGING_TAG, "onBackPressed")
         if (browseFragment.isVisible) {
             val cantGoBack = browseFragment.onBackPressed()
             if (cantGoBack)
@@ -153,13 +152,11 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        Log.d(LOGGING_TAG, "onSaveInstanceState: $currentFragmentTag")
         outState.putString(ACTIVE_FRAGMENT_KEY, currentFragmentTag)
     }
 
     override fun onResume() {
         super.onResume()
-        Log.d(LOGGING_TAG, "onResume: $currentFragmentTag")
     }
 
     // Handle light/dark theme changes

@@ -27,8 +27,6 @@ class ItchLibraryParser {
          * @return null if user is not logged in and has no access, otherwise a list of items (if size == [PAGE_SIZE], should request next page)
          */
         suspend fun parsePage(page: Int): List<ItchLibraryItem>? = withContext(Dispatchers.IO) {
-            Log.d(LOGGING_TAG, "Parse page $page")
-
             val request = Request.Builder().run {
                 url("https://itch.io/my-purchases?format=json&page=$page")
 
