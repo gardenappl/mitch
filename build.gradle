@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.4.31'
+    ext.kotlin_version = '1.4.32'
     repositories {
         google()
         jcenter()
@@ -55,4 +55,5 @@ ext {
     colormathVersion = '1.4.1'
     fetchAndroidxVersion = '3.1.6'
     prettyTimeVersion = '5.0.0.Final'
+    acraVersion = '5.7.0'
 }

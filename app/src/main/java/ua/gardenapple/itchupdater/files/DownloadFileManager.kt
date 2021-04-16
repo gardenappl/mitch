@@ -129,6 +129,7 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
     }
     
     private fun shouldHandleFiles(uploadId: Int): Boolean {
-        return !(uploadId == Installation.MITCH_UPLOAD_ID && BuildConfig.FLAVOR == FLAVOR_GITLAB)
+        //return !(uploadId == Installation.MITCH_UPLOAD_ID && BuildConfig.FLAVOR == FLAVOR_GITLAB)
+        return true
     }
 }

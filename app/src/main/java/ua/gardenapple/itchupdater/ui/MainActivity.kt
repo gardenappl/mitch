@@ -29,8 +29,6 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     private set
 
     companion object {
-        private const val LOGGING_TAG = "MainActivity"
-
         const val EXTRA_SHOULD_OPEN_LIBRARY = "SHOULD_OPEN_LIBRARY"
         
         private const val ACTIVE_FRAGMENT_KEY: String = "fragment"

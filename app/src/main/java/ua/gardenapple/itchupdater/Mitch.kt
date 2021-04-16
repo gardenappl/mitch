@@ -14,11 +14,18 @@ import com.tonyodev.fetch2.FetchConfiguration
 import com.tonyodev.fetch2okhttp.OkHttpDownloader
 import okhttp3.Cache
 import okhttp3.OkHttpClient
+import org.acra.ACRA
+import org.acra.annotation.AcraDialog
+import org.acra.config.CoreConfigurationBuilder
+import org.acra.config.DialogConfigurationBuilder
+import org.acra.config.MailSenderConfigurationBuilder
+import org.acra.data.StringFormat
 import org.ocpsoft.prettytime.PrettyTime
 import ua.gardenapple.itchupdater.files.DownloadFileManager
 import ua.gardenapple.itchupdater.client.UpdateChecker
 import ua.gardenapple.itchupdater.files.ExternalFileManager
 import ua.gardenapple.itchupdater.installer.*
+import ua.gardenapple.itchupdater.ui.CrashDialog
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -33,23 +40,18 @@ const val NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED = "updates"
 const val NOTIFICATION_CHANNEL_ID_INSTALLING = "installing"
 const val NOTIFICATION_CHANNEL_ID_WEB_RUNNING = "web_running"
 
-const val NOTIFICATION_ID_SELF_UPDATE_CHECK = 999_999_999
 const val NOTIFICATION_TAG_UPDATE_CHECK = "UpdateCheck"
 const val NOTIFICATION_TAG_DOWNLOAD = "DownloadResult"
 const val NOTIFICATION_TAG_INSTALL_RESULT = "InstallResult"
 
 const val UPDATE_CHECK_TASK_TAG = "update_check"
-const val GITLAB_UPDATE_CHECK_TASK_TAG = "gitlab_check"
 
 const val FLAVOR_FDROID = "fdroid"
 const val FLAVOR_ITCHIO = "itchio"
-const val FLAVOR_GITLAB = "gitlab"
 
 const val PREF_LAST_UPDATE_CHECK = "ua.gardenapple.itchupdater.lastupdatecheck"
-//const val PREF_DONT_SHOW_DEPRECATION_DIALOG = "ua.gardenapple.itchupdater.dontshowdeprecation"
-const val PREF_UPDATE_CHECKING = "ua.gardenapple.itchupdater.updatechecking"
 
-//TODO: Catch all app's exceptions in a nice way
+
 class Mitch : Application() {
 
     companion object {
@@ -87,6 +89,9 @@ class Mitch : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        if (ACRA.isACRASenderServiceProcess())
+            return
 
         setThemeFromPreferences(PreferenceManager.getDefaultSharedPreferences(this))
 
@@ -197,5 +202,30 @@ class Mitch : Application() {
                 "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             }
         }
+    }
+
+    /**
+     * ACRA crash reports
+     */
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base)
+
+        ACRA.init(this, CoreConfigurationBuilder(this).apply {
+            setBuildConfigClass(BuildConfig::class.java)
+            setReportFormat(StringFormat.KEY_VALUE_LIST)
+
+            getPluginConfigurationBuilder(MailSenderConfigurationBuilder::class.java).apply {
+                setMailTo("gardenapple+mitch@posteo.net")
+                setSubject("Mitch bug report")
+                setResBody(R.string.bug_report_dialog_prompt)
+                setEnabled(true)
+            }
+
+            getPluginConfigurationBuilder(DialogConfigurationBuilder::class.java).apply {
+                //TODO: figure out button style for native crash dialog
+                setReportDialogClass(CrashDialog::class.java)
+                setEnabled(true)
+            }
+        })
     }
 }

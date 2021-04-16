@@ -60,6 +60,13 @@
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.CrashDialog"
+            android:process=":acra"
+            android:theme="@style/DialogStyle"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleInstance"/>
 
         <receiver
                 android:name=".installer.InstallNotificationBroadcastReceiver"
