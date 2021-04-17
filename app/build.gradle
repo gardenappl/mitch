@@ -59,7 +59,7 @@ android {
         exclude 'META-INF/atomicfu.kotlin_module'
     }
     compileOptions {
-        coreLibraryDesugaringEnabled true
+//        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -75,8 +75,8 @@ android {
 dependencies {
 //    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    //TODO: required for PrettyTime if minSdkVersion < 26
-    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$rootProject.desugarVersion"
+//    //required for PrettyTime if minSdkVersion < 26
+//    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$rootProject.desugarVersion"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
@@ -130,8 +130,8 @@ dependencies {
     // Fetch
     implementation "androidx.tonyodev.fetch2:xfetch2:$rootProject.fetchAndroidxVersion"
     implementation "androidx.tonyodev.fetch2okhttp:xfetch2okhttp:$rootProject.fetchAndroidxVersion"
-    // PrettyTime
-    implementation "org.ocpsoft.prettytime:prettytime:$rootProject.prettyTimeVersion"
+//    // PrettyTime
+//    implementation "org.ocpsoft.prettytime:prettytime:$rootProject.prettyTimeVersion"
     // Application Crash Reports for Android (ACRA)
     implementation "ch.acra:acra-mail:$rootProject.acraVersion"
     implementation "ch.acra:acra-dialog:$acraVersion"

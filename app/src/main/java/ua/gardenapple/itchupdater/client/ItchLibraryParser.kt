@@ -42,12 +42,13 @@ class ItchLibraryParser {
                     if (response.isRedirect)
                         return@withContext null
 
-                    response.body!!.string()
+                    response.body?.string() ?: throw IOException("Expected response body, got null")
                 }
 
             val resultJson = try {
                 JSONObject(result)
             } catch (e: JSONException) {
+                //Invalid JSON == we got redirected to login page
                 return@withContext null
             }
             

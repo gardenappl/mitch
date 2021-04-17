@@ -30,7 +30,7 @@ task clean(type: Delete) {
 }
 
 ext {
-    desugarVersion = '1.1.1'
+//    desugarVersion = '1.1.1'
 
     roomVersion = '2.2.6'
     lifecycleVersion = '2.3.1'
@@ -54,6 +54,6 @@ ext {
     materialProgressBarVersion = '1.6.1'
     colormathVersion = '1.4.1'
     fetchAndroidxVersion = '3.1.6'
-    prettyTimeVersion = '5.0.0.Final'
+//    prettyTimeVersion = '5.0.0.Final'
     acraVersion = '5.7.0'
 }
