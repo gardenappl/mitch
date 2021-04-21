@@ -69,9 +69,8 @@ class ItchLibraryParser {
                 
                 val thumbnailLink = gameDiv.getElementsByClass("thumb_link").first()
                 val downloadUrl = thumbnailLink.attr("href")
-                val thumbnailUrl = 
-                    thumbnailCssPattern.find(thumbnailLink.child(0).attr("style"))!!
-                        .groupValues[1]
+                val thumbnailUrl = thumbnailCssPattern.find(thumbnailLink.child(0).attr("style"))
+                        ?.groupValues?.get(1)
                 val title = gameDiv.getElementsByClass("game_title").first().text()
                 val description = gameDiv.getElementsByClass("game_text").attr("title")
                 val author = gameDiv.getElementsByClass("game_author").first().text()
