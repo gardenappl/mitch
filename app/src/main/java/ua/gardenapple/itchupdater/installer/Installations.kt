@@ -5,13 +5,11 @@ import android.app.NotificationManager
 import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
-import ua.gardenapple.itchupdater.ui.GameListAdapter
 
 class Installations {
     companion object {

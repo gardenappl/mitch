@@ -15,16 +15,16 @@ import com.tonyodev.fetch2okhttp.OkHttpDownloader
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import org.acra.ACRA
-import org.acra.annotation.AcraDialog
 import org.acra.config.CoreConfigurationBuilder
 import org.acra.config.DialogConfigurationBuilder
 import org.acra.config.MailSenderConfigurationBuilder
 import org.acra.data.StringFormat
-import org.ocpsoft.prettytime.PrettyTime
-import ua.gardenapple.itchupdater.files.DownloadFileManager
 import ua.gardenapple.itchupdater.client.UpdateChecker
+import ua.gardenapple.itchupdater.files.DownloadFileManager
 import ua.gardenapple.itchupdater.files.ExternalFileManager
-import ua.gardenapple.itchupdater.installer.*
+import ua.gardenapple.itchupdater.installer.FileDownloadListener
+import ua.gardenapple.itchupdater.installer.Installer
+import ua.gardenapple.itchupdater.installer.InstallerDatabaseHandler
 import ua.gardenapple.itchupdater.ui.CrashDialog
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -69,9 +69,6 @@ class Mitch : Application() {
 
         val installer: Installer by lazy {
             Installer()
-        }
-        val prettyTime: PrettyTime by lazy {
-            PrettyTime()
         }
     }
 

@@ -1,6 +1,5 @@
 package ua.gardenapple.itchupdater.client
 
-import android.util.Log
 import android.webkit.CookieManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

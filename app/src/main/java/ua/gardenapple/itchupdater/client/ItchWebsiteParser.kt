@@ -15,7 +15,6 @@ import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 import java.io.IOException
-import java.lang.IllegalStateException
 import java.util.*
 import kotlin.collections.ArrayList
 

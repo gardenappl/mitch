@@ -9,7 +9,6 @@ import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
-import java.lang.IllegalArgumentException
 import java.util.*
 
 class SingleUpdateChecker(val db: AppDatabase) {

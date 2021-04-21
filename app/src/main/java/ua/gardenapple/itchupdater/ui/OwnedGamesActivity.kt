@@ -2,7 +2,6 @@ package ua.gardenapple.itchupdater.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -16,18 +15,14 @@ import androidx.paging.LoadState
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
-import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.R
-import ua.gardenapple.itchupdater.client.ItchLibraryParser
 import ua.gardenapple.itchupdater.data.ItchLibraryRepository
 import ua.gardenapple.itchupdater.data.ItchLibraryViewModel
 import ua.gardenapple.itchupdater.databinding.OwnedActivityBinding
-import ua.gardenapple.itchupdater.databinding.OwnedItemLoadStateFooterBinding
 
 class OwnedGamesActivity : AppCompatActivity() {
 

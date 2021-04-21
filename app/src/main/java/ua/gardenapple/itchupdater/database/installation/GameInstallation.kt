@@ -1,6 +1,5 @@
 package ua.gardenapple.itchupdater.database.installation
 
-import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Ignore
 import ua.gardenapple.itchupdater.database.game.Game

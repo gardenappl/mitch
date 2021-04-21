@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
@@ -15,14 +14,12 @@ import android.os.Bundle
 import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
-import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import com.github.ajalt.colormath.ConvertibleColor
 import com.github.ajalt.colormath.fromCss
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.*
-import java.net.URLConnection
 import kotlin.math.min
 
 class Utils {
