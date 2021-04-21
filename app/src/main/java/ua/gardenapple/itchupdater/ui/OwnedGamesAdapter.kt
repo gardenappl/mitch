@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -17,33 +18,35 @@ import com.bumptech.glide.Glide
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.client.ItchLibraryItem
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
+import ua.gardenapple.itchupdater.data.ItchLibraryUiModel
+import ua.gardenapple.itchupdater.databinding.OwnedItemSeparatorBinding
 
 class OwnedGamesAdapter(
     private val context: Context
-) : PagingDataAdapter<ItchLibraryItem, OwnedGamesAdapter.OwnedGameHolder>(OWNED_GAMES_COMPARATOR) {
+) : PagingDataAdapter<ItchLibraryUiModel, RecyclerView.ViewHolder>(OWNED_GAMES_COMPARATOR) {
 
     private val inflater: LayoutInflater by lazy {
         LayoutInflater.from(context)
     }
 
     companion object {
-        private val OWNED_GAMES_COMPARATOR = object : DiffUtil.ItemCallback<ItchLibraryItem>() {
+        private val OWNED_GAMES_COMPARATOR = object : DiffUtil.ItemCallback<ItchLibraryUiModel>() {
             override fun areItemsTheSame(
-                oldItem: ItchLibraryItem,
-                newItem: ItchLibraryItem
+                oldItem: ItchLibraryUiModel,
+                newItem: ItchLibraryUiModel
             ): Boolean {
                 return oldItem == newItem
             }
 
             override fun areContentsTheSame(
-                oldItem: ItchLibraryItem,
-                newItem: ItchLibraryItem
+                oldItem: ItchLibraryUiModel,
+                newItem: ItchLibraryUiModel
             ): Boolean {
                 return areItemsTheSame(oldItem, newItem)
             }
-
         }
     }
+
 
     class OwnedGameHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val thumbnailView: ImageView = itemView.findViewById(R.id.ownedGameThumbnail)
@@ -53,56 +56,77 @@ class OwnedGamesAdapter(
         val gameAuthor: TextView = itemView.findViewById(R.id.ownedGameAuthor)
         val gameAndroidLabel: TextView = itemView.findViewById(R.id.ownedGameAndroid)
         val loadingBar: ProgressBar = itemView.findViewById(R.id.ownedLoadingBar)
+
+
+        fun bind(ownedLibraryItem: ItchLibraryItem, context: Context) {
+            infoLayout.visibility = View.VISIBLE
+            loadingBar.visibility = View.GONE
+
+            gameName.text = ownedLibraryItem.title
+            gameAuthor.text = ownedLibraryItem.author
+            //Required for marquee animation
+            gameName.isSelected = true
+            gameAuthor.isSelected = true
+
+            gameAndroidLabel.text = if (ownedLibraryItem.isAndroid)
+                context.resources.getString(R.string.platform_android)
+            else
+                ""
+
+
+            val downloadUri = Uri.parse(ownedLibraryItem.downloadUrl)
+
+            itemView.setOnClickListener { _ ->
+                val storePageUri = Uri.parse(ItchWebsiteParser.getStoreUrlFromDownloadPage(downloadUri))
+                val intent = Intent(Intent.ACTION_VIEW, storePageUri, context, MainActivity::class.java)
+                context.startActivity(intent)
+            }
+
+
+            if (ownedLibraryItem.thumbnailUrl != null) {
+                thumbnailView.visibility = View.VISIBLE
+                thumbnailEmptyView.visibility = View.INVISIBLE
+                Glide.with(context)
+                    .load(ownedLibraryItem.thumbnailUrl)
+                    .override(OwnedGamesActivity.THUMBNAIL_WIDTH, OwnedGamesActivity.THUMBNAIL_HEIGHT)
+                    .into(thumbnailView)
+            } else {
+                thumbnailView.visibility = View.INVISIBLE
+                thumbnailEmptyView.visibility = View.VISIBLE
+            }
+        }
     }
 
-    override fun onBindViewHolder(holder: OwnedGameHolder, position: Int) {
-        val ownedLibraryItem = getItem(position)
-
-        if (ownedLibraryItem == null) {
-            holder.infoLayout.visibility = View.GONE
-            holder.loadingBar.visibility = View.VISIBLE
-            holder.itemView.isClickable = false
-            return
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (val uiModel = getItem(position)) {
+            is ItchLibraryUiModel.Item -> (holder as OwnedGameHolder).bind(uiModel.item, context)
+            is ItchLibraryUiModel.Separator -> (holder as SeparatorHolder).bind(uiModel)
         }
+    }
 
-        holder.infoLayout.visibility = View.VISIBLE
-        holder.loadingBar.visibility = View.GONE
-        
-        holder.gameName.text = ownedLibraryItem.title
-        holder.gameAuthor.text = ownedLibraryItem.author
-        //Required for marquee animation
-        holder.gameName.isSelected = true
-        holder.gameAuthor.isSelected = true
-
-        holder.gameAndroidLabel.text = if (ownedLibraryItem.isAndroid)
-            context.resources.getString(R.string.platform_android)
-        else
-            ""
-
-
-        val downloadUri = Uri.parse(ownedLibraryItem.downloadUrl)
-
-        holder.itemView.setOnClickListener { _ ->
-            val storePageUri = Uri.parse(ItchWebsiteParser.getStoreUrlFromDownloadPage(downloadUri))
-            val intent = Intent(Intent.ACTION_VIEW, storePageUri, context, MainActivity::class.java)
-            context.startActivity(intent)
-        }
-
-
-        if (ownedLibraryItem.thumbnailUrl != null) {
-            holder.thumbnailView.visibility = View.VISIBLE
-            holder.thumbnailEmptyView.visibility = View.INVISIBLE
-            Glide.with(context)
-                .load(ownedLibraryItem.thumbnailUrl)
-                .override(OwnedGamesActivity.THUMBNAIL_WIDTH, OwnedGamesActivity.THUMBNAIL_HEIGHT)
-                .into(holder.thumbnailView)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == R.layout.owned_item) {
+            OwnedGameHolder(inflater.inflate(R.layout.owned_item, parent, false))
         } else {
-            holder.thumbnailView.visibility = View.INVISIBLE
-            holder.thumbnailEmptyView.visibility = View.VISIBLE
+            SeparatorHolder(OwnedItemSeparatorBinding.inflate(inflater, parent, false))
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OwnedGameHolder {
-        return OwnedGameHolder(inflater.inflate(R.layout.owned_item, parent, false))
+    override fun getItemViewType(position: Int): Int {
+        return when (getItem(position)) {
+            is ItchLibraryUiModel.Item -> R.layout.owned_item
+            is ItchLibraryUiModel.Separator -> R.layout.owned_item_separator
+            else -> throw UnsupportedOperationException("Unknown item type")
+        }
+    }
+
+
+    class SeparatorHolder(private val binding: OwnedItemSeparatorBinding)
+        : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(separator: ItchLibraryUiModel.Separator) {
+            binding.divider.isVisible = !separator.isFirst
+            binding.purchaseDateLabel.text = separator.purchaseDate
+        }
     }
 }

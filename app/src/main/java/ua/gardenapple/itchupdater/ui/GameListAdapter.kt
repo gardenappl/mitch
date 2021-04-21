@@ -15,15 +15,18 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.*
 import ua.gardenapple.itchupdater.*
+import ua.gardenapple.itchupdater.client.ItchLibraryItem
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.GameRepository
 import ua.gardenapple.itchupdater.database.installation.GameInstallation
 import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.installer.Installations
+
 
 class GameListAdapter internal constructor(
     private val activity: Activity,
@@ -83,10 +86,13 @@ class GameListAdapter internal constructor(
 
         holder.overflowMenuButton.setOnClickListener { view -> onCardOverflowClick(view, position) }
 
-        Glide.with(context)
-            .load(game.thumbnailUrl)
-            .override(LibraryFragment.THUMBNAIL_WIDTH, LibraryFragment.THUMBNAIL_HEIGHT)
-            .into(holder.thumbnailView)
+        holder.thumbnailView.isVisible = game.thumbnailUrl != null
+        if (game.thumbnailUrl != null) {
+            Glide.with(context)
+                .load(game.thumbnailUrl)
+                .override(LibraryFragment.THUMBNAIL_WIDTH, LibraryFragment.THUMBNAIL_HEIGHT)
+                .into(holder.thumbnailView)
+        }
     }
 
     override fun getItemCount() = gameInstalls.size

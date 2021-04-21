@@ -8,7 +8,8 @@ data class ItchLibraryItem(
     val description: String,
     val author: String,
     val downloadUrl: String,
-    //Null if the purchase date is the same as previous item
-    val purchaseDate: Date?,
+    //Null means the purchase date is the same as previous item
+    //(but not necessarily the other way around)
+    val purchaseDate: String?,
     val isAndroid: Boolean
 )

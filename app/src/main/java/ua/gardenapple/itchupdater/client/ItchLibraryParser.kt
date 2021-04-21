@@ -57,14 +57,7 @@ class ItchLibraryParser {
             val document = Jsoup.parse(resultJson.getString("content"))
             for (gameDiv in document.getElementsByClass("game_cell")) {
                 val purchaseDate = gameDiv.getElementsByClass("date_header").firstOrNull()
-                    ?.getElementsByTag("span")
-                    ?.attr("title")
-                    ?.let {
-                        if (it.isNotEmpty())
-                            dateFormat.parse(it)
-                        else
-                            null
-                    }
+                    ?.getElementsByTag("span")?.text()
                 
                 val thumbnailLink = gameDiv.getElementsByClass("thumb_link").first()
                 val downloadUrl = thumbnailLink.attr("href")
@@ -76,7 +69,7 @@ class ItchLibraryParser {
                 val isAndroid = gameDiv.getElementsByClass("icon-android").isNotEmpty()
 
                 items.add(ItchLibraryItem(
-                    purchaseDate = purchaseDate,
+                    purchaseDate = if (purchaseDate.isNullOrEmpty()) null else purchaseDate,
                     downloadUrl = downloadUrl,
                     thumbnailUrl = thumbnailUrl,
                     title = title,
