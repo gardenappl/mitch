@@ -35,12 +35,27 @@
                 android:layout_height="0dp"
                 android:padding="5dp"
                 android:scaleType="fitCenter"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="@id/gameThumbnail"
                 app:layout_constraintDimensionRatio="W,1:1"
                 app:layout_constraintEnd_toStartOf="@id/updateCheckGameName"
                 app:layout_constraintStart_toStartOf="@id/gameThumbnail"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="?colorPrimary" />
+
+        <ImageView
+                android:id="@+id/gameThumbnailEmpty"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@id/gameThumbnail"
+                app:layout_constraintEnd_toStartOf="@id/updateCheckGameName"
+                app:layout_constraintStart_toStartOf="@id/gameThumbnail"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_baseline_star_border_24"
+                tools:visibility="visible"/>
 
 
         <TextView

@@ -28,8 +28,22 @@
                 app:layout_constraintDimensionRatio="W,315:250"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="?colorPrimary" />
+                app:srcCompat="?colorPrimary"
+                tools:visibility="invisible" />
 
+        <ImageView
+                android:id="@+id/ownedGameThumbnailEmpty"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_margin="10dp"
+                android:scaleType="fitCenter"
+                android:visibility="invisible"
+                tools:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@id/ownedGameThumbnail"
+                app:layout_constraintEnd_toStartOf="@id/ownedGameName"
+                app:layout_constraintStart_toStartOf="@id/ownedGameThumbnail"
+                app:layout_constraintTop_toTopOf="@id/ownedGameThumbnail"
+                app:srcCompat="@drawable/ic_baseline_star_border_24" />
 
         <TextView
                 android:id="@+id/ownedGameName"

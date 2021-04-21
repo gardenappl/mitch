@@ -47,12 +47,11 @@ class OwnedGamesAdapter(
 
     class OwnedGameHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val thumbnailView: ImageView = itemView.findViewById(R.id.ownedGameThumbnail)
+        val thumbnailEmptyView: ImageView = itemView.findViewById(R.id.ownedGameThumbnailEmpty)
         val infoLayout: ConstraintLayout = itemView.findViewById(R.id.ownedGameInfoLayout)
         val gameName: TextView = itemView.findViewById(R.id.ownedGameName)
         val gameAuthor: TextView = itemView.findViewById(R.id.ownedGameAuthor)
         val gameAndroidLabel: TextView = itemView.findViewById(R.id.ownedGameAndroid)
-//        val downloadOrInstallButton: MaterialButton =
-//            itemView.findViewById(R.id.ownedDownloadOrInstallButton)
         val loadingBar: ProgressBar = itemView.findViewById(R.id.ownedLoadingBar)
     }
 
@@ -80,11 +79,6 @@ class OwnedGamesAdapter(
         else
             ""
 
-//        holder.downloadOrInstallButton.text = if (ownedLibraryItem.isAndroid)
-//            context.resources.getString(R.string.library_install)
-//        else
-//            context.resources.getString(R.string.library_download)
-
 
         val downloadUri = Uri.parse(ownedLibraryItem.downloadUrl)
 
@@ -93,16 +87,19 @@ class OwnedGamesAdapter(
             val intent = Intent(Intent.ACTION_VIEW, storePageUri, context, MainActivity::class.java)
             context.startActivity(intent)
         }
-//        holder.downloadOrInstallButton.setOnClickListener { _ ->
-//            val intent = Intent(Intent.ACTION_VIEW, downloadUri)
-//            context.startActivity(intent)
-//        }
 
 
-        Glide.with(context)
-            .load(ownedLibraryItem.thumbnailUrl)
-            .override(OwnedGamesActivity.THUMBNAIL_WIDTH, OwnedGamesActivity.THUMBNAIL_HEIGHT)
-            .into(holder.thumbnailView)
+        if (ownedLibraryItem.thumbnailUrl != null) {
+            holder.thumbnailView.visibility = View.VISIBLE
+            holder.thumbnailEmptyView.visibility = View.INVISIBLE
+            Glide.with(context)
+                .load(ownedLibraryItem.thumbnailUrl)
+                .override(OwnedGamesActivity.THUMBNAIL_WIDTH, OwnedGamesActivity.THUMBNAIL_HEIGHT)
+                .into(holder.thumbnailView)
+        } else {
+            holder.thumbnailView.visibility = View.INVISIBLE
+            holder.thumbnailEmptyView.visibility = View.VISIBLE
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OwnedGameHolder {

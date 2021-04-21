@@ -65,8 +65,7 @@ class UpdatesListAdapter internal constructor(
             
             binding.appIcon.setImageDrawable(context.packageManager
                 .getApplicationIcon(availableUpdate.packageName))
-
-        } else {
+        } else if (availableUpdate.thumbnailUrl != null) {
             binding.appIcon.visibility = View.INVISIBLE
             binding.gameThumbnail.visibility = View.VISIBLE
 
@@ -74,6 +73,9 @@ class UpdatesListAdapter internal constructor(
                 .load(availableUpdate.thumbnailUrl)
                 .override(UpdatesFragment.THUMBNAIL_WIDTH, UpdatesFragment.THUMBNAIL_HEIGHT)
                 .into(binding.gameThumbnail)
+        } else {
+            binding.appIcon.visibility = View.INVISIBLE
+            binding.gameThumbnail.visibility = View.INVISIBLE
         }
 
 
