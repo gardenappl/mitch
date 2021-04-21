@@ -1,7 +1,5 @@
 package ua.gardenapple.itchupdater.client
 
-import java.util.*
-
 data class ItchLibraryItem(
     val thumbnailUrl: String?,
     val title: String,

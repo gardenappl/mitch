@@ -49,7 +49,7 @@ class LibraryFragment : Fragment() {
         _binding = LibraryFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        val pendingAdapter = GameListAdapter(requireActivity(), binding.pendingList, GameRepository.Type.Pending)
+        val pendingAdapter = LibraryAdapter(requireActivity(), binding.pendingList, GameRepository.Type.Pending)
         binding.pendingList.adapter = pendingAdapter
         binding.pendingList.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -81,7 +81,7 @@ class LibraryFragment : Fragment() {
         })
 
 
-        val downloadsAdapter = GameListAdapter(requireActivity(), binding.downloadsList, GameRepository.Type.Downloads)
+        val downloadsAdapter = LibraryAdapter(requireActivity(), binding.downloadsList, GameRepository.Type.Downloads)
         binding.downloadsList.adapter = downloadsAdapter
         binding.downloadsList.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -112,7 +112,7 @@ class LibraryFragment : Fragment() {
 
 
 
-        val installedAdapter = GameListAdapter(requireActivity(), binding.installedList, GameRepository.Type.Installed)
+        val installedAdapter = LibraryAdapter(requireActivity(), binding.installedList, GameRepository.Type.Installed)
         binding.installedList.adapter = installedAdapter
         binding.installedList.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -151,7 +151,7 @@ class LibraryFragment : Fragment() {
     }
 
     private inner class LibraryPreloadModelProvider(
-        val adapter: GameListAdapter
+        val adapter: LibraryAdapter
     ) : ListPreloader.PreloadModelProvider<GameInstallation> {
         override fun getPreloadItems(position: Int): MutableList<GameInstallation> {
             if(adapter.gameInstalls.isEmpty())

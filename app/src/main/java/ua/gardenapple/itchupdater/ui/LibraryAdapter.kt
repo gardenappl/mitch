@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.*
 import ua.gardenapple.itchupdater.*
-import ua.gardenapple.itchupdater.client.ItchLibraryItem
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.GameRepository
 import ua.gardenapple.itchupdater.database.installation.GameInstallation
@@ -28,11 +27,11 @@ import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.installer.Installations
 
 
-class GameListAdapter internal constructor(
+class LibraryAdapter internal constructor(
     private val activity: Activity,
     val list: RecyclerView,
     val type: GameRepository.Type
-) : RecyclerView.Adapter<GameListAdapter.GameViewHolder>() {
+) : RecyclerView.Adapter<LibraryAdapter.GameViewHolder>() {
 
     companion object {
         private const val LOGGING_TAG = "GameListAdapter"
