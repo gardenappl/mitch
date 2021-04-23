@@ -21,7 +21,6 @@
             android:paddingVertical="5dp"
             android:text="69 months ago"
             android:textColor="?colorPrimaryDark"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textSize="18sp" />
 
 </LinearLayout>

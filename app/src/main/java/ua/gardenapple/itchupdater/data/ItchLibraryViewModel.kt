@@ -35,10 +35,21 @@ class ItchLibraryViewModel(private val repository: ItchLibraryRepository) : View
                     if (after == null)
                         return@insertSeparators null
 
-                    return@insertSeparators if (before?.item?.purchaseDate != after.item.purchaseDate)
-                        ItchLibraryUiModel.Separator(after.item.purchaseDate, true)
-                    else
-                        null
+                    if (before == null) {
+                        return@insertSeparators ItchLibraryUiModel.Separator(
+                            after.item.purchaseDate, 
+                            isFirst = true
+                        )
+                    }
+
+                    if (before.item.purchaseDate != after.item.purchaseDate) {
+                        return@insertSeparators ItchLibraryUiModel.Separator(
+                            after.item.purchaseDate,
+                            isFirst = false
+                        )
+                    }
+
+                    null
                 }
             }
     }
