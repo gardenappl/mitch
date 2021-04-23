@@ -303,7 +303,7 @@ class ItchWebsiteParser {
             }
 
             if (ItchWebsiteUtils.isDevlogPage(doc)) {
-                return doc.getElementsByClass("game_title")[0].html()
+                return doc.getElementsByClass("game_metadata")[0].getElementsByTag("h3")[0].html()
             }
 
             throw IllegalArgumentException("Document is not related to game")
