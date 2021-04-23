@@ -7,6 +7,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.room.withTransaction
 import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2.Error
 import com.tonyodev.fetch2.FetchListener
@@ -119,18 +120,20 @@ class FileDownloadListener(private val context: Context) : FetchListener {
 
         runBlocking(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
-            val pendingInstall = db.installDao.getPendingInstallationByDownloadId(download.id)!!
+            db.withTransaction {
+                val pendingInstall = db.installDao.getPendingInstallationByDownloadId(download.id)!!
 
-            val notificationFile: File
-            if (isApk) {
-                notificationFile = downloadFileManager.getPendingFile(uploadId)!!
-            } else {
-                Installations.deleteOutdatedInstalls(context, pendingInstall)
-                downloadFileManager.replacePendingFile(download)
-                notificationFile = downloadFileManager.getDownloadedFile(uploadId)!!
+                val notificationFile: File
+                if (isApk) {
+                    notificationFile = downloadFileManager.getPendingFile(uploadId)!!
+                } else {
+                    Installations.deleteOutdatedInstalls(context, pendingInstall)
+                    downloadFileManager.replacePendingFile(download)
+                    notificationFile = downloadFileManager.getDownloadedFile(uploadId)!!
+                }
+                createResultNotification(context, notificationFile, download.id, isApk)
+                Mitch.databaseHandler.onDownloadComplete(pendingInstall, isApk)
             }
-            createResultNotification(context, notificationFile, download.id, isApk)
-            Mitch.databaseHandler.onDownloadComplete(pendingInstall, isApk)
         }
         downloadFileManager.removeFetchDownload(download.id)
     }
@@ -148,9 +151,12 @@ class FileDownloadListener(private val context: Context) : FetchListener {
         createResultNotification(context, File(download.file), download.id, isApk, error)
 
         runBlocking(Dispatchers.IO) {
+            val db = AppDatabase.getDatabase(context)
             val uploadId = Mitch.fileManager.getUploadId(download)
-            Mitch.fileManager.deletePendingFile(uploadId)
-            Mitch.databaseHandler.onDownloadFailed(download.id)
+            db.withTransaction {
+                Mitch.fileManager.deletePendingFile(uploadId)
+                Mitch.databaseHandler.onDownloadFailed(download.id)
+            }
         }
         Mitch.fileManager.removeFetchDownload(download.id)
     }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
+import androidx.room.withTransaction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,8 +25,8 @@ class ItchBrowseHandler(
         // but I want these values to be retained. Making them static is a lazy solution.
         @Volatile
         private var lastDownloadDoc: Document? = null
-//        @Volatile
-//        private var lastDownloadPageUrl: String? = null
+        @Volatile
+        private var lastDownloadPageUrl: String? = null
         @Volatile
         private var clickedUploadId: Int? = null
         @Volatile
@@ -38,12 +39,12 @@ class ItchBrowseHandler(
 
     suspend fun onPageVisited(doc: Document, url: String) {
         lastDownloadDoc = null
-//        lastDownloadPageUrl = null
+        lastDownloadPageUrl = null
 
         if (ItchWebsiteUtils.isStorePage(doc)) {
-            val db = AppDatabase.getDatabase(context)
-            ItchWebsiteParser.getGameInfoForStorePage(doc, url)?.let { game ->
-                withContext(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
+                val db = AppDatabase.getDatabase(context)
+                ItchWebsiteParser.getGameInfoForStorePage(doc, url)?.let { game ->
                     Log.d(LOGGING_TAG, "Adding game $game")
                     db.gameDao.upsert(game)
                 }
@@ -66,13 +67,13 @@ class ItchBrowseHandler(
         }
     }
 
-    fun setClickedUploadId(uploadId: Int) {
+    suspend fun setClickedUploadId(uploadId: Int) = withContext(Dispatchers.IO) {
         Log.d(LOGGING_TAG, "Set upload ID: $uploadId")
         clickedUploadId = uploadId
         tryStartDownload()
     }
 
-    fun onDownloadStarted(url: String, contentDisposition: String?, mimeType: String?) {
+    suspend fun onDownloadStarted(url: String, contentDisposition: String?, mimeType: String?) = withContext(Dispatchers.IO) {
         currentDownloadUrl = url
         currentDownloadContentDisposition = contentDisposition
         currentDownloadMimeType = mimeType
@@ -81,7 +82,7 @@ class ItchBrowseHandler(
 
     private fun tryStartDownload() {
         Log.d(LOGGING_TAG, "Upload ID: $clickedUploadId")
-        Log.d(LOGGING_TAG, "Download URL: $currentDownloadUrl")
+//        Log.d(LOGGING_TAG, "Download URL: $currentDownloadUrl")
 //        Log.d(LOGGING_TAG, "Download page URL: $lastDownloadPageUrl")
 
         val downloadPageDoc = lastDownloadDoc ?: return
@@ -91,11 +92,22 @@ class ItchBrowseHandler(
         val contentDisposition = currentDownloadContentDisposition ?: return
         val mimeType = currentDownloadMimeType ?: return
 
-        Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_LONG)
-            .show()
+        coroutineScope.launch(Dispatchers.Main) {
+            Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_LONG)
+                .show()
+        }
 
         coroutineScope.launch(Dispatchers.IO) {
             val pendingInstall = ItchWebsiteParser.getPendingInstallation(downloadPageDoc, uploadId)
+
+            val db = AppDatabase.getDatabase(context)
+
+            //Make sure that the corresponding Game is present in the database
+            val game = db.gameDao.getGameById(pendingInstall.gameId)
+            if (game == null) {
+
+            }
+
             GameDownloader.requestDownload(context, pendingInstall, downloadUrl,
                 contentDisposition, mimeType)
         }

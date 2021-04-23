@@ -91,7 +91,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         webView.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
             Log.d(LOGGING_TAG, "Requesting download...")
-            browseHandler?.onDownloadStarted(url, contentDisposition, mimeType)
+            runBlocking(Dispatchers.IO) {
+                browseHandler?.onDownloadStarted(url, contentDisposition, mimeType)
+            }
         }
 
 
@@ -526,7 +528,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     private class ItchJavaScriptInterface(val fragment: BrowseFragment) {
         @JavascriptInterface
         fun onDownloadLinkClick(uploadId: String) {
-            fragment.launch(Dispatchers.Main) {
+            fragment.launch(Dispatchers.IO) {
                 fragment.browseHandler?.setClickedUploadId(uploadId.toInt())
             }
         }

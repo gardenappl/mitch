@@ -3,6 +3,7 @@ package ua.gardenapple.itchupdater.installer
 import android.content.Context
 import android.content.pm.PackageInstaller
 import android.util.Log
+import androidx.room.withTransaction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.database.AppDatabase
@@ -14,7 +15,7 @@ class InstallerDatabaseHandler(val context: Context)  {
         private const val LOGGING_TAG = "InstallDatabaseHandler"
     }
 
-    suspend fun onInstallResult(pendingInstall: Installation, packageName: String, status: Int) =
+    suspend fun onInstallResult(pendingInstall: Installation, packageName: String, status: Int): Unit =
         withContext(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
             Log.d(LOGGING_TAG, "onInstallComplete")
@@ -71,8 +72,7 @@ class InstallerDatabaseHandler(val context: Context)  {
             val db = AppDatabase.getDatabase(context)
             Log.d(LOGGING_TAG, "onInstallStart")
 
-            val pendingInstall =
-                db.installDao.getPendingInstallationByDownloadId(downloadId) ?: return@withContext
+            val pendingInstall = db.installDao.getPendingInstallationByDownloadId(downloadId)!!
 
             pendingInstall.status = Installation.STATUS_INSTALLING
             pendingInstall.downloadOrInstallId = pendingInstallSessionId

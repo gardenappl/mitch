@@ -17,9 +17,9 @@ import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultModel.Co
 @Dao
 abstract class UpdateCheckResultDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    protected abstract fun insert(updateCheckResult: UpdateCheckResultModel)
+    protected abstract suspend fun insert(updateCheckResult: UpdateCheckResultModel)
 
-    fun insert(updateCheckResult: UpdateCheckResult) {
+    suspend fun insert(updateCheckResult: UpdateCheckResult) {
         insert(Converters.toModel(updateCheckResult))
     }
 
@@ -37,16 +37,16 @@ abstract class UpdateCheckResultDao {
     abstract fun getNotUpToDateResults(): LiveData<List<InstallUpdateCheckResult>>
     
     @Query("SELECT * FROM $TABLE_NAME WHERE $INSTALLATION_ID = :installId")
-    protected abstract fun getUpdateCheckResultModel(installId: Int): UpdateCheckResultModel?
+    protected abstract suspend fun getUpdateCheckResultModel(installId: Int): UpdateCheckResultModel?
 
-    fun getUpdateCheckResult(installId: Int): UpdateCheckResult? {
+    suspend fun getUpdateCheckResult(installId: Int): UpdateCheckResult? {
         return getUpdateCheckResultModel(installId)?.let { Converters.toResult(it) }
     }
     
     @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId")
-    protected abstract fun getUpdateCheckResultModelForUpload(uploadId: Int): UpdateCheckResultModel?
+    protected abstract suspend fun getUpdateCheckResultModelForUpload(uploadId: Int): UpdateCheckResultModel?
 
-    fun getUpdateCheckResultForUpload(uploadId: Int): UpdateCheckResult? {
+    suspend fun getUpdateCheckResultForUpload(uploadId: Int): UpdateCheckResult? {
         return getUpdateCheckResultModelForUpload(uploadId)?.let { Converters.toResult(it) }
     }
 }

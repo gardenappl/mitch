@@ -40,8 +40,8 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
     /**
      * All previous downloads for the same uploadId must be cancelled at this point
      */
-    internal fun startDownload(url: String, fileName: String, pendingInstall: Installation) {
-        val uploadId = pendingInstall.uploadId
+    internal suspend fun startDownload(url: String, fileName: String, install: Installation) {
+        val uploadId = install.uploadId
         deletePendingFile(uploadId)
         val request = Request(url, "$pendingPath/$uploadId/$fileName").apply {
             this.networkType = NetworkType.ALL
@@ -49,19 +49,23 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
                 Extras(Collections.singletonMap(DOWNLOAD_EXTRA_UPLOAD_ID, uploadId.toString()))
         }
 
+        val db = AppDatabase.getDatabase(context);
+        val insertedId: Int = db.installDao.insert(install).toInt();
+
         fetch.enqueue(request, { updatedRequest ->
             Log.d(LOGGING_TAG, "Enqueued ${updatedRequest.id}")
+
+            val pendingInstall = install.copy(internalId = insertedId);
             pendingInstall.downloadOrInstallId = updatedRequest.id
             pendingInstall.status = Installation.STATUS_DOWNLOADING
             runBlocking(Dispatchers.IO) {
-                val db = AppDatabase.getDatabase(context)
                 db.installDao.insert(pendingInstall)
             }
         }, { error ->
             Log.e(LOGGING_TAG, error.name, error.throwable)
             val builder =
                 NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
-                    setContentTitle(pendingInstall.uploadName)
+                    setContentTitle(install.uploadName)
                     setContentText(context.resources.getString(R.string.notification_download_error, error.name))
                     priority = NotificationCompat.PRIORITY_HIGH
                 }

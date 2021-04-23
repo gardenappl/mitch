@@ -8,6 +8,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.room.withTransaction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.*
@@ -52,14 +53,17 @@ class InstallerService : Service() {
                 notifyInstallResult(sessionId, packageName!!, apkName, status)
                 runBlocking(Dispatchers.IO) {
                     val db = AppDatabase.getDatabase(applicationContext)
-                    val install = db.installDao.getPendingInstallationBySessionId(sessionId)!!
-                    Mitch.fileManager.deletePendingFile(install.uploadId)
-                    Installations.deleteOutdatedInstalls(applicationContext, install)
-                    Mitch.databaseHandler.onInstallResult(install, packageName, status)
 
-                    db.updateCheckDao.getUpdateCheckResultForUpload(install.uploadId)?.let {
-                        it.isInstalling = false
-                        db.updateCheckDao.insert(it)
+                    db.withTransaction {
+                        val install = db.installDao.getPendingInstallationBySessionId(sessionId)!!
+                        Mitch.fileManager.deletePendingFile(install.uploadId)
+                        Installations.deleteOutdatedInstalls(applicationContext, install)
+                        Mitch.databaseHandler.onInstallResult(install, packageName, status)
+
+                        db.updateCheckDao.getUpdateCheckResultForUpload(install.uploadId)?.let {
+                            it.isInstalling = false
+                            db.updateCheckDao.insert(it)
+                        }
                     }
                 }
             }

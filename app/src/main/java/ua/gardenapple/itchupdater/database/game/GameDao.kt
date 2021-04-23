@@ -65,16 +65,16 @@ abstract class GameDao {
 
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId LIMIT 1")
-    abstract fun getGameById(gameId: Int): Game?
+    abstract suspend fun getGameById(gameId: Int): Game?
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     protected abstract fun insert(vararg games: Game)
 
     @Update
-    abstract fun update(vararg games: Game)
+    abstract suspend fun update(vararg games: Game)
 
     @Transaction
-    open fun upsert(vararg games: Game) {
+    open suspend fun upsert(vararg games: Game) {
         for (game in games) {
             val existingGame = getGameById(game.gameId)
             if (existingGame == null)

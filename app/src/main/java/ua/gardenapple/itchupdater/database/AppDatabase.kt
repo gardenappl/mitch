@@ -2,10 +2,12 @@ package ua.gardenapple.itchupdater.database
 
 import android.content.Context
 import android.util.Log
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+import androidx.room.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.BuildConfig
 import ua.gardenapple.itchupdater.FLAVOR_FDROID
 import ua.gardenapple.itchupdater.database.game.Game
@@ -28,21 +30,20 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val installDao: InstallationDao
     abstract val updateCheckDao: UpdateCheckResultDao
 
-    /**
-     * Singleton database
-     * https://gist.github.com/florina-muntenescu/697e543652b03d3d2a06703f5d6b44b5
-     */
     companion object {
         private const val LOGGING_TAG = "DatabaseSetup"
+
+        private val creationMutex = Mutex()
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        fun getDatabase(context: Context): AppDatabase =
-            INSTANCE ?: synchronized(this) {
+        suspend fun getDatabase(context: Context): AppDatabase =
+            INSTANCE ?: creationMutex.withLock {
                 INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
             }
         
-        private fun buildDatabase(context: Context): AppDatabase =
+        private suspend fun buildDatabase(context: Context): AppDatabase =
             Room.databaseBuilder(
                 context.applicationContext,
                 AppDatabase::class.java, "app_database"
@@ -57,7 +58,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(Migrations.Migration_8_9)
                 .build()
                 .also { appDb ->
-                    appDb.runInTransaction {
+                    appDb.withTransaction {
                         Log.d(LOGGING_TAG, "Deleting info on Mitch")
                         appDb.installDao.deleteFinishedInstallation(context.packageName)
 
@@ -77,7 +78,7 @@ abstract class AppDatabase : RoomDatabase() {
     }
 
 
-    fun addMitchToDatabase(context: Context) {
+    suspend fun addMitchToDatabase(context: Context) {
         val game = Game(
             gameId = Game.MITCH_GAME_ID,
             name = "Mitch",

@@ -20,55 +20,51 @@ abstract class InstallationDao {
     @Query("SELECT * FROM $TABLE_NAME WHERE $STATUS = $STATUS_INSTALLED")
     abstract fun getFinishedInstallations(): LiveData<List<Installation>>
 
-    //for debug purposes
-    @Query("SELECT * FROM $TABLE_NAME")
-    abstract fun getAllInstallationsSync(): List<Installation>
-
     @Query("SELECT * FROM $TABLE_NAME WHERE $STATUS = $STATUS_INSTALLED")
-    abstract fun getFinishedInstallationsSync(): List<Installation>
+    abstract suspend fun getFinishedInstallationsSync(): List<Installation>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS = $STATUS_INSTALLED")
-    abstract fun getFinishedInstallationsForGame(gameId: Int): List<Installation>
+    abstract suspend fun getFinishedInstallationsForGame(gameId: Int): List<Installation>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(vararg installations: Installation)
+    abstract suspend fun insert(installation: Installation): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(installations: List<Installation>)
+    abstract suspend fun insert(installations: List<Installation>)
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS != $STATUS_INSTALLED")
-    abstract fun getPendingInstallations(uploadId: Int): List<Installation>
+    abstract suspend fun getPendingInstallations(uploadId: Int): List<Installation>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS != $STATUS_INSTALLED")
-    abstract fun getPendingInstallation(uploadId: Int): Installation?
+    abstract suspend fun getPendingInstallation(uploadId: Int): Installation?
 
     @Update
-    abstract fun update(vararg installations: Installation)
+    abstract suspend fun update(vararg installations: Installation)
 
     @Query("DELETE FROM $TABLE_NAME WHERE $INTERNAL_ID = :internalId")
-    abstract fun delete(internalId: Int)
+    abstract suspend fun delete(internalId: Int)
 
     @Delete
-    abstract fun delete(installation: Installation)
+    abstract suspend fun delete(installation: Installation)
 
     @Delete
-    abstract fun delete(installations: List<Installation>)
+    abstract suspend fun delete(installations: List<Installation>)
 
     @Query("DELETE FROM $TABLE_NAME WHERE $PACKAGE_NAME = :packageName AND $STATUS = $STATUS_INSTALLED")
-    abstract fun deleteFinishedInstallation(packageName: String)
+    abstract suspend fun deleteFinishedInstallation(packageName: String)
 
     @Query("DELETE FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS = $STATUS_INSTALLED")
-    abstract fun deleteFinishedInstallation(uploadId: Int)
+    abstract suspend fun deleteFinishedInstallation(uploadId: Int)
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $PACKAGE_NAME = :packageName AND $STATUS = $STATUS_INSTALLED")
-    abstract fun getInstallationByPackageName(packageName: String): Installation?
+    abstract suspend fun getInstallationByPackageName(packageName: String): Installation?
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $INTERNAL_ID = :internalId LIMIT 1")
-    abstract fun getInstallationById(internalId: Int): Installation?
+    abstract suspend fun getInstallationById(internalId: Int): Installation?
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :downloadId AND $STATUS != $STATUS_INSTALLING")
-    abstract fun getPendingInstallationByDownloadId(downloadId: Int): Installation?
+    abstract suspend fun getPendingInstallationByDownloadId(downloadId: Int): Installation?
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :installSessionId AND $STATUS = $STATUS_INSTALLING")
-    abstract fun getPendingInstallationBySessionId(installSessionId: Int): Installation?
+    abstract suspend fun getPendingInstallationBySessionId(installSessionId: Int): Installation?
 }
