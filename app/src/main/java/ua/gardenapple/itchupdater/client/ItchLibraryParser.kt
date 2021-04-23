@@ -17,7 +17,6 @@ class ItchLibraryParser {
     companion object {
         private const val LOGGING_TAG = "ItchLibraryParser"
         
-        private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
         private val thumbnailCssPattern = Regex("""background-image:\s+url\('([^']*)'\)""")
         
         const val PAGE_SIZE = 50
@@ -55,9 +54,16 @@ class ItchLibraryParser {
             val items = ArrayList<ItchLibraryItem>(itemCount)
 
             val document = Jsoup.parse(resultJson.getString("content"))
+
+            var lastPurchaseDate: String? = null
             for (gameDiv in document.getElementsByClass("game_cell")) {
-                val purchaseDate = gameDiv.getElementsByClass("date_header").firstOrNull()
+                var purchaseDate: String? = gameDiv.getElementsByClass("date_header").firstOrNull()
                     ?.getElementsByTag("span")?.text()
+
+                if (purchaseDate.isNullOrEmpty())
+                    purchaseDate = lastPurchaseDate
+                else
+                    lastPurchaseDate = purchaseDate
                 
                 val thumbnailLink = gameDiv.getElementsByClass("thumb_link").first()
                 val downloadUrl = thumbnailLink.attr("href")
@@ -69,7 +75,7 @@ class ItchLibraryParser {
                 val isAndroid = gameDiv.getElementsByClass("icon-android").isNotEmpty()
 
                 items.add(ItchLibraryItem(
-                    purchaseDate = if (purchaseDate.isNullOrEmpty()) null else purchaseDate,
+                    purchaseDate = purchaseDate!!,
                     downloadUrl = downloadUrl,
                     thumbnailUrl = thumbnailUrl,
                     title = title,

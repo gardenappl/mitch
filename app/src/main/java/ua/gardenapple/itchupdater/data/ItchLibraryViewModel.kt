@@ -31,21 +31,14 @@ class ItchLibraryViewModel(private val repository: ItchLibraryRepository) : View
         return itemsFlow
             .map { pagingData -> pagingData.map { item -> ItchLibraryUiModel.Item(item) } }
             .map { 
-                it.insertSeparators { _, after ->
+                it.insertSeparators { before, after ->
                     if (after == null)
                         return@insertSeparators null
 
-                    if (lastDate == null) {
-                        lastDate = after.item.purchaseDate
-                        return@insertSeparators ItchLibraryUiModel.Separator(lastDate, true)
-                    }
-
-                    if (after.item.purchaseDate != null && after.item.purchaseDate != lastDate) {
-                        lastDate = after.item.purchaseDate
-                        return@insertSeparators ItchLibraryUiModel.Separator(lastDate!!, false)
-                    }
-
-                    null
+                    return@insertSeparators if (before?.item?.purchaseDate != after.item.purchaseDate)
+                        ItchLibraryUiModel.Separator(after.item.purchaseDate, true)
+                    else
+                        null
                 }
             }
     }
