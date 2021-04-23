@@ -48,6 +48,7 @@ class LibraryAdapter internal constructor(
 
     inner class GameViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val thumbnailView: ImageView = itemView.findViewById(R.id.gameThumbnail)
+        val emptyThumbnailView: ImageView = itemView.findViewById(R.id.gameThumbnailEmpty);
         val gameName: TextView = itemView.findViewById(R.id.gameName)
         val authorOrSubtitle: TextView = itemView.findViewById(R.id.authorOrSubtitle)
         val progressBarLayout: LinearLayout = itemView.findViewById(R.id.progressBarLayout)
@@ -91,6 +92,9 @@ class LibraryAdapter internal constructor(
                 .load(game.thumbnailUrl)
                 .override(LibraryFragment.THUMBNAIL_WIDTH, LibraryFragment.THUMBNAIL_HEIGHT)
                 .into(holder.thumbnailView)
+            holder.emptyThumbnailView.visibility = View.INVISIBLE
+        } else {
+            holder.emptyThumbnailView.visibility = View.VISIBLE
         }
     }
 

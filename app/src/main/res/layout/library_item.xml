@@ -31,6 +31,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:scaleType="fitCenter"
+                android:visibility="invisible"
 
                 app:layout_constraintBottom_toBottomOf="@id/gameThumbnail"
                 app:layout_constraintTop_toTopOf="@id/gameThumbnail"
