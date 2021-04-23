@@ -6,7 +6,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.view.MenuItemCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -30,7 +32,8 @@ class OwnedGamesActivity : AppCompatActivity() {
         const val THUMBNAIL_WIDTH = 315
         const val THUMBNAIL_HEIGHT = 250
 
-        private const val LAST_ANDROID_ONLY_FILTER = "last_android_only"
+        private const val LAST_SEARCH_QUERY = "last_search"
+        private const val LAST_ANDROID_ONLY_FILTER = "ua.gardenapple.itchupdater.lastupdatecheck.last_android_only"
         private const val DEFAULT_ANDROID_ONLY_FILTER = false
     }
 
@@ -42,6 +45,7 @@ class OwnedGamesActivity : AppCompatActivity() {
     private val repository = ItchLibraryRepository()
 
     private var androidOnlyFilter: Boolean = DEFAULT_ANDROID_ONLY_FILTER
+    private var searchString: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,7 +103,9 @@ class OwnedGamesActivity : AppCompatActivity() {
             savedInstanceState?.getBoolean(LAST_ANDROID_ONLY_FILTER, DEFAULT_ANDROID_ONLY_FILTER)
                 ?: PreferenceManager.getDefaultSharedPreferences(this).getBoolean(
                     LAST_ANDROID_ONLY_FILTER, DEFAULT_ANDROID_ONLY_FILTER)
-        load(androidOnlyFilter)
+        searchString = savedInstanceState?.getString(LAST_SEARCH_QUERY) ?: ""
+
+        load(searchString, androidOnlyFilter)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -108,11 +114,11 @@ class OwnedGamesActivity : AppCompatActivity() {
     }
 
 
-    private fun load(androidOnly: Boolean) {
+    private fun load(searchString: String, androidOnly: Boolean) {
         loadJob?.cancel()
 
         loadJob = lifecycleScope.launch(Dispatchers.IO) {
-            viewModel.getOwnedItems(androidOnly).collectLatest {
+            viewModel.getOwnedItems(searchString, androidOnly).collectLatest {
                 adapter.submitData(it)
             }
         }
@@ -144,7 +150,20 @@ class OwnedGamesActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.owned_actions, menu)
-        menu.findItem(R.id.only_android).setChecked(androidOnlyFilter)
+        menu.findItem(R.id.only_android).isChecked = androidOnlyFilter
+
+        val searchView: SearchView = menu.findItem(R.id.games_search).actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean = true
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let {
+                    searchString = newText
+                    this@OwnedGamesActivity.load(it, androidOnlyFilter)
+                }
+                return true
+            }
+        })
         return true
     }
 
@@ -152,7 +171,7 @@ class OwnedGamesActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.only_android -> {
                 androidOnlyFilter = !item.isChecked
-                load(androidOnlyFilter)
+                load(searchString, androidOnlyFilter)
                 val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
                 sharedPrefs.edit().run {
                     putBoolean(LAST_ANDROID_ONLY_FILTER, androidOnlyFilter)

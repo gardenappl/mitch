@@ -131,4 +131,5 @@
     <string name="bug_report_dialog">Sorry, Mitch crashed due to an error. Press OK to send a bug report to the developer.</string>
     <string name="bug_report_dialog_prompt">Please also describe what you were doing when the app crashed (preferably in English, Ukrainian, or Russian):</string>
     <string name="bug_report_dialog_title">Mitch stopped working</string>
+    <string name="library_games_search">Search</string>
 </resources>

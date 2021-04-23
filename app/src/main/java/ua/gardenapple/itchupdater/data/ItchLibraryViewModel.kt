@@ -12,14 +12,19 @@ class ItchLibraryViewModel(private val repository: ItchLibraryRepository) : View
     
     private lateinit var cachedItemsFlow: Flow<PagingData<ItchLibraryItem>>
 
-    fun getOwnedItems(androidOnly: Boolean) : Flow<PagingData<ItchLibraryUiModel>> {
+    fun getOwnedItems(searchString: String, androidOnly: Boolean) : Flow<PagingData<ItchLibraryUiModel>> {
         if (!this::cachedItemsFlow.isInitialized)
             cachedItemsFlow = repository.getLibraryStream().cachedIn(viewModelScope)
 
-        val itemsFlow = if (androidOnly)
-            cachedItemsFlow.map { pagingData -> pagingData.filter { item -> item.isAndroid } }
-        else
+        val itemsFlow = if (androidOnly) {
+            cachedItemsFlow.map { pagingData ->
+                pagingData.filter { item -> item.isAndroid }
+            }
+        } else {
             cachedItemsFlow
+        }.map { pagingData ->
+            pagingData.filter { item -> item.title.contains(searchString, ignoreCase = true) }
+        }
 
         var lastDate: String? = null
 
@@ -27,13 +32,12 @@ class ItchLibraryViewModel(private val repository: ItchLibraryRepository) : View
             .map { pagingData -> pagingData.map { item -> ItchLibraryUiModel.Item(item) } }
             .map { 
                 it.insertSeparators { _, after ->
-                    Log.d("agag", "lastDate: $lastDate, item: ${after?.item}")
                     if (after == null)
                         return@insertSeparators null
 
                     if (lastDate == null) {
                         lastDate = after.item.purchaseDate
-                        return@insertSeparators ItchLibraryUiModel.Separator(lastDate!!, true)
+                        return@insertSeparators ItchLibraryUiModel.Separator(lastDate, true)
                     }
 
                     if (after.item.purchaseDate != null && after.item.purchaseDate != lastDate) {

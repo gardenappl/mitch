@@ -6,8 +6,10 @@ data class ItchLibraryItem(
     val description: String,
     val author: String,
     val downloadUrl: String,
-    //Null means the purchase date is the same as previous item
-    //(but not necessarily the other way around)
+    /**
+     * Can be null if this is the first item in a page,
+     * in which case use the purchaseDate from the last item in the previous page
+     */
     val purchaseDate: String?,
     val isAndroid: Boolean
 )
