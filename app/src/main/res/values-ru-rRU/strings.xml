@@ -130,7 +130,7 @@
     <string name="library_no_android_games">Похоже, что у вас нет игр для Android.</string>
     <string name="library_go_to_store">Зайти в магазин</string>
     <string name="bug_report_dialog">Извините, Mitch крашнулся из-за некой ошибки. Нажмите ОК, чтобы сообщить об этом разработчику.</string>
-    <string name="bug_report_dialog_prompt">Пожалуйста, напишите, чем вы занимались, когда выскочила ошибка (можно писать на русском, украинском, или английском):</string>
+    <string name="bug_report_dialog_prompt">Пожалуйста, напишите, чем вы занимались, когда выскочила ошибка (можно писать на русском, украинском, или английском).</string>
     <string name="bug_report_dialog_title">Mitch перестал работать</string>
     <string name="library_games_search">Поиск</string>
 </resources>

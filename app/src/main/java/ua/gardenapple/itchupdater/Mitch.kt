@@ -216,6 +216,7 @@ class Mitch : Application() {
                 setSubject("Mitch bug report")
                 setResBody(R.string.bug_report_dialog_prompt)
                 setEnabled(true)
+                setReportFileName("crash-report.txt")
             }
 
             getPluginConfigurationBuilder(DialogConfigurationBuilder::class.java).apply {

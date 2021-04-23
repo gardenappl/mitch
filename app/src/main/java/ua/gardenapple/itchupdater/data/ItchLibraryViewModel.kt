@@ -26,8 +26,6 @@ class ItchLibraryViewModel(private val repository: ItchLibraryRepository) : View
             pagingData.filter { item -> item.title.contains(searchString, ignoreCase = true) }
         }
 
-        var lastDate: String? = null
-
         return itemsFlow
             .map { pagingData -> pagingData.map { item -> ItchLibraryUiModel.Item(item) } }
             .map { 

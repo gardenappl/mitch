@@ -129,7 +129,7 @@
     <string name="library_no_android_games">It looks like you don\'t own any Android games.</string>
     <string name="library_go_to_store">Go to store</string>
     <string name="bug_report_dialog">Sorry, Mitch crashed due to an error. Press OK to send a bug report to the developer.</string>
-    <string name="bug_report_dialog_prompt">Please also describe what you were doing when the app crashed (preferably in English, Ukrainian, or Russian):</string>
+    <string name="bug_report_dialog_prompt">Please describe what you were doing when the app crashed (preferably in English, Ukrainian, or Russian).</string>
     <string name="bug_report_dialog_title">Mitch stopped working</string>
     <string name="library_games_search">Search</string>
 </resources>
