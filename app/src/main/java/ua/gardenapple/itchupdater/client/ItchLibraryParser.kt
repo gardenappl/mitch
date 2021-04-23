@@ -16,7 +16,7 @@ import kotlin.collections.ArrayList
 class ItchLibraryParser {
     companion object {
         private const val LOGGING_TAG = "ItchLibraryParser"
-        
+
         private val thumbnailCssPattern = Regex("""background-image:\s+url\('([^']*)'\)""")
         
         const val PAGE_SIZE = 50

@@ -8,17 +8,20 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
-import androidx.core.view.MenuItemCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.R
@@ -105,7 +108,7 @@ class OwnedGamesActivity : AppCompatActivity() {
                     LAST_ANDROID_ONLY_FILTER, DEFAULT_ANDROID_ONLY_FILTER)
         searchString = savedInstanceState?.getString(LAST_SEARCH_QUERY) ?: ""
 
-        load(searchString, androidOnlyFilter)
+        loadItems(searchString, androidOnlyFilter)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -114,13 +117,20 @@ class OwnedGamesActivity : AppCompatActivity() {
     }
 
 
-    private fun load(searchString: String, androidOnly: Boolean) {
+    private fun loadItems(searchString: String, androidOnly: Boolean) {
         loadJob?.cancel()
 
         loadJob = lifecycleScope.launch(Dispatchers.IO) {
             viewModel.getOwnedItems(searchString, androidOnly).collectLatest {
                 adapter.submitData(it)
             }
+        }
+
+        lifecycleScope.launch {
+            adapter.loadStateFlow
+                .distinctUntilChangedBy { it.refresh }
+                .filter { it.refresh is LoadState.NotLoading }
+                .collect { binding.ownedItemsList.scrollToPosition(0) }
         }
     }
     
@@ -159,7 +169,7 @@ class OwnedGamesActivity : AppCompatActivity() {
             override fun onQueryTextChange(newText: String?): Boolean {
                 newText?.let {
                     searchString = newText
-                    this@OwnedGamesActivity.load(it, androidOnlyFilter)
+                    this@OwnedGamesActivity.loadItems(it, androidOnlyFilter)
                 }
                 return true
             }
@@ -171,7 +181,7 @@ class OwnedGamesActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.only_android -> {
                 androidOnlyFilter = !item.isChecked
-                load(searchString, androidOnlyFilter)
+                loadItems(searchString, androidOnlyFilter)
                 val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
                 sharedPrefs.edit().run {
                     putBoolean(LAST_ANDROID_ONLY_FILTER, androidOnlyFilter)
