@@ -1,10 +1,10 @@
 package ua.gardenapple.itchupdater.client
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
-import androidx.room.withTransaction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,7 +52,7 @@ class ItchBrowseHandler(
         }
         if (ItchWebsiteUtils.hasGameDownloadLinks(doc)) {
             lastDownloadDoc = doc
-//            lastDownloadPageUrl = url
+            lastDownloadPageUrl = url
             tryStartDownload()
         }
         if (!ItchWebsiteUtils.isStylizedPage(doc)) {
@@ -82,20 +82,13 @@ class ItchBrowseHandler(
 
     private fun tryStartDownload() {
         Log.d(LOGGING_TAG, "Upload ID: $clickedUploadId")
-//        Log.d(LOGGING_TAG, "Download URL: $currentDownloadUrl")
-//        Log.d(LOGGING_TAG, "Download page URL: $lastDownloadPageUrl")
 
         val downloadPageDoc = lastDownloadDoc ?: return
+        val downloadPageUrl = lastDownloadPageUrl ?: return
         val uploadId = clickedUploadId ?: return
-//        val downloadPageUrl = currentDownloadPageUrl ?: return
         val downloadUrl = currentDownloadUrl ?: return
         val contentDisposition = currentDownloadContentDisposition ?: return
         val mimeType = currentDownloadMimeType ?: return
-
-        coroutineScope.launch(Dispatchers.Main) {
-            Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_LONG)
-                .show()
-        }
 
         coroutineScope.launch(Dispatchers.IO) {
             val pendingInstall = ItchWebsiteParser.getPendingInstallation(downloadPageDoc, uploadId)
@@ -105,7 +98,14 @@ class ItchBrowseHandler(
             //Make sure that the corresponding Game is present in the database
             val game = db.gameDao.getGameById(pendingInstall.gameId)
             if (game == null) {
+                val storePageUrl = ItchWebsiteParser.getStoreUrlFromDownloadPage(Uri.parse(downloadPageUrl))
+                val doc = ItchWebsiteUtils.fetchAndParse(storePageUrl)
+                db.gameDao.upsert(ItchWebsiteParser.getGameInfoForStorePage(doc, storePageUrl)!!)
+            }
 
+            coroutineScope.launch(Dispatchers.Main) {
+                Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_LONG)
+                    .show()
             }
 
             GameDownloader.requestDownload(context, pendingInstall, downloadUrl,

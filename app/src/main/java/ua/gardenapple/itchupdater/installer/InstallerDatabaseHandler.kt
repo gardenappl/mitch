@@ -3,7 +3,6 @@ package ua.gardenapple.itchupdater.installer
 import android.content.Context
 import android.content.pm.PackageInstaller
 import android.util.Log
-import androidx.room.withTransaction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.database.AppDatabase

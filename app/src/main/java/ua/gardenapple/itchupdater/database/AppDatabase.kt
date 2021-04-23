@@ -3,11 +3,8 @@ package ua.gardenapple.itchupdater.database
 import android.content.Context
 import android.util.Log
 import androidx.room.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.BuildConfig
 import ua.gardenapple.itchupdater.FLAVOR_FDROID
 import ua.gardenapple.itchupdater.database.game.Game
