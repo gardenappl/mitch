@@ -2,6 +2,7 @@ package ua.gardenapple.itchupdater
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -164,6 +165,14 @@ class Utils {
                 bundle.getInt(key)
             else
                 null
+        }
+
+        fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
+            try {
+                return packageManager.getApplicationInfo(packageName, 0).enabled
+            } catch (e: PackageManager.NameNotFoundException) {
+                return false
+            }
         }
     }
 }

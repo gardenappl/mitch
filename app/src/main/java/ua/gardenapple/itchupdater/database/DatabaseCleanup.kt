@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.PREF_DB_RAN_CLEANUP_ONCE
+import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 
@@ -36,11 +37,8 @@ class DatabaseCleanup(private val context: Context) {
                 Log.d(LOGGING_TAG, "Install: $install")
                 when (install.status) {
                     Installation.STATUS_INSTALLED -> install.packageName?.let { packageName ->
-                        try {
-                            context.packageManager.getPackageInfo(packageName, 0)
-                        } catch (e: PackageManager.NameNotFoundException) {
+                        if (!Utils.isPackageInstalled(packageName, context.packageManager))
                             installsToDelete.add(install)
-                        }
                     }
                     Installation.STATUS_INSTALLING -> {
                         val installSessionId = install.downloadOrInstallId
@@ -69,6 +67,7 @@ class DatabaseCleanup(private val context: Context) {
 
 
             val installsToUpdate = ArrayList<Installation>()
+            //TODO: Backwards compatibility with older versions of Mitch
             if (sharedPrefs.getBoolean(PREF_DB_RAN_CLEANUP_ONCE, false)) {
                 for (i in installs.indices) {
                     var install = installs[i]
