@@ -19,6 +19,8 @@ abstract class GameDao {
     @Query("SELECT * FROM $TABLE_NAME")
     abstract fun getAllKnownGames(): LiveData<List<Game>>
 
+    @Query("SELECT * FROM $TABLE_NAME")
+    abstract suspend fun getAllKnownGamesSync(): List<Game>
 
     @Query("""
         SELECT games.*, installations.$STATUS as status, 
@@ -84,4 +86,7 @@ abstract class GameDao {
             }
         }
     }
+
+    @Delete
+    abstract suspend fun delete(games: List<Game>)
 }

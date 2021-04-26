@@ -100,7 +100,7 @@ class UpdateChecker(private val context: Context) {
 
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
         sharedPrefs.edit().run {
-            this.putLong(PREF_LAST_UPDATE_CHECK, Instant.now().toEpochMilli())
+//            this.putLong(PREF_LAST_UPDATE_CHECK, Instant.now().toEpochMilli())
             commit()
         }
 

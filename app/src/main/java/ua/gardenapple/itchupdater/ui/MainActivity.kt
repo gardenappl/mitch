@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
+import ua.gardenapple.itchupdater.database.DatabaseCleanup
 import ua.gardenapple.itchupdater.databinding.ActivityMainBinding
 
 

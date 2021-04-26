@@ -104,8 +104,7 @@ data class Installation(
      * A bitmask of platforms which this upload supports
      */
     @ColumnInfo(name = PLATFORMS)
-    @Deprecated(message = "Use 'platforms' field instead")
-    val platformFlags: Int,
+    val platforms: Int,
 
     /**
      * Path to file in public Downloads/ folder, if it has been moved there
@@ -126,7 +125,7 @@ data class Installation(
         uploadName: String,
         fileSize: String,
         uploadTimestamp: String? = null,
-        platformFlags: Int = PLATFORM_NONE,
+        platforms: Int = PLATFORM_NONE,
         externalFileName: String? = null
     ) : this(
         internalId = internalId,
@@ -141,7 +140,7 @@ data class Installation(
         uploadName = uploadName,
         fileSize = fileSize,
         uploadTimestamp = uploadTimestamp,
-        platformFlags = platformFlags,
+        platforms = platforms,
         externalFileName = externalFileName
     )
 
@@ -185,13 +184,4 @@ data class Installation(
         availableUploadIdsString?.split(',')?.map { uploadIdString ->
             Integer.parseInt(uploadIdString)
         }
-
-
-    //TODO: this was only used as a backwards compatibility measure with older versions of Mitch.
-    @Ignore
-    @Suppress("DEPRECATION")
-    val platforms: Int = if (packageName != null)
-        platformFlags or PLATFORM_ANDROID
-    else
-        platformFlags
 }

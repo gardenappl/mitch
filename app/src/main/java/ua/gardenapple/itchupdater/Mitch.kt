@@ -20,6 +20,7 @@ import org.acra.config.DialogConfigurationBuilder
 import org.acra.config.MailSenderConfigurationBuilder
 import org.acra.data.StringFormat
 import ua.gardenapple.itchupdater.client.UpdateChecker
+import ua.gardenapple.itchupdater.database.DatabaseCleanup
 import ua.gardenapple.itchupdater.files.DownloadFileManager
 import ua.gardenapple.itchupdater.files.ExternalFileManager
 import ua.gardenapple.itchupdater.installer.FileDownloadListener
@@ -45,11 +46,13 @@ const val NOTIFICATION_TAG_DOWNLOAD = "DownloadResult"
 const val NOTIFICATION_TAG_INSTALL_RESULT = "InstallResult"
 
 const val UPDATE_CHECK_TASK_TAG = "update_check"
+const val DB_CLEAN_TASK_TAG = "db_clean"
 
 const val FLAVOR_FDROID = "fdroid"
 const val FLAVOR_ITCHIO = "itchio"
 
-const val PREF_LAST_UPDATE_CHECK = "ua.gardenapple.itchupdater.lastupdatecheck"
+//const val PREF_LAST_UPDATE_CHECK = "ua.gardenapple.itchupdater.lastupdatecheck"
+const val PREF_DB_RAN_CLEANUP_ONCE = "ua.gardenapple.itchupdater.db_cleanup_once"
 
 
 class Mitch : Application() {
@@ -164,29 +167,39 @@ class Mitch : Application() {
 
         databaseHandler = InstallerDatabaseHandler(applicationContext)
         externalFileManager = ExternalFileManager()
+
+
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
+            DB_CLEAN_TASK_TAG,
+            ExistingPeriodicWorkPolicy.KEEP,
+            PeriodicWorkRequestBuilder<DatabaseCleanup.Worker>(2, TimeUnit.DAYS).build()
+        )
     }
 
-    private fun registerUpdateCheckTask(requiresUnmetered: Boolean, existingWorkPolicy: ExistingPeriodicWorkPolicy) {
+    private fun registerUpdateCheckTask(
+        requiresUnmetered: Boolean,
+        existingWorkPolicy: ExistingPeriodicWorkPolicy
+    ) {
         val constraints = Constraints.Builder().run {
-            if(requiresUnmetered)
+            if (requiresUnmetered)
                 setRequiredNetworkType(NetworkType.UNMETERED)
             else
                 setRequiredNetworkType(NetworkType.CONNECTED)
             build()
         }
-        val updateCheckRequest = PeriodicWorkRequestBuilder<UpdateChecker.Worker>(1, TimeUnit.DAYS).run {
-            //addTag(UPDATE_CHECK_TASK_TAG)
-            setConstraints(constraints)
-            //setInitialDelay(1, TimeUnit.MINUTES)
-            build()
-        }
+        val updateCheckRequest =
+            PeriodicWorkRequestBuilder<UpdateChecker.Worker>(1, TimeUnit.DAYS).run {
+                //addTag(UPDATE_CHECK_TASK_TAG)
+                setConstraints(constraints)
+                //setInitialDelay(1, TimeUnit.MINUTES)
+                build()
+            }
 
-        WorkManager.getInstance(applicationContext)
-            .enqueueUniquePeriodicWork(
-                UPDATE_CHECK_TASK_TAG,
-                existingWorkPolicy,
-                updateCheckRequest
-            )
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
+            UPDATE_CHECK_TASK_TAG,
+            existingWorkPolicy,
+            updateCheckRequest
+        )
     }
 
     private fun setThemeFromPreferences(prefs: SharedPreferences) {
@@ -220,7 +233,6 @@ class Mitch : Application() {
             }
 
             getPluginConfigurationBuilder(DialogConfigurationBuilder::class.java).apply {
-                //TODO: figure out button style for native crash dialog
                 setReportDialogClass(CrashDialog::class.java)
                 setEnabled(true)
             }

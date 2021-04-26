@@ -1,12 +1,15 @@
 package ua.gardenapple.itchupdater.database
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
+import androidx.preference.PreferenceManager
 import androidx.room.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import ua.gardenapple.itchupdater.BuildConfig
 import ua.gardenapple.itchupdater.FLAVOR_FDROID
+import ua.gardenapple.itchupdater.PREF_DB_RAN_CLEANUP_ONCE
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.game.GameDao
 import ua.gardenapple.itchupdater.database.installation.Installation
@@ -63,13 +66,10 @@ abstract class AppDatabase : RoomDatabase() {
                             appDb.addMitchToDatabase(context)
                         }
 
-//                            val mitchInstall = appDb.installDao.findInstallation(Game.MITCH_GAME_ID)
-//                            Log.d(LOGGING_TAG, "Mitch installation: $mitchInstall")
-//
-//                            Log.d(LOGGING_TAG, "Known installs:")
-//                            val installs = appDb.installDao.getAllInstallationsSync()
-//                            for (install in installs)
-//                                Log.d(LOGGING_TAG, "$install")
+                        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+                        if (!sharedPrefs.getBoolean(PREF_DB_RAN_CLEANUP_ONCE, false)) {
+                            DatabaseCleanup(context).cleanAppDatabase()
+                        }
                     }
                 }
     }
@@ -96,7 +96,7 @@ abstract class AppDatabase : RoomDatabase() {
             version = BuildConfig.VERSION_NAME,
             uploadName = Installation.MITCH_UPLOAD_NAME,
             fileSize = Installation.MITCH_FILE_SIZE,
-            platformFlags = Installation.PLATFORM_ANDROID
+            platforms = Installation.PLATFORM_ANDROID
         )
         Log.d(LOGGING_TAG, "Adding install $installation")
         installDao.insert(installation)

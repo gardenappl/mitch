@@ -17,6 +17,9 @@ abstract class InstallationDao {
     @Query("SELECT * FROM $TABLE_NAME")
     abstract fun getAllKnownInstallations(): LiveData<List<Installation>>
 
+    @Query("SELECT * FROM $TABLE_NAME")
+    abstract suspend fun getAllKnownInstallationsSync(): List<Installation>
+
     @Query("SELECT * FROM $TABLE_NAME WHERE $STATUS = $STATUS_INSTALLED")
     abstract fun getFinishedInstallations(): LiveData<List<Installation>>
 
@@ -40,6 +43,9 @@ abstract class InstallationDao {
 
     @Update
     abstract suspend fun update(vararg installations: Installation)
+
+    @Update
+    abstract suspend fun update(installations: List<Installation>)
 
     @Query("DELETE FROM $TABLE_NAME WHERE $INTERNAL_ID = :internalId")
     abstract suspend fun delete(internalId: Int)

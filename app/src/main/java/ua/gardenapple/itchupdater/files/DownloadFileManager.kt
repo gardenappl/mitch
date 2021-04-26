@@ -18,6 +18,8 @@ import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
 import java.io.File
 import java.util.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class DownloadFileManager(private val context: Context, private val fetch: Fetch) {
     companion object {
@@ -73,6 +75,14 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
                 notify(NOTIFICATION_TAG_DOWNLOAD, 0, builder.build())
             }
         })
+    }
+
+    suspend fun checkIsDownloading(downloadId: Int): Boolean {
+        return suspendCoroutine { cont ->
+            fetch.getDownload(downloadId) { download ->
+                cont.resume(download != null)
+            }
+        }
     }
     
     fun deletePendingFile(uploadId: Int) {

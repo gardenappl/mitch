@@ -157,7 +157,7 @@ class ItchWebsiteParser {
                     uploadTimestamp = versionDate,
                     uploadName = name,
                     fileSize = fileSize,
-                    platformFlags = platforms,
+                    platforms = platforms,
                 ))
             }
             return result
