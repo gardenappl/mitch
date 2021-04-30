@@ -172,7 +172,7 @@ class Mitch : Application() {
         WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
             DB_CLEAN_TASK_TAG,
             ExistingPeriodicWorkPolicy.KEEP,
-            PeriodicWorkRequestBuilder<DatabaseCleanup.Worker>(2, TimeUnit.DAYS).build()
+            PeriodicWorkRequestBuilder<DatabaseCleanup.Worker>(1, TimeUnit.DAYS).build()
         )
     }
 

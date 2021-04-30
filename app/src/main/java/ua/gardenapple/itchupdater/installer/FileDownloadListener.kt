@@ -138,7 +138,13 @@ class FileDownloadListener(private val context: Context) : FetchListener {
         downloadFileManager.removeFetchDownload(download.id)
     }
 
-    override fun onDeleted(download: Download) {}
+    override fun onDeleted(download: Download) {
+        //Should not happen all by itself, but let's handle this just in case
+        Log.w(LOGGING_TAG, "Deleted download! $download")
+        runBlocking(Dispatchers.IO) {
+            Mitch.databaseHandler.onDownloadFailed(download.id)
+        }
+    }
 
     override fun onDownloadBlockUpdated(
         download: Download,

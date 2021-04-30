@@ -4,10 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.tonyodev.fetch2.Download
-import com.tonyodev.fetch2.Fetch
-import com.tonyodev.fetch2.NetworkType
-import com.tonyodev.fetch2.Request
+import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.Extras
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -49,19 +46,18 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
             this.networkType = NetworkType.ALL
             this.extras =
                 Extras(Collections.singletonMap(DOWNLOAD_EXTRA_UPLOAD_ID, uploadId.toString()))
+            this.enqueueAction = EnqueueAction.REPLACE_EXISTING
         }
 
         val db = AppDatabase.getDatabase(context);
-        val insertedId: Int = db.installDao.insert(install).toInt();
 
         fetch.enqueue(request, { updatedRequest ->
             Log.d(LOGGING_TAG, "Enqueued ${updatedRequest.id}")
 
-            val pendingInstall = install.copy(internalId = insertedId);
-            pendingInstall.downloadOrInstallId = updatedRequest.id
-            pendingInstall.status = Installation.STATUS_DOWNLOADING
+            install.downloadOrInstallId = updatedRequest.id
+            install.status = Installation.STATUS_DOWNLOADING
             runBlocking(Dispatchers.IO) {
-                db.installDao.insert(pendingInstall)
+                db.installDao.insert(install)
             }
         }, { error ->
             Log.e(LOGGING_TAG, error.name, error.throwable)
