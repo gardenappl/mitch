@@ -202,7 +202,7 @@ class ItchWebsiteParser {
         /**
          * Requests the URL of a web page with available downloads for an itch.io game.
          * This download URL might be temporary, or might not be available at all.
-         * @param storeURL URL of a game's store page.
+         * @param storeUrl URL of a game's store page.
          * @return For paid games, always returns null, otherwise returns a URL of a downloads page.
          */
         suspend fun fetchDownloadUrlFromStorePage(storeUrl: String): DownloadUrl? = withContext(Dispatchers.IO) {
