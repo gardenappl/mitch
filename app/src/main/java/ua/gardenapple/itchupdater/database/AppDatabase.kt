@@ -58,18 +58,16 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(Migrations.Migration_8_9)
                 .build()
                 .also { appDb ->
-                    appDb.withTransaction {
-                        Log.d(LOGGING_TAG, "Deleting info on Mitch")
-                        appDb.installDao.deleteFinishedInstallation(context.packageName)
+                    Log.d(LOGGING_TAG, "Deleting info on Mitch")
+                    appDb.installDao.deleteFinishedInstallation(context.packageName)
 
-                        if (BuildConfig.FLAVOR != FLAVOR_FDROID) {
-                            appDb.addMitchToDatabase(context)
-                        }
+                    if (BuildConfig.FLAVOR != FLAVOR_FDROID) {
+                        appDb.addMitchToDatabase(context)
+                    }
 
-                        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
-                        if (!sharedPrefs.getBoolean(PREF_DB_RAN_CLEANUP_ONCE, false)) {
-                            DatabaseCleanup(context).cleanAppDatabase()
-                        }
+                    val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+                    if (!sharedPrefs.getBoolean(PREF_DB_RAN_CLEANUP_ONCE, false)) {
+                        DatabaseCleanup(context).cleanAppDatabase(appDb)
                     }
                 }
     }
