@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.4.32'
+    ext.kotlin_version = '1.5.0'
     repositories {
         google()
         jcenter()
@@ -35,21 +35,21 @@ ext {
     roomVersion = '2.3.0'
     lifecycleVersion = '2.3.1'
     androidxArchVersion = '2.1.0'
-    coroutinesVersion = '1.3.9'
+    coroutinesVersion = '1.4.3'
     materialVersion = '1.3.0'
     workVersion = '2.5.0'
     appcompatVersion = '1.2.0'
     constraintLayoutVersion = '2.0.4'
     swipeRefreshLayoutVersion = '1.1.0'
     preferenceVersion = '1.1.1'
-    junitVersion = '4.13.1'
+    junitVersion = '4.13.2'
     androidxJunitVersion = '1.1.2'
     androidxEspressoVersion = '3.3.0'
     pagingVersion = '3.0.0-beta03'
 
-    glideVersion = '4.11.0'
-    okHttpVersion = '4.3.1'
-    jsoupVersion = '1.9.2'
+    glideVersion = '4.12.0'
+    okHttpVersion = '4.9.1'
+    jsoupVersion = '1.13.1'
     speedDialVersion = '3.1.1'
     materialProgressBarVersion = '1.6.1'
     colormathVersion = '1.4.1'
