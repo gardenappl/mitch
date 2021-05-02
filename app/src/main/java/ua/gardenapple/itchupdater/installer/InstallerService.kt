@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.content.pm.PackageManager
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -96,8 +97,13 @@ class InstallerService : Service() {
                 setSmallIcon(R.drawable.ic_mitch_notification)
 
                 if (status == PackageInstaller.STATUS_SUCCESS) {
-                    val appInfo = context.packageManager.getApplicationInfo(packageName, 0)
-                    setContentTitle(context.packageManager.getApplicationLabel(appInfo))
+                    try {
+                        val appInfo = context.packageManager.getApplicationInfo(packageName, 0)
+                        setContentTitle(context.packageManager.getApplicationLabel(appInfo))
+                    } catch (e: PackageManager.NameNotFoundException) {
+                        Log.w(LOGGING_TAG, "Error: application $packageName not found!", e)
+                        setContentTitle(apkName)
+                    }
                 } else {
                     setContentTitle(apkName)
                 }
@@ -112,8 +118,12 @@ class InstallerService : Service() {
                         setAutoCancel(true)
                     }
 
-                    val icon = context.packageManager.getApplicationIcon(packageName)
-                    setLargeIcon(Utils.drawableToBitmap(icon))
+                    try {
+                        val icon = context.packageManager.getApplicationIcon(packageName)
+                        setLargeIcon(Utils.drawableToBitmap(icon))
+                    } catch (e: PackageManager.NameNotFoundException) {
+                        Log.w(LOGGING_TAG, "Could not load icon for $packageName", e)
+                    }
                 }
             }
 

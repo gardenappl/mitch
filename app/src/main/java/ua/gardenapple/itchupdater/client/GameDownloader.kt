@@ -118,7 +118,7 @@ class GameDownloader {
                 val storePageDoc = ItchWebsiteUtils.fetchAndParse(game.storeUrl)
                 url = ItchWebsiteParser.getDownloadUrl(storePageDoc, game.storeUrl)?.url
                     ?: return UpdateCheckResult.ACCESS_DENIED.also {
-                        Log.d(LOGGING_TAG, "Access denied to downloadUrl for ${game.storeUrl}")
+                        Log.i(LOGGING_TAG, "Access denied to downloadUrl for ${game.storeUrl}")
                     }
             }
 

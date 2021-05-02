@@ -133,4 +133,5 @@
     <string name="bug_report_dialog_prompt">Пожалуйста, напишите, чем вы занимались, когда выскочила ошибка (можно писать на русском, украинском, или английском).</string>
     <string name="bug_report_dialog_title">Mitch перестал работать</string>
     <string name="library_games_search">Поиск</string>
+    <string name="library_open_app_failed">Не удалось открыть приложение.</string>
 </resources>

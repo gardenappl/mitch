@@ -3,6 +3,7 @@ package ua.gardenapple.itchupdater.client
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -20,7 +21,6 @@ import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.installer.UpdateNotificationBroadcastReceiver
 import ua.gardenapple.itchupdater.ui.MainActivity
 import java.net.SocketTimeoutException
-import java.time.Instant
 
 class UpdateChecker(private val context: Context) {
     companion object {
@@ -131,10 +131,15 @@ class UpdateChecker(private val context: Context) {
                 setAutoCancel(true)
 
                 if (install.packageName != null) {
-                    val info = context.packageManager.getApplicationInfo(install.packageName, 0)
-                    val icon = context.packageManager.getApplicationIcon(info)
-                    setContentTitle(context.packageManager.getApplicationLabel(info))
-                    setLargeIcon(Utils.drawableToBitmap(icon))
+                    try {
+                        val info = context.packageManager.getApplicationInfo(install.packageName, 0)
+                        val icon = context.packageManager.getApplicationIcon(info)
+                        setContentTitle(context.packageManager.getApplicationLabel(info))
+                        setLargeIcon(Utils.drawableToBitmap(icon))
+                    } catch (e: PackageManager.NameNotFoundException) {
+                        Log.w(LOGGING_TAG, "Error: application ${install.packageName} not found!", e)
+                        setContentTitle(install.uploadName)
+                    }
                 } else {
                     setContentTitle(install.uploadName)
                 }

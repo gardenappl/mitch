@@ -1,7 +1,6 @@
 package ua.gardenapple.itchupdater.database
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.room.withTransaction

@@ -115,6 +115,9 @@ class LibraryAdapter internal constructor(
             val launchIntent = context.packageManager.getLaunchIntentForPackage(gameInstall.packageName)
             if (launchIntent != null) {
                 context.startActivity(launchIntent)
+            } else {
+                Toast.makeText(context, R.string.library_open_app_failed, Toast.LENGTH_LONG)
+                    .show()
             }
         } else if (gameInstall.externalFileName != null) {
             Mitch.externalFileManager.getViewIntent(activity, gameInstall.externalFileName) { intent ->

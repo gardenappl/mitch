@@ -4,7 +4,9 @@ import android.app.Activity
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -60,14 +62,24 @@ class UpdatesListAdapter internal constructor(
         binding.updateCheckUploadInfo.isSelected = true
 
         if (availableUpdate.packageName != null) {
-            binding.appIcon.visibility = View.VISIBLE
-            binding.gameThumbnail.visibility = View.INVISIBLE
-            
-            binding.appIcon.setImageDrawable(context.packageManager
-                .getApplicationIcon(availableUpdate.packageName))
+            try {
+                binding.appIcon.setImageDrawable(context.packageManager
+                    .getApplicationIcon(availableUpdate.packageName))
+
+                binding.appIcon.visibility = View.VISIBLE
+                binding.gameThumbnail.visibility = View.INVISIBLE
+                binding.gameThumbnailEmpty.visibility = View.INVISIBLE
+
+            } catch (e: PackageManager.NameNotFoundException) {
+                Log.w(LOGGING_TAG, "Could not find icon for package ${availableUpdate.packageName}", e)
+                binding.appIcon.visibility = View.INVISIBLE
+                binding.gameThumbnail.visibility = View.INVISIBLE
+                binding.gameThumbnailEmpty.visibility = View.INVISIBLE
+            }
         } else if (availableUpdate.thumbnailUrl != null) {
             binding.appIcon.visibility = View.INVISIBLE
             binding.gameThumbnail.visibility = View.VISIBLE
+            binding.gameThumbnailEmpty.visibility = View.INVISIBLE
 
             Glide.with(context)
                 .load(availableUpdate.thumbnailUrl)
@@ -76,6 +88,7 @@ class UpdatesListAdapter internal constructor(
         } else {
             binding.appIcon.visibility = View.INVISIBLE
             binding.gameThumbnail.visibility = View.INVISIBLE
+            binding.gameThumbnailEmpty.visibility = View.VISIBLE
         }
 
 

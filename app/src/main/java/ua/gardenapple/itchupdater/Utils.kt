@@ -100,7 +100,7 @@ class Utils {
         
         fun toString(e: Exception): String {
             val errorWriter = StringWriter()
-            errorWriter.append(e.localizedMessage)
+            errorWriter.appendLine(e.localizedMessage)
             e.printStackTrace(PrintWriter(errorWriter))
 
             return errorWriter.toString()
