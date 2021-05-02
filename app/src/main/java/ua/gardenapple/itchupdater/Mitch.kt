@@ -191,7 +191,7 @@ class Mitch : Application() {
             PeriodicWorkRequestBuilder<UpdateChecker.Worker>(1, TimeUnit.DAYS).run {
                 //addTag(UPDATE_CHECK_TASK_TAG)
                 setConstraints(constraints)
-                //setInitialDelay(1, TimeUnit.MINUTES)
+                setInitialDelay(10, TimeUnit.HOURS)
                 build()
             }
 
