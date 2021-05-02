@@ -28,7 +28,9 @@ class ItchLibraryParser {
             val request = Request.Builder().run {
                 url("https://itch.io/my-purchases?format=json&page=$page")
 
-                addHeader("Cookie", CookieManager.getInstance().getCookie("https://itch.io"))
+                CookieManager.getInstance()?.getCookie("https://itch.io")?.let { cookie ->
+                    addHeader("Cookie", cookie)
+                }
                 get()
                 build()
             }

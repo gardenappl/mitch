@@ -69,7 +69,9 @@ class GameDownloader {
             }
             var request = Request.Builder().run {
                 url(fileRequestUrl.toString())
-                addHeader("Cookie", CookieManager.getInstance().getCookie(game.storeUrl))
+                CookieManager.getInstance()?.getCookie(game.storeUrl)?.let { cookie ->
+                    addHeader("Cookie", cookie)
+                }
                 post(form)
                 build()
             }

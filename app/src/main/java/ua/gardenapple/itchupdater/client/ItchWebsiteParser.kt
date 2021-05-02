@@ -212,15 +212,20 @@ class ItchWebsiteParser {
             val uriBuilder = storeUriParsed.buildUpon()
             uriBuilder.appendPath("download_url")
             val getDownloadPathUri = uriBuilder.build()
+            val cookie = CookieManager.getInstance()?.getCookie(storeUrl)
 
             val form = FormBody.Builder().run {
-                //TODO: Proper CSRF token support? For paid game update checking
-                add("csrf_token", CookieManager.getInstance().getCookie(storeUrl))
+                //I don't know if I can implement my own CSRF tokens, so just do whatever
+                cookie?.let {
+                    add("csrf_token", it)
+                }
                 build()
             }
             val request = Request.Builder().run {
                 url(getDownloadPathUri.toString())
-                addHeader("Cookie", CookieManager.getInstance().getCookie(storeUrl))
+                cookie?.let {
+                    addHeader("Cookie", it)
+                }
                 post(form)
                 build()
             }

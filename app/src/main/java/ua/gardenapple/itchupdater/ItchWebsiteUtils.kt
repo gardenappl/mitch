@@ -94,7 +94,9 @@ class ItchWebsiteUtils {
         suspend fun fetchAndParse(url: String): Document = withContext(Dispatchers.IO) {
             val request = Request.Builder().run {
                 url(url)
-                addHeader("Cookie", CookieManager.getInstance().getCookie(url))
+                CookieManager.getInstance()?.getCookie(url)?.let { cookie ->
+                    addHeader("Cookie", cookie)
+                }
                 build()
             }
             var html = ""
