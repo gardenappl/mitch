@@ -2,6 +2,7 @@ package ua.gardenapple.itchupdater.ui
 
 import android.app.Activity
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -15,12 +16,16 @@ import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.acra.ACRA
+import ua.gardenapple.itchupdater.ErrorReportBroadcastReciever
 import ua.gardenapple.itchupdater.NOTIFICATION_TAG_UPDATE_CHECK
 import ua.gardenapple.itchupdater.R
+import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.client.GameDownloader
 import ua.gardenapple.itchupdater.client.UpdateCheckResult
 import ua.gardenapple.itchupdater.database.updatecheck.InstallUpdateCheckResult
 import ua.gardenapple.itchupdater.databinding.UpdatesItemBinding
+import ua.gardenapple.itchupdater.installer.UpdateNotificationBroadcastReceiver
 
 class UpdatesListAdapter internal constructor(
     private val activity: Activity,
@@ -165,7 +170,9 @@ class UpdatesListAdapter internal constructor(
         }
 
         binding.root.setOnClickListener {
-            if (activity is MainActivity) {
+            if (updateCheckResult.code == UpdateCheckResult.ERROR) {
+                ACRA.getErrorReporter().handleException(Utils.ErrorReport(updateCheckResult.errorReport!!))
+            } else if (activity is MainActivity) {
                 activity.browseUrl(availableUpdate.storeUrl)
             } else {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(availableUpdate.storeUrl),

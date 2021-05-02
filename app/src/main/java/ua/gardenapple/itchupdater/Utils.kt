@@ -24,8 +24,9 @@ import java.io.*
 import kotlin.math.min
 
 class Utils {
+    class ErrorReport(message: String) : Throwable(message)
+
     companion object {
-        private const val LOGGING_TAG = "Utils"
         private const val LOG_LIMIT: Int = 1000
 
         /**
@@ -98,10 +99,15 @@ class Utils {
             return sb.toString()
         }
         
-        fun toString(e: Exception): String {
+        fun toString(e: Throwable): String {
             val errorWriter = StringWriter()
             errorWriter.appendLine(e.localizedMessage)
             e.printStackTrace(PrintWriter(errorWriter))
+
+            e.cause?.let { cause ->
+                errorWriter.append("Cause: ")
+                errorWriter.append(toString(cause))
+            }
 
             return errorWriter.toString()
         }

@@ -228,8 +228,8 @@ class Mitch : Application() {
                 setMailTo("gardenapple+mitch@posteo.net")
                 setSubject("Mitch bug report")
                 setResBody(R.string.bug_report_dialog_prompt)
+                setReportFileName("error-report.txt")
                 setEnabled(true)
-                setReportFileName("crash-report.txt")
             }
 
             getPluginConfigurationBuilder(DialogConfigurationBuilder::class.java).apply {

@@ -78,6 +78,9 @@
                 android:name=".installer.UpdateNotificationBroadcastReceiver"
                 android:exported="false" />
         <receiver
+                android:name=".ErrorReportBroadcastReciever"
+                android:exported="false" />
+        <receiver
                 android:name=".installer.UninstallBroadcastReceiver"
                 android:exported="true">
             <intent-filter>
