@@ -131,7 +131,7 @@
     <string name="library_go_to_store">Зайти в магазин</string>
     <string name="bug_report_dialog">Вибачте, сталася деяка помилка в Mitch. Натисніть ОК, щоб повідомити про це розробнику.</string>
     <string name="bug_report_dialog_prompt">Будь-ласка, опишіть, що ви робили, коли сталася помилка (можете писати українською, англійскою або російською).</string>
-    <string name="bug_report_dialog_title">Mitch крашнувся</string>
+    <string name="bug_report_dialog_title">Щось пішло не так</string>
     <string name="library_games_search">Пошук</string>
     <string name="library_open_app_failed">Не вдалося відкрити додаток.</string>
 </resources>
