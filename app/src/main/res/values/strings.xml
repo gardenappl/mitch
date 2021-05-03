@@ -133,4 +133,9 @@
     <string name="bug_report_dialog_title">Something went wrong</string>
     <string name="library_games_search">Search</string>
     <string name="library_open_app_failed">This application could not be opened.</string>
+    <string name="settings_category_advanced">Advanced</string>
+    <string name="settings_cancel_downloads">Reset all downloads</string>
+    <string name="settings_cancel_downloads_title">Reset all current downloads?</string>
+    <string name="settings_cancel_downloads_message">This should only be done for testing or troubleshooting purposes.</string>
+    <string name="dialog_no">No</string>
 </resources>

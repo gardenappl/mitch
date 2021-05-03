@@ -134,4 +134,9 @@
     <string name="bug_report_dialog_title">Щось пішло не так</string>
     <string name="library_games_search">Пошук</string>
     <string name="library_open_app_failed">Не вдалося відкрити додаток.</string>
+    <string name="settings_category_advanced">Додатково</string>
+    <string name="settings_cancel_downloads">Скинути всі завантаження</string>
+    <string name="settings_cancel_downloads_title">Скинути всі поточні завантаження?</string>
+    <string name="dialog_no">Ні</string>
+    <string name="settings_cancel_downloads_message">Взагалі, це варто робити лише в цілях тестування або вирішення проблем з Mitch.</string>
 </resources>

@@ -134,4 +134,9 @@
     <string name="bug_report_dialog_title">Что-то пошло не так</string>
     <string name="library_games_search">Поиск</string>
     <string name="library_open_app_failed">Не удалось открыть приложение.</string>
+    <string name="settings_category_advanced">Продвинутые</string>
+    <string name="settings_cancel_downloads">Сбросить все загрузки</string>
+    <string name="settings_cancel_downloads_title">Сбросить все текущие загрузки?</string>
+    <string name="dialog_no">Нет</string>
+    <string name="settings_cancel_downloads_message">Это стоит делать только в целях тестирования или починки неполадок.</string>
 </resources>

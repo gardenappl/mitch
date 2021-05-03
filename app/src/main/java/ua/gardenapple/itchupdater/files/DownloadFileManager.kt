@@ -49,14 +49,13 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
             this.enqueueAction = EnqueueAction.REPLACE_EXISTING
         }
 
-        val db = AppDatabase.getDatabase(context);
-
         fetch.enqueue(request, { updatedRequest ->
             Log.d(LOGGING_TAG, "Enqueued ${updatedRequest.id}")
 
             install.downloadOrInstallId = updatedRequest.id
             install.status = Installation.STATUS_DOWNLOADING
             runBlocking(Dispatchers.IO) {
+                val db = AppDatabase.getDatabase(context)
                 db.installDao.insert(install)
             }
         }, { error ->
@@ -144,6 +143,19 @@ class DownloadFileManager(private val context: Context, private val fetch: Fetch
     
     private fun shouldHandleFiles(uploadId: Int): Boolean {
         //return !(uploadId == Installation.MITCH_UPLOAD_ID && BuildConfig.FLAVOR == FLAVOR_GITLAB)
+        return true
+    }
+
+    fun deleteAllDownloads(): Boolean {
+        fetch.deleteAll()
+
+        if (!pendingPath.deleteRecursively()) {
+            Log.w(LOGGING_TAG, "Unable to delete pending path!")
+            return false
+        }
+
+        if (!pendingPath.mkdirs())
+            Log.e(LOGGING_TAG, "Unable to recreate pending path, this should never happen!")
         return true
     }
 }

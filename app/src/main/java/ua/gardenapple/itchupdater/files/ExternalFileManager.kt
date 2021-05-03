@@ -26,7 +26,7 @@ class ExternalFileManager {
     /**
      * Move a completed download to downloads folder.
      * @param activity activity which might request permission (must implement [Activity.onRequestPermissionsResult]
-     * @param uploadId downlaoded file to move
+     * @param uploadId downloaded file to move
      * @param callback function which receives the new file name: it should be usable with [getViewIntent]
      */
     fun moveToDownloads(activity: Activity, uploadId: Int, callback: (String?) -> Unit) {

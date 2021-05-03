@@ -11,6 +11,7 @@ import androidx.preference.PreferenceManager
 import androidx.work.*
 import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2.FetchConfiguration
+import com.tonyodev.fetch2.Status
 import com.tonyodev.fetch2okhttp.OkHttpDownloader
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -158,6 +159,8 @@ class Mitch : Application() {
             setHttpDownloader(OkHttpDownloader(httpClient))
             setAutoRetryMaxAttempts(3)
             enableFileExistChecks(false)
+            createDownloadFileOnEnqueue(false)
+            preAllocateFileOnCreation(false)
             build()
         }
         fetch = fetchConfig.getNewFetchInstanceFromConfiguration()
