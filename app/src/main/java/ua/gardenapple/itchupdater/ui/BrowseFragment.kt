@@ -152,15 +152,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
                     val input = viewInflated.findViewById<TextInputEditText>(R.id.input)
 
-                    //Show keyboard automatically
-                    input.post {
-                        input.requestFocus()
-                        val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE)
-                            as InputMethodManager
-                        inputMethodManager.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
-                    }
-
-
                     val alertDialog = AlertDialog.Builder(requireContext())
                         .setTitle(R.string.browser_search)
                         .setView(viewInflated)
@@ -172,6 +163,20 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                             dialog.cancel()
                         }
                         .show()
+
+                    //Show keyboard automatically
+                    input.post {
+                        input.isFocusableInTouchMode = true
+                        input.requestFocus()
+
+                        input.postDelayed({
+                            val inputMethodManager =
+                                requireContext().getSystemService(Context.INPUT_METHOD_SERVICE)
+                                        as InputMethodManager
+                            inputMethodManager.showSoftInput(input,
+                                InputMethodManager.SHOW_IMPLICIT)
+                        }, 300)
+                    }
 
                     input.setOnEditorActionListener { _, actionId, _ ->
                         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
