@@ -44,7 +44,7 @@ ext {
     junitVersion = '4.13.2'
     androidxJunitVersion = '1.1.2'
     androidxEspressoVersion = '3.3.0'
-    pagingVersion = '3.0.0-beta03'
+    pagingVersion = '3.0.0-rc01'
 
     glideVersion = '4.12.0'
     okHttpVersion = '4.9.1'
