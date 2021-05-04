@@ -1,6 +1,6 @@
 # Mitch
 
-### The main repository of this project is hosted on GitLab: https://gitlab.com/gardenappl/mitch
+### Hosted on [itch.io](https://gardenapple.itch.io/mitch) and [SourceHut](https://sr.ht/~gardenapple/mitch/).
 
 **Mitch** is an unofficial mobile client for [itch.io](https://itch.io), the indie game storefront. The app allows you to install Android games from the store and keep them updated. Thus, this can act as an alternative to the Google Play Store for indie game developers and enthusiasts.
 
@@ -16,6 +16,7 @@ The app is still in development, some features are planned but not yet implement
 ## Installing
 
 **Mitch is available on F-Droid**:
+
 <a href="https://f-droid.org/packages/ua.gardenapple.itchupdater"><br> <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80px"></a>
 
 There are other ways to get this app:
