@@ -228,9 +228,16 @@ class Mitch : Application() {
             setReportFormat(StringFormat.KEY_VALUE_LIST)
 
             getPluginConfigurationBuilder(MailSenderConfigurationBuilder::class.java).apply {
-                setMailTo("gardenapple+mitch@posteo.net")
-                setSubject("Mitch bug report")
-                setResBody(R.string.bug_report_dialog_prompt)
+                setMailTo("~gardenapple/mitch-bug-reports@lists.sr.ht, gardenapple+mitch@posteo.net")
+                //Strings are English only, this is intentional
+                setSubject("[Insert short description of what happened]")
+                setBody("""
+                    Note: SourceHut does not accept email in HTML format,
+                    for security and privacy reasons.
+                    Please send this message as "plain text" if you can.
+                    
+                    [Insert description of what you were doing when you got the error]
+                """.trimIndent())
                 setReportFileName("error-report.txt")
                 setEnabled(true)
             }
