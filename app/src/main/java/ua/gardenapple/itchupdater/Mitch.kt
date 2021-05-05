@@ -232,9 +232,14 @@ class Mitch : Application() {
                 //Strings are English only, this is intentional
                 setSubject("[Insert short description of what happened]")
                 setBody("""
+                    Your message will be published on SourceHut,
+                    and also sent to the author's personal address.
+                    
                     Note: SourceHut does not accept email in HTML format,
                     for security and privacy reasons.
                     Please send this message as "plain text" if you can.
+                    
+                    Thank you for your help!
                     
                     [Insert description of what you were doing when you got the error]
                 """.trimIndent())
