@@ -128,7 +128,7 @@ class UpdateChecker(private val context: Context) {
             else -> context.resources.getString(R.string.notification_update_fail)
         }
         val builder =
-            NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
+            NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_UPDATES).apply {
                 setSmallIcon(R.drawable.ic_mitch_notification)
                 setContentText(message)
                 setAutoCancel(true)

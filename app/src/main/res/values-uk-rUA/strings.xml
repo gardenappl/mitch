@@ -138,4 +138,7 @@
     <string name="settings_cancel_downloads_title">Скинути всі поточні завантаження?</string>
     <string name="dialog_no">Ні</string>
     <string name="settings_cancel_downloads_message">Взагалі, це варто робити лише в цілях тестування або вирішення проблем з Mitch.</string>
+    <string name="settings_downloader_standard">Звичайний</string>
+    <string name="settings_downloader">Завантажувач</string>
+    <string name="settings_downloader_desc">Змініть це у випадку, коли у вас виникають проблеми з завантаженням файлів чи встановленням додатків.</string>
 </resources>

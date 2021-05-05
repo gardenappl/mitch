@@ -93,24 +93,12 @@ class ItchBrowseHandler(
         coroutineScope.launch(Dispatchers.IO) {
             val pendingInstall = ItchWebsiteParser.getPendingInstallation(downloadPageDoc, uploadId)
 
-            val db = AppDatabase.getDatabase(context)
-
-            //Make sure that the corresponding Game is present in the database
-            var game = db.gameDao.getGameById(pendingInstall.gameId)
-            if (game == null) {
-                val storePageUrl = ItchWebsiteParser.getStoreUrlFromDownloadPage(Uri.parse(downloadPageUrl))
-                val doc = ItchWebsiteUtils.fetchAndParse(storePageUrl)
-                game = ItchWebsiteParser.getGameInfoForStorePage(doc, storePageUrl)!!
-                Log.d(LOGGING_TAG, "Game is missing! Adding game $game")
-                db.gameDao.upsert(game)
-            }
-
             coroutineScope.launch(Dispatchers.Main) {
                 Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_LONG)
                     .show()
             }
 
-            GameDownloader.requestDownload(context, pendingInstall, downloadUrl,
+            GameDownloader.requestDownload(context, pendingInstall, downloadUrl, downloadPageUrl,
                 contentDisposition, mimeType)
         }
 

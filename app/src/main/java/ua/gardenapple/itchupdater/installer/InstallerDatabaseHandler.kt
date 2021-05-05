@@ -57,7 +57,7 @@ class InstallerDatabaseHandler(val context: Context)  {
             }
         }
 
-    suspend fun onDownloadFailed(downloadId: Int) = withContext(Dispatchers.IO) {
+    suspend fun onDownloadFailed(downloadId: Long) = withContext(Dispatchers.IO) {
         val db = AppDatabase.getDatabase(context)
         Log.d(LOGGING_TAG, "onDownloadFailed")
 
@@ -66,7 +66,7 @@ class InstallerDatabaseHandler(val context: Context)  {
         db.installDao.delete(pendingInstall)
     }
 
-    suspend fun onInstallStart(downloadId: Int, pendingInstallSessionId: Int) =
+    suspend fun onInstallStart(downloadId: Long, pendingInstallSessionId: Int) =
         withContext(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
             Log.d(LOGGING_TAG, "onInstallStart")
@@ -74,7 +74,7 @@ class InstallerDatabaseHandler(val context: Context)  {
             val pendingInstall = db.installDao.getPendingInstallationByDownloadId(downloadId)!!
 
             pendingInstall.status = Installation.STATUS_INSTALLING
-            pendingInstall.downloadOrInstallId = pendingInstallSessionId
+            pendingInstall.downloadOrInstallId = pendingInstallSessionId.toLong()
             db.installDao.update(pendingInstall)
         }
 }

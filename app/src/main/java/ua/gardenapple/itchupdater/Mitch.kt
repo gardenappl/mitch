@@ -21,10 +21,7 @@ import org.acra.config.MailSenderConfigurationBuilder
 import org.acra.data.StringFormat
 import ua.gardenapple.itchupdater.client.UpdateChecker
 import ua.gardenapple.itchupdater.database.DatabaseCleanup
-import ua.gardenapple.itchupdater.files.DownloadFileManager
-import ua.gardenapple.itchupdater.files.ExternalFileManager
-import ua.gardenapple.itchupdater.files.FetchDownloader
-import ua.gardenapple.itchupdater.files.MitchFetchListener
+import ua.gardenapple.itchupdater.files.*
 import ua.gardenapple.itchupdater.installer.Installer
 import ua.gardenapple.itchupdater.installer.InstallerDatabaseHandler
 import ua.gardenapple.itchupdater.ui.CrashDialog
@@ -44,6 +41,7 @@ const val NOTIFICATION_CHANNEL_ID_WEB_RUNNING = "web_running"
 
 const val NOTIFICATION_TAG_UPDATE_CHECK = "UpdateCheck"
 const val NOTIFICATION_TAG_DOWNLOAD = "DownloadResult"
+const val NOTIFICATION_TAG_DOWNLOAD_LONG = "WorkerDownloadResult"
 const val NOTIFICATION_TAG_INSTALL_RESULT = "InstallResult"
 
 const val UPDATE_CHECK_TASK_TAG = "update_check"
@@ -54,6 +52,7 @@ const val FLAVOR_ITCHIO = "itchio"
 
 //const val PREF_LAST_UPDATE_CHECK = "ua.gardenapple.itchupdater.lastupdatecheck"
 const val PREF_DB_RAN_CLEANUP_ONCE = "ua.gardenapple.itchupdater.db_cleanup_once"
+const val PREF_DOWNLOADER = "ua.gardenapple.itchupdater.downloader"
 
 
 class Mitch : Application() {
@@ -65,6 +64,8 @@ class Mitch : Application() {
             private set
         private lateinit var fetch: Fetch
         lateinit var fileManager: DownloadFileManager
+            private set
+        lateinit var workerDownloader: DownloaderWorker
             private set
         lateinit var databaseHandler: InstallerDatabaseHandler
             private set
@@ -164,13 +165,14 @@ class Mitch : Application() {
             build()
         }
         fetch = fetchConfig.getNewFetchInstanceFromConfiguration()
-        val fetchDownloader = FetchDownloader(fetch)
+        val fetchDownloader = DownloaderFetch(fetch)
         fetch.addListener(MitchFetchListener(applicationContext, fetchDownloader))
         fileManager = DownloadFileManager(applicationContext, fetchDownloader)
         fileManager.setup()
 
         databaseHandler = InstallerDatabaseHandler(applicationContext)
         externalFileManager = ExternalFileManager()
+        workerDownloader = DownloaderWorker()
 
 
         WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(

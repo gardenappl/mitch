@@ -138,4 +138,7 @@
     <string name="settings_cancel_downloads_title">Сбросить все текущие загрузки?</string>
     <string name="dialog_no">Нет</string>
     <string name="settings_cancel_downloads_message">Это стоит делать только в целях тестирования или починки неполадок.</string>
+    <string name="settings_downloader">Загрузчик</string>
+    <string name="settings_downloader_standard">Стандартный</string>
+    <string name="settings_downloader_desc">Меняйте в том случае, если у вас проблемы с загрузкой файлов или установкой приложений.</string>
 </resources>

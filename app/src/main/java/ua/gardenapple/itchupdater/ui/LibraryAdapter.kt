@@ -106,7 +106,12 @@ class LibraryAdapter internal constructor(
 
         if (gameInstall.status == Installation.STATUS_READY_TO_INSTALL) {
             val notificationService = context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-            notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, gameInstall.downloadOrInstallId!!)
+            gameInstall.downloadOrInstallId!!.let {
+                if (Utils.fitsInInt(it))
+                    notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, it.toInt())
+                else
+                    notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD_LONG, it.toInt())
+            }
 
             GlobalScope.launch {
                 Mitch.installer.install(context, gameInstall.downloadOrInstallId, gameInstall.uploadId)

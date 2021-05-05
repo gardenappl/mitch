@@ -8,12 +8,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
+import java.io.File
 import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 
-class FetchDownloader(private val fetch: Fetch) : AbstractDownloader() {
+class DownloaderFetch(private val fetch: Fetch) : DownloaderAbstract {
     companion object {
         private const val LOGGING_TAG = "FetchDownloadFileMan"
 
@@ -21,8 +22,8 @@ class FetchDownloader(private val fetch: Fetch) : AbstractDownloader() {
     }
 
     override suspend fun requestDownload(context: Context, url: String,
-                                         filePath: String, install: Installation): String? {
-        val request = Request(url, filePath).apply {
+                                         file: File, install: Installation): String? {
+        val request = Request(url, file.path).apply {
             this.networkType = NetworkType.ALL
             this.extras = Extras(Collections.singletonMap(
                 DOWNLOAD_EXTRA_UPLOAD_ID, install.uploadId.toString()
@@ -34,7 +35,7 @@ class FetchDownloader(private val fetch: Fetch) : AbstractDownloader() {
             fetch.enqueue(request, { updatedRequest ->
                 Log.d(LOGGING_TAG, "Enqueued ${updatedRequest.id}")
 
-                install.downloadOrInstallId = updatedRequest.id
+                install.downloadOrInstallId = updatedRequest.id.toLong()
                 install.status = Installation.STATUS_DOWNLOADING
                 runBlocking(Dispatchers.IO) {
                     val db = AppDatabase.getDatabase(context)
@@ -49,7 +50,7 @@ class FetchDownloader(private val fetch: Fetch) : AbstractDownloader() {
         return error?.name
     }
 
-    override suspend fun requestCancel(downloadId: Int): Boolean {
+    override suspend fun cancel(context: Context, downloadId: Int): Boolean {
         return suspendCoroutine { cont ->
             fetch.remove(downloadId, {
                 cont.resume(true)
@@ -63,7 +64,7 @@ class FetchDownloader(private val fetch: Fetch) : AbstractDownloader() {
         }
     }
 
-    override suspend fun checkIsDownloading(downloadId: Int): Boolean {
+    override suspend fun checkIsDownloading(context: Context, downloadId: Int): Boolean {
         return suspendCoroutine { cont ->
             fetch.getDownload(downloadId) { download ->
                 cont.resume(download != null)

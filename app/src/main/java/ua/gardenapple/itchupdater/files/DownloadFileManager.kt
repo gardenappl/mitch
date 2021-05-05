@@ -1,18 +1,24 @@
 package ua.gardenapple.itchupdater.files
 
 import android.content.Context
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import ua.gardenapple.itchupdater.NOTIFICATION_CHANNEL_ID_INSTALLING
-import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD
-import ua.gardenapple.itchupdater.R
+import androidx.preference.PreferenceManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import ua.gardenapple.itchupdater.*
+import ua.gardenapple.itchupdater.client.GameDownloader
+import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
+import ua.gardenapple.itchupdater.installer.Installations
 import java.io.File
 
-class DownloadFileManager(context: Context, private val fetchDownloader: FetchDownloader) {
-//    companion object {
+class DownloadFileManager(context: Context, private val fetchDownloader: DownloaderFetch) {
+    companion object {
 //        const val APK_MIME = "application/vnd.android.package-archive"
-//    }
+        const val LOGGING_TAG = "DownloadFileManager"
+    }
 
     private val uploadsPath = File(context.filesDir, "upload")
     private val pendingPath = File(context.filesDir, "pending")
@@ -24,15 +30,26 @@ class DownloadFileManager(context: Context, private val fetchDownloader: FetchDo
     }
 
     /**
-     * All previous downloads for the same uploadId must be cancelled at this point
+     * Direct request to start downloading a file.
+     * Any pending installs for the same uploadId will be cancelled.
      */
-    suspend fun requestDownload(context: Context, url: String,
-                                fileName: String, install: Installation) {
+    suspend fun requestDownload(context: Context, url: String, fileName: String,
+                                install: Installation) = withContext(Dispatchers.IO) {
+        val db = AppDatabase.getDatabase(context)
+
+        //cancel download for current pending installation
+        db.installDao.getPendingInstallation(install.uploadId)?.let { currentPendingInstall ->
+            Log.d(LOGGING_TAG, "Already existing install for ${install.uploadId}")
+
+            Installations.cancelPending(context, currentPendingInstall)
+        }
+
         val uploadId = install.uploadId
         deletePendingFile(uploadId)
 
+        val file = File(File(pendingPath, uploadId.toString()), fileName)
         val errorString =
-            getDownloaderForInstall(install).requestDownload(context, url, fileName, install)
+            getDownloaderForInstall(context, install).requestDownload(context, url, file, install)
 
         if (errorString != null) {
             val builder =
@@ -52,8 +69,15 @@ class DownloadFileManager(context: Context, private val fetchDownloader: FetchDo
         }
     }
 
-    suspend fun checkIsDownloading(downloadId: Int): Boolean {
-        return getDownloaderForId(downloadId).checkIsDownloading(downloadId)
+    suspend fun checkIsDownloading(context: Context, install: Installation): Boolean {
+        return install.downloadOrInstallId?.let { downloadId ->
+            getDownloaderForId(downloadId).checkIsDownloading(context, downloadId.toInt())
+        } ?: false
+    }
+
+    fun deleteAllDownloads(context: Context) {
+        Mitch.workerDownloader.cancelAll(context)
+        fetchDownloader.deleteAllDownloads()
     }
     
     fun deletePendingFile(uploadId: Int) {
@@ -69,8 +93,8 @@ class DownloadFileManager(context: Context, private val fetchDownloader: FetchDo
         pendingPath.renameTo(newPath)
     }
 
-    suspend fun requestCancel(downloadId: Int, uploadId: Int) {
-        getDownloaderForId(downloadId).requestCancel(downloadId)
+    suspend fun cancel(context: Context, downloadId: Long, uploadId: Int) {
+        getDownloaderForId(downloadId).cancel(context, downloadId.toInt())
         deletePendingFile(uploadId)
     }
     
@@ -89,11 +113,27 @@ class DownloadFileManager(context: Context, private val fetchDownloader: FetchDo
         return dir.listFiles()?.getOrNull(0)
     }
 
-    private fun getDownloaderForInstall(install: Installation): AbstractDownloader {
-        return fetchDownloader
+    private fun getDownloaderForInstall(context: Context,
+                                        install: Installation): DownloaderAbstract {
+        if (install.status == Installation.STATUS_INSTALLING)
+            throw IllegalArgumentException("Tried to get Downloader for INSTALLING $install")
+
+        val downloadId = install.downloadOrInstallId
+        if (downloadId == null) {
+            val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+            return if (sharedPrefs.getString(PREF_DOWNLOADER, "standard") == "standard")
+                Mitch.workerDownloader
+            else
+                fetchDownloader
+        }
+
+        return getDownloaderForId(downloadId)
     }
 
-    private fun getDownloaderForId(downloadId: Int): AbstractDownloader {
-        return fetchDownloader
+    private fun getDownloaderForId(downloadId: Long): DownloaderAbstract {
+        return if (Utils.fitsInInt(downloadId))
+            fetchDownloader
+        else
+            Mitch.workerDownloader
     }
 }

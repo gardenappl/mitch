@@ -13,7 +13,7 @@ import java.io.File
 /**
  * This listener responds to finished file downloads from Fetch.
  */
-class MitchFetchListener(private val context: Context, private val fetchDownloader: FetchDownloader)
+class MitchFetchListener(private val context: Context, private val fetchDownloader: DownloaderFetch)
     : FetchListener, DownloadFileListener() {
 
     companion object {
@@ -28,7 +28,8 @@ class MitchFetchListener(private val context: Context, private val fetchDownload
     }
 
     override fun onCompleted(download: Download) {
-        super.onCompleted(context, download.file, fetchDownloader.getUploadId(download), download.id)
+        super.onCompleted(context, download.file, fetchDownloader.getUploadId(download),
+            download.id.toLong())
 
         fetchDownloader.removeFetchDownload(download.id)
     }
@@ -37,7 +38,7 @@ class MitchFetchListener(private val context: Context, private val fetchDownload
         //Should not happen all by itself, but let's handle this just in case
         Log.w(LOGGING_TAG, "Deleted download! $download")
         runBlocking(Dispatchers.IO) {
-            Mitch.databaseHandler.onDownloadFailed(download.id)
+            Mitch.databaseHandler.onDownloadFailed(download.id.toLong())
         }
     }
 
@@ -48,7 +49,7 @@ class MitchFetchListener(private val context: Context, private val fetchDownload
     ) {}
 
     override fun onError(download: Download, error: Error, throwable: Throwable?) {
-        super.onError(context, File(download.file), download.id,
+        super.onError(context, File(download.file), download.id.toLong(),
             fetchDownloader.getUploadId(download), error.name)
 
         fetchDownloader.removeFetchDownload(download.id)
@@ -64,7 +65,7 @@ class MitchFetchListener(private val context: Context, private val fetchDownload
         onProgress(
             context,
             File(download.file),
-            download.id,
+            download.id.toLong(),
             fetchDownloader.getUploadId(download),
             download.progress,
             download.etaInMilliSeconds
@@ -85,7 +86,7 @@ class MitchFetchListener(private val context: Context, private val fetchDownload
         super.onProgress(
             context,
             File(download.file),
-            download.id,
+            download.id.toLong(),
             fetchDownloader.getUploadId(download),
             etaInMilliSeconds = null,
             progressPercent = null

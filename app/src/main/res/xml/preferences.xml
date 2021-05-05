@@ -32,6 +32,13 @@
                 android:title="@string/settings_theme" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_category_advanced">
+        <ListPreference
+                android:defaultValue="standard"
+                android:entries="@array/pref_downloader_entries"
+                android:entryValues="@array/pref_downloader_values"
+                android:key="ua.gardenapple.itchupdater.downloader"
+                android:summary="@string/settings_downloader_desc"
+                android:title="@string/settings_downloader" />
         <Preference
                 android:key="cancel_all_downloads"
                 android:title="@string/settings_cancel_downloads" />

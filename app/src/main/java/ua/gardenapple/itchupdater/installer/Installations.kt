@@ -8,6 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD
+import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD_LONG
+import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
 
@@ -52,7 +54,7 @@ class Installations {
         suspend fun cancelPending(
             context: Context,
             status: Int,
-            downloadOrInstallId: Int,
+            downloadOrInstallId: Long,
             uploadId: Int,
             installId: Int
         ) {
@@ -62,20 +64,16 @@ class Installations {
             if (status == Installation.STATUS_INSTALLING) {
                 val pkgInstaller = context.packageManager.packageInstaller
                 try {
-                    pkgInstaller.abandonSession(downloadOrInstallId)
+                    pkgInstaller.abandonSession(downloadOrInstallId.toInt())
                 } catch (e: SecurityException) {
                     Log.e(LOGGING_TAG, "Could not cancel", e)
                 }
-            } else {
-                val notificationService =
-                    context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-                notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, downloadOrInstallId)
             }
 
             withContext(Dispatchers.IO) {
                 if (status == Installation.STATUS_DOWNLOADING) {
                     Log.d(LOGGING_TAG, "Cancelling $downloadOrInstallId")
-                    Mitch.fileManager.requestCancel(downloadOrInstallId, uploadId)
+                    Mitch.fileManager.cancel(context, downloadOrInstallId, uploadId)
                 } else {
                     Mitch.fileManager.deletePendingFile(uploadId)
                 }
@@ -86,6 +84,16 @@ class Installations {
                     it.isInstalling = false
                     db.updateCheckDao.insert(it)
                 }
+            }
+
+            if (status != Installation.STATUS_INSTALLING) {
+                val notificationService =
+                    context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
+                Log.d(LOGGING_TAG, "$downloadOrInstallId, fits in int?: ${Utils.fitsInInt(downloadOrInstallId)}, to int: ${downloadOrInstallId.toInt()}")
+                if (Utils.fitsInInt(downloadOrInstallId))
+                    notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, downloadOrInstallId.toInt())
+                else
+                    notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD_LONG, downloadOrInstallId.toInt())
             }
         }
     }

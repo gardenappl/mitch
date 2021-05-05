@@ -1,16 +1,19 @@
 package ua.gardenapple.itchupdater.ui
 
+import android.app.NotificationManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.NotificationManagerCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.Mitch
+import ua.gardenapple.itchupdater.NOTIFICATION_CHANNEL_ID_INSTALLING
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.DatabaseCleanup
@@ -47,14 +50,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
                         val readyToInstall = ArrayList<Installation>()
                         for (install in db.installDao.getAllKnownInstallationsSync()) {
-                            if (install.status == Installation.STATUS_INSTALLING)
-                                requireContext().packageManager.packageInstaller.abandonSession(install.downloadOrInstallId!!)
-                            else if (install.status == Installation.STATUS_READY_TO_INSTALL)
+                            if (install.status == Installation.STATUS_INSTALLING) {
+                                requireContext().packageManager.packageInstaller
+                                    .abandonSession(install.downloadOrInstallId!!.toInt())
+                            } else if (install.status == Installation.STATUS_READY_TO_INSTALL) {
                                 readyToInstall.add(install)
+                            }
                         }
                         db.installDao.delete(readyToInstall)
 
-                        Mitch.fileManager.deleteAllDownloads()
+                        Mitch.fileManager.deleteAllDownloads(context)
 
                         DatabaseCleanup(requireContext()).cleanAppDatabase(db)
                     }

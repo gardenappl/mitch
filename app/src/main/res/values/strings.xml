@@ -137,4 +137,8 @@
     <string name="settings_cancel_downloads_title">Reset all current downloads?</string>
     <string name="settings_cancel_downloads_message">This should only be done for testing or troubleshooting purposes.</string>
     <string name="dialog_no">No</string>
+    <string name="settings_downloader_standard">Standard</string>
+    <string name="settings_downloader_fetch" translatable="false">Fetch</string>
+    <string name="settings_downloader_desc">Try changing this if you have trouble downloading files or installing apps.</string>
+    <string name="settings_downloader">Downloader</string>
 </resources>

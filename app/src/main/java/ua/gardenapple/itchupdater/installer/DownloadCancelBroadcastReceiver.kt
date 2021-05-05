@@ -9,6 +9,7 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD
+import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD_LONG
 import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.AppDatabase
 
@@ -25,19 +26,23 @@ class DownloadCancelBroadcastReceiver : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        val downloadId = Utils.getInt(intent.extras!!, EXTRA_DOWNLOAD_ID)!!
+        val downloadId = Utils.getLong(intent.extras!!, EXTRA_DOWNLOAD_ID)!!
         Log.d(LOGGING_TAG, "downloadId: $downloadId")
         val uploadId = Utils.getInt(intent.extras!!, EXTRA_UPLOAD_ID)!!
         Log.d(LOGGING_TAG, "uploadId: $uploadId")
 
         val notificationManager =
             context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(NOTIFICATION_TAG_DOWNLOAD, downloadId)
+        if (Utils.fitsInInt(downloadId))
+            notificationManager.cancel(NOTIFICATION_TAG_DOWNLOAD, downloadId.toInt())
+        else
+            notificationManager.cancel(NOTIFICATION_TAG_DOWNLOAD_LONG, downloadId.toInt())
 
         runBlocking(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
-            val install = db.installDao.getPendingInstallationByDownloadId(downloadId)!!
-            Installations.cancelPending(context, install)
+            db.installDao.getPendingInstallationByDownloadId(downloadId)?.let {
+                Installations.cancelPending(context, it)
+            }
         }
     }
 }

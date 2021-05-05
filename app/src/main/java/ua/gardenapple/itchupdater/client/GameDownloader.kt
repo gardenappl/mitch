@@ -132,7 +132,7 @@ class GameDownloader {
                 return UpdateCheckResult.EMPTY
             }
 
-            requestDownload(context, pendingInstall, downloadUrl, contentDisposition, mimeType)
+            requestDownload(context, pendingInstall, downloadUrl, url, contentDisposition, mimeType)
             return UpdateCheckResult.UPDATE_AVAILABLE
         }
 
@@ -148,37 +148,34 @@ class GameDownloader {
             context: Context,
             pendingInstall: Installation,
             url: String,
+            downloadPageUrl: String,
             contentDisposition: String?,
             mimeType: String?
         ) = withContext(Dispatchers.IO) {
-
             if (pendingInstall.internalId != 0)
                 throw IllegalArgumentException("Pending installation already has internalId!")
 
             Log.d(LOGGING_TAG, "Downloading, pending install: $pendingInstall")
 
-            val uploadId = pendingInstall.uploadId
+            //Make sure that the corresponding Game is present in the database
+            val db = AppDatabase.getDatabase(context)
+
+            var game = db.gameDao.getGameById(pendingInstall.gameId)
+            if (game == null) {
+                val storePageUrl = ItchWebsiteParser.getStoreUrlFromDownloadPage(Uri.parse(downloadPageUrl))
+                val doc = ItchWebsiteUtils.fetchAndParse(storePageUrl)
+                game = ItchWebsiteParser.getGameInfoForStorePage(doc, storePageUrl)!!
+                Log.d(LOGGING_TAG, "Game is missing! Adding game $game")
+                db.gameDao.upsert(game)
+            }
+
             val fileName = if (mimeType == "application/octet-stream") {
                 URLUtil.guessFileName(url, contentDisposition, null)
             } else {
                 URLUtil.guessFileName(url, contentDisposition, mimeType)
             }
 
-            val db = AppDatabase.getDatabase(context)
-            val downloadFileManager = Mitch.fileManager
-
-            //cancel download for current pending installation
-            db.installDao.getPendingInstallation(uploadId)?.let { currentPendingInstall ->
-                Log.d(LOGGING_TAG, "Already existing install for $uploadId")
-
-                if (currentPendingInstall.status == Installation.STATUS_DOWNLOADING) {
-                    downloadFileManager
-                        .requestCancel(currentPendingInstall.downloadOrInstallId!!, uploadId)
-                    db.installDao.delete(currentPendingInstall.internalId)
-                }
-            }
-
-            downloadFileManager.requestDownload(context, url, fileName, pendingInstall)
+            Mitch.fileManager.requestDownload(context, url, fileName, pendingInstall)
         }
     }
 }

@@ -7,6 +7,8 @@ import ua.gardenapple.itchupdater.database.installation.Installation.Companion.S
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS_INSTALLED
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS_INSTALLING
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS_READY_TO_INSTALL
+import ua.gardenapple.itchupdater.files.DownloaderWorker
+import ua.gardenapple.itchupdater.files.DownloaderFetch
 
 
 /**
@@ -69,9 +71,12 @@ data class Installation(
      * null if [STATUS_INSTALLED]
      * downloadId if [STATUS_DOWNLOADING] or [STATUS_READY_TO_INSTALL]
      * installId if [STATUS_INSTALLING]
+     *
+     * If download ID fits within an Int then it's handled by [DownloaderFetch],
+     * otherwise, it's handled by [DownloaderWorker].
      */
     @ColumnInfo(name = DOWNLOAD_OR_INSTALL_ID)
-    var downloadOrInstallId: Int?,
+    var downloadOrInstallId: Long?,
 
     /**
      * Affects timestamps and version strings.
@@ -119,7 +124,7 @@ data class Installation(
         availableUploadIds: List<Int>?,
         packageName: String? = null,
         status: Int = STATUS_INSTALLED,
-        downloadOrInstallId: Int? = null,
+        downloadOrInstallId: Long? = null,
         locale: String = ItchWebsiteParser.UNKNOWN_LOCALE,
         version: String? = null,
         uploadName: String,

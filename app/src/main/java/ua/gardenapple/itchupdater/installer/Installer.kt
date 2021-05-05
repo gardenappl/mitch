@@ -28,11 +28,11 @@ class Installer {
         return pkgInstaller.createSession(params)
     }
 
-    suspend fun install(context: Context, downloadId: Int, uploadId: Int) = withContext(Dispatchers.IO) {
+    suspend fun install(context: Context, downloadId: Long, uploadId: Int) = withContext(Dispatchers.IO) {
         install(context, downloadId, Mitch.fileManager.getPendingFile(uploadId)!!)
     }
 
-    suspend fun install(context: Context, downloadId: Int, apkFile: File) = withContext(Dispatchers.IO) {
+    suspend fun install(context: Context, downloadId: Long, apkFile: File) = withContext(Dispatchers.IO) {
         val sessionID = createSession(context)
         Log.d(LOGGING_TAG, "Created session")
 

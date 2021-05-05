@@ -63,9 +63,9 @@ class Utils {
             }
         }
 
-        fun Int.hasFlag(flag: Int): Boolean {
-            return this and flag == flag
-        }
+//        fun Int.hasFlag(flag: Int): Boolean {
+//            return this and flag == flag
+//        }
 
         //https://stackoverflow.com/a/10600736/5701177
         fun drawableToBitmap(drawable: Drawable): Bitmap {
@@ -173,12 +173,23 @@ class Utils {
                 null
         }
 
+        fun getLong(bundle: Bundle, key: String): Long? {
+            return if (bundle.containsKey(key))
+                bundle.getLong(key)
+            else
+                null
+        }
+
         fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
             try {
                 return packageManager.getApplicationInfo(packageName, 0).enabled
             } catch (e: PackageManager.NameNotFoundException) {
                 return false
             }
+        }
+
+        fun fitsInInt(l: Long): Boolean {
+            return l.toInt().toLong() == l
         }
     }
 }

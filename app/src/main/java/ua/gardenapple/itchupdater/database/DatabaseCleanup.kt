@@ -38,17 +38,14 @@ class DatabaseCleanup(private val context: Context) {
                         installsToDelete.add(install)
                 }
                 Installation.STATUS_INSTALLING -> {
-                    val installSessionId = install.downloadOrInstallId
+                    val installSessionId = install.downloadOrInstallId?.toInt()
                     if (installSessionId == null)
                         installsToDelete.add(install)
                     else if (packageInstaller.getSessionInfo(installSessionId) == null)
                         installsToDelete.add(install)
                 }
                 Installation.STATUS_DOWNLOADING -> {
-                    val downloadId = install.downloadOrInstallId
-                    if (downloadId == null)
-                        installsToDelete.add(install)
-                    else if (!Mitch.fileManager.checkIsDownloading(downloadId))
+                    if (!Mitch.fileManager.checkIsDownloading(context, install))
                         installsToDelete.add(install)
                 }
             }
