@@ -75,7 +75,7 @@ class Installations {
             withContext(Dispatchers.IO) {
                 if (status == Installation.STATUS_DOWNLOADING) {
                     Log.d(LOGGING_TAG, "Cancelling $downloadOrInstallId")
-                    Mitch.fileManager.requestCancellation(downloadOrInstallId, uploadId)
+                    Mitch.fileManager.requestCancel(downloadOrInstallId, uploadId)
                 } else {
                     Mitch.fileManager.deletePendingFile(uploadId)
                 }

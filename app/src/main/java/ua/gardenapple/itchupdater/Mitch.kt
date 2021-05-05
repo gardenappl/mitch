@@ -11,7 +11,6 @@ import androidx.preference.PreferenceManager
 import androidx.work.*
 import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2.FetchConfiguration
-import com.tonyodev.fetch2.Status
 import com.tonyodev.fetch2okhttp.OkHttpDownloader
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -24,7 +23,8 @@ import ua.gardenapple.itchupdater.client.UpdateChecker
 import ua.gardenapple.itchupdater.database.DatabaseCleanup
 import ua.gardenapple.itchupdater.files.DownloadFileManager
 import ua.gardenapple.itchupdater.files.ExternalFileManager
-import ua.gardenapple.itchupdater.installer.FileDownloadListener
+import ua.gardenapple.itchupdater.files.FetchDownloader
+import ua.gardenapple.itchupdater.files.MitchFetchListener
 import ua.gardenapple.itchupdater.installer.Installer
 import ua.gardenapple.itchupdater.installer.InstallerDatabaseHandler
 import ua.gardenapple.itchupdater.ui.CrashDialog
@@ -164,8 +164,9 @@ class Mitch : Application() {
             build()
         }
         fetch = fetchConfig.getNewFetchInstanceFromConfiguration()
-        fetch.addListener(FileDownloadListener(applicationContext))
-        fileManager = DownloadFileManager(applicationContext, fetch)
+        val fetchDownloader = FetchDownloader(fetch)
+        fetch.addListener(MitchFetchListener(applicationContext, fetchDownloader))
+        fileManager = DownloadFileManager(applicationContext, fetchDownloader)
         fileManager.setup()
 
         databaseHandler = InstallerDatabaseHandler(applicationContext)

@@ -9,38 +9,30 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.room.withTransaction
 import com.tonyodev.fetch2.Download
-import com.tonyodev.fetch2.Error
-import com.tonyodev.fetch2.FetchListener
-import com.tonyodev.fetch2core.DownloadBlock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.ui.MainActivity
 import java.io.File
+import java.util.*
 
-/**
- * This listener responds to finished file downloads from Fetch.
- */
-class FileDownloadListener(private val context: Context) : FetchListener {
+abstract class DownloadFileListener {
     companion object {
         private const val LOGGING_TAG = "FileDownloadListener"
     }
 
-    private fun createResultNotification(context: Context,
-                                         downloadFile: File,
-                                         id: Int,
-                                         isApk: Boolean,
-                                         error: Error? = null) {
+    private fun createResultNotification(context: Context, downloadFile: File, downloadId: Int,
+                                         isApk: Boolean, errorName: String?) {
         val pendingIntent: PendingIntent?
-        if (error != null) {
+        if (errorName != null) {
             pendingIntent = null
         } else if (isApk) {
             Log.d(LOGGING_TAG, downloadFile.path)
 
             val intent = Intent(context, InstallNotificationBroadcastReceiver::class.java).apply {
                 data = Uri.fromFile(downloadFile)
-                putExtra(InstallNotificationBroadcastReceiver.EXTRA_DOWNLOAD_ID, id)
+                putExtra(InstallNotificationBroadcastReceiver.EXTRA_DOWNLOAD_ID, downloadId)
             }
             pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         } else {
@@ -57,9 +49,9 @@ class FileDownloadListener(private val context: Context) : FetchListener {
 
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED).apply {
             setSmallIcon(R.drawable.ic_mitch_notification)
-            if (error != null) {
+            if (errorName != null) {
                 setContentTitle(downloadFile.name)
-                setContentText(context.resources.getString(R.string.notification_download_error, error.name))
+                setContentText(context.resources.getString(R.string.notification_download_error, errorName))
             } else {
                 if (isApk)
                     setContentTitle(context.resources.getString(R.string.notification_install_title))
@@ -74,122 +66,80 @@ class FileDownloadListener(private val context: Context) : FetchListener {
         }
 
         with(NotificationManagerCompat.from(context)) {
-            notify(NOTIFICATION_TAG_DOWNLOAD, id, builder.build())
+            notify(NOTIFICATION_TAG_DOWNLOAD, downloadId, builder.build())
         }
     }
-    
-    private fun createProgressNotification(context: Context, download: Download,
-                                           etaInMilliSeconds: Long?) {
+
+    private fun createProgressNotification(context: Context, downloadFile: File,
+                                           downloadId: Int, uploadId: Int,
+                                           progressPercent: Int?, etaInMilliSeconds: Long?) {
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
             setOngoing(true)
             setOnlyAlertOnce(true)
             priority = NotificationCompat.PRIORITY_LOW
             setSmallIcon(R.drawable.ic_mitch_notification)
-            setContentTitle(download.fileUri.lastPathSegment)
+            setContentTitle(downloadFile.name)
 
-            setProgress(100, download.progress, etaInMilliSeconds == null)
+            if (progressPercent != null)
+                setProgress(100, progressPercent, false)
+            else
+                setProgress(100, 0, true)
+
             if (etaInMilliSeconds != null)
                 setContentInfo(context.resources.getString(R.string.notification_download_time_remaining,
-                etaInMilliSeconds / 60_000, etaInMilliSeconds / 1000))
+                        etaInMilliSeconds / 60_000, etaInMilliSeconds / 1000))
 
             val cancelIntent = Intent(context, DownloadCancelBroadcastReceiver::class.java).apply {
-                putExtra(DownloadCancelBroadcastReceiver.EXTRA_DOWNLOAD_ID, download.id)
-                val uploadId = Mitch.fileManager.getUploadId(download)
+                putExtra(DownloadCancelBroadcastReceiver.EXTRA_DOWNLOAD_ID, downloadId)
                 putExtra(DownloadCancelBroadcastReceiver.EXTRA_UPLOAD_ID, uploadId)
             }
             val cancelPendingIntent = PendingIntent.getBroadcast(context, 0, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             addAction(R.drawable.ic_baseline_cancel_24, context.getString(R.string.dialog_cancel),
-                cancelPendingIntent)
+                    cancelPendingIntent)
         }
         with(NotificationManagerCompat.from(context)) {
-            notify(NOTIFICATION_TAG_DOWNLOAD, download.id, builder.build())
+            notify(NOTIFICATION_TAG_DOWNLOAD, downloadId, builder.build())
         }
     }
 
-    override fun onAdded(download: Download) {}
-
-    override fun onCancelled(download: Download) {
-        Log.d(LOGGING_TAG, "Cancelled ID: ${download.id}")
-        Mitch.fileManager.removeFetchDownload(download.id)
-    }
-
-    override fun onCompleted(download: Download) {
-        val isApk = download.file.endsWith(".apk")
+    protected fun onCompleted(context: Context, file: String, uploadId: Int, downloadId: Int) {
+        val isApk = file.endsWith(".apk")
         val downloadFileManager = Mitch.fileManager
-        val uploadId = downloadFileManager.getUploadId(download)
 
         runBlocking(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
             db.withTransaction {
-                val pendingInstall = db.installDao.getPendingInstallationByDownloadId(download.id)!!
-
+                val pendingInstall = db.installDao.getPendingInstallationByDownloadId(downloadId)!!
                 val notificationFile: File
                 if (isApk) {
                     notificationFile = downloadFileManager.getPendingFile(uploadId)!!
                 } else {
                     Installations.deleteOutdatedInstalls(context, pendingInstall)
-                    downloadFileManager.replacePendingFile(download)
+                    downloadFileManager.replacePendingFile(uploadId)
                     notificationFile = downloadFileManager.getDownloadedFile(uploadId)!!
                 }
-                createResultNotification(context, notificationFile, download.id, isApk)
+                createResultNotification(context, notificationFile, downloadId, isApk, null)
                 Mitch.databaseHandler.onDownloadComplete(pendingInstall, isApk)
             }
         }
-        downloadFileManager.removeFetchDownload(download.id)
     }
 
-    override fun onDeleted(download: Download) {
-        //Should not happen all by itself, but let's handle this just in case
-        Log.w(LOGGING_TAG, "Deleted download! $download")
-        runBlocking(Dispatchers.IO) {
-            Mitch.databaseHandler.onDownloadFailed(download.id)
-        }
-    }
-
-    override fun onDownloadBlockUpdated(
-        download: Download,
-        downloadBlock: DownloadBlock,
-        totalBlocks: Int
-    ) {}
-
-    override fun onError(download: Download, error: Error, throwable: Throwable?) {
-        val isApk = download.file.endsWith(".apk")
-        createResultNotification(context, File(download.file), download.id, isApk, error)
+    protected fun onError(context: Context, file: File, downloadId: Int, uploadId: Int, errorName: String) {
+        val isApk = file.extension == "apk"
+        createResultNotification(context, file, downloadId, isApk, errorName)
 
         runBlocking(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
-            val uploadId = Mitch.fileManager.getUploadId(download)
             db.withTransaction {
                 Mitch.fileManager.deletePendingFile(uploadId)
-                Mitch.databaseHandler.onDownloadFailed(download.id)
+                Mitch.databaseHandler.onDownloadFailed(downloadId)
             }
         }
-        Mitch.fileManager.removeFetchDownload(download.id)
     }
 
-    override fun onPaused(download: Download) {}
-
-    override fun onProgress(
-        download: Download,
-        etaInMilliSeconds: Long,
-        downloadedBytesPerSecond: Long
-    ) {
-        createProgressNotification(context, download, etaInMilliSeconds)
+    protected fun onProgress(context: Context, file: File, downloadId: Int, uploadId: Int,
+                   progressPercent: Int?, etaInMilliSeconds: Long?) {
+        createProgressNotification(context, file, downloadId, uploadId,
+            progressPercent, etaInMilliSeconds)
     }
-
-    override fun onQueued(download: Download, waitingOnNetwork: Boolean) {}
-
-    override fun onRemoved(download: Download) {}
-
-    override fun onResumed(download: Download) {}
-
-    override fun onStarted(
-        download: Download,
-        downloadBlocks: List<DownloadBlock>,
-        totalBlocks: Int
-    ) {
-        createProgressNotification(context, download, null)
-    }
-
-    override fun onWaitingNetwork(download: Download) {}
 }

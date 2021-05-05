@@ -166,28 +166,19 @@ class GameDownloader {
 
             val db = AppDatabase.getDatabase(context)
             val downloadFileManager = Mitch.fileManager
-            var willStartDownload = false
 
             //cancel download for current pending installation
             db.installDao.getPendingInstallation(uploadId)?.let { currentPendingInstall ->
                 Log.d(LOGGING_TAG, "Already existing install for $uploadId")
 
                 if (currentPendingInstall.status == Installation.STATUS_DOWNLOADING) {
-                    willStartDownload = true
-                    downloadFileManager.requestCancellation(currentPendingInstall.downloadOrInstallId!!,
-                        uploadId) {
-
-                        runBlocking(Dispatchers.IO) {
-                            db.installDao.delete(currentPendingInstall.internalId)
-                            downloadFileManager.startDownload(url, fileName, pendingInstall)
-                        }
-                    }
+                    downloadFileManager
+                        .requestCancel(currentPendingInstall.downloadOrInstallId!!, uploadId)
+                    db.installDao.delete(currentPendingInstall.internalId)
                 }
             }
 
-            if (!willStartDownload) {
-                downloadFileManager.startDownload(url, fileName, pendingInstall)
-            }
+            downloadFileManager.requestDownload(context, url, fileName, pendingInstall)
         }
     }
 }
