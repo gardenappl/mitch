@@ -157,7 +157,8 @@ class Mitch : Application() {
         }
         val fetchConfig = FetchConfiguration.Builder(applicationContext).run {
             setDownloadConcurrentLimit(3)
-            setHttpDownloader(OkHttpDownloader(httpClient))
+            //TODO: Maybe OkHttpDownloader is causing issue #22?
+//            setHttpDownloader(OkHttpDownloader(httpClient))
             setAutoRetryMaxAttempts(3)
             enableFileExistChecks(false)
             createDownloadFileOnEnqueue(false)
