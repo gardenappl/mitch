@@ -232,8 +232,9 @@ class Mitch : Application() {
 
             getPluginConfigurationBuilder(MailSenderConfigurationBuilder::class.java).apply {
                 setMailTo("~gardenapple/mitch-bug-reports@lists.sr.ht, gardenapple+mitch@posteo.net")
+                //Empty subject, user should write their own
+                setSubject("")
                 //Strings are English only, this is intentional
-                setSubject("[Insert short description of what happened]")
                 setBody("""
                     Your message will be published on SourceHut,
                     and also sent to the author's personal address.

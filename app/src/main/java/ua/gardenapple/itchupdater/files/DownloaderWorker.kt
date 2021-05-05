@@ -180,7 +180,7 @@ class DownloaderWorker : DownloaderAbstract, DownloadFileListener() {
                     //Add some shitty delay because if you send the completion notification
                     //right after a progress notification, sometimes it doesn't show up
                     delay(500)
-
+                    
                     Mitch.workerDownloader.onCompleted(applicationContext, file.name, uploadId,
                         downloadId)
                 }
