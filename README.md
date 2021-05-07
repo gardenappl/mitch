@@ -13,6 +13,16 @@ Hosted on [itch.io](https://gardenapple.itch.io/mitch) and [SourceHut](https://s
 
 The app is still in development, some features are planned but not yet implemented.
 
+## Translating
+
+Translations are provided by the generous people at [Weblate](https://weblate.org).
+
+[If you'd like to contribute to Mitch, consider helping out with translations!](https://hosted.weblate.org/projects/mitch)
+
+<a href="https://hosted.weblate.org/engage/mitch/">
+<img src="https://hosted.weblate.org/widgets/mitch/-/multi-red.svg" alt="Стан перекладу" />
+</a>
+
 ## Installing
 
 **Mitch is available on F-Droid**:
