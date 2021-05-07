@@ -1,0 +1,2 @@
+* Added new installation mechanism, which should work for MIUI users.
+* You can switch to the old mechanism in the Settings menu.
