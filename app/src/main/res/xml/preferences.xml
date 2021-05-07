@@ -33,6 +33,13 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_category_advanced">
         <ListPreference
+                android:defaultValue="native"
+                android:entries="@array/pref_installer_entries"
+                android:entryValues="@array/pref_installer_values"
+                android:key="ua.gardenapple.itchupdater.installer"
+                android:summary="@string/settings_installer_desc"
+                android:title="@string/settings_installer" />
+        <ListPreference
                 android:defaultValue="standard"
                 android:entries="@array/pref_downloader_entries"
                 android:entryValues="@array/pref_downloader_values"

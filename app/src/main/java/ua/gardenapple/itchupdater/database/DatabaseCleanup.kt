@@ -14,6 +14,7 @@ import ua.gardenapple.itchupdater.PREF_DB_RAN_CLEANUP_ONCE
 import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
+import ua.gardenapple.itchupdater.install.Installations
 
 
 class DatabaseCleanup(private val context: Context) {
@@ -22,7 +23,6 @@ class DatabaseCleanup(private val context: Context) {
     }
 
     suspend fun cleanAppDatabase(db: AppDatabase): Result = withContext(Dispatchers.IO) {
-        val packageInstaller = context.packageManager.packageInstaller
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
 
         Log.d(LOGGING_TAG, "Started.")
@@ -38,11 +38,13 @@ class DatabaseCleanup(private val context: Context) {
                         installsToDelete.add(install)
                 }
                 Installation.STATUS_INSTALLING -> {
-                    val installSessionId = install.downloadOrInstallId?.toInt()
-                    if (installSessionId == null)
+                    val installId = install.downloadOrInstallId
+                    if (installId == null) {
                         installsToDelete.add(install)
-                    else if (packageInstaller.getSessionInfo(installSessionId) == null)
+                    } else if (Installations.getInstaller(installId)
+                            .isInstalling(context, installId) == false) {
                         installsToDelete.add(install)
+                    }
                 }
                 Installation.STATUS_DOWNLOADING -> {
                     if (!Mitch.fileManager.checkIsDownloading(context, install))

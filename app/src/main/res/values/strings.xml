@@ -140,5 +140,9 @@
     <string name="settings_downloader_standard">Standard</string>
     <string name="settings_downloader_fetch" translatable="false">Fetch</string>
     <string name="settings_downloader_desc">Try changing this if you have trouble downloading files or installing apps.</string>
-    <string name="settings_downloader">Downloader</string>
+    <string name="settings_installer_desc">Try changing this if you have trouble installing apps.</string>
+    <string name="settings_downloader">Download method</string>
+    <string name="settings_installer">Installation method</string>
+    <string name="settings_installer_session">Session installer</string>
+    <string name="settings_installer_native">Native installer (default)</string>
 </resources>

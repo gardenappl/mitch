@@ -1,4 +1,4 @@
-package ua.gardenapple.itchupdater.installer
+package ua.gardenapple.itchupdater.install
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -11,9 +11,9 @@ import java.io.File
 /**
  * This is an internal receiver which only receives broadcasts when clicking the "Click to install" notification.
  */
-class InstallNotificationBroadcastReceiver : BroadcastReceiver() {
+class InstallRequestBroadcastReceiver : BroadcastReceiver() {
     companion object {
-        private const val LOGGING_TAG = "InstallReceiver"
+        private const val LOGGING_TAG = "InstallRequestReceiver"
 
         const val EXTRA_DOWNLOAD_ID = "DOWNLOAD_ID"
     }
@@ -26,7 +26,8 @@ class InstallNotificationBroadcastReceiver : BroadcastReceiver() {
 
         runBlocking {
             val apkFile = File(intent.data!!.path!!)
-            Mitch.installer.install(context, downloadId, apkFile)
+            val installer = Installations.getInstaller(context)
+            installer.requestInstall(context, downloadId, apkFile)
         }
     }
 

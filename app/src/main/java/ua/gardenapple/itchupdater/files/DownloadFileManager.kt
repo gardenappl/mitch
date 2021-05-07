@@ -8,13 +8,14 @@ import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.*
-import ua.gardenapple.itchupdater.client.GameDownloader
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
-import ua.gardenapple.itchupdater.installer.Installations
+import ua.gardenapple.itchupdater.download.Downloader
+import ua.gardenapple.itchupdater.download.FetchDownloader
+import ua.gardenapple.itchupdater.install.Installations
 import java.io.File
 
-class DownloadFileManager(context: Context, private val fetchDownloader: DownloaderFetch) {
+class DownloadFileManager(context: Context, private val fetchDownloader: FetchDownloader) {
     companion object {
 //        const val APK_MIME = "application/vnd.android.package-archive"
         const val LOGGING_TAG = "DownloadFileManager"
@@ -114,7 +115,7 @@ class DownloadFileManager(context: Context, private val fetchDownloader: Downloa
     }
 
     private fun getDownloaderForInstall(context: Context,
-                                        install: Installation): DownloaderAbstract {
+                                        install: Installation): Downloader {
         if (install.status == Installation.STATUS_INSTALLING)
             throw IllegalArgumentException("Tried to get Downloader for INSTALLING $install")
 
@@ -130,7 +131,7 @@ class DownloadFileManager(context: Context, private val fetchDownloader: Downloa
         return getDownloaderForId(downloadId)
     }
 
-    private fun getDownloaderForId(downloadId: Long): DownloaderAbstract {
+    private fun getDownloaderForId(downloadId: Long): Downloader {
         return if (Utils.fitsInInt(downloadId))
             fetchDownloader
         else

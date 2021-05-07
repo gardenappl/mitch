@@ -7,8 +7,10 @@ import ua.gardenapple.itchupdater.database.installation.Installation.Companion.S
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS_INSTALLED
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS_INSTALLING
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.STATUS_READY_TO_INSTALL
-import ua.gardenapple.itchupdater.files.DownloaderWorker
-import ua.gardenapple.itchupdater.files.DownloaderFetch
+import ua.gardenapple.itchupdater.download.WorkerDownloader
+import ua.gardenapple.itchupdater.download.FetchDownloader
+import ua.gardenapple.itchupdater.install.NativeInstaller
+import ua.gardenapple.itchupdater.install.SessionInstaller
 
 
 /**
@@ -72,8 +74,11 @@ data class Installation(
      * downloadId if [STATUS_DOWNLOADING] or [STATUS_READY_TO_INSTALL]
      * installId if [STATUS_INSTALLING]
      *
-     * If download ID fits within an Int then it's handled by [DownloaderFetch],
-     * otherwise, it's handled by [DownloaderWorker].
+     * If download ID fits within an Int then it's handled by [FetchDownloader],
+     * otherwise, it's handled by [WorkerDownloader].
+     *
+     * If installId fits within an Int then it's handled by [SessionInstaller],
+     * otherwise, it's handled by [NativeInstaller]
      */
     @ColumnInfo(name = DOWNLOAD_OR_INSTALL_ID)
     var downloadOrInstallId: Long?,

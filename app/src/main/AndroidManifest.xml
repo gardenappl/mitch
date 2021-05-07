@@ -61,27 +61,34 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.CrashDialog"
-            android:process=":acra"
-            android:theme="@style/DialogStyle"
-            android:excludeFromRecents="true"
-            android:finishOnTaskLaunch="true"
-            android:launchMode="singleInstance"/>
+                android:name=".ui.CrashDialog"
+                android:process=":acra"
+                android:theme="@style/DialogStyle"
+                android:excludeFromRecents="true"
+                android:finishOnTaskLaunch="true"
+                android:launchMode="singleInstance"/>
+        <activity
+                android:name=".install.NativeInstallerActivity"
+                android:exported="false"
+                android:theme="@style/DialogStyle"
+                android:excludeFromRecents="true"
+                android:finishOnTaskLaunch="true"
+                android:launchMode="singleInstance"/>
 
         <receiver
-                android:name=".installer.InstallNotificationBroadcastReceiver"
+                android:name=".install.InstallRequestBroadcastReceiver"
                 android:exported="false" />
         <receiver
-                android:name=".installer.DownloadCancelBroadcastReceiver"
+                android:name=".download.DownloadCancelBroadcastReceiver"
                 android:exported="false" />
         <receiver
-                android:name=".installer.UpdateNotificationBroadcastReceiver"
+                android:name=".download.UpdateNotificationBroadcastReceiver"
                 android:exported="false" />
         <receiver
                 android:name=".ErrorReportBroadcastReciever"
                 android:exported="false" />
         <receiver
-                android:name=".installer.UninstallBroadcastReceiver"
+                android:name=".install.UninstallBroadcastReceiver"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
@@ -89,13 +96,13 @@
             </intent-filter>
         </receiver>
         <receiver
-                android:name=".installer.SelfUpdateBroadcastReceiver"
+                android:name=".install.SelfUpdateBroadcastReceiver"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
-        <service android:name=".installer.InstallerService" />
+        <service android:name=".install.SessionInstallerService" />
         <provider
                 android:name="androidx.core.content.FileProvider"
                 android:authorities="ua.gardenapple.itchupdater.fileprovider"

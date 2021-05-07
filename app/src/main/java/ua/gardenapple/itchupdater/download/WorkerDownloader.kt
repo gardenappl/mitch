@@ -1,4 +1,4 @@
-package ua.gardenapple.itchupdater.files
+package ua.gardenapple.itchupdater.download
 
 import android.content.Context
 import android.util.Log
@@ -11,23 +11,18 @@ import okhttp3.Callback
 import okhttp3.Request
 import okhttp3.Response
 import ua.gardenapple.itchupdater.Mitch
-import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD
 import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD_LONG
-import ua.gardenapple.itchupdater.client.UpdateChecker
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
-import ua.gardenapple.itchupdater.installer.DownloadFileListener
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.lang.Exception
-import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
-class DownloaderWorker : DownloaderAbstract, DownloadFileListener() {
+class WorkerDownloader : Downloader, DownloadFileListener() {
     companion object {
         private const val WORKER_URL = "url"
         private const val WORKER_FILE_PATH = "path"

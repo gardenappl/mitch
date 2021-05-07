@@ -13,16 +13,13 @@ import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker.Result
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.*
-import org.acra.ACRA
-import org.json.JSONException
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
-import ua.gardenapple.itchupdater.installer.UpdateNotificationBroadcastReceiver
+import ua.gardenapple.itchupdater.download.UpdateNotificationBroadcastReceiver
 import ua.gardenapple.itchupdater.ui.MainActivity
-import java.lang.RuntimeException
 import java.net.SocketTimeoutException
 
 class UpdateChecker(private val context: Context) {

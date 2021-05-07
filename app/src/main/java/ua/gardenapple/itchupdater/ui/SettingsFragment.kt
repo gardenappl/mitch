@@ -18,6 +18,7 @@ import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.DatabaseCleanup
 import ua.gardenapple.itchupdater.database.installation.Installation
+import ua.gardenapple.itchupdater.install.Installations
 
 class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -51,8 +52,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
                         val readyToInstall = ArrayList<Installation>()
                         for (install in db.installDao.getAllKnownInstallationsSync()) {
                             if (install.status == Installation.STATUS_INSTALLING) {
-                                requireContext().packageManager.packageInstaller
-                                    .abandonSession(install.downloadOrInstallId!!.toInt())
+                                Installations.getInstaller(context, install)
+                                    .tryCancel(context, install.downloadOrInstallId!!)
                             } else if (install.status == Installation.STATUS_READY_TO_INSTALL) {
                                 readyToInstall.add(install)
                             }

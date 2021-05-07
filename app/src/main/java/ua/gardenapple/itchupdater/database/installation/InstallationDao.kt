@@ -71,6 +71,6 @@ abstract class InstallationDao {
     @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :downloadId AND $STATUS != $STATUS_INSTALLING")
     abstract suspend fun getPendingInstallationByDownloadId(downloadId: Long): Installation?
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :installSessionId AND $STATUS = $STATUS_INSTALLING")
-    abstract suspend fun getPendingInstallationBySessionId(installSessionId: Int): Installation?
+    @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :installId AND $STATUS = $STATUS_INSTALLING")
+    abstract suspend fun getPendingInstallationByInstallId(installId: Long): Installation?
 }

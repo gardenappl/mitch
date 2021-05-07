@@ -1,4 +1,4 @@
-package ua.gardenapple.itchupdater.files
+package ua.gardenapple.itchupdater.download
 
 import android.content.Context
 import android.util.Log
@@ -14,7 +14,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 
-class DownloaderFetch(private val fetch: Fetch) : DownloaderAbstract {
+class FetchDownloader(private val fetch: Fetch) : Downloader {
     companion object {
         private const val LOGGING_TAG = "FetchDownloadFileMan"
 

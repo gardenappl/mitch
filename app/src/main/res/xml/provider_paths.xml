@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
+    <files-path name="pending" path="pending"/>
     <files-path name="uploads" path="upload"/>
     <external-path name="public-downloads" path="Download" />
 </paths>

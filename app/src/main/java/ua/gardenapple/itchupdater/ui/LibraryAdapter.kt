@@ -24,7 +24,7 @@ import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.GameRepository
 import ua.gardenapple.itchupdater.database.installation.GameInstallation
 import ua.gardenapple.itchupdater.database.installation.Installation
-import ua.gardenapple.itchupdater.installer.Installations
+import ua.gardenapple.itchupdater.install.Installations
 
 
 class LibraryAdapter internal constructor(
@@ -48,7 +48,7 @@ class LibraryAdapter internal constructor(
 
     inner class GameViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val thumbnailView: ImageView = itemView.findViewById(R.id.gameThumbnail)
-        val emptyThumbnailView: ImageView = itemView.findViewById(R.id.gameThumbnailEmpty);
+        val emptyThumbnailView: ImageView = itemView.findViewById(R.id.gameThumbnailEmpty)
         val gameName: TextView = itemView.findViewById(R.id.gameName)
         val authorOrSubtitle: TextView = itemView.findViewById(R.id.authorOrSubtitle)
         val progressBarLayout: LinearLayout = itemView.findViewById(R.id.progressBarLayout)
@@ -113,8 +113,11 @@ class LibraryAdapter internal constructor(
                     notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD_LONG, it.toInt())
             }
 
+            //TODO: Activity for SessionInstaller to avoid GlobalScope
             GlobalScope.launch {
-                Mitch.installer.install(context, gameInstall.downloadOrInstallId, gameInstall.uploadId)
+                val installer = Installations.getInstaller(context)
+                val file = Mitch.fileManager.getPendingFile(gameInstall.uploadId)!!
+                installer.requestInstall(context, gameInstall.downloadOrInstallId, file)
             }
         } else if (gameInstall.packageName != null) {
             val launchIntent = context.packageManager.getLaunchIntentForPackage(gameInstall.packageName)

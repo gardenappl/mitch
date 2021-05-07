@@ -1,4 +1,4 @@
-package ua.gardenapple.itchupdater.files
+package ua.gardenapple.itchupdater.download
 
 import android.content.Context
 import android.util.Log
@@ -7,13 +7,12 @@ import com.tonyodev.fetch2core.DownloadBlock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.Mitch
-import ua.gardenapple.itchupdater.installer.DownloadFileListener
 import java.io.File
 
 /**
  * This listener responds to finished file downloads from Fetch.
  */
-class MitchFetchListener(private val context: Context, private val fetchDownloader: DownloaderFetch)
+class MitchFetchListener(private val context: Context, private val fetchDownloader: FetchDownloader)
     : FetchListener, DownloadFileListener() {
 
     companion object {

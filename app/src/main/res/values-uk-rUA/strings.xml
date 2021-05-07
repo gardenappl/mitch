@@ -139,6 +139,10 @@
     <string name="dialog_no">Ні</string>
     <string name="settings_cancel_downloads_message">Взагалі, це варто робити лише в цілях тестування або вирішення проблем з Mitch.</string>
     <string name="settings_downloader_standard">Звичайний</string>
-    <string name="settings_downloader">Завантажувач</string>
+    <string name="settings_downloader">Метод завантаження</string>
     <string name="settings_downloader_desc">Змініть це у випадку, коли у вас виникають проблеми з завантаженням файлів чи встановленням додатків.</string>
+    <string name="settings_installer_desc">Змініть це у випадку, коли у вас виникають проблеми зі встановленням додатків.</string>
+    <string name="settings_installer">Метод встановлення</string>
+    <string name="settings_installer_native">Системний встановлювач (за замовчуванням)</string>
+    <string name="settings_installer_session">Встановлення сесією</string>
 </resources>

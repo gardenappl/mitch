@@ -1,4 +1,4 @@
-package ua.gardenapple.itchupdater.installer
+package ua.gardenapple.itchupdater.install
 
 import android.app.PendingIntent
 import android.content.Context
@@ -11,9 +11,9 @@ import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.Utils
 import java.io.File
 
-class Installer {
+class SessionInstaller : AbstractInstaller() {
     companion object {
-        private const val LOGGING_TAG = "Installer"
+        private const val LOGGING_TAG = "SessionInstaller"
     }
 
     /**
@@ -26,21 +26,6 @@ class Installer {
             PackageInstaller.SessionParams.MODE_FULL_INSTALL
         )
         return pkgInstaller.createSession(params)
-    }
-
-    suspend fun install(context: Context, downloadId: Long, uploadId: Int) = withContext(Dispatchers.IO) {
-        install(context, downloadId, Mitch.fileManager.getPendingFile(uploadId)!!)
-    }
-
-    suspend fun install(context: Context, downloadId: Long, apkFile: File) = withContext(Dispatchers.IO) {
-        val sessionID = createSession(context)
-        Log.d(LOGGING_TAG, "Created session")
-
-        Mitch.databaseHandler.onInstallStart(downloadId, sessionID)
-        Log.d(LOGGING_TAG, "Notified")
-
-        doInstall(apkFile, sessionID, context)
-        Log.d(LOGGING_TAG, "Installed")
     }
 
     private suspend fun doInstall(apkFile: File, sessionId: Int, context: Context) = withContext(Dispatchers.IO) {
@@ -60,12 +45,37 @@ class Installer {
             Log.e(LOGGING_TAG, "Error occurred while creating install session", e)
         }
 
-        val callbackIntent = Intent(context, InstallerService::class.java)
-            .putExtra(InstallerService.EXTRA_APK_NAME, apkFile.name)
+        val callbackIntent = Intent(context, SessionInstallerService::class.java)
+            .putExtra(SessionInstallerService.EXTRA_APK_NAME, apkFile.name)
         val pendingIntent = PendingIntent.getService(
             context, sessionId, callbackIntent, PendingIntent.FLAG_UPDATE_CURRENT
         )
         session.commit(pendingIntent.intentSender)
         session.close()
+    }
+
+    override suspend fun requestInstall(context: Context, downloadId: Long, apkFile: File): Unit =
+        withContext(Dispatchers.IO) {
+            val sessionID = createSession(context)
+            Log.d(LOGGING_TAG, "Created session")
+
+            Mitch.databaseHandler.onInstallStart(downloadId, sessionID.toLong())
+            Log.d(LOGGING_TAG, "Notified")
+
+            doInstall(apkFile, sessionID, context)
+            Log.d(LOGGING_TAG, "Installed")
+        }
+
+    override suspend fun tryCancel(context: Context, installId: Long): Boolean {
+        try {
+            context.packageManager.packageInstaller.abandonSession(installId.toInt())
+        } catch (e: SecurityException) {
+            return false
+        }
+        return true
+    }
+
+    override suspend fun isInstalling(context: Context, installId: Long): Boolean? {
+        return context.packageManager.packageInstaller.getSessionInfo(installId.toInt())?.isActive ?: false
     }
 }

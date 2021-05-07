@@ -1,4 +1,4 @@
-package ua.gardenapple.itchupdater.installer
+package ua.gardenapple.itchupdater.install
 
 import android.content.Context
 import android.content.pm.PackageInstaller
@@ -14,7 +14,7 @@ class InstallerDatabaseHandler(val context: Context)  {
         private const val LOGGING_TAG = "InstallDatabaseHandler"
     }
 
-    suspend fun onInstallResult(pendingInstall: Installation, packageName: String, status: Int): Unit =
+    suspend fun onInstallResult(pendingInstall: Installation, packageName: String?, status: Int): Unit =
         withContext(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
             Log.d(LOGGING_TAG, "onInstallComplete")
@@ -33,7 +33,7 @@ class InstallerDatabaseHandler(val context: Context)  {
                     val newInstall = pendingInstall.copy(
                         status = Installation.STATUS_INSTALLED,
                         downloadOrInstallId = null,
-                        packageName = packageName
+                        packageName = packageName!!
                     )
                     Log.d(LOGGING_TAG, "New install: $newInstall")
                     Installations.deleteOutdatedInstalls(context, pendingInstall)
@@ -66,7 +66,7 @@ class InstallerDatabaseHandler(val context: Context)  {
         db.installDao.delete(pendingInstall)
     }
 
-    suspend fun onInstallStart(downloadId: Long, pendingInstallSessionId: Int) =
+    suspend fun onInstallStart(downloadId: Long, pendingInstallId: Long) =
         withContext(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
             Log.d(LOGGING_TAG, "onInstallStart")
@@ -74,7 +74,7 @@ class InstallerDatabaseHandler(val context: Context)  {
             val pendingInstall = db.installDao.getPendingInstallationByDownloadId(downloadId)!!
 
             pendingInstall.status = Installation.STATUS_INSTALLING
-            pendingInstall.downloadOrInstallId = pendingInstallSessionId.toLong()
+            pendingInstall.downloadOrInstallId = pendingInstallId
             db.installDao.update(pendingInstall)
         }
 }

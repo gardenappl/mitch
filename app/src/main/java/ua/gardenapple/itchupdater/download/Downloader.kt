@@ -1,10 +1,10 @@
-package ua.gardenapple.itchupdater.files
+package ua.gardenapple.itchupdater.download
 
 import android.content.Context
 import ua.gardenapple.itchupdater.database.installation.Installation
 import java.io.File
 
-interface DownloaderAbstract {
+interface Downloader {
     /**
      * All previous downloads for the same uploadId must be cancelled at this point
      * @return error message to present to the user, null if successful

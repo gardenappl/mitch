@@ -19,6 +19,7 @@ import androidx.core.content.FileProvider
 import com.github.ajalt.colormath.ConvertibleColor
 import com.github.ajalt.colormath.fromCss
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.*
 import kotlin.math.min
@@ -56,6 +57,7 @@ class Utils {
             val buffer = ByteArray(BUFFER_SIZE)
             var n: Int
             while (true) {
+                ensureActive()
                 n = input.read(buffer)
                 if (n == -1)
                     break
@@ -157,13 +159,17 @@ class Utils {
         
         fun getIntentForFile(context: Context, file: File, fileProvider: String): Intent {
             return Intent(Intent.ACTION_VIEW).apply {
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                data = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                    FileProvider.getUriForFile(context, fileProvider, file)
-                else
-                    Uri.fromFile(file)
+                data = getIntentUriForFile(context, file, fileProvider)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
+        }
+
+        fun getIntentUriForFile(context: Context, file: File, fileProvider: String): Uri {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                FileProvider.getUriForFile(context, fileProvider, file)
+            else
+                Uri.fromFile(file)
         }
         
         fun getInt(bundle: Bundle, key: String): Int? {

@@ -1,4 +1,4 @@
-package ua.gardenapple.itchupdater.installer
+package ua.gardenapple.itchupdater.download
 
 import android.app.PendingIntent
 import android.content.Context
@@ -12,6 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
+import ua.gardenapple.itchupdater.install.InstallRequestBroadcastReceiver
+import ua.gardenapple.itchupdater.install.Installations
 import ua.gardenapple.itchupdater.ui.MainActivity
 import java.io.File
 
@@ -22,16 +24,13 @@ abstract class DownloadFileListener {
 
     private fun createResultNotification(context: Context, downloadFile: File, downloadId: Long,
                                          isApk: Boolean, errorName: String?) {
-        Log.d(LOGGING_TAG, "Result for $downloadId")
         val pendingIntent: PendingIntent?
         if (errorName != null) {
             pendingIntent = null
         } else if (isApk) {
-            Log.d(LOGGING_TAG, downloadFile.path)
-
-            val intent = Intent(context, InstallNotificationBroadcastReceiver::class.java).apply {
+            val intent = Intent(context, InstallRequestBroadcastReceiver::class.java).apply {
                 data = Uri.fromFile(downloadFile)
-                putExtra(InstallNotificationBroadcastReceiver.EXTRA_DOWNLOAD_ID, downloadId)
+                putExtra(InstallRequestBroadcastReceiver.EXTRA_DOWNLOAD_ID, downloadId)
             }
             pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         } else {
@@ -75,7 +74,6 @@ abstract class DownloadFileListener {
     private fun createProgressNotification(context: Context, downloadFile: File,
                                            downloadId: Long, uploadId: Int,
                                            progressPercent: Int?, etaInMilliSeconds: Long?) {
-        Log.d(LOGGING_TAG, "Progress for $downloadId: $progressPercent%")
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
             setOngoing(true)
             setOnlyAlertOnce(true)

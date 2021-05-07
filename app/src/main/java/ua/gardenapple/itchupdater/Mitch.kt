@@ -11,7 +11,6 @@ import androidx.preference.PreferenceManager
 import androidx.work.*
 import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2.FetchConfiguration
-import com.tonyodev.fetch2okhttp.OkHttpDownloader
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import org.acra.ACRA
@@ -21,9 +20,12 @@ import org.acra.config.MailSenderConfigurationBuilder
 import org.acra.data.StringFormat
 import ua.gardenapple.itchupdater.client.UpdateChecker
 import ua.gardenapple.itchupdater.database.DatabaseCleanup
+import ua.gardenapple.itchupdater.download.FetchDownloader
+import ua.gardenapple.itchupdater.download.WorkerDownloader
+import ua.gardenapple.itchupdater.download.MitchFetchListener
 import ua.gardenapple.itchupdater.files.*
-import ua.gardenapple.itchupdater.installer.Installer
-import ua.gardenapple.itchupdater.installer.InstallerDatabaseHandler
+import ua.gardenapple.itchupdater.install.SessionInstaller
+import ua.gardenapple.itchupdater.install.InstallerDatabaseHandler
 import ua.gardenapple.itchupdater.ui.CrashDialog
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -43,6 +45,7 @@ const val NOTIFICATION_TAG_UPDATE_CHECK = "UpdateCheck"
 const val NOTIFICATION_TAG_DOWNLOAD = "DownloadResult"
 const val NOTIFICATION_TAG_DOWNLOAD_LONG = "WorkerDownloadResult"
 const val NOTIFICATION_TAG_INSTALL_RESULT = "InstallResult"
+const val NOTIFICATION_TAG_INSTALL_RESULT_LONG = "NativeInstallResult"
 
 const val UPDATE_CHECK_TASK_TAG = "update_check"
 const val DB_CLEAN_TASK_TAG = "db_clean"
@@ -53,6 +56,7 @@ const val FLAVOR_ITCHIO = "itchio"
 //const val PREF_LAST_UPDATE_CHECK = "ua.gardenapple.itchupdater.lastupdatecheck"
 const val PREF_DB_RAN_CLEANUP_ONCE = "ua.gardenapple.itchupdater.db_cleanup_once"
 const val PREF_DOWNLOADER = "ua.gardenapple.itchupdater.downloader"
+const val PREF_INSTALLER = "ua.gardenapple.itchupdater.installer"
 
 
 class Mitch : Application() {
@@ -65,15 +69,15 @@ class Mitch : Application() {
         private lateinit var fetch: Fetch
         lateinit var fileManager: DownloadFileManager
             private set
-        lateinit var workerDownloader: DownloaderWorker
+        lateinit var workerDownloader: WorkerDownloader
             private set
         lateinit var databaseHandler: InstallerDatabaseHandler
             private set
         lateinit var externalFileManager: ExternalFileManager
             private set
 
-        val installer: Installer by lazy {
-            Installer()
+        val installer: SessionInstaller by lazy {
+            SessionInstaller()
         }
     }
 
@@ -166,14 +170,14 @@ class Mitch : Application() {
             build()
         }
         fetch = fetchConfig.getNewFetchInstanceFromConfiguration()
-        val fetchDownloader = DownloaderFetch(fetch)
+        val fetchDownloader = FetchDownloader(fetch)
         fetch.addListener(MitchFetchListener(applicationContext, fetchDownloader))
         fileManager = DownloadFileManager(applicationContext, fetchDownloader)
         fileManager.setup()
 
         databaseHandler = InstallerDatabaseHandler(applicationContext)
         externalFileManager = ExternalFileManager()
-        workerDownloader = DownloaderWorker()
+        workerDownloader = WorkerDownloader()
 
 
         WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(

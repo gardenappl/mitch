@@ -1,4 +1,4 @@
-package ua.gardenapple.itchupdater.installer
+package ua.gardenapple.itchupdater.download
 
 import android.app.Activity
 import android.app.NotificationManager
@@ -12,6 +12,7 @@ import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD
 import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD_LONG
 import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.AppDatabase
+import ua.gardenapple.itchupdater.install.Installations
 
 /**
  * This is an internal receiver which only receives broadcasts when clicking "Cancel"
