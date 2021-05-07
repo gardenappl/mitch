@@ -45,7 +45,8 @@ class NativeInstallerActivity : FragmentActivity() {
         }
     }
 
-    @SuppressLint("InlinedApi")
+    @Suppress("DEPRECATION")
+    @SuppressLint("ObsoleteSdkInt")
     private fun installPackage(uri: Uri, installId: Long) {
         Log.d(LOGGING_TAG, "Installing ID: $installId, uri: $uri")
         // https://code.google.com/p/android/issues/detail?id=205827
