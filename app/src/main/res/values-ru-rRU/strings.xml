@@ -4,8 +4,8 @@
     <string name="notification_channel_install">Установка приложений</string>
     <string name="notification_install_title">Нажмите, чтобы установить</string>
     <string name="notification_download_complete_title">Загрузка завершена</string>
-    <string name="notification_channel_install_desc">Уведомлять, когда приложение из itch.io требует установку</string>
-    <string name="notification_channel_updates_desc">Уведомлять, когда для игры из itch.io доступно обновление</string>
+    <string name="notification_channel_install_desc">Уведомлять, когда приложение из itch.io требует установку.</string>
+    <string name="notification_channel_updates_desc">Уведомлять, когда для игры из itch.io доступно обновление.</string>
     <string name="nav_settings">Настройки</string>
     <string name="nav_installed">Игротека</string>
     <string name="settings_block_trackers">Защита от слежения</string>
