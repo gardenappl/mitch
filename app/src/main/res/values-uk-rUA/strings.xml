@@ -3,9 +3,9 @@
     <string name="nav_settings">Налаштування</string>
     <string name="nav_website_view">Сайт</string>
     <string name="notification_channel_install">Встановлення додатків</string>
-    <string name="notification_channel_install_desc">Сповіщати коли додаток з itch.io потребує встановлення</string>
+    <string name="notification_channel_install_desc">Сповіщати коли додаток з itch.io потребує встановлення.</string>
     <string name="notification_channel_updates">Оновлення ігор</string>
-    <string name="notification_channel_updates_desc">Сповіщати коли для гри з itch.io доступне оновлення</string>
+    <string name="notification_channel_updates_desc">Сповіщати коли для гри з itch.io доступне оновлення.</string>
     <string name="notification_download_complete_title">Завантаження завершено</string>
     <string name="notification_install_title">Натисніть, щоб встановити</string>
     <string name="settings_block_trackers">Захист від стеження</string>
