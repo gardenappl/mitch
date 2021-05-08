@@ -79,7 +79,7 @@
     <string name="popup_download_or_install_cancelled">Отменено</string>
     <string name="notification_game_running">Запущена веб-игра itch.io</string>
     <string name="notification_channel_web_running">Запущена веб-игра itch.io</string>
-    <string name="notification_channel_web_running_desc">Уведомлять, когда во встроенном браузере запущена игра</string>
+    <string name="notification_channel_web_running_desc">Уведомлять, когда во встроенном браузере запущена игра.</string>
     <string name="notification_download_error">Ошибка во время загрузки: %1$s</string>
     <string name="select_app_for_file">Открыть файл, используя</string>
     <string name="game_download_delete">Удалить</string>
