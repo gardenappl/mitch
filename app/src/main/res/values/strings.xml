@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">Mitch</string>
     <string name="notification_channel_updates">Game updates</string>
@@ -82,7 +83,7 @@
     <string name="popup_download_or_install_cancelled">Cancelled</string>
     <string name="notification_game_running">itch.io web game is running</string>
     <string name="notification_channel_web_running">Web game is running</string>
-    <string name="notification_channel_web_running_desc">Notify when a game is running inside the app\'s web browser</string>
+    <string name="notification_channel_web_running_desc">Notify when a game is running inside the app\'s web browser.</string>
     <string name="notification_download_error">Error while downloading: %1$s</string>
     <string name="select_app_for_file">Open this file using</string>
     <string name="popup_game_deleted">%1$s has been deleted.</string>
