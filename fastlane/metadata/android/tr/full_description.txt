@@ -1,0 +1,14 @@
+Mitch, bağımsız oyun mağazası itch.io için resmi olmayan bir mobil istemcidir. Uygulama, Android oyunlarını mağazadan kurmanıza ve güncel tutmanıza olanak tanır. Dolayısıyla bu, bağımsız oyun geliştiricileri ve meraklıları için Google Play Store'a bir alternatif olabilir.
+
+
+* Oyunları itch.io'dan indirin ve güncel tutun
+* APK indirmeleri ve diğer oyunlar için destek
+* Yerleşik tarayıcıda HTML5 oyunlarını çalıştırabilir
+* itch.io hesabı gerekli değildir
+* İzleyicileri ve analizleri öntanımlı olarak engeller (yalnızca F-Droid sürümü)
+* Güzel Material Kullanıcı Arayüzü, oyun geliştiricileri tarafından belirlenen özel renk şemalarına uyum sağlar
+* Tam itch.io mobil web sitesi işlevselliği
+
+Uygulama hala geliştirme aşamasındadır, bazı özellikler planlanmıştır ancak henüz uygulanmamıştır.
+
+Uygulama geliştiricisini desteklemek istiyorsanız, itch.io'dan satın almayı düşünün: https://gardenapple.itch.io/mitch
