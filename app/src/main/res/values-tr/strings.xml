@@ -21,7 +21,7 @@
     <string name="library_no_games">Görünüşe göre hiç itch.io oyununa sahip değilsiniz.</string>
     <string name="library_options_show_only_android">Yalnızca Android</string>
     <string name="log_in">Oturum aç</string>
-    <string name="library_not_logged_in">Sahip olunan ögelere erişmek için itch.io hesabınızda oturum açmalısınız</string>
+    <string name="library_not_logged_in">Sahip olunan ögelere erişmek için itch.io hesabınızda oturum açmalısınız.</string>
     <string name="network_request_retry">Yeniden dene</string>
     <string name="library_download">İndir</string>
     <string name="library_install">Kur</string>
@@ -63,7 +63,7 @@
     <string name="popup_game_deleted">%1$s silindi.</string>
     <string name="select_app_for_file">Bu dosyayı şununla aç</string>
     <string name="notification_download_error">İndirilirken hata oluştu: %1$s</string>
-    <string name="notification_channel_web_running_desc">Uygulamanın web tarayıcısı içinde bir oyun çalışırken bildirimde bulun</string>
+    <string name="notification_channel_web_running_desc">Uygulamanın web tarayıcısı içinde bir oyun çalışırken bildirimde bulun.</string>
     <string name="notification_channel_web_running">Web oyunu çalışıyor</string>
     <string name="notification_game_running">itch.io web oyunu çalışıyor</string>
     <string name="popup_download_or_install_cancelled">İptal edildi</string>
