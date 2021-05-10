@@ -57,7 +57,7 @@ class UpdatesFragment : Fragment(), CoroutineScope by MainScope() {
 
         val adapter = UpdatesListAdapter(requireActivity(), binding.updateResults)
         binding.updateResults.adapter = adapter
-        binding.updateResults.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        binding.updateResults.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
         //Glide thumbnail handling
         val sizeProvider = FixedPreloadSizeProvider<InstallUpdateCheckResult>(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT)
