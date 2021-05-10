@@ -255,7 +255,7 @@ class Mitch : Application() {
                     
                     [Insert description of what you were doing when you got the error]
                 """.trimIndent())
-                setReportFileName("error-report.txt")
+                setReportFileName("error-report-and-logs.txt")
                 setEnabled(true)
             }
 
