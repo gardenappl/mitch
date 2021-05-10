@@ -1,0 +1,1 @@
+Android için itch.io istemcisi. Bağımsız oyunlar satın alın, kurun ve oynayın.

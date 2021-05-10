@@ -4,8 +4,8 @@
     <string name="notification_channel_install">Установка приложений</string>
     <string name="notification_install_title">Нажмите, чтобы установить</string>
     <string name="notification_download_complete_title">Загрузка завершена</string>
-    <string name="notification_channel_install_desc">Уведомлять, когда приложение из itch.io требует установку</string>
-    <string name="notification_channel_updates_desc">Уведомлять, когда для игры из itch.io доступно обновление</string>
+    <string name="notification_channel_install_desc">Уведомлять, когда приложение из itch.io требует установку.</string>
+    <string name="notification_channel_updates_desc">Уведомлять, когда для игры из itch.io доступно обновление.</string>
     <string name="nav_settings">Настройки</string>
     <string name="nav_installed">Игротека</string>
     <string name="settings_block_trackers">Защита от слежения</string>
@@ -79,7 +79,7 @@
     <string name="popup_download_or_install_cancelled">Отменено</string>
     <string name="notification_game_running">Запущена веб-игра itch.io</string>
     <string name="notification_channel_web_running">Запущена веб-игра itch.io</string>
-    <string name="notification_channel_web_running_desc">Уведомлять, когда во встроенном браузере запущена игра</string>
+    <string name="notification_channel_web_running_desc">Уведомлять, когда во встроенном браузере запущена игра.</string>
     <string name="notification_download_error">Ошибка во время загрузки: %1$s</string>
     <string name="select_app_for_file">Открыть файл, используя</string>
     <string name="game_download_delete">Удалить</string>

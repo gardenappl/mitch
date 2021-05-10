@@ -1,0 +1,13 @@
+Mitch er en uoffisiell mobilklient for indie-spillbutikken itch.io. Programmet lar deg installere Android-spill derfra og oppgraderinger til dem. Det er dermed et alternativ til Play-butikken for indie-spillutviklere og entusiaster.
+
+* Last ned spill fra itch.io og hold dem oppdatert.
+* Støtte for APK-nedlastinger, såvel som andre typer spill
+* Kan kjøre HTML5-spill i innebygd nettleser
+* Krever ikke itch-io-konto
+* Blokkerer sporere og analyse som forvalg (kun F-Droid versjon)
+* Flott materielt grensesnitt som tilpasser seg egendefinerte paletter valgt av spillutviklerne
+* All funksjonaliteten fra itch-io sin mobil-nettside
+
+Programmet er fremdeles under utvikling, noen funksjoner er planlagt og ikke implementert enda.
+
+Hvis du ønsker å støtte programutvikleren, overvei å kjøpe programmet på itch.io: https://gardenapple.itch.io/mitch

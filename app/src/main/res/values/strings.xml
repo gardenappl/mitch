@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">Mitch</string>
     <string name="notification_channel_updates">Game updates</string>
@@ -82,7 +83,7 @@
     <string name="popup_download_or_install_cancelled">Cancelled</string>
     <string name="notification_game_running">itch.io web game is running</string>
     <string name="notification_channel_web_running">Web game is running</string>
-    <string name="notification_channel_web_running_desc">Notify when a game is running inside the app\'s web browser</string>
+    <string name="notification_channel_web_running_desc">Notify when a game is running inside the app\'s web browser.</string>
     <string name="notification_download_error">Error while downloading: %1$s</string>
     <string name="select_app_for_file">Open this file using</string>
     <string name="popup_game_deleted">%1$s has been deleted.</string>
@@ -122,7 +123,7 @@
     <string name="library_install">Install</string>
     <string name="library_download">Download</string>
     <string name="network_request_retry">Retry</string>
-    <string name="library_not_logged_in">You must log in to your itch.io account in order to access owned items</string>
+    <string name="library_not_logged_in">You must log in to your itch.io account in order to access owned items.</string>
     <string name="log_in">Log in</string>
     <string name="library_options_show_only_android">Only Android</string>
     <string name="library_no_games">It looks like you don\'t own any itch.io games.</string>
