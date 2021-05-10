@@ -20,7 +20,7 @@ import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultModel
 
 @Database(
     entities = [Game::class, Installation::class, UpdateCheckResultModel::class],
-    version = 9,
+    version = 10,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -47,29 +47,23 @@ abstract class AppDatabase : RoomDatabase() {
             Room.databaseBuilder(
                 context.applicationContext,
                 AppDatabase::class.java, "app_database"
-            )
-                .addMigrations(Migrations.Migration_1_2)
-                .addMigrations(Migrations.Migration_2_3)
-                .addMigrations(Migrations.Migration_3_4)
-                .addMigrations(Migrations.Migration_4_5)
-                .addMigrations(Migrations.Migration_5_6)
-                .addMigrations(Migrations.Migration_6_7)
-                .addMigrations(Migrations.Migration_7_8)
-                .addMigrations(Migrations.Migration_8_9)
-                .build()
-                .also { appDb ->
-                    Log.d(LOGGING_TAG, "Deleting info on Mitch")
-                    appDb.installDao.deleteFinishedInstallation(context.packageName)
+            ).run {
+                for (migration in Migrations)
+                    addMigrations(migration)
+                build()
+            }.also { appDb ->
+                Log.d(LOGGING_TAG, "Deleting info on Mitch")
+                appDb.installDao.deleteFinishedInstallation(context.packageName)
 
-                    if (BuildConfig.FLAVOR != FLAVOR_FDROID) {
-                        appDb.addMitchToDatabase(context)
-                    }
-
-                    val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
-                    if (!sharedPrefs.getBoolean(PREF_DB_RAN_CLEANUP_ONCE, false)) {
-                        DatabaseCleanup(context).cleanAppDatabase(appDb)
-                    }
+                if (BuildConfig.FLAVOR != FLAVOR_FDROID) {
+                    appDb.addMitchToDatabase(context)
                 }
+
+                val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+                if (!sharedPrefs.getBoolean(PREF_DB_RAN_CLEANUP_ONCE, false)) {
+                    DatabaseCleanup(context).cleanAppDatabase(appDb)
+                }
+            }
     }
 
 

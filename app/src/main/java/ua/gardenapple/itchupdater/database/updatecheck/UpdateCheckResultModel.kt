@@ -50,7 +50,10 @@ data class UpdateCheckResultModel(
     val downloadPageIsPermanent: Boolean = false,
     
     @ColumnInfo(name = IS_INSTALLING)
-    val isInstalling: Boolean = false
+    val isInstalling: Boolean = false,
+
+    @ColumnInfo(name = ERROR_REPORT)
+    val errorReport: String? = null
 ) {
     companion object {
         const val TABLE_NAME = "update_check_results"
@@ -66,6 +69,7 @@ data class UpdateCheckResultModel(
         const val DOWNLOAD_IS_STORE_PAGE = "download_is_store_page"
         const val DOWNLOAD_IS_PERMANENT = "download_is_permanent"
         const val IS_INSTALLING = "is_installing"
+        const val ERROR_REPORT = "error_message"
     }
 }
 
@@ -75,19 +79,20 @@ class Converters {
         @JvmStatic
         fun toResult(model: UpdateCheckResultModel): UpdateCheckResult {
             return UpdateCheckResult(
-                installationId = model.installId,
-                code = model.code,
-                newUploadName = model.uploadName,
-                newTimestamp = model.timestamp,
-                newSize = model.fileSize,
-                newVersionString = model.versionString,
-                uploadID = model.uploadID,
-                downloadPageUrl = model.downloadPageUrl?.let {
+                model.installId,
+                model.code,
+                model.uploadID,
+                model.downloadPageUrl?.let {
                     ItchWebsiteParser.DownloadUrl(
                         it, model.downloadPageIsPermanent, model.downloadPageIsStorePage
                     )
                 },
-                isInstalling = model.isInstalling
+                model.uploadName,
+                model.versionString,
+                model.fileSize,
+                model.timestamp,
+                model.errorReport,
+                model.isInstalling
             )
         }
 
@@ -105,7 +110,8 @@ class Converters {
                 downloadPageUrl = result.downloadPageUrl?.url,
                 downloadPageIsStorePage = result.downloadPageUrl?.isStorePage == true,
                 downloadPageIsPermanent = result.downloadPageUrl?.isPermanent == true,
-                isInstalling = result.isInstalling
+                isInstalling = result.isInstalling,
+                errorReport = result.errorReport
             )
         }
     }
