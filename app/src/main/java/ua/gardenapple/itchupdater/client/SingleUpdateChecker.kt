@@ -134,21 +134,30 @@ class SingleUpdateChecker(val db: AppDatabase) {
                         
                         return UpdateCheckResult(currentInstall.internalId,
                             code = UpdateCheckResult.UP_TO_DATE)
-                    } else if (containsCurrentVersion == false) {
+                    } else if (isSameLocale(install, currentInstall)) {
                         logD(game, "Version tag changed!")
 
                         return UpdateCheckResult(
                             currentInstall.internalId,
-                            code = UpdateCheckResult.UPDATE_AVAILABLE,
                             downloadPageUrl = downloadPageUrl,
-                            uploadID = install.uploadId,
-                            newUploadName = install.uploadName,
-                            newVersionString = install.version,
-                            newTimestamp = install.uploadTimestamp,
-                            newSize = install.fileSize
+                            availableUpdateInstall = install
                         )
                     } else {
-                        throw IllegalStateException("Version tag unknown? This should not happen")
+                        logD(game, "Version tag changed, but the locale is also different")
+                        logD(game, "Or maybe current install version tag is null? That should not happen!")
+                        if (install.uploadTimestamp?.equals(currentInstall.uploadTimestamp) == true) {
+                            logD(game, "Timestamp is still the same, probably false positive")
+                            return UpdateCheckResult(currentInstall.internalId,
+                                code = UpdateCheckResult.UP_TO_DATE)
+                        } else {
+                            logD(game, "Timestamp changed! Might still be false positive but meh")
+
+                            return UpdateCheckResult(
+                                currentInstall.internalId,
+                                downloadPageUrl = downloadPageUrl,
+                                availableUpdateInstall = install
+                            )
+                        }
                     }
                 } else {
                     logD(game, "Current install is not a butler upload")
@@ -158,13 +167,8 @@ class SingleUpdateChecker(val db: AppDatabase) {
 
                         return UpdateCheckResult(
                             currentInstall.internalId,
-                            code = UpdateCheckResult.UPDATE_AVAILABLE,
                             downloadPageUrl = downloadPageUrl,
-                            uploadID = install.uploadId,
-                            newUploadName = install.uploadName,
-                            newVersionString = install.version,
-                            newTimestamp = install.uploadTimestamp,
-                            newSize = install.fileSize
+                            availableUpdateInstall = install
                         )
                     } else {
                         logD(game, "Nothing changed")
@@ -185,13 +189,8 @@ class SingleUpdateChecker(val db: AppDatabase) {
         }
         logD(game, "Didn't find current uploadId")
         return UpdateCheckResult(currentInstall.internalId,
-            UpdateCheckResult.UPDATE_AVAILABLE,
-            uploadID = suggestedInstall?.uploadId,
             downloadPageUrl = downloadPageUrl,
-            newUploadName = suggestedInstall?.uploadName,
-            newTimestamp = suggestedInstall?.uploadTimestamp,
-            newVersionString = suggestedInstall?.version,
-            newSize = suggestedInstall?.fileSize
+            availableUpdateInstall = suggestedInstall
         )
     }
 

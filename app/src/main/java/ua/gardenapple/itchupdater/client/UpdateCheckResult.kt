@@ -1,5 +1,7 @@
 package ua.gardenapple.itchupdater.client
 
+import ua.gardenapple.itchupdater.database.installation.Installation
+
 
 data class UpdateCheckResult(
     val installationId: Int,
@@ -36,4 +38,23 @@ data class UpdateCheckResult(
         const val EMPTY = 4
         const val ERROR = 5
     }
+
+    /**
+     * Construct an [UpdateCheckResult] with code [UPDATE_AVAILABLE], based on a new
+     * available [Installation].
+     */
+    constructor(
+        currentInstallId: Int,
+        downloadPageUrl: ItchWebsiteParser.DownloadUrl,
+        availableUpdateInstall: Installation?
+    ) : this(
+        installationId = currentInstallId,
+        code = UPDATE_AVAILABLE,
+        uploadID = availableUpdateInstall?.uploadId,
+        downloadPageUrl = downloadPageUrl,
+        newUploadName = availableUpdateInstall?.uploadName,
+        newVersionString = availableUpdateInstall?.version,
+        newSize = availableUpdateInstall?.fileSize,
+        newTimestamp = availableUpdateInstall?.uploadTimestamp
+    )
 }
