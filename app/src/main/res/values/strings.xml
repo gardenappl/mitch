@@ -145,4 +145,6 @@
     <string name="settings_installer">Installation method</string>
     <string name="settings_installer_session">Session installer</string>
     <string name="settings_installer_native">Native installer (default)</string>
+    <string name="game_justice_bundle_claim">Claim</string>
+    <string name="game_buy">Purchase</string>
 </resources>

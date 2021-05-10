@@ -57,6 +57,9 @@ const val FLAVOR_ITCHIO = "itchio"
 const val PREF_DB_RAN_CLEANUP_ONCE = "ua.gardenapple.itchupdater.db_cleanup_once"
 const val PREF_DOWNLOADER = "ua.gardenapple.itchupdater.downloader"
 const val PREF_INSTALLER = "ua.gardenapple.itchupdater.installer"
+const val PREF_JUSTICE_LINK = "mitch.justice"
+const val PREF_PREFIX_JUSTICE_LINK = "mitch.justice_"
+const val PREF_PREFIX_JUSTICE_LAST_CHECK = "mitch.justicetimestamp_"
 
 
 class Mitch : Application() {

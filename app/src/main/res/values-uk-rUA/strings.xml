@@ -145,4 +145,6 @@
     <string name="settings_installer">Метод встановлення</string>
     <string name="settings_installer_native">Системний встановлювач (за замовчуванням)</string>
     <string name="settings_installer_session">Встановлення сесією</string>
+    <string name="game_justice_bundle_claim">Присвоїти</string>
+    <string name="game_buy">Купити</string>
 </resources>

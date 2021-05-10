@@ -12,6 +12,7 @@ import kotlinx.coroutines.withContext
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.R
+import ua.gardenapple.itchupdater.data.JusticeBundleGameIDs
 import ua.gardenapple.itchupdater.database.AppDatabase
 
 class ItchBrowseHandler(
@@ -47,6 +48,13 @@ class ItchBrowseHandler(
                 ItchWebsiteParser.getGameInfoForStorePage(doc, url)?.let { game ->
                     Log.d(LOGGING_TAG, "Adding game $game")
                     db.gameDao.upsert(game)
+
+                    if (JusticeBundleGameIDs.belongsToJusticeBundle(game.gameId)) {
+                        Log.d(LOGGING_TAG, "Belongs to Racial Justice bundle!")
+                        val username = ItchWebsiteUtils.getLoggedInUserName(doc)
+                        val bundleLink = JusticeBundleHandler.getLinkForUser(context, username)
+//                        Log.d(LOGGING_TAG, "Bundle link: $bundleLink")
+                    }
                 }
             }
         }
@@ -64,6 +72,9 @@ class ItchBrowseHandler(
                     it.putString("current_site_theme", "light")
                 it.apply()
             }
+        }
+        if (JusticeBundleHandler.checkIsBundleLink(context, doc, url)) {
+            Log.d(LOGGING_TAG, "Is bundle link! $url")
         }
     }
 
