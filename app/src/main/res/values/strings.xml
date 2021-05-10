@@ -148,4 +148,11 @@
     <string name="settings_installer_native">Native installer (default)</string>
     <string name="game_justice_bundle_claim">Claim</string>
     <string name="game_buy">Purchase</string>
+    <string name="game_justice_bundle_claim_error">Could not access download link from the Racial Justice bundle.</string>
+    <string name="settings_justice_link">Bundle for Racial Justice and Equality</string>
+    <string name="settings_justice_link_desc">Set custom download URL</string>
+    <string name="settings_justice_claim_all">Claim all Bundle games</string>
+    <string name="settings_justice_claim_all_desc">Claim every game from the Racial Justice and Equality bundle.</string>
+    <string name="settings_justice_claim_dialog_title">Are you sure?</string>
+    <string name="settings_justice_claim_dialog">Warning: you are about to fill your library with 1000+ games. Are you sure you want to do this?\n\nThis will take a really, really long time.\n\nThis process is irreversible.</string>
 </resources>
