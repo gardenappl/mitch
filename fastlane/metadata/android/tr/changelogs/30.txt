@@ -1,0 +1,2 @@
+* MIUI kullanıcıları için çalışması gereken yeni kurulum yöntemi eklendi.
+* Ayarlar menüsünden eski yönteme geçebilirsiniz.
