@@ -1,0 +1,2 @@
+* Thêm cơ chế cài đặt mới, nó rất có thể sẽ hoạt động được cho những người dùng MIUI.
+* Bạn có thể chuyển sang cơ chế cũ trong menu Cài đặt.
