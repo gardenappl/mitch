@@ -1,0 +1,4 @@
+* Arabisch, Turks, Noors Bokmål vertalingen toegevoegd
+* Herstel fout update controleresultaat na veranderen van taal
+* Updates lijst is nu verticaal in plaats van horizontaal (oeps)
+* Herstel fout tijdens het rapporteren van fout voor updatecontrole (oeps)
