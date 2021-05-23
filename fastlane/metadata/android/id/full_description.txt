@@ -1,0 +1,14 @@
+Mitch adalah klien ponsel tidak resmi untuk itch.io, sebuah etalase game indie. Aplikasi ini memungkinkan kamu untuk memasang game Android dari toko dan terus memperbaruinya. Dengan demikian, ini dapat menjadi alternatif Google Play Store untuk pengembang dan penggemar game indie.
+
+
+* Unduh game dari itch.io dan selalu perbarui
+* Dukungan untuk unduhan APK serta game lainnya
+* Dapat menjalankan game HTML5 di dalam browser bawaan
+* akun itch.io tidak diperlukan
+* Memblokir pelacak dan analitik secara default (hanya versi F-Droid)
+* Material UI indah yang menyesuaikan dengan skema warna khusus yang ditetapkan oleh pengembang game
+* Fungsionalitas penuh dari situs web ponsel itch.io
+
+Aplikasi ini masih dalam pengembangan, beberapa fitur telah direncanakan tetapi belum diimplementasikan.
+
+Jika Anda ingin mendukung pengembang aplikasi, pertimbangkan untuk membelinya di itch.io: https://gardenapple.itch.io/mitch

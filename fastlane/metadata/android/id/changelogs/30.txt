@@ -1,0 +1,2 @@
+* Menambahkan mekanisme pemasangan baru, yang seharusnya bekerja untuk pengguna MIUI.
+* Kamu dapat beralih ke mekanisme lama di menu Pengaturan.
