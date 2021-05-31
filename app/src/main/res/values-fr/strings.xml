@@ -1,2 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="settings_justice_claim_dialog_title">Êtes-vous sûr·e \?</string>
+    <string name="settings_justice_link">Offre groupée pour la justice raciale et l’égalité</string>
+    <string name="settings_update_check_mode">Mettre à jour le mode de vérification</string>
+    <string name="settings_category_updater">Installation et mises à jour</string>
+    <string name="nav_settings">Paramètres</string>
+    <string name="nav_installed">Ma bibliothèque</string>
+    <string name="nav_website_view">Parcourir</string>
+    <string name="notification_download_complete_title">Téléchargement terminé</string>
+    <string name="notification_install_title">Cliquez pour installer</string>
+    <string name="notification_channel_updates_desc">Prévenez lorsqu’un jeu itch.io reçoit une mise à jour.</string>
+    <string name="notification_channel_install_desc">Prévenir lorsqu’une application itch.io nécessite une installation.</string>
+    <string name="notification_channel_install">Installation de l’application</string>
+    <string name="notification_channel_updates">Mises à jour du jeu</string>
+</resources>
