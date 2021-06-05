@@ -89,7 +89,7 @@
     <string name="popup_download_started">Pengunduhan dimulai</string>
     <string name="search_games_hint">Cari game atau pembuat</string>
     <string name="browser_share">Bagikan tautan</string>
-    <string name="browser_search"></string>
+    <string name="browser_search"/>
     <string name="browser_reload">Muat ulang halaman</string>
     <string name="notification_update_fail">Sebuah kesalahan terjadi saat memeriksa pembaruan</string>
     <string name="notification_update_empty">Unduhan tidak lagi tersedia</string>
@@ -137,4 +137,5 @@
     <string name="notification_channel_updates_desc">Kirimkan notifikasi ketika sebuah game itch.io menerima pembaruan.</string>
     <string name="notification_channel_install">Pemasangan aplikasi</string>
     <string name="notification_channel_updates">Pembaruan game</string>
+    <string name="library_category_installed">Aplikasi terpasang</string>
 </resources>
