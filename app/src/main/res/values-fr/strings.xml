@@ -103,7 +103,7 @@
     <string name="settings_start_page_itch">Page principale d’itch.io</string>
     <string name="settings_start_page_library">Ludothèque personnelle</string>
     <string name="settings_start_page_android">Jeux Android populaires</string>
-    <string name="settings_start_page">Pge d’accueil</string>
+    <string name="settings_start_page">Page d’accueil</string>
     <string name="settings_theme_site">Selon le site</string>
     <string name="settings_theme_system">Selon le système</string>
     <string name="settings_theme_light">Clair</string>
