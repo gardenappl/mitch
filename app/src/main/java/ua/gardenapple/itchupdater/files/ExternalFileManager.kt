@@ -104,13 +104,9 @@ class ExternalFileManager {
     private fun doGetViewIntent(context: Context, externalFileName: String, callback: (Intent?) -> Unit) {
         val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val file = File(downloadsDir, externalFileName)
-        if (file.exists()) {
-            callback(Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.fromFile(file)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            })
-        } else {
+        if (file.exists())
+            callback(Utils.getIntentForFile(context, file, FILE_PROVIDER))
+        else
             callback(null)
-        }
     }
 }
