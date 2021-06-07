@@ -186,7 +186,7 @@ class WorkerDownloader : Downloader, DownloadFileListener() {
                 //TODO: localize error name?
                 val errorName = if (e is IOException) "I/O error" else "Unknown error"
                 Mitch.workerDownloader.onError(applicationContext, file,
-                    downloadId, uploadId, e.localizedMessage ?: errorName)
+                    downloadId, uploadId, e.localizedMessage ?: errorName, e)
                 Result.failure()
             }
 

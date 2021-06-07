@@ -100,14 +100,16 @@ class NativeInstallerActivity : FragmentActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d(LOGGING_TAG, "Result code: $resultCode, data: $data")
         Log.d(LOGGING_TAG, "Extras: ${Utils.toString(data?.extras)}")
-        
+
         val installId = Utils.getLong(intent.extras!!, EXTRA_INSTALL_ID)!!
         val apkName = intent.data!!.lastPathSegment!!
         when (requestCode) {
             REQUEST_CODE_INSTALL -> when (resultCode) {
                 RESULT_OK -> runBlocking(Dispatchers.IO) {
+                    Log.d(LOGGING_TAG, "OK, intent data: ${intent.data}")
                     val packageInfo =
                         packageManager.getPackageArchiveInfo(intent.data!!.path!!, 0)!!
+                    Log.d(LOGGING_TAG, "OK, pkg info: $packageInfo")
                     Installations.onInstallResult(applicationContext, installId,
                         packageInfo.packageName, apkName, PackageInstaller.STATUS_SUCCESS)
                 }

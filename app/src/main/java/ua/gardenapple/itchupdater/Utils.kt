@@ -101,7 +101,10 @@ object Utils {
         return sb.toString()
     }
 
-    fun toString(e: Throwable): String {
+    fun toString(e: Throwable?): String {
+        if (e == null)
+            return "Throwable is null"
+
         val errorWriter = StringWriter()
         errorWriter.appendLine(e.localizedMessage)
         e.printStackTrace(PrintWriter(errorWriter))

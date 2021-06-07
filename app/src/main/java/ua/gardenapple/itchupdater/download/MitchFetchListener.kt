@@ -7,6 +7,7 @@ import com.tonyodev.fetch2core.DownloadBlock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.Mitch
+import ua.gardenapple.itchupdater.Utils
 import java.io.File
 
 /**
@@ -49,7 +50,7 @@ class MitchFetchListener(private val context: Context, private val fetchDownload
 
     override fun onError(download: Download, error: Error, throwable: Throwable?) {
         super.onError(context, File(download.file), download.id.toLong(),
-            fetchDownloader.getUploadId(download), error.name)
+            fetchDownloader.getUploadId(download), error.name, throwable)
 
         fetchDownloader.removeFetchDownload(download.id)
     }

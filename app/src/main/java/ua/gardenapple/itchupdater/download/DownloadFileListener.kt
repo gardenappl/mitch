@@ -23,10 +23,14 @@ abstract class DownloadFileListener {
     }
 
     private fun createResultNotification(context: Context, downloadFile: File, downloadId: Long,
-                                         isApk: Boolean, errorName: String?) {
-        val pendingIntent: PendingIntent?
+                                         isApk: Boolean, errorName: String?, errorReport: String?) {
+        val pendingIntent: PendingIntent
         if (errorName != null) {
-            pendingIntent = null
+            val intent = Intent(context, ErrorReportBroadcastReciever::class.java).apply {
+                putExtra(ErrorReportBroadcastReciever.EXTRA_ERROR_STRING, errorReport)
+            }
+            pendingIntent = PendingIntent.getBroadcast(context, 0,
+                intent, PendingIntent.FLAG_ONE_SHOT)
         } else if (isApk) {
             val intent = Intent(context, InstallRequestBroadcastReceiver::class.java).apply {
                 data = Uri.fromFile(downloadFile)
@@ -121,14 +125,15 @@ abstract class DownloadFileListener {
                 downloadFileManager.replacePendingFile(uploadId)
                 notificationFile = downloadFileManager.getDownloadedFile(uploadId)!!
             }
-            createResultNotification(context, notificationFile, downloadId, isApk, null)
+            createResultNotification(context, notificationFile, downloadId, isApk, null, null)
             Mitch.databaseHandler.onDownloadComplete(pendingInstall, isApk)
         }
     }
 
-    protected fun onError(context: Context, file: File, downloadId: Long, uploadId: Int, errorName: String) {
+    protected fun onError(context: Context, file: File, downloadId: Long, uploadId: Int,
+                          errorName: String, throwable: Throwable?) {
         val isApk = file.extension == "apk"
-        createResultNotification(context, file, downloadId, isApk, errorName)
+        createResultNotification(context, file, downloadId, isApk, errorName, Utils.toString(throwable))
 
         runBlocking(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
