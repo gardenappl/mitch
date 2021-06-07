@@ -24,178 +24,178 @@ import kotlinx.coroutines.withContext
 import java.io.*
 import kotlin.math.min
 
-class Utils {
+object Utils {
     class ErrorReport(message: String) : Throwable(message)
 
-    companion object {
-        private const val LOG_LIMIT: Int = 1000
+    private const val LOG_LIMIT: Int = 1000
 
-        /**
-         * Logcat normally has a limit of 1000 characters.
-         * This function splits long strings into multiple log entries.
-         */
-        fun logPrintLong(priority: Int, tag: String, string: String) {
-            for (i in string.indices step LOG_LIMIT) {
-                Log.println(priority, tag, string.substring(i, min(string.length, i + LOG_LIMIT)))
-            }
+    /**
+     * Logcat normally has a limit of 1000 characters.
+     * This function splits long strings into multiple log entries.
+     */
+    fun logPrintLong(priority: Int, tag: String, string: String) {
+        for (i in string.indices step LOG_LIMIT) {
+            Log.println(priority, tag, string.substring(i, min(string.length, i + LOG_LIMIT)))
         }
+    }
 
-        /**
-         * logPrintLong with Debug priority
-         */
-        fun logLongD(tag: String, string: String) {
-            logPrintLong(Log.DEBUG, tag, string)
+    /**
+     * logPrintLong with Debug priority
+     */
+    fun logLongD(tag: String, string: String) {
+        logPrintLong(Log.DEBUG, tag, string)
+    }
+
+    fun getCurrentUnixTime(): Long {
+        return System.currentTimeMillis() / 1000
+    }
+
+    suspend fun copy(input: InputStream, output: OutputStream) = withContext(Dispatchers.IO) {
+        val BUFFER_SIZE = 1024 * 1024
+
+        val buffer = ByteArray(BUFFER_SIZE)
+        var n: Int
+        while (true) {
+            ensureActive()
+            n = input.read(buffer)
+            if (n == -1)
+                break
+            output.write(buffer, 0, n)
         }
-
-        fun getCurrentUnixTime(): Long {
-            return System.currentTimeMillis() / 1000
-        }
-
-        suspend fun copy(input: InputStream, output: OutputStream) = withContext(Dispatchers.IO) {
-            val BUFFER_SIZE = 1024 * 1024
-
-            val buffer = ByteArray(BUFFER_SIZE)
-            var n: Int
-            while (true) {
-                ensureActive()
-                n = input.read(buffer)
-                if (n == -1)
-                    break
-                output.write(buffer, 0, n)
-            }
-        }
+    }
 
 //        fun Int.hasFlag(flag: Int): Boolean {
 //            return this and flag == flag
 //        }
 
-        //https://stackoverflow.com/a/10600736/5701177
-        fun drawableToBitmap(drawable: Drawable): Bitmap {
-            if (drawable is BitmapDrawable && drawable.bitmap != null)
-                return drawable.bitmap
+    //https://stackoverflow.com/a/10600736/5701177
+    fun drawableToBitmap(drawable: Drawable): Bitmap {
+        if (drawable is BitmapDrawable && drawable.bitmap != null)
+            return drawable.bitmap
 
-            val bitmap: Bitmap
-            if (drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) {
-                // Single color bitmap will be created of 1x1 pixel
-                bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
-            } else {
-                bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
-            }
-
-            val canvas = Canvas(bitmap)
-            drawable.setBounds(0, 0, canvas.width, canvas.height)
-            drawable.draw(canvas)
-            return bitmap
+        val bitmap: Bitmap
+        if (drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) {
+            // Single color bitmap will be created of 1x1 pixel
+            bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+        } else {
+            bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight,
+                Bitmap.Config.ARGB_8888)
         }
 
-        fun toString(bundle: Bundle?): String {
-            if (bundle == null)
-                return "null"
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+        return bitmap
+    }
 
-            val sb = StringBuilder()
-            sb.append("[ ")
-            for (key in bundle.keySet()) {
-                sb.append("$key = ${bundle.get(key)}, ")
-            }
-            sb.append(" ]")
-            return sb.toString()
+    fun toString(bundle: Bundle?): String {
+        if (bundle == null)
+            return "null"
+
+        val sb = StringBuilder()
+        sb.append("[ ")
+        for (key in bundle.keySet()) {
+            sb.append("$key = ${bundle.get(key)}, ")
         }
-        
-        fun toString(e: Throwable): String {
-            val errorWriter = StringWriter()
-            errorWriter.appendLine(e.localizedMessage)
-            e.printStackTrace(PrintWriter(errorWriter))
+        sb.append(" ]")
+        return sb.toString()
+    }
 
-            e.cause?.let { cause ->
-                errorWriter.append("Cause: ")
-                errorWriter.append(toString(cause))
-            }
+    fun toString(e: Throwable): String {
+        val errorWriter = StringWriter()
+        errorWriter.appendLine(e.localizedMessage)
+        e.printStackTrace(PrintWriter(errorWriter))
 
-            return errorWriter.toString()
-        }
-
-        /**
-         * Wrapper method for external library
-         * TODO: minimal CSS color parsing without library?
-         */
-        fun parseCssColor(color: String): Int {
-            return ConvertibleColor.fromCss(color).toRGB().toPackedInt()
+        e.cause?.let { cause ->
+            errorWriter.append("Cause: ")
+            errorWriter.append(toString(cause))
         }
 
-        
-        fun colorStateListOf(vararg mapping: Pair<IntArray, Int>): ColorStateList {
-            val (states, colors) = mapping.unzip()
-            return ColorStateList(states.toTypedArray(), colors.toIntArray())
-        }
+        return errorWriter.toString()
+    }
 
-        fun colorStateListOf(@ColorInt color: Int): ColorStateList {
-            return ColorStateList.valueOf(color)
-        }
+    /**
+     * Wrapper method for external library
+     * TODO: minimal CSS color parsing without library?
+     */
+    fun parseCssColor(color: String): Int {
+        return ConvertibleColor.fromCss(color).toRGB().toPackedInt()
+    }
 
-        /**
-         * Similar to ContextCompat.getColor, except also aware of light/dark themes
-         */
-        @ColorInt
-        @Suppress("DEPRECATION")
-        fun getColor(context: Context, @ColorRes id: Int): Int {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                context.getColor(id)
-            } else {
-                val nightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-                if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
-                    when (id) {
-                        R.color.colorBackground -> context.resources.getColor(R.color.colorPrimaryDark)
-                        R.color.colorForeground -> context.resources.getColor(R.color.colorPrimary)
-                    }
-                } else {
-                    when (id) {
-                        R.color.colorBackground -> context.resources.getColor(R.color.colorPrimary)
-                        R.color.colorForeground -> context.resources.getColor(R.color.colorPrimaryDark)
-                    }
+
+    fun colorStateListOf(vararg mapping: Pair<IntArray, Int>): ColorStateList {
+        val (states, colors) = mapping.unzip()
+        return ColorStateList(states.toTypedArray(), colors.toIntArray())
+    }
+
+    fun colorStateListOf(@ColorInt color: Int): ColorStateList {
+        return ColorStateList.valueOf(color)
+    }
+
+    /**
+     * Similar to ContextCompat.getColor, except also aware of light/dark themes
+     */
+    @ColorInt
+    @Suppress("DEPRECATION")
+    fun getColor(context: Context, @ColorRes id: Int): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            context.getColor(id)
+        } else {
+            val nightMode =
+                context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
+                when (id) {
+                    R.color.colorBackground -> context.resources.getColor(R.color.colorPrimaryDark)
+                    R.color.colorForeground -> context.resources.getColor(R.color.colorPrimary)
                 }
-                context.resources.getColor(id)
+            } else {
+                when (id) {
+                    R.color.colorBackground -> context.resources.getColor(R.color.colorPrimary)
+                    R.color.colorForeground -> context.resources.getColor(R.color.colorPrimaryDark)
+                }
             }
+            context.resources.getColor(id)
         }
-        
-        fun getIntentForFile(context: Context, file: File, fileProvider: String): Intent {
-            return Intent(Intent.ACTION_VIEW).apply {
-                data = getIntentUriForFile(context, file, fileProvider)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-        }
+    }
 
-        fun getIntentUriForFile(context: Context, file: File, fileProvider: String): Uri {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                FileProvider.getUriForFile(context, fileProvider, file)
-            else
-                Uri.fromFile(file)
+    fun getIntentForFile(context: Context, file: File, fileProvider: String): Intent {
+        return Intent(Intent.ACTION_VIEW).apply {
+            data = getIntentUriForFile(context, file, fileProvider)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        
-        fun getInt(bundle: Bundle, key: String): Int? {
-            return if (bundle.containsKey(key))
-                bundle.getInt(key)
-            else
-                null
-        }
+    }
 
-        fun getLong(bundle: Bundle, key: String): Long? {
-            return if (bundle.containsKey(key))
-                bundle.getLong(key)
-            else
-                null
-        }
+    fun getIntentUriForFile(context: Context, file: File, fileProvider: String): Uri {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            FileProvider.getUriForFile(context, fileProvider, file)
+        else
+            Uri.fromFile(file)
+    }
 
-        fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
-            try {
-                return packageManager.getApplicationInfo(packageName, 0).enabled
-            } catch (e: PackageManager.NameNotFoundException) {
-                return false
-            }
-        }
+    fun getInt(bundle: Bundle, key: String): Int? {
+        return if (bundle.containsKey(key))
+            bundle.getInt(key)
+        else
+            null
+    }
 
-        fun fitsInInt(l: Long): Boolean {
-            return l.toInt().toLong() == l
+    fun getLong(bundle: Bundle, key: String): Long? {
+        return if (bundle.containsKey(key))
+            bundle.getLong(key)
+        else
+            null
+    }
+
+    fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
+        try {
+            return packageManager.getApplicationInfo(packageName, 0).enabled
+        } catch (e: PackageManager.NameNotFoundException) {
+            return false
         }
+    }
+
+    fun fitsInInt(l: Long): Boolean {
+        return l.toInt().toLong() == l
     }
 }
