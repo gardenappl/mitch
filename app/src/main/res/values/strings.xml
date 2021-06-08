@@ -146,6 +146,7 @@
     <string name="settings_installer">Installation method</string>
     <string name="settings_installer_session">Session installer</string>
     <string name="settings_installer_native">Native installer (default)</string>
+    <string name="popup_handler_app_not_found">Don\'t know how to open %s</string>
     <string name="game_justice_bundle_claim">Claim</string>
     <string name="game_buy">Purchase</string>
     <string name="game_justice_bundle_claim_error">Could not access download link from the Racial Justice bundle.</string>

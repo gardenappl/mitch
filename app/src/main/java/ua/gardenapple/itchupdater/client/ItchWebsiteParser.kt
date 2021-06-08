@@ -40,6 +40,7 @@ object ItchWebsiteParser {
 
     fun getGameInfoForStorePage(storePageDoc: Document, gamePageUrl: String): Game? {
         val gameId: Int = ItchWebsiteUtils.getGameId(storePageDoc) ?: return null
+        Log.d(LOGGING_TAG, "Getting info for $gamePageUrl")
         val name: String = getGameName(storePageDoc)
 
         val thumbnails = storePageDoc.head().getElementsByAttributeValue("property", "og:image")
@@ -285,6 +286,7 @@ object ItchWebsiteParser {
     }
 
     private fun getAuthorName(gamePageUri: Uri, infoTable: Element): String {
+        Log.d(LOGGING_TAG, "Author URL: ${getAuthorUrlFromGamePage(gamePageUri)}")
         return infoTable.getElementsByAttributeValue(
             "href",
             getAuthorUrlFromGamePage(gamePageUri)

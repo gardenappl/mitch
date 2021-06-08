@@ -14,6 +14,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.*
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.annotation.Keep
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
@@ -573,7 +574,15 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 return false
             else {
                 val intent = Intent(Intent.ACTION_VIEW, request.url)
-                startActivity(intent)
+                if (intent.resolveActivity(requireContext().packageManager) != null) {
+                    startActivity(intent)
+                } else {
+                    Log.i(LOGGING_TAG, "No app found that can handle ${request.url}")
+                    Toast.makeText(context,
+                        resources.getString(R.string.popup_handler_app_not_found, request.url),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
                 return true
             }
         }

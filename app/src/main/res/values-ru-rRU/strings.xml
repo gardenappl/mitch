@@ -147,4 +147,5 @@
     <string name="settings_installer_session">Установка сессией</string>
     <string name="game_justice_bundle_claim">Присвоить</string>
     <string name="game_buy">Купить</string>
+    <string name="popup_handler_app_not_found">Не знаю, как открыть %s</string>
 </resources>
