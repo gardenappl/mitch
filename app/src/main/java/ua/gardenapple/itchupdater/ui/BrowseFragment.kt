@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
+import android.transition.Visibility
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
@@ -20,6 +21,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ShareCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.textfield.TextInputEditText
 import com.leinardi.android.speeddial.SpeedDialActionItem
@@ -31,6 +33,7 @@ import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.client.ItchBrowseHandler
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
+import ua.gardenapple.itchupdater.client.SpecialBundleHandler
 import ua.gardenapple.itchupdater.databinding.BrowseFragmentBinding
 import ua.gardenapple.itchupdater.databinding.DialogWebPromptBinding
 import java.io.ByteArrayInputStream
@@ -53,6 +56,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     var browseHandler: ItchBrowseHandler? = null
     private var currentDoc: Document? = null
+    private var currentInfo: ItchBrowseHandler.Info? = null
 
 
     override fun onAttach(context: Context) {
@@ -269,11 +273,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
      * Adapts the app's UI to the theme of the current web page.
      */
     fun updateUI() {
-        updateUI(currentDoc)
+        updateUI(currentDoc, currentInfo)
     }
 
     fun restoreDefaultUI() {
-        updateUI(null)
+        updateUI(null, null)
     }
 
     //TODO: hide stuff on scroll?
@@ -282,8 +286,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
      * fragment is selected.
      * Must run on the UI thread!
      * @param doc the parsed DOM of the page the user is currently on. Null if the UI shouldn't adapt to any web page at all
+     * @param info metadata about the page
      */
-    private fun updateUI(doc: Document?) {
+    private fun updateUI(doc: Document?, info: ItchBrowseHandler.Info?) {
         if (!this::chromeClient.isInitialized || isWebFullscreen)
             return
 
@@ -295,9 +300,12 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         //Log.d(LOGGING_TAG, "Processing UI...")
 
         val navBar = mainActivity.binding.bottomNavigationView
+        val bottomGameBar = mainActivity.binding.bottomGameBar
         val fab = mainActivity.binding.speedDial
         val supportAppBar = mainActivity.supportActionBar!!
         val appBar = mainActivity.binding.toolbar
+        val gameButton = mainActivity.binding.gameButton
+        val gameButtonInfo = mainActivity.binding.gameButtonInfo
 
         fab.show()
 
@@ -307,8 +315,32 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             if (ItchWebsiteUtils.isGamePage(doc)) {
                 //Hide app's navbar after hiding web navbar
                 val navBarHideCallback: (String) -> Unit = {
-                    if (isVisible)
+                    if (isVisible) {
                         navBar.visibility = View.GONE
+                        if (info?.isFromSpecialBundle == true) {
+                            bottomGameBar.visibility = View.VISIBLE
+
+                            //Required for marquee animation
+                            gameButtonInfo.isSelected = true
+
+                            gameButton.text = resources.getString(R.string.game_justice_bundle_claim)
+                            if (info.isSpecialBundlePalestinian)
+                                gameButtonInfo.text = "Indie bundle for Palestinian Aid"
+                            else
+                                gameButtonInfo.text = "Bundle for Racial Justice and Equality"
+                            gameButton.setOnClickListener {
+                                lifecycleScope.launch {
+                                    SpecialBundleHandler.claimGame(
+                                        info.bundleDownloadLink!!,
+                                        info.game!!
+                                    )
+                                    webView.reload()
+                                }
+                            }
+                        } else {
+                            bottomGameBar.visibility = View.GONE
+                        }
+                    }
                 }
                 if (ItchWebsiteUtils.siteHasNavbar(webView, doc)) {
                     setSiteNavbarVisibility(false, navBarHideCallback)
@@ -343,10 +375,12 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 addDefaultAppBarActions(appBar)
                 supportAppBar.show()
 
+                bottomGameBar.visibility = View.GONE
                 navBar.visibility = View.GONE
             }
         } else {
             navBar.visibility = View.VISIBLE
+            bottomGameBar.visibility = View.GONE
             supportAppBar.hide()
         }
 
@@ -362,12 +396,14 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val gameThemeBgColor = doc?.run { ItchWebsiteUtils.getBackgroundUIColor(doc) }
         val gameThemeButtonColor = doc?.run { ItchWebsiteUtils.getAccentUIColor(doc) }
         val gameThemeButtonFgColor = doc?.run { ItchWebsiteUtils.getAccentFgUIColor(doc) }
+        val gameThemeTextColor = doc?.run { ItchWebsiteUtils.getTextColor(doc) }
 
         val accentColor = gameThemeButtonColor ?: defaultAccentColor
         val accentFgColor = gameThemeButtonFgColor ?: defaultWhiteColor
 
         val bgColor = gameThemeBgColor ?: defaultBgColor
         val fgColor = if (gameThemeBgColor == null) defaultFgColor else defaultWhiteColor
+        val miscTextColor = gameThemeTextColor ?: fgColor
 
         fab.mainFabClosedBackgroundColor = accentColor
         fab.mainFabOpenedBackgroundColor = accentColor
@@ -386,6 +422,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         appBar.setBackgroundColor(bgColor)
         appBar.setTitleTextColor(fgColor)
         appBar.overflowIcon?.setTint(fgColor)
+
+        bottomGameBar.setBackgroundColor(bgColor)
+        gameButtonInfo.setTextColor(miscTextColor)
+        gameButton.setTextColor(accentFgColor)
+        gameButton.setBackgroundColor(accentColor)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             mainActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
@@ -549,8 +590,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
             fragment.launch(Dispatchers.Default) {
                 val doc = Jsoup.parse(html)
-                fragment.browseHandler?.onPageVisited(doc, url)
+                val info = fragment.browseHandler?.onPageVisited(doc, url)
                 fragment.currentDoc = doc
+                fragment.currentInfo = info
                 fragment.activity?.runOnUiThread {
                     fragment.updateUI()
                 }

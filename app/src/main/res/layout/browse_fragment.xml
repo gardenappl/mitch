@@ -29,4 +29,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:mpb_progressStyle="horizontal"
             app:mpb_useIntrinsicPadding="false" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

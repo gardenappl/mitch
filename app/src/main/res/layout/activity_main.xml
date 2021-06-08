@@ -22,35 +22,69 @@
             android:id="@+id/fragmentContainer"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+            app:layout_constraintBottom_toTopOf="@id/bottomView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottomNavigationView"
+    <FrameLayout
+            android:id="@+id/bottomView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="?colorPrimary"
-            android:paddingLeft="0dp"
-            android:paddingRight="0dp"
-            app:itemBackground="?colorPrimary"
-            app:itemIconTint="@drawable/bottom_navigation_selector"
-            app:itemTextColor="@drawable/bottom_navigation_selector"
-            app:labelVisibilityMode="labeled"
-            android:elevation="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:menu="@menu/main" />
+            app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+                tools:visibility="gone"
+                android:id="@+id/bottomNavigationView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?colorPrimary"
+                android:elevation="10dp"
+                android:paddingLeft="0dp"
+                android:paddingRight="0dp"
+                app:itemBackground="?colorPrimary"
+                app:itemIconTint="@drawable/bottom_navigation_selector"
+                app:itemTextColor="@drawable/bottom_navigation_selector"
+                app:labelVisibilityMode="labeled"
+                app:menu="@menu/main" />
+        <LinearLayout
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:id="@+id/bottomGameBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="5dp">
+            <com.google.android.material.button.MaterialButton
+                    style="@style/FilledButtonStyle"
+                    android:id="@+id/game_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/game_install" />
+            <TextView
+                    android:id="@+id/game_button_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:text="$5.10 or more"
+                    android:ellipsize="marquee"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"/>
+        </LinearLayout>
+    </FrameLayout>
 
     <com.leinardi.android.speeddial.SpeedDialView
             android:id="@+id/speedDial"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            app:layout_constraintBottom_toBottomOf="@+id/fragmentContainer"
-            app:layout_constraintEnd_toEndOf="@+id/fragmentContainer"
+            app:layout_constraintBottom_toTopOf="@id/bottomView"
+            app:layout_constraintEnd_toEndOf="parent"
             app:sdMainFabClosedSrc="@drawable/ic_baseline_more_vert_24"
             app:sdMainFabClosedIconColor="@color/colorPrimary"/>
 

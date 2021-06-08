@@ -149,6 +149,9 @@
     <string name="popup_handler_app_not_found">Don\'t know how to open %s</string>
     <string name="game_justice_bundle_claim">Claim</string>
     <string name="game_buy">Purchase</string>
+    <string name="game_download">Download</string>
+    <string name="game_install">Install</string>
+    <string name="game_price">%s or more</string>
     <string name="game_justice_bundle_claim_error">Could not access download link from the Racial Justice bundle.</string>
     <string name="settings_justice_link">Bundle for Racial Justice and Equality</string>
     <string name="settings_justice_link_desc">Set custom download URL</string>

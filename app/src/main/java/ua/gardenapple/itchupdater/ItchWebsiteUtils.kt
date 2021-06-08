@@ -21,6 +21,7 @@ object ItchWebsiteUtils {
     private val gameBgColorPattern = Regex("root[{]--itchio_ui_bg: (#?\\w+);")
     private val gameButtonColorPattern = Regex("--itchio_button_color: (#?\\w+);")
     private val gameButtonFgColorPattern = Regex("--itchio_button_fg_color: (#?\\w+);")
+    private val gameTextColorPattern = Regex("--itchio_text_color: ([^;]+);")
 
     private val userBgColorPattern = Regex("--itchio_gray_back: (#?\\w+);")
     private val userFgColorPattern = Regex("--itchio_border_radius: ?\\w+;color:(#?\\w+);")
@@ -182,6 +183,16 @@ object ItchWebsiteUtils {
         val userThemeCSS = doc.getElementById("user_theme")?.html()
         if (userThemeCSS != null) {
             val foundColors = userBgColorPattern.find(userThemeCSS)
+            if (foundColors != null)
+                return Utils.parseCssColor(foundColors.groupValues[1])
+        }
+        return null
+    }
+
+    fun getTextColor(doc: Document): Int? {
+        val gameThemeCSS = doc.getElementById("game_theme")?.html()
+        if (gameThemeCSS != null) {
+            val foundColors = gameTextColorPattern.find(gameThemeCSS)
             if (foundColors != null)
                 return Utils.parseCssColor(foundColors.groupValues[1])
         }

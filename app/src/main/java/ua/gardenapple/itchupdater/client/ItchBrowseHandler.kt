@@ -14,6 +14,7 @@ import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.data.JusticeBundleGameIDs
 import ua.gardenapple.itchupdater.data.PalestineBundleGameIDs
 import ua.gardenapple.itchupdater.database.AppDatabase
+import ua.gardenapple.itchupdater.database.game.Game
 
 class ItchBrowseHandler(
     private val context: Context,
@@ -38,28 +39,45 @@ class ItchBrowseHandler(
         private var currentDownloadMimeType: String? = null
     }
 
-    suspend fun onPageVisited(doc: Document, url: String) {
+    data class Info(
+        val isFromSpecialBundle: Boolean,
+        val isSpecialBundlePalestinian: Boolean,
+        val bundleDownloadLink: String?,
+        val game: Game?
+    )
+
+    suspend fun onPageVisited(doc: Document, url: String): Info {
         lastDownloadDoc = null
         lastDownloadPageUrl = null
+
+        var bundleLink: String? = null
+        var bundlePalestinian: Boolean? = null
+        var game: Game? = null
 
         if (ItchWebsiteUtils.isStorePage(doc)) {
             withContext(Dispatchers.IO) {
                 val db = AppDatabase.getDatabase(context)
-                ItchWebsiteParser.getGameInfoForStorePage(doc, url)?.let { game ->
+                ItchWebsiteParser.getGameInfoForStorePage(doc, url)?.let { gameInfo ->
+                    game = gameInfo
                     Log.d(LOGGING_TAG, "Adding game $game")
-                    db.gameDao.upsert(game)
+                    db.gameDao.upsert(gameInfo)
 
-                    if (JusticeBundleGameIDs.belongsToJusticeBundle(game.gameId)) {
+                    if (JusticeBundleGameIDs.belongsToJusticeBundle(gameInfo.gameId)) {
                         Log.d(LOGGING_TAG, "Belongs to Racial Justice bundle!")
                         val username = ItchWebsiteUtils.getLoggedInUserName(doc)
-                        val bundleLink = SpecialBundleHandler.getLinkForUser(context, false, username)
+
+                        bundleLink = SpecialBundleHandler.getLinkForUser(context, false, username)
                         Log.d(LOGGING_TAG, "Bundle link: $bundleLink")
+                        bundlePalestinian = false
                     }
-                    if (PalestineBundleGameIDs.belongsToPalestineBundle(game.gameId)) {
+
+                    if (PalestineBundleGameIDs.belongsToPalestineBundle(gameInfo.gameId)) {
                         Log.d(LOGGING_TAG, "Belongs to Palestinian Aid bundle!")
                         val username = ItchWebsiteUtils.getLoggedInUserName(doc)
-                        val bundleLink = SpecialBundleHandler.getLinkForUser(context, true, username)
+
+                        bundleLink = SpecialBundleHandler.getLinkForUser(context, true, username)
                         Log.d(LOGGING_TAG, "Bundle link: $bundleLink")
+                        bundlePalestinian = true
                     }
                 }
             }
@@ -82,6 +100,19 @@ class ItchBrowseHandler(
         if (SpecialBundleHandler.checkIsBundleLink(context, doc, url)) {
             Log.d(LOGGING_TAG, "Is bundle link! $url")
         }
+        return bundleLink?.let { link ->
+            Info(
+                isFromSpecialBundle = true,
+                isSpecialBundlePalestinian = bundlePalestinian!!,
+                bundleDownloadLink = link,
+                game = game
+            )
+        } ?: Info(
+            isFromSpecialBundle = false,
+            isSpecialBundlePalestinian = false,
+            bundleDownloadLink = null,
+            game = game
+        )
     }
 
     suspend fun setClickedUploadId(uploadId: Int) = withContext(Dispatchers.IO) {
