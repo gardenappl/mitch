@@ -13,6 +13,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker.Result
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
@@ -32,6 +34,8 @@ class UpdateChecker(private val context: Context) {
         val installations = db.installDao.getFinishedInstallationsSync()
         val updateChecker = SingleUpdateChecker(db)
         var success = true
+
+        val concurrencyLimit = Semaphore(3)
 
         coroutineScope {
             //We support multiple installs per game, and we don't want to download the
@@ -55,39 +59,44 @@ class UpdateChecker(private val context: Context) {
                         dbGame
                     }
 
-                    try {
-                        val downloadInfo = if (downloadInfoCache.containsKey(install.gameId)) {
-                            downloadInfoCache[install.gameId]
-                        } else {
-                            val newDownloadInfo = updateChecker.getDownloadInfo(game)
-                            downloadInfoCache[install.gameId] = newDownloadInfo
-                            Log.d(LOGGING_TAG, "Download URL for ${game.name}: ${newDownloadInfo?.second}")
-                            newDownloadInfo
-                        }
+                    concurrencyLimit.withPermit {
+                        try {
+                            val downloadInfo = if (downloadInfoCache.containsKey(install.gameId)) {
+                                downloadInfoCache[install.gameId]
+                            } else {
+                                val newDownloadInfo = updateChecker.getDownloadInfo(game)
+                                downloadInfoCache[install.gameId] = newDownloadInfo
+                                Log.d(
+                                    LOGGING_TAG,
+                                    "Download URL for ${game.name}: ${newDownloadInfo?.second}"
+                                )
+                                newDownloadInfo
+                            }
 
-                        if (downloadInfo == null) {
+                            if (downloadInfo == null) {
+                                result = UpdateCheckResult(
+                                    install.internalId,
+                                    UpdateCheckResult.ACCESS_DENIED
+                                )
+                            } else {
+                                val (updateCheckDoc, downloadUrlInfo) = downloadInfo
+                                result = updateChecker.checkUpdates(
+                                    game, install, updateCheckDoc, downloadUrlInfo
+                                )
+                            }
+                        } catch (e: CancellationException) {
+                            return@launch
+                        } catch (e: SocketTimeoutException) {
+                            return@launch
+                        } catch (e: Exception) {
                             result = UpdateCheckResult(
-                                install.internalId,
-                                UpdateCheckResult.ACCESS_DENIED
+                                installationId = install.internalId,
+                                code = UpdateCheckResult.ERROR,
+                                errorReport = Utils.toString(e)
                             )
-                        } else {
-                            val (updateCheckDoc, downloadUrlInfo) = downloadInfo
-                            result = updateChecker.checkUpdates(
-                                game, install, updateCheckDoc, downloadUrlInfo
-                            )
+                            success = false
+                            Log.e(LOGGING_TAG, "Update check error!", e)
                         }
-                    } catch (e: CancellationException) {
-                        return@launch
-                    } catch (e: SocketTimeoutException) {
-                        return@launch
-                    } catch (e: Exception) {
-                        result = UpdateCheckResult(
-                            installationId = install.internalId,
-                            code = UpdateCheckResult.ERROR,
-                            errorReport = Utils.toString(e)
-                        )
-                        success = false
-                        Log.e(LOGGING_TAG, "Update check error!", e)
                     }
 
                     launch(Dispatchers.IO) {
