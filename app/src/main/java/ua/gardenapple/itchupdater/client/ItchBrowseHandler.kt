@@ -1,7 +1,6 @@
 package ua.gardenapple.itchupdater.client
 
 import android.content.Context
-import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
@@ -13,6 +12,7 @@ import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.data.JusticeBundleGameIDs
+import ua.gardenapple.itchupdater.data.PalestineBundleGameIDs
 import ua.gardenapple.itchupdater.database.AppDatabase
 
 class ItchBrowseHandler(
@@ -52,8 +52,14 @@ class ItchBrowseHandler(
                     if (JusticeBundleGameIDs.belongsToJusticeBundle(game.gameId)) {
                         Log.d(LOGGING_TAG, "Belongs to Racial Justice bundle!")
                         val username = ItchWebsiteUtils.getLoggedInUserName(doc)
-                        val bundleLink = JusticeBundleHandler.getLinkForUser(context, username)
-//                        Log.d(LOGGING_TAG, "Bundle link: $bundleLink")
+                        val bundleLink = SpecialBundleHandler.getLinkForUser(context, false, username)
+                        Log.d(LOGGING_TAG, "Bundle link: $bundleLink")
+                    }
+                    if (PalestineBundleGameIDs.belongsToPalestineBundle(game.gameId)) {
+                        Log.d(LOGGING_TAG, "Belongs to Palestinian Aid bundle!")
+                        val username = ItchWebsiteUtils.getLoggedInUserName(doc)
+                        val bundleLink = SpecialBundleHandler.getLinkForUser(context, true, username)
+                        Log.d(LOGGING_TAG, "Bundle link: $bundleLink")
                     }
                 }
             }
@@ -73,7 +79,7 @@ class ItchBrowseHandler(
                 it.apply()
             }
         }
-        if (JusticeBundleHandler.checkIsBundleLink(context, doc, url)) {
+        if (SpecialBundleHandler.checkIsBundleLink(context, doc, url)) {
             Log.d(LOGGING_TAG, "Is bundle link! $url")
         }
     }

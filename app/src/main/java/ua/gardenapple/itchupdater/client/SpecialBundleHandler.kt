@@ -12,15 +12,15 @@ import okhttp3.Request
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.game.Game
-import java.io.IOException
 import java.lang.RuntimeException
 import java.net.URL
 import java.util.regex.Pattern
 
-object JusticeBundleHandler {
-    private const val LOGGING_TAG = "JusticeBundleHandler"
+object SpecialBundleHandler {
+    private const val LOGGING_TAG = "SpeicalBundleHandler"
 
-    private const val BUNDLE_URL = "https://itch.io/b/520/bundle-for-racial-justice-and-equality"
+    private const val JUSTICE_BUNDLE_URL = "https://itch.io/b/520/bundle-for-racial-justice-and-equality"
+    private const val PALESTINE_BUNDLE_URL = "https://itch.io/b/902/indie-bundle-for-palestinian-aid"
     private const val LINK_EMPTY = "NONE"
     private const val CACHE_KEEP_DAYS = 3
 
@@ -28,38 +28,49 @@ object JusticeBundleHandler {
      * If a download link for this username has been cached, return it.
      * Otherwise, do network requests and parsing to get bundle download link.
      */
-    suspend fun getLinkForUser(context: Context,
+    suspend fun getLinkForUser(context: Context, palestine: Boolean,
                                  userName: String?): String? = withContext(Dispatchers.IO) {
+        when (palestine) {
+            true -> getLinkForUser(context, PREF_PALESTINE_LINK, PREF_PREFIX_PALESTINE_LINK,
+                PREF_PREFIX_PALESTINE_LAST_CHECK, PALESTINE_BUNDLE_URL, userName)
+            false -> getLinkForUser(context, PREF_JUSTICE_LINK, PREF_PREFIX_JUSTICE_LINK,
+                PREF_PREFIX_JUSTICE_LAST_CHECK, JUSTICE_BUNDLE_URL, userName)
+        }
+    }
+
+    private suspend fun getLinkForUser(context: Context, prefLink: String, prefLinkPrefix: String,
+                                       prefTimestamp: String, bundleUrl: String,
+                                       userName: String?): String? {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
 
-        var link = sharedPrefs.getString(PREF_JUSTICE_LINK, LINK_EMPTY)
+        var link = sharedPrefs.getString(prefLink, LINK_EMPTY)
         if (link != LINK_EMPTY)
-            return@withContext link
+            return link
 
 
         if (userName == null)
-            return@withContext null
+            return null
 
-        link = sharedPrefs.getString(PREF_PREFIX_JUSTICE_LINK + userName, LINK_EMPTY)
+        link = sharedPrefs.getString(prefLinkPrefix + userName, LINK_EMPTY)
         if (link == LINK_EMPTY) {
-            val timestamp = sharedPrefs.getLong(PREF_PREFIX_JUSTICE_LAST_CHECK + userName, 0)
+            val timestamp = sharedPrefs.getLong(prefTimestamp + userName, 0)
             //TODO: Use [Instant] (requires higher API)
             if (System.currentTimeMillis() - timestamp < 1000L * 60 * 60 * 24 * CACHE_KEEP_DAYS)
-                return@withContext null
+                return null
 
-            link = getBundleDownloadLink()
+            link = getBundleDownloadLink(bundleUrl)
 
             sharedPrefs.edit().apply {
-                putLong(PREF_PREFIX_JUSTICE_LAST_CHECK + userName, System.currentTimeMillis())
-                putString(PREF_PREFIX_JUSTICE_LINK + userName, link ?: LINK_EMPTY)
+                putLong(prefTimestamp + userName, System.currentTimeMillis())
+                putString(prefLinkPrefix + userName, link ?: LINK_EMPTY)
                 commit()
             }
         }
-        return@withContext link
+        return link
     }
 
-    private suspend fun getBundleDownloadLink(): String? {
-        val bundleDoc = ItchWebsiteUtils.fetchAndParse(BUNDLE_URL)
+    private suspend fun getBundleDownloadLink(bundleUrl: String): String? {
+        val bundleDoc = ItchWebsiteUtils.fetchAndParse(bundleUrl)
 
         val div = bundleDoc.getElementsByClass("existing_purchases")
         return div.first()?.getElementsByClass("button")?.first()?.attr("href")?.let { link ->
@@ -71,7 +82,8 @@ object JusticeBundleHandler {
     }
 
     /**
-     * Checks if this document is a download page for the Racial Justice bundle.
+     * Checks if this document is a download page for the Racial Justice bundle,
+     * or the Palestine Aid bundle.
      * If it is, and the user is logged in, this [url] will be saved into cache
      * for the current username.
      */
@@ -79,12 +91,37 @@ object JusticeBundleHandler {
         if (doc.body().attr("data-page_name") != "bundle_download")
             return false
 
+        var palestine: Boolean? = null
+
+        val titles = doc.getElementsByClass("object_title")
+        for (title in titles) {
+            val links = title.getElementsByTag("a")
+            for (link in links) {
+                if (link.attr("href").contains("/520/")) {
+                    //Racial Justice bundle
+                    palestine = false
+                    break
+                } else if (link.attr("href").contains("/902/")) {
+                    //Palestinian Aid
+                    palestine = true
+                    break
+                }
+            }
+        }
+        if (palestine == null)
+            return false
+
         val name = ItchWebsiteUtils.getLoggedInUserName(doc)
 
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
         sharedPrefs.edit().apply {
-            putString(PREF_PREFIX_JUSTICE_LINK + name, url)
-            putLong(PREF_PREFIX_JUSTICE_LAST_CHECK, System.currentTimeMillis())
+            if (palestine) {
+                putString(PREF_PREFIX_PALESTINE_LINK + name, url)
+                putLong(PREF_PREFIX_PALESTINE_LAST_CHECK + name, System.currentTimeMillis())
+            } else {
+                putString(PREF_PREFIX_JUSTICE_LINK + name, url)
+                putLong(PREF_PREFIX_JUSTICE_LAST_CHECK + name, System.currentTimeMillis())
+            }
             apply()
         }
         return true
