@@ -35,8 +35,6 @@ class UpdateChecker(private val context: Context) {
         val updateChecker = SingleUpdateChecker(db)
         var success = true
 
-        val concurrencyLimit = Semaphore(3)
-
         coroutineScope {
             //We support multiple installs per game, and we don't want to download the
             //HTML for the same game multiple times
@@ -56,47 +54,42 @@ class UpdateChecker(private val context: Context) {
                     } else {
                         val dbGame = db.gameDao.getGameById(install.gameId)!!
                         gameCache[install.gameId] = dbGame
+
                         dbGame
                     }
 
-                    concurrencyLimit.withPermit {
-                        try {
-                            val downloadInfo = if (downloadInfoCache.containsKey(install.gameId)) {
-                                downloadInfoCache[install.gameId]
-                            } else {
-                                val newDownloadInfo = updateChecker.getDownloadInfo(game)
-                                downloadInfoCache[install.gameId] = newDownloadInfo
-                                Log.d(
-                                    LOGGING_TAG,
-                                    "Download URL for ${game.name}: ${newDownloadInfo?.second}"
-                                )
-                                newDownloadInfo
-                            }
+                    try {
+                        val downloadInfo = if (downloadInfoCache.containsKey(install.gameId)) {
+                            downloadInfoCache[install.gameId]
+                        } else {
+                            val newDownloadInfo = updateChecker.getDownloadInfo(game)
+                            downloadInfoCache[install.gameId] = newDownloadInfo
+                            Log.d(LOGGING_TAG,
+                                "Download URL for ${game.name}: ${newDownloadInfo?.second}")
 
-                            if (downloadInfo == null) {
-                                result = UpdateCheckResult(
-                                    install.internalId,
-                                    UpdateCheckResult.ACCESS_DENIED
-                                )
-                            } else {
-                                val (updateCheckDoc, downloadUrlInfo) = downloadInfo
-                                result = updateChecker.checkUpdates(
-                                    game, install, updateCheckDoc, downloadUrlInfo
-                                )
-                            }
-                        } catch (e: CancellationException) {
-                            return@launch
-                        } catch (e: SocketTimeoutException) {
-                            return@launch
-                        } catch (e: Exception) {
-                            result = UpdateCheckResult(
-                                installationId = install.internalId,
-                                code = UpdateCheckResult.ERROR,
-                                errorReport = Utils.toString(e)
-                            )
-                            success = false
-                            Log.e(LOGGING_TAG, "Update check error!", e)
+                            newDownloadInfo
                         }
+
+                        if (downloadInfo == null) {
+                            result = UpdateCheckResult(install.internalId,
+                                UpdateCheckResult.ACCESS_DENIED)
+                        } else {
+                            val (updateCheckDoc, downloadUrlInfo) = downloadInfo
+                            result = updateChecker.checkUpdates(game, install,
+                                updateCheckDoc, downloadUrlInfo)
+                        }
+                    } catch (e: CancellationException) {
+                        return@launch
+                    } catch (e: SocketTimeoutException) {
+                        return@launch
+                    } catch (e: Exception) {
+                        result = UpdateCheckResult(
+                            installationId = install.internalId,
+                            code = UpdateCheckResult.ERROR,
+                            errorReport = Utils.toString(e)
+                        )
+                        success = false
+                        Log.e(LOGGING_TAG, "Update check error!", e)
                     }
 
                     launch(Dispatchers.IO) {

@@ -100,6 +100,7 @@ class NativeInstallerActivity : FragmentActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d(LOGGING_TAG, "Result code: $resultCode, data: $data")
         Log.d(LOGGING_TAG, "Extras: ${Utils.toString(data?.extras)}")
+        
 
         val installId = Utils.getLong(intent.extras!!, EXTRA_INSTALL_ID)!!
         val apkName = intent.data!!.lastPathSegment!!

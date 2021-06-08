@@ -6,24 +6,49 @@ import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.BuildConfig
 import ua.gardenapple.itchupdater.FLAVOR_ITCHIO
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
+import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
+import java.io.IOException
+import java.lang.RuntimeException
 import java.util.*
+import kotlin.random.Random
 
 class SingleUpdateChecker(val db: AppDatabase) {
     companion object {
         private const val LOGGING_TAG: String = "UpdateChecker"
+        private const val RETRY_COUNT = 3
+        private const val DELAY_MIN = 2000
+        private const val DELAY_MAX = 5000
     }
 
     fun shouldCheck(installation: Installation): Boolean {
         return !(installation.gameId == Game.MITCH_GAME_ID && BuildConfig.FLAVOR != FLAVOR_ITCHIO)
     }
 
+    suspend fun getDownloadInfo(currentGame: Game): Pair<Document, ItchWebsiteParser.DownloadUrl>? {
+        for (i: Int in 0 until RETRY_COUNT) {
+            try {
+                return tryGetDownloadInfo(currentGame)
+            } catch (e: IOException) {
+                Log.e(LOGGING_TAG, "Error for ${currentGame.name}", e)
+
+                if (i == RETRY_COUNT - 1) {
+                    throw e
+                } else {
+                    logD(currentGame, "Retrying...")
+                    delay(Random.nextInt(DELAY_MIN, DELAY_MAX).toLong())
+                }
+            }
+        }
+        throw RuntimeException()
+    }
+
     /**
      * @return null if access is denied
      */
-    suspend fun getDownloadInfo(currentGame: Game): Pair<Document, ItchWebsiteParser.DownloadUrl>? =
+    private suspend fun tryGetDownloadInfo(currentGame: Game): Pair<Document, ItchWebsiteParser.DownloadUrl>? =
         withContext(Dispatchers.IO) {
             var updateCheckDoc: Document
             var downloadPageInfo: ItchWebsiteParser.DownloadUrl
@@ -78,7 +103,31 @@ class SingleUpdateChecker(val db: AppDatabase) {
             return@withContext Pair(updateCheckDoc, downloadPageInfo)
         }
 
+
     suspend fun checkUpdates(
+        currentGame: Game,
+        currentInstall: Installation,
+        updateCheckDoc: Document,
+        downloadPageInfo: ItchWebsiteParser.DownloadUrl
+    ): UpdateCheckResult {
+        for (i: Int in 0 until RETRY_COUNT) {
+            try {
+                return tryCheckUpdates(currentGame, currentInstall,
+                    updateCheckDoc, downloadPageInfo)
+            } catch (e: IOException) {
+                Log.e(LOGGING_TAG, "Error for ${currentGame.name}", e)
+                if (i == RETRY_COUNT - 1) {
+                    throw e
+                } else {
+                    logD(currentGame, "Retrying...")
+                    delay(Random.nextInt(DELAY_MIN, DELAY_MAX).toLong())
+                }
+            }
+        }
+        throw RuntimeException()
+    }
+
+    private suspend fun tryCheckUpdates(
         currentGame: Game, 
         currentInstall: Installation,
         updateCheckDoc: Document,

@@ -11,6 +11,7 @@ import androidx.preference.PreferenceManager
 import androidx.work.*
 import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2.FetchConfiguration
+import com.tonyodev.fetch2okhttp.OkHttpDownloader
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import org.acra.ACRA
@@ -160,8 +161,7 @@ class Mitch : Application() {
         }
         val fetchConfig = FetchConfiguration.Builder(applicationContext).run {
             setDownloadConcurrentLimit(3)
-            //TODO: Maybe OkHttpDownloader is causing issue #22?
-//            setHttpDownloader(OkHttpDownloader(httpClient))
+            setHttpDownloader(OkHttpDownloader(httpClient))
             setAutoRetryMaxAttempts(3)
             enableFileExistChecks(false)
             createDownloadFileOnEnqueue(false)
