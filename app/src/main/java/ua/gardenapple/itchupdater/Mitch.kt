@@ -78,10 +78,6 @@ class Mitch : Application() {
             private set
         lateinit var externalFileManager: ExternalFileManager
             private set
-
-        val installer: SessionInstaller by lazy {
-            SessionInstaller()
-        }
     }
 
     private val preferenceChangeListener =
@@ -244,16 +240,16 @@ class Mitch : Application() {
                 setSubject("")
                 //Strings are English only, this is intentional
                 setBody("""
-                    Your message will be published on SourceHut,
-                    and also sent to the author's personal address.
+                    > Your message will be published on SourceHut,
+                    > and also sent to the author's personal address.
                     
-                    Note: SourceHut does not accept email in HTML format,
-                    for security and privacy reasons.
-                    Please send this message as "plain text" if you can.
+                    > Note: SourceHut does not accept email in HTML format,
+                    > for security and privacy reasons.
+                    > Please send this message as "plain text" if you can.
                     
-                    Thank you for your help!
+                    > Thank you for your help!
                     
-                    [Insert description of what you were doing when you got the error]
+                    > Insert description of what you were doing when you got the error:
                 """.trimIndent())
                 setReportFileName("error-report-and-logs.txt")
                 setEnabled(true)
