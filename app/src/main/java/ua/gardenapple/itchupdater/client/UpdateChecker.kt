@@ -34,7 +34,7 @@ class UpdateChecker(private val context: Context) {
         var success = true
 
         coroutineScope {
-            //We support multiple install per game, and we don't want to download the
+            //We support multiple installs per game, and we don't want to download the
             //HTML for the same game multiple times
             val gameCache = HashMap<Int, Game>()
             val downloadInfoCache = HashMap<Int, Pair<Document, ItchWebsiteParser.DownloadUrl>?>()

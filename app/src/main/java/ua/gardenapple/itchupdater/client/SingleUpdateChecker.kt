@@ -27,6 +27,7 @@ class SingleUpdateChecker(val db: AppDatabase) {
         withContext(Dispatchers.IO) {
             var updateCheckDoc: Document
             var downloadPageInfo: ItchWebsiteParser.DownloadUrl
+            var storePageDoc: Document? = null
 
             if (currentGame.downloadPageUrl != null) {
                 //Have cached download URL
@@ -36,7 +37,7 @@ class SingleUpdateChecker(val db: AppDatabase) {
 
                 if (!ItchWebsiteUtils.hasGameDownloadLinks(updateCheckDoc)) {
                     //game info may be out-dated
-                    val storePageDoc = if (downloadPageInfo.isStorePage)
+                    storePageDoc = if (downloadPageInfo.isStorePage)
                         updateCheckDoc
                     else
                         ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
@@ -45,26 +46,35 @@ class SingleUpdateChecker(val db: AppDatabase) {
                         ItchWebsiteParser.getDownloadUrl(storePageDoc, currentGame.storeUrl)
                             ?: return@withContext null
 
-                    if (downloadPageInfo.isPermanent) {
-                        //insert new info
-                        val newGameInfo =
-                            ItchWebsiteParser.getGameInfoForStorePage(
-                                storePageDoc,
-                                currentGame.storeUrl
-                            )!!
-                        db.gameDao.update(newGameInfo.copy(downloadPageUrl = downloadPageInfo.url))
-                    }
                     updateCheckDoc = ItchWebsiteUtils.fetchAndParse(downloadPageInfo.url)
                 }
             } else {
                 //Must get fresh download URL
 
-                val storePageDoc = ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
+                storePageDoc = ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
                 downloadPageInfo =
                     ItchWebsiteParser.getDownloadUrl(storePageDoc, currentGame.storeUrl)
                         ?: return@withContext null
                 updateCheckDoc = ItchWebsiteUtils.fetchAndParse(downloadPageInfo.url)
             }
+
+
+            //Update game metadata
+            if (storePageDoc == null) {
+                storePageDoc = if (downloadPageInfo.isStorePage)
+                    updateCheckDoc
+                else
+                    ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
+            }
+
+            var newGameInfo = ItchWebsiteParser.getGameInfoForStorePage(storePageDoc, currentGame.storeUrl)!!
+            if (downloadPageInfo.isPermanent) {
+                newGameInfo = newGameInfo.copy(downloadPageUrl = downloadPageInfo.url)
+            }
+            db.gameDao.update(newGameInfo)
+            logD(currentGame, "Inserted new game info: $newGameInfo")
+
+
             return@withContext Pair(updateCheckDoc, downloadPageInfo)
         }
 

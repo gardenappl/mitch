@@ -178,11 +178,7 @@ object ItchWebsiteParser {
      */
     suspend fun getDownloadUrl(doc: Document, storeUrl: String): DownloadUrl? =
         withContext(Dispatchers.IO) {
-            //The game is free and the store page provides download links
-            if (doc.getElementsByClass("download_btn").isNotEmpty())
-                return@withContext DownloadUrl(storeUrl, isPermanent = true, isStorePage = true)
-
-            //The game has been bought and the store page provides download links
+            //The game has been bought
             var elements = doc.getElementsByClass("purchase_banner_inner")
             if (elements.isNotEmpty()) {
                 Log.d(LOGGING_TAG, "Purchased game")
@@ -199,6 +195,10 @@ object ItchWebsiteParser {
                     isPermanent = true, isStorePage = false
                 )
             }
+
+            //The game is free and the store page provides download links
+            if (doc.getElementsByClass("download_btn").isNotEmpty())
+                return@withContext DownloadUrl(storeUrl, isPermanent = true, isStorePage = true)
 
             //The game is free but accepts donations and hasn't been paid for
             return@withContext fetchDownloadUrlFromStorePage(storeUrl)
