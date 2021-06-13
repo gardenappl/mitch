@@ -89,7 +89,7 @@
     <string name="popup_download_started">Pengunduhan dimulai</string>
     <string name="search_games_hint">Cari game atau pembuat</string>
     <string name="browser_share">Bagikan tautan</string>
-    <string name="browser_search"/>
+    <string name="browser_search">Cari situs web</string>
     <string name="browser_reload">Muat ulang halaman</string>
     <string name="notification_update_fail">Sebuah kesalahan terjadi saat memeriksa pembaruan</string>
     <string name="notification_update_empty">Unduhan tidak lagi tersedia</string>
@@ -125,7 +125,6 @@
     <string name="settings_update_check_mode">Mode pengecekan pembaruan</string>
     <string name="settings_category_updater">Pemasangan dan Pembaruan</string>
     <string name="settings_block_trackers_desc">Mencegah akses ke Google Analytics.
-\n
 \nIngat bahwa pengembang game mungkin mengandalkan statistik tersebut.</string>
     <string name="settings_block_trackers">Blokir pelacak</string>
     <string name="nav_settings">Pengaturan</string>
@@ -138,4 +137,26 @@
     <string name="notification_channel_install">Pemasangan aplikasi</string>
     <string name="notification_channel_updates">Pembaruan game</string>
     <string name="library_category_installed">Aplikasi terpasang</string>
+    <string name="settings_installer_native">Pemasang asli (default)</string>
+    <string name="settings_justice_claim_all">Klaim semua game Bundel</string>
+    <string name="settings_justice_link">Bundel untuk Keadilan dan Kesetaraan Rasial</string>
+    <string name="game_justice_bundle_claim_error">Tak bisa mengakses tautan unduhan dari bundel Keadilan Rasial.</string>
+    <string name="settings_installer_session">Pemasang sesi</string>
+    <string name="settings_cancel_downloads_title">Setel ulang semua unduhan saat ini\?</string>
+    <string name="settings_cancel_downloads">Setel ulang semua unduhan</string>
+    <string name="settings_category_advanced">Lanjutan</string>
+    <string name="popup_move_to_download_error">Galat saat memindahkan ke folder Unduhan</string>
+    <string name="popup_moving_to_downloads">Memindahkan file ke folder Unduh…</string>
+    <string name="popup_moved_to_downloads">Memindahkan file %1$s ke folder Unduhan.</string>
+    <string name="dialog_missing_file">File %1$s dipindahkan atau dihapus dari folder Unduhan.
+\n
+\nApakah Anda ingin menghapusnya dari aplikasi Mitch\? Anda tidak akan lagi menerima pembaruan untuk %2$s.</string>
+    <string name="game_move_to_downloads">Pindahkan ke folder Unduhan</string>
+    <string name="library_category_pending">Sedang berlangsung</string>
+    <string name="settings_start_page_feed">Umpan berita</string>
+    <string name="menu_game_gamejam">%1$s entri</string>
+    <string name="dialog_game_remove">File %1$s akan tetap berada di folder Unduhan Anda.</string>
+    <string name="notification_install_conflict_title">Aplikasi bentrok dengan paket lain</string>
+    <string name="settings_category_browse">Menjelajah</string>
+    <string name="settings_justice_claim_all_desc">Klaim setiap game dari bundel Keadilan dan Kesetaraan Rasial.</string>
 </resources>
