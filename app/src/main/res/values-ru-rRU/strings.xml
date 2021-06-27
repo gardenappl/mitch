@@ -147,4 +147,11 @@
     <string name="settings_installer_session">Установка сессией</string>
     <string name="game_justice_bundle_claim">Присвоить</string>
     <string name="game_buy">Купить</string>
+    <string name="settings_justice_claim_dialog">Внимание: вы собираетесь заполнить свою библиотеку 1000+ играми. Вы уверены, что хотите это сделать\?
+\n
+\nЭто займет очень, очень много времени.
+\n
+\nЭтот процесс необратим.</string>
+    <string name="settings_justice_claim_dialog_title">Вы уверены\?</string>
+    <string name="settings_justice_link_desc">Установка пользовательского URL-адреса загрузки</string>
 </resources>
