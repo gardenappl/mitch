@@ -1,0 +1,4 @@
+* Ajout de traductions en arabe, turc et norvégien bokmål
+* Correction du résultat erroné de la vérification des mises à jour après un changement de langue.
+* La liste des mises à jour est maintenant verticale au lieu d’être horizontale (oups)
+* Correction d’une erreur lors du signalement d’une erreur de vérification de mise à jour (oups)

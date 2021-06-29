@@ -1,0 +1,14 @@
+Mitch is een onofficiële mobiele app voor itch.io, de indie game appstore. Met de app kun je Android-games uit de winkel installeren en up-to-date houden. Dit kan dus dienen als een alternatief voor de Google Play Store voor indie game-ontwikkelaars en liefhebbers.
+
+
+* Download spellen van itch.io en houd ze bijgewerkt
+* Ondersteuning voor APK-downloads en andere spellen
+* Kan HTML5-spellen binnen ingebouwde browser spelen
+* itch.io-account is niet nodig
+* Blokkeert trackers en analytics standaard (alleen F-Droid versie)
+* Mooie Material UI past zich aan aangepaste kleurenschema's ingesteld door game-ontwikkelaars
+* Volledige functionaliteit van itch.io's mobiele website
+
+De app is nog in ontwikkeling, sommige functies zijn gepland, maar nog niet geïmplementeerd.
+
+Als je de ontwikkelaar van de app wilt steunen, kan je overwegen de app te kopen op itch.io: https://gardenapple.itch.io/mitch

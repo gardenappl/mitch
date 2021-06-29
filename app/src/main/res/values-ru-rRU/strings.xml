@@ -151,4 +151,11 @@
     <string name="game_download">Скачать</string>
     <string name="game_install">Установить</string>
     <string name="game_price">%s или больше</string>
+    <string name="settings_justice_claim_dialog">Внимание: вы собираетесь заполнить свою библиотеку 1000+ играми. Вы уверены, что хотите это сделать?
+\n
+\nЭто займет очень, очень много времени.
+\n
+\nЭтот процесс необратим.</string>
+    <string name="settings_justice_claim_dialog_title">Вы уверены?</string>
+    <string name="settings_justice_link_desc">Установка пользовательского URL-адреса загрузки</string>
 </resources>

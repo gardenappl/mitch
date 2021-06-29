@@ -1,0 +1,4 @@
+* Thêm bản dịch tiếng Ả Rập, tiếng Thổ Nhĩ Kỳ, tiếng Na-uy Bokmål
+* Sửa kết quả kiểm tra cập nhật sai sau khi thay đổi ngôn ngữ
+* Danh sách cập nhật bây giờ là dọc thay vì ngang (ối trời ơi)
+* Sửa lỗi trong khi báo cáo lỗi đối với kiểm tra cập nhật (ối trời ơi)

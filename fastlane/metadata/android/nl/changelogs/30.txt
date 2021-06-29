@@ -1,0 +1,2 @@
+* Nieuw installatie methode toegevoegd, dat zou moeten werken voor MIUI-gebruikers.
+* Je kan overschakelen naar de oude methode in de instellingen.

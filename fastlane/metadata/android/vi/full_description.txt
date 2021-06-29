@@ -1,0 +1,14 @@
+Mitch là một ứng dụng khách trên di động cho itch.io, cửa hàng trò chơi độc lập. Ứng dụng này cho phép bạn cài đặt các trò chơi Android từ cửa hàng và giữ cho chúng được cập nhật. Do đó, ứng dụng này có thể hoạt động như một sự thay thế cho Google Play Store cho các nhà phát triển và những người có tâm huyết với các trò chơi độc lập.
+
+
+* Tải xuống các trò chơi từ itch.io và giữ cho chúng được cập nhật
+* Hỗ trợ tải xuống APK cũng như là các trò chơi khác
+* Có thể chạy các trò chơi HTML5 trong trình duyệt được tích hợp
+* Không yêu cầu tài khoản itch.io
+* Chặn trình theo dõi và phân tích theo mặc định (chỉ phiên bản F-Droid)
+* Giao diện Material đẹp thích nghi với những sự sắp đặt màu sắc được các nhà phát triển trò chơi đặt
+* Đầy đủ chức năng của trang web di động của itch.io
+
+Ứng dụng này vẫn đang được phát triển, một số tính năng được lên kế hoạch nhưng chưa được thêm vào.
+
+Nếu bạn muốn hỗ trợ nhà phát triển của ứng dụng, hãy cân nhắc việc mua nó trên itch.io: https://gardenapple.itch.io/mitch
