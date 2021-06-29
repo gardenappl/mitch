@@ -158,4 +158,8 @@
 \nЭтот процесс необратим.</string>
     <string name="settings_justice_claim_dialog_title">Вы уверены?</string>
     <string name="settings_justice_link_desc">Установка пользовательского URL-адреса загрузки</string>
+    <string name="settings_justice_link">Набор Racial Justice and Equality</string>
+    <string name="settings_justice_claim_all_desc">Присвоить все игры из набора Racial Justice and Equality.</string>
+    <string name="settings_justice_claim_all">Присвоить все игры из набора</string>
+    <string name="game_justice_bundle_claim_error">Не удалось получить доступ к ссылке из набора Racial Justice.</string>
 </resources>
