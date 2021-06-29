@@ -160,4 +160,8 @@
     <string name="game_justice_bundle_claim_error">Irksal Adalet paketinden indirme bağlantısına erişilemedi.</string>
     <string name="game_buy">Satın al</string>
     <string name="game_justice_bundle_claim">Talep et</string>
+    <string name="game_price">%s veya daha fazla</string>
+    <string name="game_install">Kur</string>
+    <string name="game_download">İndir</string>
+    <string name="popup_handler_app_not_found">Nasıl açılacağını bilmiyorum: %s</string>
 </resources>
