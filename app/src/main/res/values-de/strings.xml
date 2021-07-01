@@ -159,4 +159,9 @@
     <string name="library_category_installed">Installierte Anwendungen</string>
     <string name="notification_install_storage_title">Installation fehlgeschlagen: Speicherprobleme</string>
     <string name="notification_install_invalid_title">Ungültige Datei</string>
+    <string name="settings_justice_claim_all_desc">Beanspruche jedes Spiel aus dem Paket Rassengerechtigkeit und Gleichheit.</string>
+    <string name="game_price">%s oder mehr</string>
+    <string name="game_install">Installieren</string>
+    <string name="game_download">Herunterladen</string>
+    <string name="popup_handler_app_not_found">Ich weiß nicht, wie man %s öffnet</string>
 </resources>
