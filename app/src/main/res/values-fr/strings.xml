@@ -160,4 +160,8 @@
     <string name="settings_block_trackers_desc">Empêche l’accès à Google Analytics.
 \nNotez que certains développeurs de jeux peuvent s’appuyez sur ces statistiques.</string>
     <string name="settings_block_trackers">Bloquer les traqueurs</string>
+    <string name="game_price">%s ou plus</string>
+    <string name="game_install">Installer</string>
+    <string name="game_download">Télécharger</string>
+    <string name="popup_handler_app_not_found">Ne sait pas comment ouvrir %s</string>
 </resources>
