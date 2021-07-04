@@ -159,4 +159,8 @@
     <string name="dialog_delete">Xoá</string>
     <string name="dialog_remove">Xoá</string>
     <string name="dialog_game_delete">Bạn có chắc bạn muốn xoá tệp %1$s không\?</string>
+    <string name="game_price">%s hoặc nhiều hơn</string>
+    <string name="game_install">Cài đặt</string>
+    <string name="game_download">Tải xuống</string>
+    <string name="popup_handler_app_not_found">Không biết cách mở %s</string>
 </resources>
