@@ -159,4 +159,8 @@
     <string name="notification_install_conflict_title">Aplikasi bentrok dengan paket lain</string>
     <string name="settings_category_browse">Menjelajah</string>
     <string name="settings_justice_claim_all_desc">Klaim setiap game dari bundel Keadilan dan Kesetaraan Rasial.</string>
+    <string name="game_price">%s atau lebih</string>
+    <string name="game_install">Pasang</string>
+    <string name="game_download">Unduh</string>
+    <string name="popup_handler_app_not_found">Tidak tahu cara membuka %s</string>
 </resources>
