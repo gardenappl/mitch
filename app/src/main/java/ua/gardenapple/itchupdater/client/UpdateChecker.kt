@@ -28,6 +28,12 @@ class UpdateChecker(private val context: Context) {
     }
 
     suspend fun checkUpdates(): Result = withContext(Dispatchers.IO) {
+        // Avoid a bunch of individual errors, if we just have no network connection
+        if (!Utils.isNetworkConnected(context)) {
+            Log.w(LOGGING_TAG, "No network connection detected, aborting")
+            return@withContext Result.failure()
+        }
+
         val db = AppDatabase.getDatabase(context)
         val installations = db.installDao.getFinishedInstallationsSync()
         val updateChecker = SingleUpdateChecker(db)

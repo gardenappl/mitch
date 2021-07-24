@@ -22,7 +22,7 @@ class InstallRequestBroadcastReceiver : BroadcastReceiver() {
         Log.d(LOGGING_TAG, "onReceive")
         val extras = intent.extras!!
 
-        val downloadId = extras.getLong(EXTRA_DOWNLOAD_ID)
+        val downloadId = extras.getInt(EXTRA_DOWNLOAD_ID)
 
         runBlocking {
             val apkFile = File(intent.data!!.path!!)
@@ -30,5 +30,4 @@ class InstallRequestBroadcastReceiver : BroadcastReceiver() {
             installer.requestInstall(context, downloadId, apkFile)
         }
     }
-
 }

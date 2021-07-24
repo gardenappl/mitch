@@ -11,7 +11,7 @@ import okhttp3.Callback
 import okhttp3.Request
 import okhttp3.Response
 import ua.gardenapple.itchupdater.Mitch
-import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD_LONG
+import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
 import java.io.BufferedInputStream
@@ -60,7 +60,7 @@ object Downloader : DownloadFileListener() {
                 setInputData(workDataOf(
                     Pair(WORKER_URL, url),
                     Pair(WORKER_FILE_PATH, file.path),
-                    Pair(WORKER_DOWNLOAD_ID, install.downloadOrInstallId),
+                    Pair(WORKER_DOWNLOAD_ID, downloadId),
                     Pair(WORKER_UPLOAD_ID, install.uploadId)
                 ))
                 addTag(TAG_WORKER)
@@ -94,7 +94,7 @@ object Downloader : DownloadFileListener() {
     class Worker(appContext: Context, params: WorkerParameters)
         : CoroutineWorker(appContext, params) {
 
-        private suspend fun download(response: Response, file: File, downloadId: Long,
+        private suspend fun download(response: Response, file: File, downloadId: Int,
                                      uploadId: Int) = withContext(Dispatchers.IO) {
             val totalBytes = response.body!!.contentLength()
             var progressPercent: Long = 0
@@ -128,7 +128,7 @@ object Downloader : DownloadFileListener() {
         override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
             val url = inputData.getString(WORKER_URL)!!
             val filePath = inputData.getString(WORKER_FILE_PATH)!!
-            val downloadId = inputData.getLong(WORKER_DOWNLOAD_ID, -1)
+            val downloadId = inputData.getInt(WORKER_DOWNLOAD_ID, -1)
             val uploadId = inputData.getInt(WORKER_UPLOAD_ID, -1)
             val file = File(filePath)
 
@@ -165,7 +165,7 @@ object Downloader : DownloadFileListener() {
                     download(response, file, downloadId, uploadId)
 
                     with(NotificationManagerCompat.from(applicationContext)) {
-                        cancel(NOTIFICATION_TAG_DOWNLOAD_LONG, downloadId.toInt())
+                        cancel(NOTIFICATION_TAG_DOWNLOAD, downloadId)
                     }
 
                     //Add some shitty delay because if you send the completion notification

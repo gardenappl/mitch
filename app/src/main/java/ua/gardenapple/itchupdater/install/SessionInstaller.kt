@@ -54,7 +54,7 @@ class SessionInstaller : AbstractInstaller() {
         session.close()
     }
 
-    override suspend fun requestInstall(context: Context, downloadId: Long, apkFile: File): Unit =
+    override suspend fun requestInstall(context: Context, downloadId: Int, apkFile: File): Unit =
         withContext(Dispatchers.IO) {
             val sessionID = createSession(context)
             Log.d(LOGGING_TAG, "Created session")

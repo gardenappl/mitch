@@ -38,7 +38,6 @@ const val NOTIFICATION_CHANNEL_ID_WEB_RUNNING = "web_running"
 
 const val NOTIFICATION_TAG_UPDATE_CHECK = "UpdateCheck"
 const val NOTIFICATION_TAG_DOWNLOAD = "DownloadResult"
-const val NOTIFICATION_TAG_DOWNLOAD_LONG = "WorkerDownloadResult"
 const val NOTIFICATION_TAG_INSTALL_RESULT = "InstallResult"
 const val NOTIFICATION_TAG_INSTALL_RESULT_LONG = "NativeInstallResult"
 
@@ -48,7 +47,6 @@ const val DB_CLEAN_TASK_TAG = "db_clean"
 const val FLAVOR_FDROID = "fdroid"
 const val FLAVOR_ITCHIO = "itchio"
 
-//const val PREF_LAST_UPDATE_CHECK = "ua.gardenapple.itchupdater.lastupdatecheck"
 const val PREF_DB_RAN_CLEANUP_ONCE = "ua.gardenapple.itchupdater.db_cleanup_once"
 const val PREF_INSTALLER = "ua.gardenapple.itchupdater.installer"
 const val PREF_JUSTICE_LINK = "mitch.racial"

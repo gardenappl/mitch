@@ -9,7 +9,7 @@ abstract class AbstractInstaller {
      * Implementations should call [InstallerDatabaseHandler.onInstallStart] when they have a
      * meaningful "install ID", and call [Installations.onInstallResult] on completion.
      */
-    abstract suspend fun requestInstall(context: Context, downloadId: Long, apkFile: File)
+    abstract suspend fun requestInstall(context: Context, downloadId: Int, apkFile: File)
 
     /**
      * @return true if installation was cancelled

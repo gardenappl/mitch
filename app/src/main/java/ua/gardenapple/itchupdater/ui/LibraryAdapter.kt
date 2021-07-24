@@ -105,19 +105,17 @@ class LibraryAdapter internal constructor(
         val gameInstall = gameInstalls[position]
 
         if (gameInstall.status == Installation.STATUS_READY_TO_INSTALL) {
-            val notificationService = context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-            gameInstall.downloadOrInstallId!!.let {
-                if (Utils.fitsInInt(it))
-                    notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, it.toInt())
-                else
-                    notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD_LONG, it.toInt())
-            }
+            val notificationService = context.getSystemService(Activity.NOTIFICATION_SERVICE)
+                    as NotificationManager
+
+            notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD,
+                gameInstall.downloadOrInstallId!!.toInt())
 
             //TODO: Activity for SessionInstaller to avoid GlobalScope
             GlobalScope.launch {
                 val installer = Installations.getInstaller(context)
                 val file = Mitch.fileManager.getPendingFile(gameInstall.uploadId)!!
-                installer.requestInstall(context, gameInstall.downloadOrInstallId, file)
+                installer.requestInstall(context, gameInstall.downloadOrInstallId.toInt(), file)
             }
         } else if (gameInstall.packageName != null) {
             val launchIntent = context.packageManager.getLaunchIntentForPackage(gameInstall.packageName)

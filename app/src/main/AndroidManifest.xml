@@ -7,7 +7,14 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+
+    <!-- Foreground service to prevent browser games from being killed
+        when the user switches to another app -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- Show warning to the user if manually checking updates with no Internet connection -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
 
     <application
             android:allowBackup="true"

@@ -19,7 +19,7 @@ class NativeInstaller : AbstractInstaller() {
         }
     }
 
-    override suspend fun requestInstall(context: Context, downloadId: Long, apkFile: File) {
+    override suspend fun requestInstall(context: Context, downloadId: Int, apkFile: File) {
         val db = AppDatabase.getDatabase(context)
 
         val pendingInstall = db.installDao.getPendingInstallationByDownloadId(downloadId)!!

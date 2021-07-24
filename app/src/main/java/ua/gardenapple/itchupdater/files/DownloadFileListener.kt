@@ -21,7 +21,7 @@ abstract class DownloadFileListener {
         private const val LOGGING_TAG = "FileDownloadListener"
     }
 
-    private fun createResultNotification(context: Context, downloadFile: File, downloadId: Long,
+    private fun createResultNotification(context: Context, downloadFile: File, downloadId: Int,
                                          isApk: Boolean, errorName: String?, errorReport: String?) {
         val pendingIntent: PendingIntent
         if (errorName != null) {
@@ -67,15 +67,12 @@ abstract class DownloadFileListener {
         }
 
         with(NotificationManagerCompat.from(context)) {
-            if (Utils.fitsInInt(downloadId))
-                notify(NOTIFICATION_TAG_DOWNLOAD, downloadId.toInt(), builder.build())
-            else
-                notify(NOTIFICATION_TAG_DOWNLOAD_LONG, downloadId.toInt(), builder.build())
+            notify(NOTIFICATION_TAG_DOWNLOAD, downloadId.toInt(), builder.build())
         }
     }
 
     private fun createProgressNotification(context: Context, downloadFile: File,
-                                           downloadId: Long, uploadId: Int,
+                                           downloadId: Int, uploadId: Int,
                                            progressPercent: Int?) {
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
             setOngoing(true)
@@ -98,14 +95,11 @@ abstract class DownloadFileListener {
                     cancelPendingIntent)
         }
         with(NotificationManagerCompat.from(context)) {
-            if (Utils.fitsInInt(downloadId))
-                notify(NOTIFICATION_TAG_DOWNLOAD, downloadId.toInt(), builder.build())
-            else
-                notify(NOTIFICATION_TAG_DOWNLOAD_LONG, downloadId.toInt(), builder.build())
+            notify(NOTIFICATION_TAG_DOWNLOAD, downloadId.toInt(), builder.build())
         }
     }
 
-    protected fun onCompleted(context: Context, fileName: String, uploadId: Int, downloadId: Long) {
+    protected fun onCompleted(context: Context, fileName: String, uploadId: Int, downloadId: Int) {
         val isApk = fileName.endsWith(".apk")
         val downloadFileManager = Mitch.fileManager
 
@@ -125,7 +119,7 @@ abstract class DownloadFileListener {
         }
     }
 
-    protected fun onError(context: Context, file: File, downloadId: Long, uploadId: Int,
+    protected fun onError(context: Context, file: File, downloadId: Int, uploadId: Int,
                           errorName: String, throwable: Throwable?) {
         val isApk = file.extension == "apk"
         createResultNotification(context, file, downloadId, isApk, errorName, Utils.toString(throwable))
@@ -139,7 +133,7 @@ abstract class DownloadFileListener {
         }
     }
 
-    protected fun onProgress(context: Context, file: File, downloadId: Long, uploadId: Int,
+    protected fun onProgress(context: Context, file: File, downloadId: Int, uploadId: Int,
                    progressPercent: Int?) {
         createProgressNotification(context, file, downloadId, uploadId,
             progressPercent)

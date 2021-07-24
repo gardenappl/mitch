@@ -90,10 +90,7 @@ class Installations {
             if (status != Installation.STATUS_INSTALLING) {
                 val notificationService =
                     context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-                if (Utils.fitsInInt(downloadOrInstallId))
-                    notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, downloadOrInstallId.toInt())
-                else
-                    notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD_LONG, downloadOrInstallId.toInt())
+                notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, downloadOrInstallId.toInt())
             }
         }
 
