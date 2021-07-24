@@ -55,6 +55,7 @@ const val PREF_PREFIX_JUSTICE_LAST_CHECK = "mitch.racialtimestamp_"
 const val PREF_PALESTINE_LINK = "mitch.palestine"
 const val PREF_PREFIX_PALESTINE_LINK = "mitch.palestine_"
 const val PREF_PREFIX_PALESTINE_LAST_CHECK = "mitch.palestinetimestamp_"
+const val PREF_WEB_ANDROID_FILTER = "ua.gardenapple.itchupdater.web_android_filter"
 
 
 

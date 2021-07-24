@@ -142,10 +142,24 @@
     <string name="settings_installer">Метод встановлення</string>
     <string name="settings_installer_native">Системний встановлювач (за замовчуванням)</string>
     <string name="settings_installer_session">Встановлення сесією</string>
-    <string name="game_justice_bundle_claim">Присвоїти</string>
+    <string name="game_bundle_claim">Присвоїти</string>
     <string name="game_buy">Купити</string>
     <string name="popup_handler_app_not_found">Не знаю, як відкрити %s</string>
     <string name="game_download">Завантажити</string>
     <string name="game_install">Встановити</string>
     <string name="game_price">%s чи більше</string>
+    <string name="game_justice_bundle_claim_error">Не вдалося завантажити сторінку набору Racial Justice.</string>
+    <string name="game_bundle_justice">Bundle for Racial Justice and Equality</string>
+    <string name="settings_bundle_link_desc">Встановити власне посилання для завантаження</string>
+    <string name="settings_justice_claim_all">Набір Racial Justice: присвоїти все</string>
+    <string name="settings_justice_claim_all_desc">Присвоїти всі ігри з набору Racial Justice and Equality.</string>
+    <string name="settings_bundle_claim_dialog_title">Ви впевнені?</string>
+    <string name="settings_bundle_claim_dialog">Увага: це додасть більше 1000 ігор до вашої ігротеки. Ви точно цього хочете?\n\nЦей прогрес може зайняти дуже багато часу.\n\nЦю дію не можна скасувати.</string>
+    <string name="popup_no_network_connection">Для перевірки оновлень необхідно підключитися до Інтернету</string>
+    <string name="settings_android_only_filter">Android: показувати лише завантажуване</string>
+    <string name="settings_android_only_filter_desc">Показуючи ігри для Android, ховати ігри, які доступні лише через сторонні магазини.</string>
+    <string name="game_palestine_bundle_claim_error">Не вдалося завантажити сторінку набору Palestinian Aid.</string>
+    <string name="game_bundle_palestine">Indie bundle for Palestinian Aid</string>
+    <string name="settings_palestine_claim_all">Набір Palestinian Aid: присвоїти все</string>
+    <string name="settings_palestine_claim_all_desc">Присвоїти всі ігри з набору Indie bundle for Palestinian Aid.</string>
 </resources>

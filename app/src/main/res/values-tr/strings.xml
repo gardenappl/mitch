@@ -144,19 +144,19 @@
     <string name="notification_channel_install_desc">Bir itch.io uygulaması kurulum gerektirdiğinde bildirimde bulun.</string>
     <string name="notification_channel_install">Uygulama kurulumu</string>
     <string name="notification_channel_updates">Oyun güncellemeleri</string>
-    <string name="settings_justice_claim_dialog">Uyarı: Kitaplığınızı 1000\'den fazla oyunla doldurmak üzeresiniz. Bunu yapmak istediğinize emin misiniz\?
+    <string name="settings_bundle_claim_dialog">Uyarı: Kitaplığınızı 1000\'den fazla oyunla doldurmak üzeresiniz. Bunu yapmak istediğinize emin misiniz\?
 \n
 \nBu gerçekten çok uzun bir zaman alacak.
 \n
 \nBu süreç geri alınamaz.</string>
-    <string name="settings_justice_claim_dialog_title">Emin misiniz\?</string>
+    <string name="settings_bundle_claim_dialog_title">Emin misiniz\?</string>
     <string name="settings_justice_claim_all_desc">Irksal Adalet ve Eşitlik paketindeki tüm oyunları talep edin.</string>
     <string name="settings_justice_claim_all">Paketteki tüm oyunları talep et</string>
-    <string name="settings_justice_link_desc">Özel indirme URL\'si ayarlayın</string>
-    <string name="settings_justice_link">Irksal Adalet ve Eşitlik Paketi</string>
+    <string name="settings_bundle_link_desc">Özel indirme URL\'si ayarlayın</string>
+    <string name="game_bundle_justice">Irksal Adalet ve Eşitlik Paketi</string>
     <string name="game_justice_bundle_claim_error">Irksal Adalet paketinden indirme bağlantısına erişilemedi.</string>
     <string name="game_buy">Satın al</string>
-    <string name="game_justice_bundle_claim">Talep et</string>
+    <string name="game_bundle_claim">Talep et</string>
     <string name="game_price">%s veya daha fazla</string>
     <string name="game_install">Kur</string>
     <string name="game_download">İndir</string>

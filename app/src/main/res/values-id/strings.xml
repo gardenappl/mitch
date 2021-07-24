@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_justice_claim_dialog">Peringatan: kamu akan mengisi perpustakaanmu dengan 1000+ game. Apakah kamu yakin ingin melakukan ini\?
+    <string name="settings_bundle_claim_dialog">Peringatan: kamu akan mengisi perpustakaanmu dengan 1000+ game. Apakah kamu yakin ingin melakukan ini\?
 \n
 \nIni akan memakan sangat, sangat banyak waktu.
 \n
 \nProses ini tidak dapat dibatalkan.</string>
-    <string name="settings_justice_claim_dialog_title">Apakah kamu yakin\?</string>
-    <string name="settings_justice_link_desc">Tetapkan URL pengunduhan kustom</string>
+    <string name="settings_bundle_claim_dialog_title">Apakah kamu yakin\?</string>
+    <string name="settings_bundle_link_desc">Tetapkan URL pengunduhan kustom</string>
     <string name="game_buy">Beli</string>
-    <string name="game_justice_bundle_claim">Klaim</string>
+    <string name="game_bundle_claim">Klaim</string>
     <string name="settings_installer">Metode pemasangan</string>
     <string name="settings_installer_desc">Coba ubah ini jika kamu mengalami masalah ketika memasang aplikasi.</string>
     <string name="dialog_no">Tidak</string>
@@ -136,7 +136,7 @@
     <string name="library_category_installed">Aplikasi terpasang</string>
     <string name="settings_installer_native">Pemasang asli (default)</string>
     <string name="settings_justice_claim_all">Klaim semua game Bundel</string>
-    <string name="settings_justice_link">Bundel untuk Keadilan dan Kesetaraan Rasial</string>
+    <string name="game_bundle_justice">Bundel untuk Keadilan dan Kesetaraan Rasial</string>
     <string name="game_justice_bundle_claim_error">Tak bisa mengakses tautan unduhan dari bundel Keadilan Rasial.</string>
     <string name="settings_installer_session">Pemasang sesi</string>
     <string name="settings_cancel_downloads_title">Setel ulang semua unduhan saat ini\?</string>

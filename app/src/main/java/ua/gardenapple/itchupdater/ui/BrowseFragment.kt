@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
-import android.transition.Visibility
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
@@ -29,6 +28,7 @@ import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
+import ua.gardenapple.itchupdater.PREF_WEB_ANDROID_FILTER
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.client.ItchBrowseHandler
@@ -309,8 +309,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         fab.show()
 
-        hideUnwantedElements()
-
         if (doc != null && ItchWebsiteUtils.isStylizedPage(doc)) {
             if (ItchWebsiteUtils.isGamePage(doc)) {
                 //Hide app's navbar after hiding web navbar
@@ -323,11 +321,12 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                             //Required for marquee animation
                             gameButtonInfo.isSelected = true
 
-                            gameButton.text = resources.getString(R.string.game_justice_bundle_claim)
+                            gameButton.text = getString(R.string.game_bundle_claim)
                             if (info.isSpecialBundlePalestinian)
-                                gameButtonInfo.text = "Indie bundle for Palestinian Aid"
+                                gameButtonInfo.text = getString(R.string.game_bundle_palestine)
                             else
-                                gameButtonInfo.text = "Bundle for Racial Justice and Equality"
+                                gameButtonInfo.text = getString(R.string.game_bundle_justice)
+
                             gameButton.setOnClickListener {
                                 lifecycleScope.launch {
                                     SpecialBundleHandler.claimGame(
@@ -556,20 +555,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
     }
 
-    private fun hideUnwantedElements() {
-        webView.post {
-            webView.evaluateJavascript("""
-                    {
-                        let elements = document.getElementsByClassName("youtube_mobile_banner_widget")
-                        for (var element of elements)
-                            element.style.visibility = "hidden"
-                    }
-                """, null
-            )
-        }
-    }
-
-
 
     @Keep //prevent this class from being removed by compiler optimizations
     private class ItchJavaScriptInterface(val fragment: BrowseFragment) {
@@ -663,19 +648,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
             view.evaluateJavascript("""
                     document.addEventListener("DOMContentLoaded", (event) => {
+                        // tell Android that the document is ready
                         mitchCustomJS.onHtmlLoaded("<html>" + document.getElementsByTagName("html")[0].innerHTML + "</html>",
                                                    window.location.href);
-                    });
-                    window.addEventListener("resize", (event) => {
-                        mitchCustomJS.onResize();
-                    });
-                """, null
-            )
-        }
-
-        override fun onPageFinished(view: WebView, url: String) {
-            view.evaluateJavascript("""
-                    {
+                                               
+                        // setup download buttons
                         let downloadButtons = document.getElementsByClassName("download_btn");
                         for (var downloadButton of downloadButtons) {
                             let uploadId = downloadButton.getAttribute("data-upload_id");
@@ -683,9 +660,36 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                                 mitchCustomJS.onDownloadLinkClick(uploadId);
                             });
                         }
-                    }
+                        
+                        // remove YouTube banner
+                        let elements = document.getElementsByClassName("youtube_mobile_banner_widget");
+                        for (var element of elements)
+                            element.style.visibility = "hidden";
+                    });
+                    window.addEventListener("resize", (event) => {
+                        mitchCustomJS.onResize();
+                    });
                 """, null
             )
+
+            val uri = Uri.parse(url)
+            if (uri.pathSegments.containsAll(listOf("games", "platform-android"))) {
+                val preferenceManager = PreferenceManager.getDefaultSharedPreferences(context)
+                val androidOnlyFilter = preferenceManager.getBoolean(PREF_WEB_ANDROID_FILTER, true)
+                if (androidOnlyFilter) {
+                    webView.evaluateJavascript("""
+                    document.addEventListener("DOMContentLoaded", (event) => {
+                        // Android-only filter
+                        let elements = document.getElementsByClassName("game_cell");
+                        for (var element of elements) {
+                            if (element.getElementsByClassName("icon-android").length == 0) {
+                                element.style.display = "none";
+                            }
+                        }
+                    });
+                    """, null)
+                }
+            }
         }
     }
 

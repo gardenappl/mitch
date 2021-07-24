@@ -10,6 +10,11 @@
                 android:summary="%s"
                 android:title="@string/settings_start_page" />
         <SwitchPreference
+                android:defaultValue="true"
+                android:key="ua.gardenapple.itchupdater.web_android_filter"
+                android:summary="@string/settings_android_only_filter_desc"
+                android:title="@string/settings_android_only_filter" />
+        <SwitchPreference
                 android:defaultValue="@string/preference_value_block_trackers"
                 android:key="preference_block_trackers"
                 android:summary="@string/settings_block_trackers_desc"

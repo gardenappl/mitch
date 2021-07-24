@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_justice_claim_dialog">Waarschuwing: je staat op het punt om je bibliotheek te vullen met 1000+ spellen. Weet je zeker dat je dit wilt doen\?
+    <string name="settings_bundle_claim_dialog">Waarschuwing: je staat op het punt om je bibliotheek te vullen met 1000+ spellen. Weet je zeker dat je dit wilt doen\?
 \n
 \nDit zal heel, heel lang duren.
 \n
 \nDit proces is onomkeerbaar.</string>
-    <string name="settings_justice_claim_dialog_title">Weet je het zeker\?</string>
+    <string name="settings_bundle_claim_dialog_title">Weet je het zeker\?</string>
     <string name="settings_justice_claim_all_desc">Claim elk spel uit de Rassenrechtvaardigheid en Gelijkheid bundel.</string>
     <string name="settings_justice_claim_all">Alle Bundel-spellen claimen</string>
-    <string name="settings_justice_link_desc">Aangepaste download URL instellen</string>
-    <string name="settings_justice_link">Bundel voor Rassengelijkheid en Rechtvaardigheid</string>
+    <string name="settings_bundle_link_desc">Aangepaste download URL instellen</string>
+    <string name="game_bundle_justice">Bundel voor Rassengelijkheid en Rechtvaardigheid</string>
     <string name="game_justice_bundle_claim_error">Kon geen toegang krijgen tot de download link van de \'Racial Justice\' bundel.</string>
     <string name="game_buy">Kopen</string>
-    <string name="game_justice_bundle_claim">Claimen</string>
+    <string name="game_bundle_claim">Claimen</string>
     <string name="settings_installer_native">Native installeerder (standaard)</string>
     <string name="settings_installer_session">Sessie installeerder</string>
     <string name="settings_installer">Installatie methode</string>

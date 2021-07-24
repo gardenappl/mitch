@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_justice_claim_dialog">Cảnh báo: Bạn sắp lấp đầy thư viện của bạn bằng hơn 1000 trò chơi. Bạn có chắc bạn muốn làm việc này không\?
+    <string name="settings_bundle_claim_dialog">Cảnh báo: Bạn sắp lấp đầy thư viện của bạn bằng hơn 1000 trò chơi. Bạn có chắc bạn muốn làm việc này không\?
 \n
 \nViệc này sẽ mất rất nhiều thời gian.
 \n
 \nQuá trình này không thể được đảo ngược.</string>
     <string name="settings_justice_claim_all_desc">Nhận mọi trò chơi từ gói Công lý và Bình đẳng chủng tộc.</string>
-    <string name="settings_justice_link">Gói vì Công lý và Bình đẳng chủng tộc</string>
-    <string name="settings_justice_claim_dialog_title">Bạn có chắc không\?</string>
+    <string name="game_bundle_justice">Gói vì Công lý và Bình đẳng chủng tộc</string>
+    <string name="settings_bundle_claim_dialog_title">Bạn có chắc không\?</string>
     <string name="settings_justice_claim_all">Nhận tất cả trò chơi trong gói</string>
-    <string name="settings_justice_link_desc">Đặt URL tải xuống tuỳ chỉnh</string>
+    <string name="settings_bundle_link_desc">Đặt URL tải xuống tuỳ chỉnh</string>
     <string name="game_justice_bundle_claim_error">Không thể truy cập liên kết tải xuống từ gói Racial Justice.</string>
     <string name="game_buy">Mua</string>
-    <string name="game_justice_bundle_claim">Nhận</string>
+    <string name="game_bundle_claim">Nhận</string>
     <string name="settings_installer_native">Trình cài đặt của hệ thống (mặc định)</string>
     <string name="settings_installer_session">Trình cài đặt phiên làm việc</string>
     <string name="settings_installer">Phương pháp cài đặt</string>
