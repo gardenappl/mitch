@@ -79,10 +79,10 @@
                 android:name=".install.InstallRequestBroadcastReceiver"
                 android:exported="false" />
         <receiver
-                android:name=".download.DownloadCancelBroadcastReceiver"
+                android:name=".files.DownloadCancelBroadcastReceiver"
                 android:exported="false" />
         <receiver
-                android:name=".download.UpdateNotificationBroadcastReceiver"
+                android:name=".files.UpdateNotificationBroadcastReceiver"
                 android:exported="false" />
         <receiver
                 android:name=".ErrorReportBroadcastReciever"

@@ -27,10 +27,7 @@
     <string name="settings_installer_native">Installateur natif (par défaut)</string>
     <string name="settings_installer_session">Installateur de session</string>
     <string name="settings_installer">Méthode d’installation</string>
-    <string name="settings_downloader">Méthode de téléchargement</string>
     <string name="settings_installer_desc">Essayez de modifier ce paramètre si vous avez des difficultés à installer des applications.</string>
-    <string name="settings_downloader_desc">Essayez de modifier ce paramètre si vous avez des difficultés à télécharger des fichiers ou à installer des applications.</string>
-    <string name="settings_downloader_standard">Standard</string>
     <string name="dialog_no">Non</string>
     <string name="settings_cancel_downloads_message">Ceci ne doit être fait qu’à des fins de test ou de dépannage.</string>
     <string name="settings_cancel_downloads_title">Réinitialiser tous les téléchargements en cours \?</string>

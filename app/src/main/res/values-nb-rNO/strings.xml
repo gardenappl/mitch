@@ -9,8 +9,6 @@
     <string name="settings_installer_session">Økt-installerer</string>
     <string name="settings_cancel_downloads_message">Dette bør kun gjøres i test- eller feilsøkingsøyemed.</string>
     <string name="settings_installer_desc">Endre dette hvis du har problemer med å installere programmer.</string>
-    <string name="settings_downloader_desc">Endre dette hvis du har problemer med å laste ned filer eller installere programmer.</string>
-    <string name="settings_downloader_standard">Forvalg</string>
     <string name="library_open_app_failed">Kunne ikke åpne programmet.</string>
     <string name="library_no_games">Det ser ikke ut til at du eier noen itch-io-spill.</string>
     <string name="library_no_android_games">Det ser ikke ut til at du eier noen Android-spill.</string>
@@ -103,7 +101,6 @@
     <string name="notification_channel_install">Programinstallasjon</string>
     <string name="notification_channel_updates">Spilloppdateringer</string>
     <string name="settings_installer">Installasjonsmetode</string>
-    <string name="settings_downloader">Nedlastingsmetode</string>
     <string name="dialog_no">Nei</string>
     <string name="settings_cancel_downloads_title">Tilbakestill nåværende nedlastinger\?</string>
     <string name="settings_cancel_downloads">Tilbakestill alle nedlastinger</string>

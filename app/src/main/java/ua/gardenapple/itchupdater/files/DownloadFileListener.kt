@@ -1,10 +1,9 @@
-package ua.gardenapple.itchupdater.download
+package ua.gardenapple.itchupdater.files
 
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.room.withTransaction
@@ -77,7 +76,7 @@ abstract class DownloadFileListener {
 
     private fun createProgressNotification(context: Context, downloadFile: File,
                                            downloadId: Long, uploadId: Int,
-                                           progressPercent: Int?, etaInMilliSeconds: Long?) {
+                                           progressPercent: Int?) {
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
             setOngoing(true)
             setOnlyAlertOnce(true)
@@ -89,10 +88,6 @@ abstract class DownloadFileListener {
                 setProgress(100, progressPercent, false)
             else
                 setProgress(100, 0, true)
-
-            if (etaInMilliSeconds != null)
-                setContentInfo(context.resources.getString(R.string.notification_download_time_remaining,
-                        etaInMilliSeconds / 60_000, etaInMilliSeconds / 1000))
 
             val cancelIntent = Intent(context, DownloadCancelBroadcastReceiver::class.java).apply {
                 putExtra(DownloadCancelBroadcastReceiver.EXTRA_DOWNLOAD_ID, downloadId)
@@ -145,8 +140,8 @@ abstract class DownloadFileListener {
     }
 
     protected fun onProgress(context: Context, file: File, downloadId: Long, uploadId: Int,
-                   progressPercent: Int?, etaInMilliSeconds: Long?) {
+                   progressPercent: Int?) {
         createProgressNotification(context, file, downloadId, uploadId,
-            progressPercent, etaInMilliSeconds)
+            progressPercent)
     }
 }

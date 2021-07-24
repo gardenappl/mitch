@@ -124,9 +124,6 @@ dependencies {
     implementation("me.zhanghai.android.materialprogressbar:library:${Build.Versions.materialProgressBar}")
     // Colormath (CSS color parsing)
     implementation("com.github.ajalt:colormath:${Build.Versions.colormath}")
-    // Fetch
-    implementation("androidx.tonyodev.fetch2:xfetch2:${Build.Versions.fetchAndroidx}")
-    implementation("androidx.tonyodev.fetch2okhttp:xfetch2okhttp:${Build.Versions.fetchAndroidx}")
     // Application Crash Reports for Android (ACRA)
     implementation("ch.acra:acra-mail:${Build.Versions.acra}")
     implementation("ch.acra:acra-dialog:${Build.Versions.acra}")

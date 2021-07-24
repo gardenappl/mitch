@@ -4,9 +4,6 @@
     <string name="settings_installer_session">مثبت الجلسة</string>
     <string name="settings_installer">طريقة التثبيت</string>
     <string name="settings_installer_desc">حاول تغيير هذا إذا واجهتك مشاكل في تثبيت التطبيقات.</string>
-    <string name="settings_downloader">المنزل</string>
-    <string name="settings_downloader_desc">اول تغيير هذا إذا لديك مشاكل في تنزيل الملفات أو تثبيت التطبيقات.</string>
-    <string name="settings_downloader_standard">لاافتراضي</string>
     <string name="dialog_no">لا</string>
     <string name="settings_cancel_downloads_message">يجب فعل هذا فقط للاختبار أو تصويب الأخطاء.</string>
     <string name="settings_cancel_downloads_title">أعد كل التنزيلات؟</string>

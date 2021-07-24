@@ -16,10 +16,7 @@
     <string name="settings_installer_native">Trình cài đặt của hệ thống (mặc định)</string>
     <string name="settings_installer_session">Trình cài đặt phiên làm việc</string>
     <string name="settings_installer">Phương pháp cài đặt</string>
-    <string name="settings_downloader">Phương pháp tải xuống</string>
     <string name="settings_installer_desc">Hãy thử thay đổi tuỳ chọn này nếu bạn gặp rắc rối trong việc cài đặt ứng dụng.</string>
-    <string name="settings_downloader_desc">Hãy thử thay đổi tuỳ chọn này nếu bạn gặp rắc rối trong việc tải tệp xuống hoặc cài đặt ứng dụng.</string>
-    <string name="settings_downloader_standard">Tiêu chuẩn</string>
     <string name="dialog_no">Không</string>
     <string name="settings_cancel_downloads_message">Việc này chỉ nên được làm vì mục đích thử nghiệm hoặc xử lý sự cố.</string>
     <string name="settings_cancel_downloads_title">Đặt lại tất cả lượt tải xuống hiện tại\?</string>

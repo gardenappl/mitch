@@ -35,7 +35,6 @@ object Build {
         const val speedDial = "3.2.0"
         const val materialProgressBar = "1.6.1"
         const val colormath = "1.4.1"
-        const val fetchAndroidx = "3.1.6"
         const val acra = "5.7.0"
     }
 }

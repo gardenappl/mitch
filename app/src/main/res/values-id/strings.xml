@@ -10,10 +10,7 @@
     <string name="game_buy">Beli</string>
     <string name="game_justice_bundle_claim">Klaim</string>
     <string name="settings_installer">Metode pemasangan</string>
-    <string name="settings_downloader">Metode pengunduhan</string>
     <string name="settings_installer_desc">Coba ubah ini jika kamu mengalami masalah ketika memasang aplikasi.</string>
-    <string name="settings_downloader_desc">Coba ubah ini jika kamu mengalami masalah ketika mengunduh berkas-berkas atau memasang aplikasi.</string>
-    <string name="settings_downloader_standard">Standar</string>
     <string name="dialog_no">Tidak</string>
     <string name="settings_cancel_downloads_message">Ini hanya digunakan untuk keperluan pengujian atau pemecahan masalah.</string>
     <string name="library_open_app_failed">Aplikasi ini tidak bisa dibuka.</string>

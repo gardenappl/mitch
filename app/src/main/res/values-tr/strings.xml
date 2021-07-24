@@ -3,10 +3,7 @@
     <string name="settings_installer_native">Yerel kurucu (öntanımlı)</string>
     <string name="settings_installer_session">Oturum kurucusu</string>
     <string name="settings_installer">Kurulum yöntemi</string>
-    <string name="settings_downloader">İndirme yöntemi</string>
     <string name="settings_installer_desc">Uygulamaları kurarken sorun yaşıyorsanız bunu değiştirmeyi deneyin.</string>
-    <string name="settings_downloader_desc">Dosyaları indirirken veya uygulamaları kurarken sorun yaşıyorsanız bunu değiştirmeyi deneyin.</string>
-    <string name="settings_downloader_standard">Standart</string>
     <string name="dialog_no">Hayır</string>
     <string name="settings_cancel_downloads_message">Bu yalnızca test veya sorun giderme amacıyla yapılmalıdır.</string>
     <string name="settings_cancel_downloads_title">Tüm geçerli indirmeler sıfırlansın mı\?</string>

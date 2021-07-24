@@ -1,5 +1,6 @@
 package ua.gardenapple.itchupdater
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -9,9 +10,6 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import androidx.work.*
-import com.tonyodev.fetch2.Fetch
-import com.tonyodev.fetch2.FetchConfiguration
-import com.tonyodev.fetch2okhttp.OkHttpDownloader
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import org.acra.ACRA
@@ -21,11 +19,7 @@ import org.acra.config.MailSenderConfigurationBuilder
 import org.acra.data.StringFormat
 import ua.gardenapple.itchupdater.client.UpdateChecker
 import ua.gardenapple.itchupdater.database.DatabaseCleanup
-import ua.gardenapple.itchupdater.download.FetchDownloader
-import ua.gardenapple.itchupdater.download.WorkerDownloader
-import ua.gardenapple.itchupdater.download.MitchFetchListener
 import ua.gardenapple.itchupdater.files.*
-import ua.gardenapple.itchupdater.install.SessionInstaller
 import ua.gardenapple.itchupdater.install.InstallerDatabaseHandler
 import ua.gardenapple.itchupdater.ui.CrashDialog
 import java.io.File
@@ -56,7 +50,6 @@ const val FLAVOR_ITCHIO = "itchio"
 
 //const val PREF_LAST_UPDATE_CHECK = "ua.gardenapple.itchupdater.lastupdatecheck"
 const val PREF_DB_RAN_CLEANUP_ONCE = "ua.gardenapple.itchupdater.db_cleanup_once"
-const val PREF_DOWNLOADER = "ua.gardenapple.itchupdater.downloader"
 const val PREF_INSTALLER = "ua.gardenapple.itchupdater.installer"
 const val PREF_JUSTICE_LINK = "mitch.racial"
 const val PREF_PREFIX_JUSTICE_LINK = "mitch.racial_"
@@ -74,14 +67,13 @@ class Mitch : Application() {
 
         lateinit var httpClient: OkHttpClient
             private set
-        private lateinit var fetch: Fetch
         lateinit var fileManager: DownloadFileManager
             private set
-        lateinit var workerDownloader: WorkerDownloader
-            private set
-        lateinit var databaseHandler: InstallerDatabaseHandler
-            private set
         lateinit var externalFileManager: ExternalFileManager
+            private set
+        //The only Context that this uses is applicationContext, so it should be okay
+        @SuppressLint("StaticFieldLeak")
+        lateinit var databaseHandler: InstallerDatabaseHandler
             private set
     }
 
@@ -163,24 +155,11 @@ class Mitch : Application() {
             ))
             build()
         }
-        val fetchConfig = FetchConfiguration.Builder(applicationContext).run {
-            setDownloadConcurrentLimit(3)
-            setHttpDownloader(OkHttpDownloader(httpClient))
-            setAutoRetryMaxAttempts(3)
-            enableFileExistChecks(false)
-            createDownloadFileOnEnqueue(false)
-            preAllocateFileOnCreation(false)
-            build()
-        }
-        fetch = fetchConfig.getNewFetchInstanceFromConfiguration()
-        val fetchDownloader = FetchDownloader(fetch)
-        fetch.addListener(MitchFetchListener(applicationContext, fetchDownloader))
-        fileManager = DownloadFileManager(applicationContext, fetchDownloader)
+        fileManager = DownloadFileManager(applicationContext)
         fileManager.setup()
 
         databaseHandler = InstallerDatabaseHandler(applicationContext)
         externalFileManager = ExternalFileManager()
-        workerDownloader = WorkerDownloader()
 
 
         WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(

@@ -41,9 +41,6 @@ class WebParserTests {
             ItchWebsiteUtils.fetchAndParse(game.downloadPageUrl ?: game.storeUrl)
         }
 
-//        Log.d(LOGGING_TAG, "HTML: ")
-//        Utils.logLongD(LOGGING_TAG, doc.outerHtml())
-
         val installs = ItchWebsiteParser.getInstallations(doc)
         assertEquals(4, installs.size)
 
@@ -67,9 +64,6 @@ class WebParserTests {
         val doc: Document = runBlocking(Dispatchers.IO) {
             ItchWebsiteUtils.fetchAndParse(getDownloadPage(game.storeUrl)!!.url)
         }
-
-//        Log.d(LOGGING_TAG, "HTML: ")
-//        Utils.logLongD(LOGGING_TAG, doc.outerHtml())
 
         val installs = ItchWebsiteParser.getInstallations(doc)
 
@@ -107,9 +101,6 @@ class WebParserTests {
         assertEquals(false, url.isPermanent)
         assertEquals(false, url.isStorePage)
         val doc = Jsoup.connect(url.url).get()
-
-//        Log.d(LOGGING_TAG, "HTML: ")
-//        Utils.logLongD(LOGGING_TAG, doc.outerHtml())
 
         assertEquals(true, doc.getElementsByClass("download_btn").isNotEmpty())
     }

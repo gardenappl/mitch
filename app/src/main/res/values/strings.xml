@@ -138,11 +138,7 @@
     <string name="settings_cancel_downloads_title">Reset all current downloads?</string>
     <string name="settings_cancel_downloads_message">This should only be done for testing or troubleshooting purposes.</string>
     <string name="dialog_no">No</string>
-    <string name="settings_downloader_standard">Standard</string>
-    <string name="settings_downloader_fetch" translatable="false">Fetch</string>
-    <string name="settings_downloader_desc">Try changing this if you have trouble downloading files or installing apps.</string>
     <string name="settings_installer_desc">Try changing this if you have trouble installing apps.</string>
-    <string name="settings_downloader">Download method</string>
     <string name="settings_installer">Installation method</string>
     <string name="settings_installer_session">Session installer</string>
     <string name="settings_installer_native">Native installer (default)</string>
@@ -159,4 +155,5 @@
     <string name="settings_justice_claim_all_desc">Claim every game from the Racial Justice and Equality bundle.</string>
     <string name="settings_justice_claim_dialog_title">Are you sure?</string>
     <string name="settings_justice_claim_dialog">Warning: you are about to fill your library with 1000+ games. Are you sure you want to do this?\n\nThis will take a really, really long time.\n\nThis process is irreversible.</string>
+    <string name="popup_no_network_connection">Checking updates requires a network connection</string>
 </resources>

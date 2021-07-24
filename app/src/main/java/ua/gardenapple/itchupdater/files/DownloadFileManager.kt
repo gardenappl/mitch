@@ -4,18 +4,15 @@ import android.content.Context
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
-import ua.gardenapple.itchupdater.download.Downloader
-import ua.gardenapple.itchupdater.download.FetchDownloader
 import ua.gardenapple.itchupdater.install.Installations
 import java.io.File
 
-class DownloadFileManager(context: Context, private val fetchDownloader: FetchDownloader) {
+class DownloadFileManager(context: Context) {
     companion object {
 //        const val APK_MIME = "application/vnd.android.package-archive"
         const val LOGGING_TAG = "DownloadFileManager"
@@ -49,8 +46,7 @@ class DownloadFileManager(context: Context, private val fetchDownloader: FetchDo
         deletePendingFile(uploadId)
 
         val file = File(File(pendingPath, uploadId.toString()), fileName)
-        val errorString =
-            getDownloaderForInstall(context, install).requestDownload(context, url, file, install)
+        val errorString = Downloader.requestDownload(context, url, file, install)
 
         if (errorString != null) {
             val builder =
@@ -70,15 +66,14 @@ class DownloadFileManager(context: Context, private val fetchDownloader: FetchDo
         }
     }
 
-    suspend fun checkIsDownloading(context: Context, install: Installation): Boolean {
+    fun checkIsDownloading(context: Context, install: Installation): Boolean {
         return install.downloadOrInstallId?.let { downloadId ->
-            getDownloaderForId(downloadId).checkIsDownloading(context, downloadId.toInt())
+            Downloader.checkIsDownloading(context, downloadId.toInt())
         } ?: false
     }
 
     fun deleteAllDownloads(context: Context) {
-        Mitch.workerDownloader.cancelAll(context)
-        fetchDownloader.deleteAllDownloads()
+        Downloader.cancelAll(context)
     }
     
     fun deletePendingFile(uploadId: Int) {
@@ -95,7 +90,7 @@ class DownloadFileManager(context: Context, private val fetchDownloader: FetchDo
     }
 
     suspend fun cancel(context: Context, downloadId: Long, uploadId: Int) {
-        getDownloaderForId(downloadId).cancel(context, downloadId.toInt())
+        Downloader.cancel(context, downloadId.toInt())
         deletePendingFile(uploadId)
     }
     
@@ -112,29 +107,5 @@ class DownloadFileManager(context: Context, private val fetchDownloader: FetchDo
     fun getDownloadedFile(uploadId: Int): File? {
         val dir = File(uploadsPath, uploadId.toString())
         return dir.listFiles()?.getOrNull(0)
-    }
-
-    private fun getDownloaderForInstall(context: Context,
-                                        install: Installation): Downloader {
-        if (install.status == Installation.STATUS_INSTALLING)
-            throw IllegalArgumentException("Tried to get Downloader for INSTALLING $install")
-
-        val downloadId = install.downloadOrInstallId
-        if (downloadId == null) {
-            val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
-            return if (sharedPrefs.getString(PREF_DOWNLOADER, "standard") == "standard")
-                Mitch.workerDownloader
-            else
-                fetchDownloader
-        }
-
-        return getDownloaderForId(downloadId)
-    }
-
-    private fun getDownloaderForId(downloadId: Long): Downloader {
-        return if (Utils.fitsInInt(downloadId))
-            fetchDownloader
-        else
-            Mitch.workerDownloader
     }
 }

@@ -39,13 +39,6 @@
                 android:key="ua.gardenapple.itchupdater.installer"
                 android:summary="@string/settings_installer_desc"
                 android:title="@string/settings_installer" />
-        <ListPreference
-                android:defaultValue="standard"
-                android:entries="@array/pref_downloader_entries"
-                android:entryValues="@array/pref_downloader_values"
-                android:key="ua.gardenapple.itchupdater.downloader"
-                android:summary="@string/settings_downloader_desc"
-                android:title="@string/settings_downloader" />
         <Preference
                 android:key="cancel_all_downloads"
                 android:title="@string/settings_cancel_downloads" />

@@ -1,4 +1,4 @@
-package ua.gardenapple.itchupdater.download
+package ua.gardenapple.itchupdater.files
 
 import android.content.BroadcastReceiver
 import android.content.Context

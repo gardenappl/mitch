@@ -1,4 +1,4 @@
-package ua.gardenapple.itchupdater.download
+package ua.gardenapple.itchupdater.files
 
 import android.content.Context
 import android.util.Log
@@ -22,16 +22,14 @@ import java.lang.Exception
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class WorkerDownloader : Downloader, DownloadFileListener() {
-    companion object {
-        private const val WORKER_URL = "url"
-        private const val WORKER_FILE_PATH = "path"
-        private const val WORKER_DOWNLOAD_ID = "download_id"
-        private const val WORKER_UPLOAD_ID = "upload_id"
-        private const val TAG_WORKER = "MITCH_DOWN"
+object Downloader : DownloadFileListener() {
+    private const val WORKER_URL = "url"
+    private const val WORKER_FILE_PATH = "path"
+    private const val WORKER_DOWNLOAD_ID = "download_id"
+    private const val WORKER_UPLOAD_ID = "upload_id"
+    private const val TAG_WORKER = "MITCH_DOWN"
 
-        private const val LOGGING_TAG = "WorkerDownloader"
-    }
+    private const val LOGGING_TAG = "WorkerDownloader"
 
     @Synchronized
     private fun getUnusedDownloadId(context: Context): Int {
@@ -46,13 +44,11 @@ class WorkerDownloader : Downloader, DownloadFileListener() {
 
     private fun getWorkName(downloadId: Int): String = "MITCH_DOWN_$downloadId"
 
-    override suspend fun requestDownload(context: Context, url: String,
-                                         file: File, install: Installation): String? {
+    suspend fun requestDownload(context: Context, url: String, file: File,
+                                install: Installation): String? {
         val downloadId = getUnusedDownloadId(context)
         Log.d(LOGGING_TAG, "Download ID: $downloadId")
-        //Set most significant bit
-        install.downloadOrInstallId = downloadId.toLong().or(1L shl 63)
-        Log.d(LOGGING_TAG, "(saving as ${install.downloadOrInstallId})")
+        install.downloadOrInstallId = downloadId.toLong()
         install.status = Installation.STATUS_DOWNLOADING
         withContext(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
@@ -80,13 +76,13 @@ class WorkerDownloader : Downloader, DownloadFileListener() {
         return null
     }
 
-    override suspend fun cancel(context: Context, downloadId: Int): Boolean {
+    suspend fun cancel(context: Context, downloadId: Int): Boolean {
         val operation = WorkManager.getInstance(context).cancelUniqueWork(getWorkName(downloadId))
         operation.await()
         return true
     }
 
-    override suspend fun checkIsDownloading(context: Context, downloadId: Int): Boolean {
+    fun checkIsDownloading(context: Context, downloadId: Int): Boolean {
         return WorkManager.getInstance(context)
             .getWorkInfosForUniqueWork(getWorkName(downloadId)).isDone
     }
@@ -120,8 +116,8 @@ class WorkerDownloader : Downloader, DownloadFileListener() {
 
                     val currentProgress: Long = 100 * bytesRead / totalBytes
                     if (currentProgress != progressPercent) {
-                        Mitch.workerDownloader.onProgress(applicationContext, file, downloadId,
-                            uploadId, currentProgress.toInt(), null)
+                        Downloader.onProgress(applicationContext, file, downloadId,
+                            uploadId, currentProgress.toInt())
                         progressPercent = currentProgress
                     }
                 }
@@ -163,8 +159,8 @@ class WorkerDownloader : Downloader, DownloadFileListener() {
                 }
 
                 response.use {
-                    Mitch.workerDownloader.onProgress(applicationContext, file, downloadId,
-                        uploadId, null, null)
+                    Downloader.onProgress(applicationContext, file, downloadId,
+                        uploadId, null)
 
                     download(response, file, downloadId, uploadId)
 
@@ -175,9 +171,8 @@ class WorkerDownloader : Downloader, DownloadFileListener() {
                     //Add some shitty delay because if you send the completion notification
                     //right after a progress notification, sometimes it doesn't show up
                     delay(500)
-                    
-                    Mitch.workerDownloader.onCompleted(applicationContext, file.name, uploadId,
-                        downloadId)
+
+                    Downloader.onCompleted(applicationContext, file.name, uploadId, downloadId)
                 }
             } catch (e: CancellationException) {
                 return@withContext Result.failure()
@@ -185,7 +180,7 @@ class WorkerDownloader : Downloader, DownloadFileListener() {
                 Log.e(LOGGING_TAG, "Caught while downloading", e)
                 //TODO: localize error name?
                 val errorName = if (e is IOException) "I/O error" else "Unknown error"
-                Mitch.workerDownloader.onError(applicationContext, file,
+                Downloader.onError(applicationContext, file,
                     downloadId, uploadId, e.localizedMessage ?: errorName, e)
                 Result.failure()
             }

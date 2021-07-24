@@ -16,10 +16,7 @@
     <string name="settings_installer_native">Native installeerder (standaard)</string>
     <string name="settings_installer_session">Sessie installeerder</string>
     <string name="settings_installer">Installatie methode</string>
-    <string name="settings_downloader">Download methode</string>
     <string name="settings_installer_desc">Probeer dit te veranderen als je problemen hebt met het installeren van apps.</string>
-    <string name="settings_downloader_desc">Probeer dit te veranderen als je problemen hebt met het downloaden van bestanden of het installeren van apps.</string>
-    <string name="settings_downloader_standard">Standaard</string>
     <string name="dialog_no">Nee</string>
     <string name="settings_cancel_downloads_message">Dit mag alleen worden gedaan voor test- of probleemoplossingsdoeleinden.</string>
     <string name="settings_cancel_downloads_title">Reset alle huidige downloads\?</string>
