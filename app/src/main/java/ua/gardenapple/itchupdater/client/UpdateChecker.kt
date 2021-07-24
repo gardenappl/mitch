@@ -120,7 +120,7 @@ class UpdateChecker(private val context: Context) {
      * @param result the result of the update check
      */
     private fun handleNotification(game: Game, install: Installation, result: UpdateCheckResult) {
-        if(result.code == UpdateCheckResult.UP_TO_DATE)
+        if (result.code == UpdateCheckResult.UP_TO_DATE)
             return
 
         val message = when (result.code) {

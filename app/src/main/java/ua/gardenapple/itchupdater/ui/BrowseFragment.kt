@@ -611,10 +611,15 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
 
     inner class MitchWebViewClient : WebViewClient() {
+        val githubLoginPathRegex = Regex("""/?(login|sessions)(/.*)?""")
+
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-            if (ItchWebsiteUtils.isItchWebPage(request.url))
+            if (ItchWebsiteUtils.isItchWebPage(request.url)) {
                 return false
-            else {
+            } else if (request.url.host == "github.com"
+                    && request.url.path?.matches(githubLoginPathRegex) == true) {
+                return false
+            } else {
                 val intent = Intent(Intent.ACTION_VIEW, request.url)
                 if (intent.resolveActivity(requireContext().packageManager) != null) {
                     startActivity(intent)
