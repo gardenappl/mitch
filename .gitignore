@@ -10,7 +10,6 @@ keystore.properties
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 .DS_Store
-/build
-/build-release
+**/build
 /captures
 .externalNativeBuild

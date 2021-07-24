@@ -159,7 +159,7 @@ class Mitch : Application() {
         httpClient = OkHttpClient.Builder().run {
             cache(Cache(
                 directory = okHttpCacheDir,
-                maxSize = 10 * 1024 * 1024 //10 MB
+                maxSize = 10L * 1024 * 1024 //10 MB
             ))
             build()
         }

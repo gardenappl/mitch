@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
@@ -25,7 +26,9 @@ class UpdateCheckerTests {
         @JvmStatic fun setup() {
             val context = InstrumentationRegistry.getInstrumentation().context
             db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
-            db.addMitchToDatabase(context)
+            runBlocking(Dispatchers.IO) {
+                db.addMitchToDatabase(context)
+            }
 
             updateChecker = SingleUpdateChecker(db)
         }
