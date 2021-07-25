@@ -165,4 +165,5 @@
     <string name="settings_palestine_claim_all_desc">Присвоить все игры из набора Indie bundle for Palestinian Aid.</string>
     <string name="settings_palestine_claim_all">Набор Palestinian Aid: присвоить всё</string>
     <string name="game_bundle_palestine">Набор Indie bundle for Palestinian Aid</string>
+    <string name="game_palestine_bundle_claim_error">Не удалось получить доступ к ссылке из набора Palestinian Aid.</string>
 </resources>
