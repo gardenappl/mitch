@@ -144,4 +144,28 @@
     <string name="nav_settings">Innstillinger</string>
     <string name="nav_installed">Mitt bibliotek</string>
     <string name="nav_website_view">Utforsk</string>
+    <string name="popup_no_network_connection">Å se etter oppdateringer krever en nettverksforbindelse</string>
+    <string name="settings_bundle_claim_dialog">Advarsel: Du er i ferd med å fylle biblioteket ditt med over 1000 spill. Er du sikker\?
+\n
+\nDette vil ta virkelig lang tid.
+\n
+\nProsessen kan ikke angres.</string>
+    <string name="settings_palestine_claim_all_desc">Gjør krav på alle spill fra programknippen for Palestinsk nødhjelp.</string>
+    <string name="settings_justice_claim_all_desc">Gjør krav på alle spill fra programknippen for «rasejustis».</string>
+    <string name="settings_palestine_claim_all">Palestinsk-nødhjelpsprogramknippe: gjør krav på alle</string>
+    <string name="settings_justice_claim_all">«Rasejustis»-programknippe: gjør krav på alle</string>
+    <string name="game_justice_bundle_claim_error">Fikk ikke tak i nedlastingslenke fra programknippet for «rasejustis».</string>
+    <string name="game_bundle_claim">Gjør krav på</string>
+    <string name="settings_android_only_filter_desc">Ved utforsking av Android-spill vil oppføringer som kun er tilgjengelige i andre butikker skjules.</string>
+    <string name="settings_android_only_filter">Android: Filtrer kun nedlastbare</string>
+    <string name="settings_bundle_link_desc">Sett egendefinert nedlastingsadresse</string>
+    <string name="game_bundle_palestine">Indie-programknippe for Palestinsk nødhjelp</string>
+    <string name="game_bundle_justice">Programknippe for «rasejustis og likhet»</string>
+    <string name="game_palestine_bundle_claim_error">Fikk ikke tak i nedlastingslenke fra programknippet for Palestinsk nødhjelp.</string>
+    <string name="settings_bundle_claim_dialog_title">Sikker\?</string>
+    <string name="game_price">%s eller mer</string>
+    <string name="game_install">Installer</string>
+    <string name="game_download">Last ned</string>
+    <string name="game_buy">Kjøp</string>
+    <string name="popup_handler_app_not_found">Vet ikke hvordan %s skal åpnes</string>
 </resources>
