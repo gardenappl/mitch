@@ -1,5 +1,6 @@
 package ua.gardenapple.itchupdater.client
 
+import android.util.Log
 import android.webkit.CookieManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -71,7 +72,10 @@ object ItchLibraryParser {
             val thumbnailUrl = thumbnailCssPattern.find(thumbnailLink.child(0).attr("style"))
                 ?.groupValues?.get(1)
             val title = gameDiv.selectFirst(".game_title").text()
-            val description = gameDiv.selectFirst(".game_text").attr("title")
+//            val description = gameDiv.selectFirst(".game_text").attr("title")
+//            if (gameDiv.selectFirst(".game_text") == null) {
+//                Log.d(LOGGING_TAG, "Game $title has no description, hmm")
+//            }
             val author = gameDiv.selectFirst(".game_author").text()
             val isAndroid = gameDiv.selectFirst("icon-android") != null
 
@@ -82,7 +86,7 @@ object ItchLibraryParser {
                     thumbnailUrl = thumbnailUrl,
                     title = title,
                     author = author,
-                    description = description,
+//                    description = description,
                     isAndroid = isAndroid
                 )
             )
