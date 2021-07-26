@@ -1,0 +1,6 @@
+* Add native UI for downloading, buying games, and claiming games from the big famous bundles
+* Hide games which claim to support Android but are only available through Google Play links
+* New translations: Dutch, Vietnamese, Indonesian, French, German, Hindi
+* Fix login through GitHub
+
+Plus many other fixes, see full changelog here: https://gardenapple.itch.io/mitch/devlog
