@@ -29,7 +29,7 @@ import ua.gardenapple.itchupdater.data.ItchLibraryRepository
 import ua.gardenapple.itchupdater.data.ItchLibraryViewModel
 import ua.gardenapple.itchupdater.databinding.OwnedActivityBinding
 
-class OwnedGamesActivity : AppCompatActivity() {
+class OwnedGamesActivity : MitchActivity() {
 
     companion object {
         const val THUMBNAIL_WIDTH = 315
@@ -58,6 +58,7 @@ class OwnedGamesActivity : AppCompatActivity() {
 
         binding.toolbar.navigationIcon =
             ContextCompat.getDrawable(this, R.drawable.ic_baseline_arrow_back_24)
+        binding.toolbar.title = getString(R.string.library_category_owned)
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
