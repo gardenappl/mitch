@@ -3,10 +3,9 @@ object Build {
         const val compileSdk = 29
         const val minSdk = 21
         const val targetSdk = 29
-        const val versionCode = 31
-        const val versionName = "1.3.9"
 
-        //    const val buildToolsVersion = "29.0.2"
+        const val versionCode = 32
+        const val versionName = "1.4.0"
     }
 
 
