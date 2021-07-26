@@ -58,7 +58,7 @@ object ItchLibraryParser {
 
         var lastPurchaseDate: String? = null
         for (gameDiv in document.getElementsByClass("game_cell")) {
-            var purchaseDate: String? = gameDiv.getElementsByClass("date_header").firstOrNull()
+            var purchaseDate: String? = gameDiv.selectFirst(".date_header")
                 ?.getElementsByTag("span")?.text()
 
             if (purchaseDate.isNullOrEmpty())
@@ -66,14 +66,14 @@ object ItchLibraryParser {
             else
                 lastPurchaseDate = purchaseDate
 
-            val thumbnailLink = gameDiv.getElementsByClass("thumb_link").first()
+            val thumbnailLink = gameDiv.selectFirst(".thumb_link")
             val downloadUrl = thumbnailLink.attr("href")
             val thumbnailUrl = thumbnailCssPattern.find(thumbnailLink.child(0).attr("style"))
                 ?.groupValues?.get(1)
-            val title = gameDiv.getElementsByClass("game_title").first().text()
-            val description = gameDiv.getElementsByClass("game_text").attr("title")
-            val author = gameDiv.getElementsByClass("game_author").first().text()
-            val isAndroid = gameDiv.getElementsByClass("icon-android").isNotEmpty()
+            val title = gameDiv.selectFirst(".game_title").text()
+            val description = gameDiv.selectFirst(".game_text").attr("title")
+            val author = gameDiv.selectFirst(".game_author").text()
+            val isAndroid = gameDiv.selectFirst("icon-android") != null
 
             items.add(
                 ItchLibraryItem(

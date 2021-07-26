@@ -1,8 +1,10 @@
 package ua.gardenapple.itchupdater.client
 
+import android.graphics.Color
 import android.net.Uri
 import android.util.Log
 import android.webkit.CookieManager
+import androidx.core.graphics.ColorUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
@@ -12,6 +14,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.Mitch
+import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 import java.io.IOException
@@ -24,15 +27,26 @@ object ItchWebsiteParser {
     data class DownloadUrl(val url: String, val isPermanent: Boolean, val isStorePage: Boolean) {
         val downloadKey: String?
             get() {
-                if (isStorePage || !isPermanent)
+                if (isFree)
                     return null
                 return Uri.parse(url).lastPathSegment
             }
-//
-//        override fun toString(): String {
-//            return "{ URL: $url, is permanent?: $isPermanent, is store page?: $isStorePage }"
-//        }
+
+        val isFree: Boolean
+            get() {
+                return isStorePage || !isPermanent
+            }
     }
+
+    data class PurchasedInfo(
+        val ownershipReasonHtml: String,
+        val downloadPage: String
+    )
+
+    data class PaymentInfo(
+        val messageHtml: String,
+        val isPaymentOptional: Boolean
+    )
 
     private const val LOGGING_TAG = "ItchWebsiteParser"
     const val UNKNOWN_LOCALE = "Unknown"
@@ -43,12 +57,12 @@ object ItchWebsiteParser {
         Log.d(LOGGING_TAG, "Getting info for $gamePageUrl")
         val name: String = getGameName(storePageDoc)
 
-        val thumbnails = storePageDoc.head().getElementsByAttributeValue("property", "og:image")
-        var thumbnailUrl = ""
-        if (thumbnails.isNotEmpty()) {
-            thumbnailUrl = thumbnails[0].attr("content")
+        val thumbnail = storePageDoc.head().selectFirst("[property=\"og:image\"]")
+        val thumbnailUrl = if (thumbnail != null) {
+            thumbnail.attr("content")
         } else {
             Log.d(LOGGING_TAG, "No thumbnail!")
+            null
         }
 
         val infoTable = getInfoTable(storePageDoc)
@@ -79,6 +93,10 @@ object ItchWebsiteParser {
             return installList.first()
     }
 
+    fun hasAndroidInstallation(doc: Document): Boolean {
+        return doc.selectFirst(".icon-android") != null
+    }
+
     private fun parseInstallations(doc: Document, requiredUploadId: Int?): List<Installation> {
         if (!ItchWebsiteUtils.hasGameDownloadLinks(doc))
             throw IllegalStateException("Unparse-able game page")
@@ -95,7 +113,7 @@ object ItchWebsiteParser {
             }
 
             if (uploadButton == null) {
-                if (doc.getElementsByClass("uploads").isNotEmpty())
+                if (doc.selectFirst(".uploads") != null)
                     throw UploadNotFoundException(requiredUploadId)
                 else
                     throw IllegalStateException("Unparse-able game page")
@@ -125,11 +143,11 @@ object ItchWebsiteParser {
                     platforms = platforms or Installation.PLATFORM_LINUX
             }
 
-            val uploadNameDiv = uploadDiv.getElementsByClass("upload_name")[0]
-            val name = uploadNameDiv.getElementsByClass("name").attr("title")
-            val fileSize = uploadNameDiv.getElementsByClass("file_size")[0].child(0).html()
+            val uploadNameDiv = uploadDiv.selectFirst(".upload_name")
+            val name = uploadNameDiv.selectFirst(".name").attr("title")
+            val fileSize = uploadNameDiv.selectFirst(".file_size").child(0).html()
             val uploadId = requiredUploadId
-                ?: Integer.parseInt(uploadDiv.getElementsByClass("download_btn")[0].attr("data-upload_id"))
+                ?: Integer.parseInt(uploadDiv.selectFirst(".download_btn").attr("data-upload_id"))
 
             //These may or may not exist
             var versionName: String? = null
@@ -140,13 +158,13 @@ object ItchWebsiteParser {
                 if (buildRow.hasClass("upload_date"))
                     versionDate = buildRow.child(0).attr("title")
 
-                var elements = buildRow.getElementsByClass("version_name")
-                if (elements.isNotEmpty())
-                    versionName = elements[0].html()
+                val versionNameDiv = buildRow.selectFirst(".version_name")
+                if (versionNameDiv != null)
+                    versionName = versionNameDiv.html()
 
-                elements = buildRow.getElementsByClass("version_date")
-                if (elements.isNotEmpty())
-                    versionDate = elements[0].child(0).attr("title")
+                val versionDateDiv = buildRow.selectFirst(".version_date")
+                if (versionDateDiv != null)
+                    versionDate = versionDateDiv.child(0).attr("title")
             }
             result.add(
                 Installation(
@@ -174,30 +192,81 @@ object ItchWebsiteParser {
     }
 
     /**
+     * @return null if the user did not purchase this item
+     */
+    fun getPurchasedInfo(doc: Document): PurchasedInfo? {
+        val purchaseBanner = doc.selectFirst(".purchase_banner_inner") ?: return null
+
+        Log.d(LOGGING_TAG, "Purchased game")
+        val downloadButtonRow = purchaseBanner.getElementsByClass("key_row").sortedBy {
+            val price = it.selectFirst(".purchase_price") ?: return@sortedBy 0
+
+            Log.d(LOGGING_TAG, "Paid: ${price.html().removePrefix("$").replace(".", "")}")
+            return@sortedBy price.html().removePrefix("$").replace(".", "").toInt()
+        }.last()
+
+
+        //Reformat cloned element
+
+        val ownershipReason = downloadButtonRow.selectFirst(".ownership_reason").clone()
+
+        val purchasedPrice = ownershipReason.selectFirst(".purchase_price")
+        purchasedPrice.replaceWith(Element("b").text(purchasedPrice.ownText()))
+
+        val ownDate = ownershipReason.selectFirst(".own_date")
+        ownDate.replaceWith(Element("i").text(ownDate.ownText()))
+
+
+        return PurchasedInfo(
+            ownershipReasonHtml = ownershipReason.html(),
+            downloadPage = downloadButtonRow.selectFirst(".button").attr("href")
+        )
+    }
+
+    /**
+     * Should be called if [getPurchasedInfo] returns null
+     * @return null if the game does not accept payments
+     */
+    fun getPaymentInfo(doc: Document): PaymentInfo? {
+        val message = doc.selectFirst(".buy_message")?.clone() ?: return null
+        val price = message.selectFirst("[itemprop=price]")
+        val sub = message.selectFirst(".sub")
+
+        if (sub != null) {
+            val color = Utils.asHexCode(ColorUtils.blendARGB(
+                ItchWebsiteUtils.getBackgroundUIColor(doc)!!,
+                Color.WHITE,
+                0.5f
+            ))
+            sub.replaceWith(Element("span")
+                .text(sub.ownText())
+                .attr("style", "color: $color")
+            )
+        }
+
+        if (price != null) {
+            val color = Utils.asHexCode(ItchWebsiteUtils.getAccentFgUIColor(doc)!!)
+            price.replaceWith(Element("b")
+                .text(price.ownText())
+                .attr("style", "color: $color")
+            )
+            return PaymentInfo(messageHtml = message.html(), isPaymentOptional = false)
+        }
+        return PaymentInfo(messageHtml = message.html(), isPaymentOptional = true)
+    }
+
+    /**
      * @return null if user does not have access
      */
     suspend fun getDownloadUrl(doc: Document, storeUrl: String): DownloadUrl? =
         withContext(Dispatchers.IO) {
             //The game has been bought
-            var elements = doc.getElementsByClass("purchase_banner_inner")
-            if (elements.isNotEmpty()) {
-                Log.d(LOGGING_TAG, "Purchased game")
-                val downloadButtonRows = elements[0].getElementsByClass("key_row").sortedBy {
-                    elements = it.getElementsByClass("purchase_price")
-
-                    return@sortedBy if (elements.isNotEmpty()) {
-                        Log.d(LOGGING_TAG, "Paid: ${elements[0].html().removePrefix("$").replace(".", "")}")
-                        elements[0].html().removePrefix("$").replace(".", "").toInt()
-                    } else 0
-                }
-                return@withContext DownloadUrl(
-                    downloadButtonRows.last()!!.child(0).attr("href"),
-                    isPermanent = true, isStorePage = false
-                )
-            }
+            val purchaseInfo = getPurchasedInfo(doc)
+            if (purchaseInfo != null)
+                return@withContext DownloadUrl(purchaseInfo.downloadPage, isPermanent = true, isStorePage = false)
 
             //The game is free and the store page provides download links
-            if (doc.getElementsByClass("download_btn").isNotEmpty())
+            if (doc.selectFirst("download_btn") != null)
                 return@withContext DownloadUrl(storeUrl, isPermanent = true, isStorePage = true)
 
             //The game is free but accepts donations and hasn't been paid for
@@ -287,10 +356,7 @@ object ItchWebsiteParser {
 
     private fun getAuthorName(gamePageUri: Uri, infoTable: Element): String {
         Log.d(LOGGING_TAG, "Author URL: ${getAuthorUrlFromGamePage(gamePageUri)}")
-        return infoTable.getElementsByAttributeValue(
-            "href",
-            getAuthorUrlFromGamePage(gamePageUri)
-        )[0].html()
+        return infoTable.selectFirst("[href=\"${getAuthorUrlFromGamePage(gamePageUri)}\"]").html()
     }
 
     /*fun getAuthorName(doc: Document, gamePageUri: Uri): String {
@@ -298,16 +364,16 @@ object ItchWebsiteParser {
     }*/
 
     private fun getInfoTable(doc: Document): Element {
-        return doc.body().getElementsByClass("game_info_panel_widget")[0].child(0).child(0)
+        return doc.body().selectFirst(".game_info_panel_widget").child(0).child(0)
     }
 
     fun getGameName(doc: Document): String {
         if (ItchWebsiteUtils.isPurchasePage(doc)) {
-            return doc.getElementsByTag("h1")[0].child(0).text()
+            return doc.selectFirst("h1").child(0).text()
         }
 
         if (ItchWebsiteUtils.isDownloadPage(doc)) {
-            return doc.getElementsByTag("h2")[0].child(0).text()
+            return doc.selectFirst("h2").child(0).text()
         }
 
         if (ItchWebsiteUtils.isStorePage(doc)) {
@@ -319,8 +385,8 @@ object ItchWebsiteParser {
         }
 
         if (ItchWebsiteUtils.isDevlogPage(doc)) {
-            return (doc.getElementsByClass("game_title").firstOrNull()
-                ?: doc.getElementsByClass("game_metadata")[0].getElementsByTag("h3")[0])
+            return (doc.selectFirst(".game_title")
+                ?: doc.selectFirst(".game_metadata").selectFirst("h3"))
                 .html()
         }
 
@@ -329,7 +395,7 @@ object ItchWebsiteParser {
 
     fun getUserName(doc: Document): String {
         if (ItchWebsiteUtils.isUserPage(doc)) {
-            return doc.getElementById("profile_header").getElementsByTag("h1")[0].text()
+            return doc.getElementById("profile_header").selectFirst("h1").text()
         }
 
         throw IllegalArgumentException("Document is not a user page")

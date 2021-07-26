@@ -153,10 +153,6 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         outState.putString(ACTIVE_FRAGMENT_KEY, currentFragmentTag)
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
     // Handle light/dark theme changes
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
@@ -300,6 +296,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             PERMISSION_REQUEST_MOVE_TO_DOWNLOADS ->
                 if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)

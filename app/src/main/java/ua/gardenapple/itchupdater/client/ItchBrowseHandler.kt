@@ -43,7 +43,10 @@ class ItchBrowseHandler(
         val isFromSpecialBundle: Boolean,
         val isSpecialBundlePalestinian: Boolean,
         val bundleDownloadLink: String?,
-        val game: Game?
+        val game: Game?,
+        val purchasedInfo: ItchWebsiteParser.PurchasedInfo?,
+        val paymentInfo: ItchWebsiteParser.PaymentInfo?,
+        val hasAndroidVersion: Boolean
     )
 
     suspend fun onPageVisited(doc: Document, url: String): Info {
@@ -53,6 +56,9 @@ class ItchBrowseHandler(
         var bundleLink: String? = null
         var bundlePalestinian: Boolean? = null
         var game: Game? = null
+        var purchasedInfo: ItchWebsiteParser.PurchasedInfo? = null
+        var paymentInfo: ItchWebsiteParser.PaymentInfo? = null
+        var hasAndroidVersion = false
 
         if (ItchWebsiteUtils.isStorePage(doc)) {
             withContext(Dispatchers.IO) {
@@ -67,7 +73,7 @@ class ItchBrowseHandler(
                         val username = ItchWebsiteUtils.getLoggedInUserName(doc)
 
                         bundleLink = SpecialBundleHandler.getLinkForUser(context, false, username)
-                        Log.d(LOGGING_TAG, "Bundle link: $bundleLink")
+//                        Log.d(LOGGING_TAG, "Bundle link: $bundleLink")
                         bundlePalestinian = false
                     }
 
@@ -76,11 +82,15 @@ class ItchBrowseHandler(
                         val username = ItchWebsiteUtils.getLoggedInUserName(doc)
 
                         bundleLink = SpecialBundleHandler.getLinkForUser(context, true, username)
-                        Log.d(LOGGING_TAG, "Bundle link: $bundleLink")
+//                        Log.d(LOGGING_TAG, "Bundle link: $bundleLink")
                         bundlePalestinian = true
                     }
                 }
             }
+            purchasedInfo = ItchWebsiteParser.getPurchasedInfo(doc)
+            if (purchasedInfo == null)
+                paymentInfo = ItchWebsiteParser.getPaymentInfo(doc)
+            hasAndroidVersion = ItchWebsiteParser.hasAndroidInstallation(doc)
         }
         if (ItchWebsiteUtils.hasGameDownloadLinks(doc)) {
             lastDownloadDoc = doc
@@ -100,18 +110,14 @@ class ItchBrowseHandler(
         if (SpecialBundleHandler.checkIsBundleLink(context, doc, url)) {
             Log.d(LOGGING_TAG, "Is bundle link! $url")
         }
-        return bundleLink?.let { link ->
-            Info(
-                isFromSpecialBundle = true,
-                isSpecialBundlePalestinian = bundlePalestinian!!,
-                bundleDownloadLink = link,
-                game = game
-            )
-        } ?: Info(
-            isFromSpecialBundle = false,
-            isSpecialBundlePalestinian = false,
-            bundleDownloadLink = null,
-            game = game
+        return Info(
+            isFromSpecialBundle = bundleLink != null,
+            isSpecialBundlePalestinian = bundlePalestinian == true,
+            bundleDownloadLink = bundleLink,
+            game = game,
+            purchasedInfo = purchasedInfo,
+            paymentInfo = paymentInfo,
+            hasAndroidVersion = hasAndroidVersion
         )
     }
 

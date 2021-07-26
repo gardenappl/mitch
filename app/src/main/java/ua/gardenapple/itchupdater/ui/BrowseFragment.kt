@@ -312,33 +312,69 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         if (doc != null && ItchWebsiteUtils.isStylizedPage(doc)) {
             if (ItchWebsiteUtils.isGamePage(doc)) {
                 //Hide app's navbar after hiding web navbar
-                val navBarHideCallback: (String) -> Unit = {
-                    if (isVisible) {
-                        navBar.visibility = View.GONE
-                        if (info?.isFromSpecialBundle == true) {
-                            bottomGameBar.visibility = View.VISIBLE
+                val navBarHideCallback: (String) -> Unit = navBarHide@{
+                    if (!isVisible)
+                        return@navBarHide
 
-                            //Required for marquee animation
-                            gameButtonInfo.isSelected = true
+                    navBar.visibility = View.GONE
+                    if (info?.purchasedInfo != null) {
+                        bottomGameBar.visibility = View.VISIBLE
 
-                            gameButton.text = getString(R.string.game_bundle_claim)
-                            if (info.isSpecialBundlePalestinian)
-                                gameButtonInfo.text = getString(R.string.game_bundle_palestine)
-                            else
-                                gameButtonInfo.text = getString(R.string.game_bundle_justice)
+                        //Required for marquee animation
+                        gameButtonInfo.isSelected = true
 
-                            gameButton.setOnClickListener {
-                                lifecycleScope.launch {
-                                    SpecialBundleHandler.claimGame(
-                                        info.bundleDownloadLink!!,
-                                        info.game!!
-                                    )
-                                    webView.reload()
-                                }
-                            }
-                        } else {
-                            bottomGameBar.visibility = View.GONE
+                        if (info.hasAndroidVersion)
+                            gameButton.text = getString(R.string.game_install)
+                        else
+                            gameButton.text = getString(R.string.game_download)
+                        gameButtonInfo.text =
+                            Utils.spannedFromHtml(info.purchasedInfo.ownershipReasonHtml)
+
+                        gameButton.setOnClickListener {
+                            mainActivity.browseUrl(info.purchasedInfo.downloadPage)
                         }
+                    } else if (info?.isFromSpecialBundle == true) {
+                        bottomGameBar.visibility = View.VISIBLE
+
+                        //Required for marquee animation
+                        gameButtonInfo.isSelected = true
+
+                        gameButton.text = getString(R.string.game_bundle_claim)
+                        if (info.isSpecialBundlePalestinian)
+                            gameButtonInfo.text = getString(R.string.game_bundle_palestine)
+                        else
+                            gameButtonInfo.text = getString(R.string.game_bundle_justice)
+
+                        gameButton.setOnClickListener {
+                            lifecycleScope.launch {
+                                SpecialBundleHandler.claimGame(
+                                    info.bundleDownloadLink!!,
+                                    info.game!!
+                                )
+                                webView.reload()
+                            }
+                        }
+                    } else if (info?.paymentInfo != null) {
+                        bottomGameBar.visibility = View.VISIBLE
+
+                        if (!info.paymentInfo.isPaymentOptional)
+                            gameButton.text = getString(R.string.game_buy)
+                        else if (info.hasAndroidVersion)
+                            gameButton.text = getString(R.string.game_install)
+                        else
+                            gameButton.text = getString(R.string.game_download)
+
+                        gameButtonInfo.text =
+                            Utils.spannedFromHtml(info.paymentInfo.messageHtml)
+
+                        gameButton.setOnClickListener {
+                            val purchaseUri = Uri.parse(info.game!!.storeUrl)
+                                .buildUpon()
+                                .appendPath("purchase")
+                            mainActivity.browseUrl(purchaseUri.toString())
+                        }
+                    } else {
+                        bottomGameBar.visibility = View.GONE
                     }
                 }
                 if (ItchWebsiteUtils.siteHasNavbar(webView, doc)) {
@@ -347,14 +383,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     setSiteNavbarVisibility(true, navBarHideCallback)
                 }
 
-                val appBarTitle =
-                    "<b>${Html.escapeHtml(ItchWebsiteParser.getGameName(doc))}</b>"
-
-                @Suppress("DEPRECATION")
-                if (Build.VERSION.SDK_INT >= 24)
-                    supportAppBar.title = Html.fromHtml(appBarTitle, 0)
-                else
-                    supportAppBar.title = Html.fromHtml(appBarTitle)
+                supportAppBar.title =
+                    Utils.spannedFromHtml("<b>${Html.escapeHtml(ItchWebsiteParser.getGameName(doc))}</b>")
 
                 appBar.menu.clear()
                 addAppBarActions(appBar, doc)
@@ -395,14 +425,12 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val gameThemeBgColor = doc?.run { ItchWebsiteUtils.getBackgroundUIColor(doc) }
         val gameThemeButtonColor = doc?.run { ItchWebsiteUtils.getAccentUIColor(doc) }
         val gameThemeButtonFgColor = doc?.run { ItchWebsiteUtils.getAccentFgUIColor(doc) }
-        val gameThemeTextColor = doc?.run { ItchWebsiteUtils.getTextColor(doc) }
 
         val accentColor = gameThemeButtonColor ?: defaultAccentColor
         val accentFgColor = gameThemeButtonFgColor ?: defaultWhiteColor
 
         val bgColor = gameThemeBgColor ?: defaultBgColor
         val fgColor = if (gameThemeBgColor == null) defaultFgColor else defaultWhiteColor
-        val miscTextColor = gameThemeTextColor ?: fgColor
 
         fab.mainFabClosedBackgroundColor = accentColor
         fab.mainFabOpenedBackgroundColor = accentColor
@@ -423,7 +451,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         appBar.overflowIcon?.setTint(fgColor)
 
         bottomGameBar.setBackgroundColor(bgColor)
-        gameButtonInfo.setTextColor(miscTextColor)
+        gameButtonInfo.setTextColor(defaultWhiteColor)
         gameButton.setTextColor(accentFgColor)
         gameButton.setBackgroundColor(accentColor)
 
@@ -662,9 +690,14 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         }
                         
                         // remove YouTube banner
-                        let elements = document.getElementsByClassName("youtube_mobile_banner_widget");
+                        let ytBanner = document.querySelector(".youtube_mobile_banner_widget");
+                        if (ytBanner)
+                            ytBanner.style.visibility = "hidden";
+                            
+                        // remove game purchase banners, we implement our own
+                        let elements = document.querySelectorAll(".purchase_banner, .header_buy_row .buy_row, .donate_btn");
                         for (var element of elements)
-                            element.style.visibility = "hidden";
+                            element.style.display = "none";
                     });
                     window.addEventListener("resize", (event) => {
                         mitchCustomJS.onResize();

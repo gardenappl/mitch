@@ -27,7 +27,7 @@ data class Game(
     val storeUrl: String,
 
     /**
-     * Set to null for games where the download page URL is not permament.
+     * Set to null for games where the download page URL is not permanent.
      */
     @ColumnInfo(name = DOWNLOAD_PAGE_URL)
     val downloadPageUrl: String? = null,

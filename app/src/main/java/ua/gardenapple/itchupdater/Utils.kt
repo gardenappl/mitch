@@ -14,6 +14,8 @@ import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.text.Html
+import android.text.Spanned
 import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
@@ -236,5 +238,19 @@ object Utils {
                 else -> false
             }
         }
+    }
+
+    fun spannedFromHtml(htmlString: String): Spanned {
+        if (Build.VERSION.SDK_INT >= 24) {
+            return Html.fromHtml(htmlString, 0)
+        } else {
+            @Suppress("DEPRECATION")
+            return Html.fromHtml(htmlString)
+        }
+    }
+
+    fun asHexCode(@ColorInt color: Int): String {
+        // https://stackoverflow.com/a/6540378/5701177
+        return String.format("#%06X", 0xFFFFFF and color)
     }
 }
