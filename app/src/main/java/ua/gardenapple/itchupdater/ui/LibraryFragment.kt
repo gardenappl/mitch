@@ -178,10 +178,16 @@ class LibraryFragment : Fragment() {
 
         //Re-attaching a fragment will redraw its UI
         //This takes care of changing day/night theme
-        (activity as MainActivity).supportFragmentManager.beginTransaction().apply {
-            detach(this@LibraryFragment)
-            attach(this@LibraryFragment)
-            commit()
+        val manager = requireActivity().supportFragmentManager
+
+        manager.beginTransaction().let {
+            it.detach(this)
+            it.commit()
+        }
+        manager.executePendingTransactions()
+        manager.beginTransaction().let {
+            it.attach(this)
+            it.commit()
         }
     }
 }

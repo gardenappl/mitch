@@ -25,19 +25,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.preferences, rootKey)
     }
 
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        
-        //Re-attaching a fragment will redraw its UI
-        //This takes care of changing day/night theme
-        (activity as MainActivity).supportFragmentManager.beginTransaction().apply {
-            detach(this@SettingsFragment)
-            attach(this@SettingsFragment)
-            commit()
-        }
-    }
-
     override fun onPreferenceTreeClick(preference: Preference?): Boolean {
         if (preference?.key == "cancel_all_downloads") {
             val dialog = AlertDialog.Builder(requireContext()).run {
@@ -74,5 +61,24 @@ class SettingsFragment : PreferenceFragmentCompat() {
             return true
         }
         return false
+    }
+
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        //Re-attaching a fragment will redraw its UI
+        //This takes care of changing day/night theme
+        val manager = requireActivity().supportFragmentManager
+
+        manager.beginTransaction().let {
+            it.detach(this)
+            it.commit()
+        }
+        manager.executePendingTransactions()
+        manager.beginTransaction().let {
+            it.attach(this)
+            it.commit()
+        }
     }
 }

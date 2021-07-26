@@ -27,15 +27,6 @@ class UpdatesFragment : Fragment(), CoroutineScope by MainScope() {
 
     private lateinit var availableResultsViewModel: UpdateCheckResultViewModel
 
-//    private val preferenceChangeListener =
-//        SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
-//            if (key == PREF_LAST_UPDATE_CHECK) {
-//                launch {
-//                    setUpdateCheckInfo(prefs)
-//                }
-//            }
-//        }
-
     companion object {
         const val THUMBNAIL_WIDTH = 315
         const val THUMBNAIL_HEIGHT = 250
@@ -131,10 +122,16 @@ class UpdatesFragment : Fragment(), CoroutineScope by MainScope() {
 
         //Re-attaching a fragment will redraw its UI
         //This takes care of changing day/night theme
-        (activity as MainActivity).supportFragmentManager.beginTransaction().apply {
-            detach(this@UpdatesFragment)
-            attach(this@UpdatesFragment)
-            commit()
+        val manager = requireActivity().supportFragmentManager
+
+        manager.beginTransaction().let {
+            it.detach(this)
+            it.commit()
+        }
+        manager.executePendingTransactions()
+        manager.beginTransaction().let {
+            it.attach(this)
+            it.commit()
         }
     }
 }
