@@ -162,4 +162,8 @@
     <string name="popup_no_network_connection">Checking updates requires a network connection</string>
     <string name="settings_android_only_filter">Android: filter downloadable only</string>
     <string name="settings_android_only_filter_desc">When browsing Android games, hide entries which are available only on other stores.</string>
+    <string name="settings_lang_default">Default</string>
+    <string name="settings_lang_site">Depends on site</string>
+    <string name="settings_lang_system">Depends on system</string>
+    <string name="settings_lang">Language</string>
 </resources>

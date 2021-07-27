@@ -162,4 +162,8 @@
     <string name="game_bundle_palestine">Indie bundle for Palestinian Aid</string>
     <string name="settings_palestine_claim_all">Набір Palestinian Aid: присвоїти все</string>
     <string name="settings_palestine_claim_all_desc">Присвоїти всі ігри з набору Indie bundle for Palestinian Aid.</string>
+    <string name="settings_lang_default">За замовчуванням</string>
+    <string name="settings_lang_site">Як на сайті</string>
+    <string name="settings_lang_system">Як у системі</string>
+    <string name="settings_lang">Мова</string>
 </resources>
