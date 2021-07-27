@@ -168,4 +168,8 @@
     <string name="game_download">Last ned</string>
     <string name="game_buy">Kjøp</string>
     <string name="popup_handler_app_not_found">Vet ikke hvordan %s skal åpnes</string>
+    <string name="settings_lang">Språk</string>
+    <string name="settings_lang_system">Avhengig av system</string>
+    <string name="settings_lang_site">Avhengig av side</string>
+    <string name="settings_lang_default">Forvalg</string>
 </resources>
