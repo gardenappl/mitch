@@ -64,16 +64,31 @@ class Mitch : Application() {
     companion object {
         const val LOGGING_TAG: String = "MitchApp"
 
-        lateinit var httpClient: OkHttpClient
-            private set
-        lateinit var fileManager: DownloadFileManager
-            private set
-        lateinit var externalFileManager: ExternalFileManager
-            private set
-        //The only Context that this uses is applicationContext, so it should be okay
-        @SuppressLint("StaticFieldLeak")
-        lateinit var databaseHandler: InstallerDatabaseHandler
-            private set
+        // Used for lazy initialization
+        private lateinit var applicationContext: Context
+        private lateinit var cacheDir: File
+
+        val httpClient: OkHttpClient by lazy {
+            val okHttpCacheDir = File(this.cacheDir, "OkHttp")
+            okHttpCacheDir.mkdirs()
+
+            return@lazy OkHttpClient.Builder().run {
+                cache(Cache(
+                    directory = okHttpCacheDir,
+                    maxSize = 10L * 1024 * 1024 //10 MB
+                ))
+                build()
+            }
+        }
+        val fileManager: DownloadFileManager by lazy {
+            val downloadFileManager = DownloadFileManager(applicationContext)
+            downloadFileManager.setup()
+            return@lazy fileManager
+        }
+        val externalFileManager = ExternalFileManager()
+        val databaseHandler: InstallerDatabaseHandler by lazy {
+            InstallerDatabaseHandler(applicationContext)
+        }
     }
 
     private val preferenceChangeListener =
@@ -90,6 +105,9 @@ class Mitch : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        Mitch.cacheDir = cacheDir
+        Mitch.applicationContext = applicationContext
 
         if (ACRA.isACRASenderServiceProcess())
             return
@@ -144,21 +162,6 @@ class Mitch : Application() {
         registerUpdateCheckTask(!workOnMetered, ExistingPeriodicWorkPolicy.KEEP)
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
-
-        val okHttpCacheDir = File(cacheDir, "OkHttp")
-        okHttpCacheDir.mkdirs()
-        httpClient = OkHttpClient.Builder().run {
-            cache(Cache(
-                directory = okHttpCacheDir,
-                maxSize = 10L * 1024 * 1024 //10 MB
-            ))
-            build()
-        }
-        fileManager = DownloadFileManager(applicationContext)
-        fileManager.setup()
-
-        databaseHandler = InstallerDatabaseHandler(applicationContext)
-        externalFileManager = ExternalFileManager()
 
 
         WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(

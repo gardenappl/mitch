@@ -40,13 +40,6 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //Force database to fully initialize while splash screen is on
-        runBlocking(Dispatchers.IO) {
-            val db = AppDatabase.getDatabase(this@MainActivity)
-            if (!db.isOpen)
-                db.installDao.getInstallationByPackageName(packageName)
-        }
-        
         //Initially set to SplashScreenTheme during loading, this sets the proper theme
         setTheme(R.style.AppTheme_NoActionBar)
         super.onCreate(savedInstanceState)

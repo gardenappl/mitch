@@ -72,13 +72,13 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         super.onCreateView(inflater, container, savedInstanceState)
 
         _binding = BrowseFragmentBinding.inflate(inflater, container, false)
+        webView = binding.webView
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        webView = view.findViewById(R.id.webView)
         chromeClient = MitchWebChromeClient()
 
         @SuppressLint("SetJavaScriptEnabled")
