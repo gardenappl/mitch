@@ -1,4 +1,4 @@
 * Add Arabic, Turkish, Norwegian Bokmål translations
-* Fix wrong upate check result after changing language
+* Fix wrong update-check result after changing language
 * Updates list is now vertical instead of horizontal (whoops)
 * Fix error while reporting error for update checking (whoops)
