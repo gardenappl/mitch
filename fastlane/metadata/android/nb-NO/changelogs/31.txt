@@ -1,0 +1,4 @@
+* Norsk bokmål, tyrkisk og arabisk oversettelse
+* Fikset feilaktig oppdateringssjekk etter bytte av språk
+* Oppdateringslisten er nå loddrett istedenfor vannrett
+* Fikset feil under rapportering av feil for oppdateringssjekk
