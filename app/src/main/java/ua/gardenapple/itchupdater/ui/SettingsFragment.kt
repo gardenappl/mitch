@@ -1,20 +1,21 @@
 package ua.gardenapple.itchupdater.ui
 
 import android.app.NotificationManager
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.work.ExistingPeriodicWorkPolicy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import ua.gardenapple.itchupdater.Mitch
-import ua.gardenapple.itchupdater.NOTIFICATION_CHANNEL_ID_INSTALLING
-import ua.gardenapple.itchupdater.R
+import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.DatabaseCleanup
 import ua.gardenapple.itchupdater.database.installation.Installation
@@ -62,7 +63,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
         return false
     }
-
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)

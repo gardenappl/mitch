@@ -166,4 +166,6 @@
     <string name="settings_lang_site">Depends on site</string>
     <string name="settings_lang_system">Depends on system</string>
     <string name="settings_lang">Language</string>
+    <string name="dialog_lang_restart_title">Language changed</string>
+    <string name="dialog_lang_restart">The app will restart to apply the new language</string>
 </resources>

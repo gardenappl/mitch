@@ -166,4 +166,6 @@
     <string name="settings_lang_site">Як на сайті</string>
     <string name="settings_lang_system">Як у системі</string>
     <string name="settings_lang">Мова</string>
+    <string name="dialog_lang_restart_title">Зміна мови</string>
+    <string name="dialog_lang_restart">Додаток перезапуститься з новою мовою</string>
 </resources>

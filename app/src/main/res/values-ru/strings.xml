@@ -170,4 +170,6 @@
     <string name="settings_lang_site">Как у сайта</string>
     <string name="settings_lang_system">Как у системы</string>
     <string name="settings_lang">Язык</string>
+    <string name="dialog_lang_restart_title">Смена языка</string>
+    <string name="dialog_lang_restart">Приложение перезапустится, чтобы сменить язык</string>
 </resources>

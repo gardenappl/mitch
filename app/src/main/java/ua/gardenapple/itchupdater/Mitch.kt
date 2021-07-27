@@ -8,10 +8,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import androidx.work.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import org.acra.ACRA
@@ -20,8 +23,11 @@ import org.acra.config.DialogConfigurationBuilder
 import org.acra.config.MailSenderConfigurationBuilder
 import org.acra.data.StringFormat
 import ua.gardenapple.itchupdater.client.UpdateChecker
+import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.DatabaseCleanup
+import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.files.*
+import ua.gardenapple.itchupdater.install.Installations
 import ua.gardenapple.itchupdater.install.InstallerDatabaseHandler
 import ua.gardenapple.itchupdater.ui.CrashDialog
 import ua.gardenapple.itchupdater.ui.MitchContextWrapper
@@ -60,6 +66,9 @@ const val PREF_PREFIX_PALESTINE_LINK = "mitch.palestine_"
 const val PREF_PREFIX_PALESTINE_LAST_CHECK = "mitch.palestinetimestamp_"
 const val PREF_WEB_ANDROID_FILTER = "ua.gardenapple.itchupdater.web_android_filter"
 const val PREF_LANG = "mitch.lang"
+/**
+ * Locale is not controlled directly by the user; instead, it is managed automatically in Mitch.kt
+ */
 const val PREF_LANG_LOCALE = "mitch.lang_locale"
 const val PREF_LANG_SITE_LOCALE = "mitch.lang_site_locale"
 
@@ -99,7 +108,6 @@ class Mitch : Application() {
 
     private val preferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
-            Log.d(LOGGING_TAG, "Changed $key !")
             when (key) {
                 "preference_update_check_if_metered" -> {
                     registerUpdateCheckTask(prefs.getBoolean(key, false),
@@ -222,19 +230,21 @@ class Mitch : Application() {
     }
 
     private fun setLangFromPreferences(prefs: SharedPreferences) {
-        prefs.edit(true) {
-            val newLocale = when (prefs.getString(PREF_LANG, "default")) {
-                "system" -> Utils.getPreferredLocale(applicationContext).toLanguageTag()
-                "site" -> prefs.getString(PREF_LANG_SITE_LOCALE, "en")
-                else -> {
-                    val siteLocale = prefs.getString(PREF_LANG_SITE_LOCALE, "en")
-                    if (siteLocale == "en")
-                        Utils.getPreferredLocale(applicationContext).toLanguageTag()
-                    else
-                        siteLocale
-                }
+        val systemLocale = Utils.getPreferredLocale(applicationContext).toLanguageTag()
+        val newLocale = when (prefs.getString(PREF_LANG, "default")) {
+            "system" -> systemLocale
+            "site" -> prefs.getString(PREF_LANG_SITE_LOCALE, "en")
+            else -> {
+                val siteLocale = prefs.getString(PREF_LANG_SITE_LOCALE, "en")
+                if (siteLocale == "en")
+                    systemLocale
+                else
+                    siteLocale
             }
-            putString(PREF_LANG_LOCALE, newLocale)
+        }
+        prefs.edit(true) {
+            if (newLocale != prefs.getString(PREF_LANG_LOCALE, systemLocale))
+                putString(PREF_LANG_LOCALE, newLocale)
         }
     }
 

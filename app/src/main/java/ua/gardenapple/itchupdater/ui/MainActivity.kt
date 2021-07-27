@@ -1,17 +1,24 @@
 package ua.gardenapple.itchupdater.ui
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.preference.PreferenceManager
+import androidx.work.ExistingPeriodicWorkPolicy
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -20,7 +27,9 @@ import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.DatabaseCleanup
 import ua.gardenapple.itchupdater.databinding.ActivityMainBinding
 
-
+/**
+ * The MainActiviry handles a lot of things, including day/night themes and languages
+ */
 class MainActivity : MitchActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
     private lateinit var browseFragment: BrowseFragment
     private lateinit var currentFragmentTag: String
@@ -28,7 +37,45 @@ class MainActivity : MitchActivity(), ActivityCompat.OnRequestPermissionsResultC
     lateinit var binding: ActivityMainBinding
     private set
 
+    /**
+     * The restart dialog is handled here.
+     * Yes, this means that if the language changes outside of MainActivity,
+     * then there will be no dialog.
+     */
+    private val langChangeListener =
+        SharedPreferences.OnSharedPreferenceChangeListener langChange@{ prefs, key ->
+            if (key != PREF_LANG_LOCALE)
+                return@langChange
+
+            Log.d(LOGGING_TAG, "lang changed to ${prefs.getString(PREF_LANG_LOCALE, "null?")}")
+
+            AlertDialog.Builder(this).run {
+                setTitle(R.string.dialog_lang_restart_title)
+                setMessage(R.string.dialog_lang_restart)
+                setIcon(R.drawable.ic_baseline_warning_24)
+
+                setPositiveButton(android.R.string.ok) { _, _ ->
+                    //Restart app https://stackoverflow.com/a/22345538/5701177
+                    val intent = Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(browseFragment.webView.url),
+                        context,
+                        MainActivity::class.java
+                    )
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
+                    finish()
+                    Runtime.getRuntime().exit(0);
+                }
+
+                setCancelable(false)
+                show()
+            }
+        }
+
     companion object {
+        const val LOGGING_TAG = "MainActivity"
+
         const val EXTRA_SHOULD_OPEN_LIBRARY = "SHOULD_OPEN_LIBRARY"
         
         private const val ACTIVE_FRAGMENT_KEY: String = "fragment"
@@ -128,6 +175,18 @@ class MainActivity : MitchActivity(), ActivityCompat.OnRequestPermissionsResultC
         } else if (intent.getBooleanExtra(EXTRA_SHOULD_OPEN_LIBRARY, false)) {
             setActiveFragment(LIBRARY_FRAGMENT_TAG)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .registerOnSharedPreferenceChangeListener(langChangeListener)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .unregisterOnSharedPreferenceChangeListener(langChangeListener)
     }
 
     override fun onBackPressed() {
@@ -286,6 +345,7 @@ class MainActivity : MitchActivity(), ActivityCompat.OnRequestPermissionsResultC
             else -> throw IllegalArgumentException()
         }
     }
+
 
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
