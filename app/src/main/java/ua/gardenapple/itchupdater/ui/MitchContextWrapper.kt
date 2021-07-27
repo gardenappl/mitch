@@ -6,6 +6,7 @@ import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.os.Build
 import android.util.Log
+import ua.gardenapple.itchupdater.Utils
 import java.util.*
 
 
@@ -19,12 +20,12 @@ class MitchContextWrapper private constructor(val systemLocale: Locale, base: Co
         const val LOGGING_TAG = "MitchContextWrapper"
 
         @JvmStatic
-        fun wrap(context: Context, language: String): ContextWrapper {
+        fun wrap(context: Context, language: String): MitchContextWrapper {
             val config = context.resources.configuration
 
-            val systemLocale = getLocale(config)
-            Log.d(LOGGING_TAG, "Current locale: $systemLocale")
-            Log.d(LOGGING_TAG, "Wrapper locale: $language")
+            val systemLocale = Utils.getPreferredLocale(config)
+//            Log.d(LOGGING_TAG, "Current locale: $systemLocale")
+//            Log.d(LOGGING_TAG, "Wrapper locale: $language")
 
             if (language != "" && systemLocale.language != language) {
                 val langComponents = language.split('_', '-')
@@ -45,15 +46,6 @@ class MitchContextWrapper private constructor(val systemLocale: Locale, base: Co
             }
 
             return MitchContextWrapper(systemLocale, wrappedContext)
-        }
-
-        private fun getLocale(config: Configuration): Locale {
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
-                return config.locales.get(0)
-            } else {
-                @Suppress("deprecation")
-                return config.locale
-            }
         }
 
         private fun setLocale(config: Configuration, locale: Locale) {

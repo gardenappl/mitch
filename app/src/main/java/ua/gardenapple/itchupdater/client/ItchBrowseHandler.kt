@@ -3,6 +3,7 @@ package ua.gardenapple.itchupdater.client
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -10,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
+import ua.gardenapple.itchupdater.PREF_LANG_SITE_LOCALE
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.data.JusticeBundleGameIDs
 import ua.gardenapple.itchupdater.data.PalestineBundleGameIDs
@@ -97,14 +99,18 @@ class ItchBrowseHandler(
             lastDownloadPageUrl = url
             tryStartDownload()
         }
-        if (!ItchWebsiteUtils.isStylizedPage(doc)) {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            preferences.edit().also {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        prefs.edit(true) {
+            if (!ItchWebsiteUtils.isStylizedPage(doc)) {
                 if (ItchWebsiteUtils.isDarkTheme(doc))
-                    it.putString("current_site_theme", "dark")
+                    putString("current_site_theme", "dark")
                 else
-                    it.putString("current_site_theme", "light")
-                it.apply()
+                    putString("current_site_theme", "light")
+            }
+            val locale = ItchWebsiteParser.getLocale(doc)
+            if (locale != ItchWebsiteParser.UNKNOWN_LOCALE) {
+                Log.d(LOGGING_TAG, "Site locale is $locale")
+                putString(PREF_LANG_SITE_LOCALE, locale)
             }
         }
         if (SpecialBundleHandler.checkIsBundleLink(context, doc, url)) {

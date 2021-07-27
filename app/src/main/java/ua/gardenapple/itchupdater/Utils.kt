@@ -26,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.*
+import java.util.*
 import kotlin.math.min
 
 
@@ -252,5 +253,18 @@ object Utils {
     fun asHexCode(@ColorInt color: Int): String {
         // https://stackoverflow.com/a/6540378/5701177
         return String.format("#%06X", 0xFFFFFF and color)
+    }
+
+    fun getPreferredLocale(config: Configuration): Locale {
+        return if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
+            return config.locales.get(0)
+        } else {
+            @Suppress("deprecation")
+            return config.locale
+        }
+    }
+
+    fun getPreferredLocale(context: Context): Locale {
+        return getPreferredLocale(context.resources.configuration)
     }
 }

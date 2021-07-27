@@ -40,4 +40,15 @@
         <item>native</item>
         <item>session</item>
     </string-array>
+
+    <string-array name="pref_lang_entries">
+        <item>@string/settings_lang_default</item>
+        <item>@string/settings_lang_site</item>
+        <item>@string/settings_lang_system</item>
+    </string-array>
+    <string-array name="pref_lang_values">
+        <item>default</item>
+        <item>site</item>
+        <item>system</item>
+    </string-array>
 </resources>

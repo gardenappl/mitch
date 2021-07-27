@@ -7,7 +7,9 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import androidx.work.*
 import okhttp3.Cache
@@ -22,6 +24,7 @@ import ua.gardenapple.itchupdater.database.DatabaseCleanup
 import ua.gardenapple.itchupdater.files.*
 import ua.gardenapple.itchupdater.install.InstallerDatabaseHandler
 import ua.gardenapple.itchupdater.ui.CrashDialog
+import ua.gardenapple.itchupdater.ui.MitchContextWrapper
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -56,6 +59,9 @@ const val PREF_PALESTINE_LINK = "mitch.palestine"
 const val PREF_PREFIX_PALESTINE_LINK = "mitch.palestine_"
 const val PREF_PREFIX_PALESTINE_LAST_CHECK = "mitch.palestinetimestamp_"
 const val PREF_WEB_ANDROID_FILTER = "ua.gardenapple.itchupdater.web_android_filter"
+const val PREF_LANG = "mitch.lang"
+const val PREF_LANG_LOCALE = "mitch.lang_locale"
+const val PREF_LANG_SITE_LOCALE = "mitch.lang_site_locale"
 
 
 
@@ -64,8 +70,8 @@ class Mitch : Application() {
     companion object {
         const val LOGGING_TAG: String = "MitchApp"
 
-        // Used for lazy initialization
-        private lateinit var applicationContext: Context
+        // Used for lazy initialization, and for locale stuff
+        private lateinit var mitchContext: MitchContextWrapper
         private lateinit var cacheDir: File
 
         val httpClient: OkHttpClient by lazy {
@@ -81,18 +87,19 @@ class Mitch : Application() {
             }
         }
         val fileManager: DownloadFileManager by lazy {
-            val downloadFileManager = DownloadFileManager(applicationContext)
+            val downloadFileManager = DownloadFileManager(mitchContext)
             downloadFileManager.setup()
             return@lazy fileManager
         }
         val externalFileManager = ExternalFileManager()
         val databaseHandler: InstallerDatabaseHandler by lazy {
-            InstallerDatabaseHandler(applicationContext)
+            InstallerDatabaseHandler(mitchContext)
         }
     }
 
     private val preferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
+            Log.d(LOGGING_TAG, "Changed $key !")
             when (key) {
                 "preference_update_check_if_metered" -> {
                     registerUpdateCheckTask(prefs.getBoolean(key, false),
@@ -100,19 +107,27 @@ class Mitch : Application() {
                 }
                 "preference_theme",
                 "current_site_theme" -> setThemeFromPreferences(prefs)
+                PREF_LANG,
+                PREF_LANG_SITE_LOCALE -> setLangFromPreferences(prefs)
             }
         }
 
+
     override fun onCreate() {
         super.onCreate()
-
-        Mitch.cacheDir = cacheDir
-        Mitch.applicationContext = applicationContext
-
         if (ACRA.isACRASenderServiceProcess())
             return
 
-        setThemeFromPreferences(PreferenceManager.getDefaultSharedPreferences(this))
+
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        setThemeFromPreferences(sharedPreferences)
+        setLangFromPreferences(sharedPreferences)
+
+        mitchContext = MitchContextWrapper.wrap(applicationContext,
+            sharedPreferences.getString(PREF_LANG_LOCALE, "en")!!)
+        Mitch.cacheDir = cacheDir
+
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             var name = getString(R.string.notification_channel_install)
@@ -156,13 +171,10 @@ class Mitch : Application() {
             notificationManager.createNotificationChannel(channel)
         }
 
-
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val workOnMetered = sharedPreferences.getBoolean("preference_update_check_if_metered", true)
         registerUpdateCheckTask(!workOnMetered, ExistingPeriodicWorkPolicy.KEEP)
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
-
 
         WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
             DB_CLEAN_TASK_TAG,
@@ -206,6 +218,23 @@ class Mitch : Application() {
                 "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             }
+        }
+    }
+
+    private fun setLangFromPreferences(prefs: SharedPreferences) {
+        prefs.edit(true) {
+            val newLocale = when (prefs.getString(PREF_LANG, "default")) {
+                "system" -> Utils.getPreferredLocale(applicationContext).toLanguageTag()
+                "site" -> prefs.getString(PREF_LANG_SITE_LOCALE, "en")
+                else -> {
+                    val siteLocale = prefs.getString(PREF_LANG_SITE_LOCALE, "en")
+                    if (siteLocale == "en")
+                        Utils.getPreferredLocale(applicationContext).toLanguageTag()
+                    else
+                        siteLocale
+                }
+            }
+            putString(PREF_LANG_LOCALE, newLocale)
         }
     }
 

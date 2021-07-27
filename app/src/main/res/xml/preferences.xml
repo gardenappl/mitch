@@ -35,6 +35,13 @@
                 android:key="preference_theme"
                 android:summary="%s"
                 android:title="@string/settings_theme" />
+        <ListPreference
+                android:defaultValue="default"
+                android:entries="@array/pref_lang_entries"
+                android:entryValues="@array/pref_lang_values"
+                android:key="mitch.lang"
+                android:summary="%s"
+                android:title="@string/settings_lang" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_category_advanced">
         <ListPreference
