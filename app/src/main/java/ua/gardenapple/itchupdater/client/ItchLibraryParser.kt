@@ -77,7 +77,7 @@ object ItchLibraryParser {
 //                Log.d(LOGGING_TAG, "Game $title has no description, hmm")
 //            }
             val author = gameDiv.selectFirst(".game_author").text()
-            val isAndroid = gameDiv.selectFirst("icon-android") != null
+            val isAndroid = gameDiv.selectFirst(".icon-android") != null
 
             items.add(
                 ItchLibraryItem(

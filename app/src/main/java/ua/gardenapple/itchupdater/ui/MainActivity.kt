@@ -21,7 +21,7 @@ import ua.gardenapple.itchupdater.database.DatabaseCleanup
 import ua.gardenapple.itchupdater.databinding.ActivityMainBinding
 
 
-class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
+class MainActivity : MitchActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
     private lateinit var browseFragment: BrowseFragment
     private lateinit var currentFragmentTag: String
 
