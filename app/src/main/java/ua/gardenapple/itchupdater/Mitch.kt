@@ -83,22 +83,23 @@ class Mitch : Application() {
         private lateinit var mitchContext: MitchContextWrapper
         private lateinit var cacheDir: File
 
-        val httpClient: OkHttpClient by lazy {
-            val okHttpCacheDir = File(this.cacheDir, "OkHttp")
-            okHttpCacheDir.mkdirs()
+        // Be careful with lazy init to avoid circular dependency, I'm stupid
 
-            return@lazy OkHttpClient.Builder().run {
-                cache(Cache(
+        val httpClient: OkHttpClient by lazy {
+            OkHttpClient.Builder().let {
+                val okHttpCacheDir = File(Mitch.cacheDir, "OkHttp")
+                okHttpCacheDir.mkdirs()
+                it.cache(Cache(
                     directory = okHttpCacheDir,
                     maxSize = 10L * 1024 * 1024 //10 MB
                 ))
-                build()
+                it.build()
             }
         }
         val fileManager: DownloadFileManager by lazy {
-            val downloadFileManager = DownloadFileManager(mitchContext)
-            downloadFileManager.setup()
-            return@lazy fileManager
+            DownloadFileManager(mitchContext).apply {
+                setup()
+            }
         }
         val externalFileManager = ExternalFileManager()
         val databaseHandler: InstallerDatabaseHandler by lazy {
