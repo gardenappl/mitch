@@ -31,6 +31,7 @@ import ua.gardenapple.itchupdater.files.*
 import ua.gardenapple.itchupdater.install.Installations
 import ua.gardenapple.itchupdater.install.InstallerDatabaseHandler
 import ua.gardenapple.itchupdater.ui.CrashDialog
+import ua.gardenapple.itchupdater.ui.MainActivity
 import ua.gardenapple.itchupdater.ui.MitchContextWrapper
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -70,9 +71,11 @@ const val PREF_PREFIX_PALESTINE_LAST_CHECK = "mitch.palestinetimestamp_"
 const val PREF_WEB_ANDROID_FILTER = "ua.gardenapple.itchupdater.web_android_filter"
 const val PREF_LANG = "mitch.lang"
 /**
- * Locale is not controlled directly by the user; instead, it is managed automatically in Mitch.kt
+ * Locale is not controlled directly by the user; instead, Mitch.kt applies
+ * [PREF_LANG_LOCALE_NEXT], and then [PREF_LANG_LOCALE] gets applied on next app restart
  */
 const val PREF_LANG_LOCALE = "mitch.lang_locale"
+const val PREF_LANG_LOCALE_NEXT = "mitch.lang_locale_next"
 const val PREF_LANG_SITE_LOCALE = "mitch.lang_site_locale"
 
 
@@ -132,8 +135,16 @@ class Mitch : Application() {
 
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        setThemeFromPreferences(sharedPreferences)
+
+        sharedPreferences.edit(true) {
+            val nextLocale = sharedPreferences.getString(PREF_LANG_LOCALE_NEXT, null)
+            if (nextLocale != null) {
+                remove(PREF_LANG_LOCALE_NEXT)
+                putString(PREF_LANG_LOCALE, nextLocale)
+            }
+        }
         setLangFromPreferences(sharedPreferences)
+        setThemeFromPreferences(sharedPreferences)
 
         mitchContext = MitchContextWrapper.wrap(applicationContext,
             sharedPreferences.getString(PREF_LANG_LOCALE, "en")!!)
@@ -247,8 +258,9 @@ class Mitch : Application() {
             }
         }
         prefs.edit(true) {
-            if (newLocale != prefs.getString(PREF_LANG_LOCALE, systemLocale))
-                putString(PREF_LANG_LOCALE, newLocale)
+            if (newLocale != prefs.getString(PREF_LANG_LOCALE_NEXT,
+                    prefs.getString(PREF_LANG_LOCALE, systemLocale)))
+                putString(PREF_LANG_LOCALE_NEXT, newLocale)
         }
     }
 
