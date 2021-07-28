@@ -18,6 +18,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import org.acra.ACRA
+import org.acra.ReportField
 import org.acra.config.CoreConfigurationBuilder
 import org.acra.config.DialogConfigurationBuilder
 import org.acra.config.MailSenderConfigurationBuilder
@@ -55,6 +56,8 @@ const val DB_CLEAN_TASK_TAG = "db_clean"
 
 const val FLAVOR_FDROID = "fdroid"
 const val FLAVOR_ITCHIO = "itchio"
+
+// Remember to exclude sensitive info from ACRA reports
 
 const val PREF_DB_RAN_CLEANUP_ONCE = "ua.gardenapple.itchupdater.db_cleanup_once"
 const val PREF_INSTALLER = "ua.gardenapple.itchupdater.installer"
@@ -258,6 +261,14 @@ class Mitch : Application() {
         ACRA.init(this, CoreConfigurationBuilder(this).apply {
             setBuildConfigClass(BuildConfig::class.java)
             setReportFormat(StringFormat.KEY_VALUE_LIST)
+            setReportContent(
+                ReportField.ANDROID_VERSION,
+                ReportField.BUILD_CONFIG,
+                ReportField.STACK_TRACE,
+                ReportField.LOGCAT,
+                ReportField.SHARED_PREFERENCES
+            )
+            setExcludeMatchingSharedPreferencesKeys(".*(justice|racial|palestine).*")
 
             getPluginConfigurationBuilder(MailSenderConfigurationBuilder::class.java).apply {
                 setMailTo("~gardenapple/mitch-bug-reports@lists.sr.ht, gardenapple+mitch@posteo.net")
@@ -274,7 +285,7 @@ class Mitch : Application() {
                     
                     > Thank you for your help!
                     
-                    > Insert description of what you were doing when you got the error:
+                    > Please describe what you were doing when you got the error:
                 """.trimIndent())
                 setReportFileName("error-report-and-logs.txt")
                 setEnabled(true)
