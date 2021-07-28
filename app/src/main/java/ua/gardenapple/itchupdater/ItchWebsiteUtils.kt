@@ -63,7 +63,7 @@ object ItchWebsiteUtils {
     }
 
     fun hasGameDownloadLinks(htmlDoc: Document): Boolean {
-        return htmlDoc.body().getElementsByClass("download_btn").isNotEmpty()
+        return htmlDoc.body().selectFirst(".download_btn") != null
     }
 
     /**
@@ -85,7 +85,7 @@ object ItchWebsiteUtils {
      * @return If htmlDoc is a store page or download page, will return the associated gameID. Otherwise, the behavior is undefined.
      */
     fun getGameId(htmlDoc: Document): Int? {
-        return htmlDoc.head().getElementsByAttributeValue("name", "itch:path").first()
+        return htmlDoc.head().selectFirst("[name=\"itch:path\"]")
             ?.attr("content")
             ?.substringAfter("games/")?.toInt()
     }
@@ -189,10 +189,10 @@ object ItchWebsiteUtils {
     }
 
     fun isDarkTheme(doc: Document): Boolean {
-        return doc.getElementsByClass("main_layout").first()?.hasClass("dark_theme") ?: false
+        return doc.selectFirst(".main_layout")?.hasClass("dark_theme") ?: false
     }
 
     fun getLoggedInUserName(doc: Document): String? {
-        return doc.getElementsByClass("user_name").first()?.html()
+        return doc.selectFirst(".user_name")?.html()
     }
 }

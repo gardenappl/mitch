@@ -75,7 +75,6 @@ class ItchBrowseHandler(
                         val username = ItchWebsiteUtils.getLoggedInUserName(doc)
 
                         bundleLink = SpecialBundleHandler.getLinkForUser(context, false, username)
-//                        Log.d(LOGGING_TAG, "Bundle link: $bundleLink")
                         bundlePalestinian = false
                     }
 
@@ -84,7 +83,6 @@ class ItchBrowseHandler(
                         val username = ItchWebsiteUtils.getLoggedInUserName(doc)
 
                         bundleLink = SpecialBundleHandler.getLinkForUser(context, true, username)
-//                        Log.d(LOGGING_TAG, "Bundle link: $bundleLink")
                         bundlePalestinian = true
                     }
                 }

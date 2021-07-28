@@ -357,6 +357,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     } else if (info?.paymentInfo != null) {
                         bottomGameBar.visibility = View.VISIBLE
 
+                        //Required for marquee animation
+                        gameButtonInfo.isSelected = true
+
                         if (!info.paymentInfo.isPaymentOptional)
                             gameButton.text = getString(R.string.game_buy)
                         else if (info.hasAndroidVersion)
@@ -393,12 +396,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             } else if (ItchWebsiteUtils.isUserPage(doc)) {
                 val appBarTitle =
                     "<b>${Html.escapeHtml(ItchWebsiteParser.getUserName(doc))}</b>"
-
-                @Suppress("DEPRECATION")
-                if (Build.VERSION.SDK_INT >= 24)
-                    supportAppBar.title = Html.fromHtml(appBarTitle, 0)
-                else
-                    supportAppBar.title = Html.fromHtml(appBarTitle)
+                supportAppBar.title = Utils.spannedFromHtml(appBarTitle)
 
                 appBar.menu.clear()
                 addDefaultAppBarActions(appBar)
