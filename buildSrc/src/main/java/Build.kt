@@ -4,8 +4,8 @@ object Build {
         const val minSdk = 21
         const val targetSdk = 29
 
-        const val versionCode = 34
-        const val versionName = "1.4.2"
+        const val versionCode = 35
+        const val versionName = "1.4.3"
     }
 
 
