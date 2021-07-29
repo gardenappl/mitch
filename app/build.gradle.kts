@@ -30,12 +30,12 @@ android {
         }
     }
 
-    compileSdkVersion(Build.Android.compileSdk)
+    compileSdk = Build.Android.compileSdk
 
     defaultConfig {
         applicationId = "ua.gardenapple.itchupdater"
-        minSdkVersion(Build.Android.minSdk)
-        targetSdkVersion(Build.Android.targetSdk)
+        minSdk = Build.Android.minSdk
+        targetSdk = Build.Android.targetSdk
         versionCode = Build.Android.versionCode
         versionName = Build.Android.versionName
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -55,7 +55,7 @@ android {
             applicationIdSuffix = ".debug"
         }
     }
-    flavorDimensions("platform")
+    flavorDimensions.add("platform")
     productFlavors {
         create("fdroid") {
         }
@@ -63,7 +63,7 @@ android {
         }
     }
     packagingOptions {
-        exclude("META-INF/atomicfu.kotlin_module")
+        resources.excludes.add("META-INF/atomicfu.kotlin_module")
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

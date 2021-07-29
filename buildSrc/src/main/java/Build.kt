@@ -10,7 +10,7 @@ object Build {
 
 
     object Versions {
-        const val gradle = "4.2.2"
+        const val gradle = "7.0.0"
         const val kotlin = "1.5.21"
 
         const val room = "2.3.0"
