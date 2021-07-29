@@ -320,9 +320,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     if (info?.purchasedInfo != null) {
                         bottomGameBar.visibility = View.VISIBLE
 
-                        //Required for marquee animation
-                        gameButtonInfo.isSelected = true
-
                         if (info.hasAndroidVersion)
                             gameButton.text = getString(R.string.game_install)
                         else
@@ -335,9 +332,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         }
                     } else if (info?.isFromSpecialBundle == true) {
                         bottomGameBar.visibility = View.VISIBLE
-
-                        //Required for marquee animation
-                        gameButtonInfo.isSelected = true
 
                         gameButton.text = getString(R.string.game_bundle_claim)
                         if (info.isSpecialBundlePalestinian)
@@ -356,9 +350,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         }
                     } else if (info?.paymentInfo != null) {
                         bottomGameBar.visibility = View.VISIBLE
-
-                        //Required for marquee animation
-                        gameButtonInfo.isSelected = true
 
                         if (!info.paymentInfo.isPaymentOptional)
                             gameButton.text = getString(R.string.game_buy)

@@ -55,6 +55,7 @@
                 android:id="@+id/bottomGameBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="5dp">
             <com.google.android.material.button.MaterialButton
@@ -63,18 +64,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/game_install" />
+
             <TextView
                     android:id="@+id/game_button_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
-                    android:text="$5.10 or more"
-                    android:ellipsize="marquee"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:marqueeRepeatLimit="marquee_forever"
-                    android:scrollHorizontally="true"
-                    android:singleLine="true"/>
+                    android:maxLines="2"
+                    android:text="$5.10 or more, or maybe there is a lot of text in here, I don't really know" />
         </LinearLayout>
     </FrameLayout>
 
