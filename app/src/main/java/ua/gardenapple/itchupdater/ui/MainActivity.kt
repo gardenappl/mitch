@@ -20,17 +20,19 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import androidx.work.ExistingPeriodicWorkPolicy
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.DatabaseCleanup
+import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.databinding.ActivityMainBinding
 
 /**
  * The [MainActivity] handles a lot of things, including day/night themes and languages
  */
-class MainActivity : MitchActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
+class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
+    ActivityCompat.OnRequestPermissionsResultCallback {
+
     private lateinit var browseFragment: BrowseFragment
     private lateinit var currentFragmentTag: String
 
@@ -178,6 +180,13 @@ class MainActivity : MitchActivity(), ActivityCompat.OnRequestPermissionsResultC
         } else if (intent.getBooleanExtra(EXTRA_SHOULD_OPEN_LIBRARY, false)) {
             setActiveFragment(LIBRARY_FRAGMENT_TAG)
         }
+
+        launch(Dispatchers.IO) {
+            // Force lazy-init database to fully initialize, in the background
+            val db = AppDatabase.getDatabase(this@MainActivity)
+            if (!db.isOpen)
+                db.installDao.getInstallationByPackageName(packageName)
+        }
     }
 
     override fun onResume() {
@@ -201,6 +210,11 @@ class MainActivity : MitchActivity(), ActivityCompat.OnRequestPermissionsResultC
         }
         //super method handles fragment back stack
         super.onBackPressed()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cancel()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

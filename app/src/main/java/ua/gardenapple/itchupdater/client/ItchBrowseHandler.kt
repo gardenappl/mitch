@@ -107,7 +107,6 @@ class ItchBrowseHandler(
             }
             val locale = ItchWebsiteParser.getLocale(doc)
             if (locale != ItchWebsiteParser.UNKNOWN_LOCALE) {
-                Log.d(LOGGING_TAG, "Site locale is $locale")
                 putString(PREF_LANG_SITE_LOCALE, locale)
             }
         }
