@@ -99,7 +99,7 @@ class ItchBrowseHandler(
         }
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         prefs.edit(true) {
-            if (!ItchWebsiteUtils.isStylizedPage(doc)) {
+            if (ItchWebsiteUtils.shouldHandleDayNightThemes(doc)) {
                 if (ItchWebsiteUtils.isDarkTheme(doc))
                     putString("current_site_theme", "dark")
                 else

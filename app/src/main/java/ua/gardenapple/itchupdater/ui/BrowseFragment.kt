@@ -309,93 +309,113 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         fab.show()
 
-        if (doc != null && ItchWebsiteUtils.isStylizedPage(doc)) {
-            if (ItchWebsiteUtils.isGamePage(doc)) {
-                //Hide app's navbar after hiding web navbar
-                val navBarHideCallback: (String) -> Unit = navBarHide@{
-                    if (!isVisible)
-                        return@navBarHide
+        if (doc?.let { ItchWebsiteUtils.isGamePage(doc) } == true) {
+            //Hide app's navbar after hiding web navbar
+            val navBarHideCallback: (String) -> Unit = navBarHide@{
+                if (!isVisible)
+                    return@navBarHide
 
-                    navBar.visibility = View.GONE
-                    if (info?.purchasedInfo != null) {
-                        bottomGameBar.visibility = View.VISIBLE
-
-                        if (info.hasAndroidVersion)
-                            gameButton.text = getString(R.string.game_install)
-                        else
-                            gameButton.text = getString(R.string.game_download)
-                        gameButtonInfo.text =
-                            Utils.spannedFromHtml(info.purchasedInfo.ownershipReasonHtml)
-
-                        gameButton.setOnClickListener {
-                            mainActivity.browseUrl(info.purchasedInfo.downloadPage)
-                        }
-                    } else if (info?.isFromSpecialBundle == true) {
-                        bottomGameBar.visibility = View.VISIBLE
-
-                        gameButton.text = getString(R.string.game_bundle_claim)
-                        if (info.isSpecialBundlePalestinian)
-                            gameButtonInfo.text = getString(R.string.game_bundle_palestine)
-                        else
-                            gameButtonInfo.text = getString(R.string.game_bundle_justice)
-
-                        gameButton.setOnClickListener {
-                            lifecycleScope.launch {
-                                SpecialBundleHandler.claimGame(
-                                    info.bundleDownloadLink!!,
-                                    info.game!!
-                                )
-                                webView.reload()
-                            }
-                        }
-                    } else if (info?.paymentInfo != null) {
-                        bottomGameBar.visibility = View.VISIBLE
-
-                        if (!info.paymentInfo.isPaymentOptional)
-                            gameButton.text = getString(R.string.game_buy)
-                        else if (info.hasAndroidVersion)
-                            gameButton.text = getString(R.string.game_install)
-                        else
-                            gameButton.text = getString(R.string.game_download)
-
-                        gameButtonInfo.text =
-                            Utils.spannedFromHtml(info.paymentInfo.messageHtml)
-
-                        gameButton.setOnClickListener {
-                            val purchaseUri = Uri.parse(info.game!!.storeUrl)
-                                .buildUpon()
-                                .appendPath("purchase")
-                            mainActivity.browseUrl(purchaseUri.toString())
-                        }
-                    } else {
-                        bottomGameBar.visibility = View.GONE
-                    }
-                }
-                if (ItchWebsiteUtils.siteHasNavbar(webView, doc)) {
-                    setSiteNavbarVisibility(false, navBarHideCallback)
-                } else {
-                    setSiteNavbarVisibility(true, navBarHideCallback)
-                }
-
-                supportAppBar.title =
-                    Utils.spannedFromHtml("<b>${Html.escapeHtml(ItchWebsiteParser.getGameName(doc))}</b>")
-
-                appBar.menu.clear()
-                addAppBarActions(appBar, doc)
-                addDefaultAppBarActions(appBar)
-                supportAppBar.show()
-            } else if (ItchWebsiteUtils.isUserPage(doc)) {
-                val appBarTitle =
-                    "<b>${Html.escapeHtml(ItchWebsiteParser.getUserName(doc))}</b>"
-                supportAppBar.title = Utils.spannedFromHtml(appBarTitle)
-
-                appBar.menu.clear()
-                addDefaultAppBarActions(appBar)
-                supportAppBar.show()
-
-                bottomGameBar.visibility = View.GONE
                 navBar.visibility = View.GONE
+                if (info?.purchasedInfo != null) {
+                    bottomGameBar.visibility = View.VISIBLE
+
+                    if (info.hasAndroidVersion)
+                        gameButton.text = getString(R.string.game_install)
+                    else
+                        gameButton.text = getString(R.string.game_download)
+                    gameButtonInfo.text =
+                        Utils.spannedFromHtml(info.purchasedInfo.ownershipReasonHtml)
+
+                    gameButton.setOnClickListener {
+                        mainActivity.browseUrl(info.purchasedInfo.downloadPage)
+                    }
+                } else if (info?.isFromSpecialBundle == true) {
+                    bottomGameBar.visibility = View.VISIBLE
+
+                    gameButton.text = getString(R.string.game_bundle_claim)
+                    if (info.isSpecialBundlePalestinian)
+                        gameButtonInfo.text = getString(R.string.game_bundle_palestine)
+                    else
+                        gameButtonInfo.text = getString(R.string.game_bundle_justice)
+
+                    gameButton.setOnClickListener {
+                        lifecycleScope.launch {
+                            SpecialBundleHandler.claimGame(
+                                info.bundleDownloadLink!!,
+                                info.game!!
+                            )
+                            webView.reload()
+                        }
+                    }
+                } else if (info?.paymentInfo != null) {
+                    bottomGameBar.visibility = View.VISIBLE
+
+                    if (!info.paymentInfo.isPaymentOptional)
+                        gameButton.text = getString(R.string.game_buy)
+                    else if (info.hasAndroidVersion)
+                        gameButton.text = getString(R.string.game_install)
+                    else
+                        gameButton.text = getString(R.string.game_download)
+
+                    gameButtonInfo.text =
+                        Utils.spannedFromHtml(info.paymentInfo.messageHtml)
+
+                    gameButton.setOnClickListener {
+                        val purchaseUri = Uri.parse(info.game!!.storeUrl)
+                            .buildUpon()
+                            .appendPath("purchase")
+                        mainActivity.browseUrl(purchaseUri.toString())
+                    }
+                } else {
+                    bottomGameBar.visibility = View.GONE
+                }
             }
+            if (ItchWebsiteUtils.siteHasNavbar(webView, doc)) {
+                setSiteNavbarVisibility(false, navBarHideCallback)
+            } else {
+                setSiteNavbarVisibility(true, navBarHideCallback)
+            }
+
+            supportAppBar.title =
+                Utils.spannedFromHtml("<b>${Html.escapeHtml(ItchWebsiteParser.getGameName(doc))}</b>")
+
+            appBar.menu.clear()
+            addAppBarActions(appBar, doc)
+            addDefaultAppBarActions(appBar)
+            supportAppBar.show()
+        } else if (doc?.let { ItchWebsiteUtils.isUserPage(it) } == true) {
+            val appBarTitle =
+                "<b>${Html.escapeHtml(ItchWebsiteParser.getUserName(doc))}</b>"
+            supportAppBar.title = Utils.spannedFromHtml(appBarTitle)
+
+            appBar.menu.clear()
+            addDefaultAppBarActions(appBar)
+            supportAppBar.show()
+
+            bottomGameBar.visibility = View.GONE
+            navBar.visibility = View.GONE
+        } else if (doc?.let { ItchWebsiteUtils.isUserPage(it) } == true) {
+            val appBarTitle =
+                "<b>${Html.escapeHtml(ItchWebsiteParser.getUserName(doc))}</b>"
+            supportAppBar.title = Utils.spannedFromHtml(appBarTitle)
+
+            appBar.menu.clear()
+            addDefaultAppBarActions(appBar)
+            supportAppBar.show()
+
+            bottomGameBar.visibility = View.GONE
+            navBar.visibility = View.GONE
+        } else if (doc?.let { ItchWebsiteUtils.isJamOrForumPage(it) } == true) {
+            val appBarTitle =
+                "<b>${Html.escapeHtml(ItchWebsiteParser.getForumOrJamName(doc))}</b>"
+            supportAppBar.title = Utils.spannedFromHtml(appBarTitle)
+
+            appBar.menu.clear()
+            addDefaultAppBarActions(appBar)
+            supportAppBar.show()
+
+            bottomGameBar.visibility = View.GONE
+            navBar.visibility = View.GONE
         } else {
             navBar.visibility = View.VISIBLE
             bottomGameBar.visibility = View.GONE
@@ -414,6 +434,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val gameThemeBgColor = doc?.run { ItchWebsiteUtils.getBackgroundUIColor(doc) }
         val gameThemeButtonColor = doc?.run { ItchWebsiteUtils.getAccentUIColor(doc) }
         val gameThemeButtonFgColor = doc?.run { ItchWebsiteUtils.getAccentFgUIColor(doc) }
+
+//        Log.d(LOGGING_TAG, "game theme bg color: $gameThemeBgColor")
+//        Log.d(LOGGING_TAG, "game theme button color: $gameThemeButtonColor")
+//        Log.d(LOGGING_TAG, "game theme button fg color: $gameThemeButtonFgColor")
 
         val accentColor = gameThemeButtonColor ?: defaultAccentColor
         val accentFgColor = gameThemeButtonFgColor ?: defaultWhiteColor

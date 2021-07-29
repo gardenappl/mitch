@@ -20,6 +20,7 @@ import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.core.content.FileProvider
+import androidx.core.graphics.ColorUtils
 import com.github.ajalt.colormath.ConvertibleColor
 import com.github.ajalt.colormath.fromCss
 import kotlinx.coroutines.Dispatchers
@@ -266,5 +267,9 @@ object Utils {
 
     fun getPreferredLocale(context: Context): Locale {
         return getPreferredLocale(context.resources.configuration)
+    }
+
+    fun shouldUseLightForeground(@ColorInt bgColor: Int): Boolean {
+        return ColorUtils.calculateLuminance(bgColor) < 0.5
     }
 }

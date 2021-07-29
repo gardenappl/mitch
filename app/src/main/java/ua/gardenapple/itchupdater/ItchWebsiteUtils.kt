@@ -18,12 +18,14 @@ object ItchWebsiteUtils {
     val STORE_ANDROID_PAGE_URI: Uri = Uri.parse("https://itch.io/games/platform-android")
     val STORE_PAGE_URI: Uri = Uri.parse("https://itch.io/games")
 
-    private val gameBgColorPattern = Regex("root[{]--itchio_ui_bg: (#?\\w+);")
+    private val forumJamGameBgColorPattern = Regex("--itchio_ui_bg: (#?\\w+);")
     private val gameButtonColorPattern = Regex("--itchio_button_color: (#?\\w+);")
     private val gameButtonFgColorPattern = Regex("--itchio_button_fg_color: (#?\\w+);")
 
     private val userBgColorPattern = Regex("--itchio_gray_back: (#?\\w+);")
     private val userFgColorPattern = Regex("--itchio_border_radius: ?\\w+;color:(#?\\w+);")
+
+    private val jamLinkColorPattern = Regex("""\.view_jam_page\s+a[^{]*\{[^}]*color: (#?\w+);""")
 
 
     fun isItchWebPage(uri: Uri): Boolean {
@@ -57,6 +59,10 @@ object ItchWebsiteUtils {
         }
     }
 
+    fun isJamOrForumPage(htmlDoc: Document): Boolean {
+        return htmlDoc.head().getElementById("jam_theme") != null
+    }
+
     fun isGamePage(htmlDoc: Document): Boolean {
         return isDevlogPage(htmlDoc) || isStorePage(htmlDoc) ||
                 isPurchasePage(htmlDoc) || isDownloadPage(htmlDoc)
@@ -67,11 +73,14 @@ object ItchWebsiteUtils {
     }
 
     /**
-     * @return true if the page is a store page or devlog page, or stylized community profile
+     * Should you do day/night handling for this page?
+     *
+     * Note that most jam pages and forum pages have a few custom colors, but overall they do NOT
+     * count as stylized pages, as they follow the standard rules for day/night themes
+     * @return true if the page is a store page, devlog page, or stylized community profile
      */
-    fun isStylizedPage(htmlDoc: Document): Boolean {
-        return htmlDoc.getElementById("game_theme") != null ||
-                htmlDoc.getElementById("user_theme") != null
+    fun shouldHandleDayNightThemes(htmlDoc: Document): Boolean {
+        return htmlDoc.selectFirst("#game_theme, #user_theme, [data-page_name=\"view_jam\"]") == null
     }
 
     /**
@@ -139,22 +148,21 @@ object ItchWebsiteUtils {
      */
 
     fun getBackgroundUIColor(doc: Document): Int? {
-        val gameThemeCSS = doc.getElementById("game_theme")?.html()
+        val gameThemeCSS = doc.selectFirst("#game_theme, #jam_theme")?.html()
         if (gameThemeCSS != null) {
-            val foundColors = gameBgColorPattern.find(gameThemeCSS)
+            val foundColors = forumJamGameBgColorPattern.find(gameThemeCSS)
             if (foundColors != null)
                 return Utils.parseCssColor(foundColors.groupValues[1])
         }
 
         val userThemeCSS = doc.getElementById("user_theme")?.html()
-        if (userThemeCSS != null) {
+        if (userThemeCSS != null)
             return Utils.parseCssColor("#333333")
-        }
         return null
     }
 
     fun getAccentUIColor(doc: Document): Int? {
-        val gameThemeCSS = doc.getElementById("game_theme")?.html()
+        val gameThemeCSS = doc.selectFirst("#game_theme, #jam_theme")?.html()
         if (gameThemeCSS != null) {
             val foundColors = gameButtonColorPattern.find(gameThemeCSS)
             if (foundColors != null)
@@ -167,12 +175,20 @@ object ItchWebsiteUtils {
             if (foundColors != null)
                 return Utils.parseCssColor(foundColors.groupValues[1])
         }
+
+        val jamThemeCSS = doc.selectFirst("#jam_theme")?.html()
+        if (jamThemeCSS != null) {
+            val foundColors = jamLinkColorPattern.find(jamThemeCSS)
+            if (foundColors != null)
+                return Utils.parseCssColor(foundColors.groupValues[1])
+        }
+
         return null
     }
 
 
     fun getAccentFgUIColor(doc: Document): Int? {
-        val gameThemeCSS = doc.getElementById("game_theme")?.html()
+        val gameThemeCSS = doc.selectFirst("#game_theme, #jam_theme")?.html()
         if (gameThemeCSS != null) {
             val foundColors = gameButtonFgColorPattern.find(gameThemeCSS)
             if (foundColors != null)
@@ -184,6 +200,18 @@ object ItchWebsiteUtils {
             val foundColors = userBgColorPattern.find(userThemeCSS)
             if (foundColors != null)
                 return Utils.parseCssColor(foundColors.groupValues[1])
+        }
+
+        val jamThemeCSS = doc.selectFirst("#jam_theme")?.html()
+        if (jamThemeCSS != null) {
+            val foundColors = jamLinkColorPattern.find(jamThemeCSS)
+            if (foundColors != null) {
+                val color = Utils.parseCssColor(foundColors.groupValues[1])
+                return if (Utils.shouldUseLightForeground(color))
+                    R.color.colorPrimary
+                else
+                    R.color.colorPrimaryDark
+            }
         }
         return null
     }

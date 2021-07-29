@@ -400,4 +400,9 @@ object ItchWebsiteParser {
 
         throw IllegalArgumentException("Document is not a user page")
     }
+
+    fun getForumOrJamName(doc: Document): String {
+        return doc.selectFirst(".jam_title_header, .game_summary h1")?.text()
+            ?: throw IllegalArgumentException("Could not find game jam or forum name")
+    }
 }
