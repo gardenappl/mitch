@@ -151,7 +151,7 @@
 \nBu süreç geri alınamaz.</string>
     <string name="settings_bundle_claim_dialog_title">Emin misiniz\?</string>
     <string name="settings_justice_claim_all_desc">Irksal Adalet ve Eşitlik paketindeki tüm oyunları talep edin.</string>
-    <string name="settings_justice_claim_all">Paketteki tüm oyunları talep et</string>
+    <string name="settings_justice_claim_all">Irksal Adalet paketi: hepsini talep et</string>
     <string name="settings_bundle_link_desc">Özel indirme URL\'si ayarlayın</string>
     <string name="game_bundle_justice">Irksal Adalet ve Eşitlik Paketi</string>
     <string name="game_justice_bundle_claim_error">Irksal Adalet paketinden indirme bağlantısına erişilemedi.</string>
@@ -161,4 +161,15 @@
     <string name="game_install">Kur</string>
     <string name="game_download">İndir</string>
     <string name="popup_handler_app_not_found">Nasıl açılacağını bilmiyorum: %s</string>
+    <string name="settings_lang">Dil</string>
+    <string name="settings_lang_system">Sisteme göre</string>
+    <string name="settings_lang_site">Siteye göre</string>
+    <string name="settings_lang_default">Öntanımlı</string>
+    <string name="settings_android_only_filter_desc">Android oyunlarına göz atarken, yalnızca diğer mağazalarda bulunan girdileri gizleyin.</string>
+    <string name="settings_android_only_filter">Android: yalnızca indirilebilenleri filtrele</string>
+    <string name="popup_no_network_connection">Güncellemeleri denetlemek için ağ bağlantısı gerekir</string>
+    <string name="settings_palestine_claim_all_desc">Filistin Yardımı için bağımsız paketteki her oyunu talep edin.</string>
+    <string name="settings_palestine_claim_all">Filistin Yardım paketi: hepsini talep et</string>
+    <string name="game_bundle_palestine">Filistin Yardımı için bağımsız paket</string>
+    <string name="game_palestine_bundle_claim_error">Filistin Yardım paketinden indirme bağlantısına erişilemedi.</string>
 </resources>
