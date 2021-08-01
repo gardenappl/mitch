@@ -167,4 +167,8 @@
     <string name="settings_palestine_claim_all">Gói Palestinian Aid: nhận tất cả</string>
     <string name="game_bundle_palestine">Gói độc lập cho Palestinian Aid</string>
     <string name="game_palestine_bundle_claim_error">Không thể truy cập liên kết tải xuống từ gói Palestinian Aid.</string>
+    <string name="settings_lang">Ngôn ngữ</string>
+    <string name="settings_lang_system">Tùy vào hệ thống</string>
+    <string name="settings_lang_site">Tùy vào trang</string>
+    <string name="settings_lang_default">Mặc định</string>
 </resources>
