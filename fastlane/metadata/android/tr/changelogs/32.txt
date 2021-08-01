@@ -1,0 +1,6 @@
+* Büyük ünlü paketlerden oyun indirmek, satın almak ve oyun talep etmek için yerel kullanıcı arayüzü eklendi
+* Android'i desteklediğini iddia eden ancak yalnızca Google Play bağlantıları aracılığıyla kullanılabilen oyunları gizle
+* Yeni çeviriler: Felemenkçe, Vietnamca, Endonezyaca, Fransızca, Almanca, Hintçe
+* GitHub ile oturum açma düzeltildi
+
+Ayrıca diğer birçok düzeltme, tam değişiklik günlüğüne şuradan bakın: https://gardenapple.itch.io/mitch/devlog

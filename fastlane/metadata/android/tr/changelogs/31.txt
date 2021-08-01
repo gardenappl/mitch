@@ -1,4 +1,4 @@
 * Arapça, Türkçe, Bokmål Norveççe çevirileri eklendi
-* Dili değiştirdikten sonra yanlış güncelleme denetim sonucunu düzeltildi
+* Dili değiştirdikten sonra yanlış güncelleme denetim sonucu düzeltildi
 * Güncellemeler listesi artık yatay yerine dikey (tüh)
 * Güncelleme denetimi için hata bildirirken alınan hata düzeltildi (tüh)
