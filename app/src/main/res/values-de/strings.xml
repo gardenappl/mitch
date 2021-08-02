@@ -161,4 +161,11 @@
     <string name="game_install">Installieren</string>
     <string name="game_download">Herunterladen</string>
     <string name="popup_handler_app_not_found">Ich weiß nicht, wie man %s öffnet</string>
+    <string name="settings_lang">Sprache</string>
+    <string name="settings_lang_system">Systemabhängig</string>
+    <string name="settings_lang_site">Abhängig von der Website</string>
+    <string name="settings_lang_default">Standardmäßig</string>
+    <string name="settings_android_only_filter_desc">Blenden Sie beim Durchsuchen von Android-Spielen Einträge aus, die nur in anderen Stores verfügbar sind.</string>
+    <string name="settings_android_only_filter">Android: Filter nur zum Herunterladen</string>
+    <string name="popup_no_network_connection">Die Überprüfung von Aktualisierungen erfordert eine Netzwerkverbindung</string>
 </resources>
