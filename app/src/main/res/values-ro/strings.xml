@@ -7,7 +7,7 @@
     <string name="settings_lang_default">Mod implicit</string>
     <string name="settings_android_only_filter">Android: numai filtru descărcabil</string>
     <string name="popup_no_network_connection">Verificarea actualizărilor necesită o conexiune la rețea</string>
-    <string name="game_justice_bundle_claim_error"></string>
+    <string name="game_justice_bundle_claim_error"/>
     <string name="settings_bundle_claim_dialog">Atenție: sunteți pe punctul de a vă umple biblioteca cu peste 1000 de jocuri. Ești sigur că vrei să faci asta\?
 \n
 \nAcest lucru va dura foarte mult.
@@ -55,7 +55,7 @@
     <plurals name="updates_available">
         <item quantity="one">%d o actualizare disponibilă!</item>
         <item quantity="few">%d actualizări disponibile!</item>
-        <item quantity="other"></item>
+        <item quantity="other">Altele</item>
     </plurals>
     <string name="updates_error">Eroare la verificarea actualizărilor</string>
     <string name="nav_updates">Actualizări</string>
@@ -158,4 +158,6 @@
     <string name="settings_start_page_web">Jocuri populare pentru web</string>
     <string name="settings_start_page_all_games">Jocuri populare</string>
     <string name="settings_start_page_itch">itch.io Pagina principală</string>
+    <string name="settings_update_check_metered_desc">Dacă această opțiune este dezactivată, Mitch nu va verifica dacă există actualizări pe conexiunile cu limite de date.</string>
+    <string name="nav_website_view">Navigare</string>
 </resources>
