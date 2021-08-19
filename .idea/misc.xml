@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="../../../windows/Yurik/code/android/mitch/app/src/main/res/layout/library_fragment.xml" value="0.103125" />
+        <entry key="../../../windows/Yurik/code/android/mitch/app/src/main/res/layout/owned_activity.xml" value="0.1" />
+      </map>
+    </option>
+  </component>
   <component name="EntryPointsManager">
     <list size="1">
       <item index="0" class="java.lang.String" itemvalue="android.webkit.JavascriptInterface" />
