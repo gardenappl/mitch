@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
+import java.io.File
 
 /**
  * This service gets started after an APK gets installed by an Installer.
@@ -24,7 +25,7 @@ class SessionInstallerService : Service() {
     companion object {
         private const val LOGGING_TAG = "InstallerService"
 
-        const val EXTRA_APK_NAME = "APK_NAME"
+        const val EXTRA_APK_PATH = "APK_PATH"
     }
 
     override fun onBind(p0: Intent?): IBinder? = null
@@ -34,7 +35,7 @@ class SessionInstallerService : Service() {
         val status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE)
         val packageName = intent.getStringExtra(PackageInstaller.EXTRA_PACKAGE_NAME)
         val sessionId = intent.getIntExtra(PackageInstaller.EXTRA_SESSION_ID, -1)
-        val apkName = intent.getStringExtra(EXTRA_APK_NAME)!!
+        val apkPath = intent.getStringExtra(EXTRA_APK_PATH)!!
 
         //InstallerService shouldn't receive intent for Mitch anyway,
         //this is handled by SelfUpdateBroadcastReceiver
@@ -52,7 +53,7 @@ class SessionInstallerService : Service() {
             }
             else -> runBlocking(Dispatchers.IO) {
                 Installations.onInstallResult(applicationContext, sessionId.toLong(),
-                    packageName, apkName, status)
+                    packageName, File(apkPath), status)
             }
         }
 

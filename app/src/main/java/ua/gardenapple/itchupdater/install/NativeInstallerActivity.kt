@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.FILE_PROVIDER
 import ua.gardenapple.itchupdater.Utils
+import java.io.File
 
 
 /**
@@ -36,10 +37,17 @@ class NativeInstallerActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (ACTION_INSTALL_PACKAGE == intent.action) {
+        if (intent.action == ACTION_INSTALL_PACKAGE) {
+            Log.d(LOGGING_TAG, "Starting installation...")
             val installId = intent.extras!!.getLong(EXTRA_INSTALL_ID)
-            val uri = Utils.getIntentUriForFile(this, intent.data!!.toFile(), FILE_PROVIDER)
-            installPackage(uri, installId)
+
+            val file = intent.data!!.toFile()
+            runBlocking(Dispatchers.IO) {
+                Installations.tryUpdatePendingInstallData(this@NativeInstallerActivity,
+                    installId, file)
+            }
+
+            installPackage(file, installId)
         } else {
             throw IllegalStateException("Intent action not specified!")
         }
@@ -47,17 +55,15 @@ class NativeInstallerActivity : FragmentActivity() {
 
     @Suppress("DEPRECATION")
     @SuppressLint("ObsoleteSdkInt")
-    private fun installPackage(uri: Uri, installId: Long) {
+    private fun installPackage(file: File, installId: Long) {
+        val uri = Utils.getIntentUriForFile(this, file, FILE_PROVIDER)
+
         Log.d(LOGGING_TAG, "Installing ID: $installId, uri: $uri")
         // https://code.google.com/p/android/issues/detail?id=205827
-        if (Build.VERSION.SDK_INT < 24
-            && ContentResolver.SCHEME_FILE != uri.scheme
-        ) {
+        if (Build.VERSION.SDK_INT < 24 && ContentResolver.SCHEME_FILE != uri.scheme) {
             throw RuntimeException("PackageInstaller < Android N only supports file scheme!")
         }
-        if (Build.VERSION.SDK_INT >= 24
-            && ContentResolver.SCHEME_CONTENT != uri.scheme
-        ) {
+        if (Build.VERSION.SDK_INT >= 24 && ContentResolver.SCHEME_CONTENT != uri.scheme) {
             throw RuntimeException("PackageInstaller >= Android N only supports content scheme!")
         }
         val intent = Intent()
@@ -90,7 +96,7 @@ class NativeInstallerActivity : FragmentActivity() {
             Log.e(LOGGING_TAG, "ActivityNotFoundException", e)
             runBlocking(Dispatchers.IO) {
                 Installations.onInstallResult(applicationContext, installId, null,
-                    uri.lastPathSegment!!, PackageInstaller.STATUS_FAILURE)
+                    file, PackageInstaller.STATUS_FAILURE)
             }
             finish()
         }
@@ -103,25 +109,22 @@ class NativeInstallerActivity : FragmentActivity() {
         
 
         val installId = Utils.getLong(intent.extras!!, EXTRA_INSTALL_ID)!!
-        val apkName = intent.data!!.lastPathSegment!!
+        val apk = intent.data!!.toFile()
         when (requestCode) {
             REQUEST_CODE_INSTALL -> when (resultCode) {
                 RESULT_OK -> runBlocking(Dispatchers.IO) {
                     Log.d(LOGGING_TAG, "OK, intent data: ${intent.data}")
-                    val packageInfo =
-                        packageManager.getPackageArchiveInfo(intent.data!!.path!!, 0)!!
-                    Log.d(LOGGING_TAG, "OK, pkg info: $packageInfo")
-                    Installations.onInstallResult(applicationContext, installId,
-                        packageInfo.packageName, apkName, PackageInstaller.STATUS_SUCCESS)
+                    Installations.onInstallResult(applicationContext, installId, null,
+                        apk, PackageInstaller.STATUS_SUCCESS)
                 }
                 RESULT_CANCELED -> runBlocking(Dispatchers.IO) {
                     Installations.onInstallResult(applicationContext, installId, null,
-                        apkName, PackageInstaller.STATUS_FAILURE_ABORTED)
+                        apk, PackageInstaller.STATUS_FAILURE_ABORTED)
                 }
                 //RESULT_FIRST_USER // AOSP returns AppCompatActivity.RESULT_FIRST_USER on error
                 else -> runBlocking(Dispatchers.IO) {
                     Installations.onInstallResult(applicationContext, installId, null,
-                        apkName, PackageInstaller.STATUS_FAILURE)
+                        apk, PackageInstaller.STATUS_FAILURE)
                 }
             }
             else -> throw RuntimeException("Invalid request code!")

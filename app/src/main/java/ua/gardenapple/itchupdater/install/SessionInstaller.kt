@@ -46,7 +46,7 @@ class SessionInstaller : AbstractInstaller() {
         }
 
         val callbackIntent = Intent(context, SessionInstallerService::class.java)
-            .putExtra(SessionInstallerService.EXTRA_APK_NAME, apkFile.name)
+            .putExtra(SessionInstallerService.EXTRA_APK_PATH, apkFile.path)
         val pendingIntent = PendingIntent.getService(
             context, sessionId, callbackIntent, PendingIntent.FLAG_UPDATE_CURRENT
         )
