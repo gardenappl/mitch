@@ -47,6 +47,8 @@ android {
             if (shouldSign) {
                 signingConfig = signingConfigs.getByName("release")
             }
+
+            isMinifyEnabled = false
         }
         named("debug").configure {
             isMinifyEnabled = false
