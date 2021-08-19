@@ -1,0 +1,6 @@
+* Systemspesifikt grensesnitt for nedlasting, kjøp, og å gjøre krav på spill fra de store kjente programknippene
+* Skjul spill som sier de støtter Android, men kun er tilgjengelige gjennom Google Play-lenker
+* Nederlandsk, vietnamesisk, indonesisk, fransk, tysk, og hindi-oversettelser.
+* Fikset innlogging via GitHub
+
+Pluss mange andre fikser. Full endringslogg her: https://gardenapple.itch.io/mitch/devlog

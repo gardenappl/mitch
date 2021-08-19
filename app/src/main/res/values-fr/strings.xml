@@ -161,4 +161,13 @@
     <string name="game_install">Installer</string>
     <string name="game_download">Télécharger</string>
     <string name="popup_handler_app_not_found">Ne sait pas comment ouvrir %s</string>
+    <string name="settings_lang">Langue</string>
+    <string name="settings_lang_system">Dépend du système</string>
+    <string name="settings_lang_site">Dépend du site</string>
+    <string name="settings_lang_default">Par défaut</string>
+    <string name="settings_android_only_filter_desc">Lorsque vous parcourez les jeux Android, masquez les entrées qui ne sont disponibles que sur d’autres magasins.</string>
+    <string name="settings_android_only_filter">Android : filtre téléchargeable uniquement</string>
+    <string name="popup_no_network_connection">La vérification des mises à jour nécessite une connexion réseau</string>
+    <string name="settings_palestine_claim_all_desc">Réclamez tous les jeux du lot indé pour l’aide à la Palestine.</string>
+    <string name="game_palestine_bundle_claim_error">Impossible d’accéder au lien de téléchargement du paquet d’aide palestinienne.</string>
 </resources>

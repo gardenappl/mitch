@@ -8,7 +8,7 @@
     <string name="settings_justice_claim_all_desc">Nhận mọi trò chơi từ gói Công lý và Bình đẳng chủng tộc.</string>
     <string name="game_bundle_justice">Gói vì Công lý và Bình đẳng chủng tộc</string>
     <string name="settings_bundle_claim_dialog_title">Bạn có chắc không\?</string>
-    <string name="settings_justice_claim_all">Nhận tất cả trò chơi trong gói</string>
+    <string name="settings_justice_claim_all">Gói Racial Justice: nhận tất cả</string>
     <string name="settings_bundle_link_desc">Đặt URL tải xuống tuỳ chỉnh</string>
     <string name="game_justice_bundle_claim_error">Không thể truy cập liên kết tải xuống từ gói Racial Justice.</string>
     <string name="game_buy">Mua</string>
@@ -160,4 +160,15 @@
     <string name="game_install">Cài đặt</string>
     <string name="game_download">Tải xuống</string>
     <string name="popup_handler_app_not_found">Không biết cách mở %s</string>
+    <string name="settings_android_only_filter_desc">Khi duyệt các trò chơi trên Android, ẩn các mục chỉ có sẵn trên các cửa hàng khác.</string>
+    <string name="settings_android_only_filter">Android: chỉ lọc mục có thể tải xuống</string>
+    <string name="popup_no_network_connection">Việc kiểm tra cập nhật yêu cầu có kết nối mạng</string>
+    <string name="settings_palestine_claim_all_desc">Nhận mọi trò chơi từ gói độc lập cho Palestinian Aid.</string>
+    <string name="settings_palestine_claim_all">Gói Palestinian Aid: nhận tất cả</string>
+    <string name="game_bundle_palestine">Gói độc lập cho Palestinian Aid</string>
+    <string name="game_palestine_bundle_claim_error">Không thể truy cập liên kết tải xuống từ gói Palestinian Aid.</string>
+    <string name="settings_lang">Ngôn ngữ</string>
+    <string name="settings_lang_system">Tùy vào hệ thống</string>
+    <string name="settings_lang_site">Tùy vào trang</string>
+    <string name="settings_lang_default">Mặc định</string>
 </resources>

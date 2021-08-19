@@ -1,0 +1,2 @@
+* Ny installasjonsmekanisme lagt til. som bør fungere for MIUI-brukere.
+* Du kan bytte til den gamle mekanismen fra innstillingsmenyen.
