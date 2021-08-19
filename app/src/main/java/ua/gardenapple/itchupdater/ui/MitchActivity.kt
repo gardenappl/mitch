@@ -10,6 +10,6 @@ abstract class MitchActivity : AppCompatActivity() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(newBase)
 
         super.attachBaseContext(MitchContextWrapper.wrap(newBase,
-            prefs.getString(PREF_LANG_LOCALE, "en")!!))
+            prefs.getString(PREF_LANG_LOCALE, "")!!))
     }
 }

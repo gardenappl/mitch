@@ -147,7 +147,7 @@ class Mitch : Application() {
         setThemeFromPreferences(sharedPreferences)
 
         mitchContext = MitchContextWrapper.wrap(applicationContext,
-            sharedPreferences.getString(PREF_LANG_LOCALE, "en")!!)
+            sharedPreferences.getString(PREF_LANG_LOCALE, "")!!)
         Mitch.cacheDir = cacheDir
 
 
