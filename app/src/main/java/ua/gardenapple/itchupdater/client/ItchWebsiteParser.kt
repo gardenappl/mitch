@@ -210,11 +210,11 @@ object ItchWebsiteParser {
 
         val ownershipReason = downloadButtonRow.selectFirst(".ownership_reason").clone()
 
-        val purchasedPrice = ownershipReason.selectFirst(".purchase_price")
-        purchasedPrice.replaceWith(Element("b").text(purchasedPrice.ownText()))
+        val purchasedPrice: Element? = ownershipReason.selectFirst(".purchase_price")
+        purchasedPrice?.replaceWith(Element("b").text(purchasedPrice.ownText()))
 
-        val ownDate = ownershipReason.selectFirst(".own_date")
-        ownDate.replaceWith(Element("i").text(ownDate.ownText()))
+        val ownDate: Element? = ownershipReason.selectFirst(".own_date")
+        ownDate?.replaceWith(Element("i").text(ownDate.ownText()))
 
 
         return PurchasedInfo(
