@@ -257,7 +257,7 @@ object Utils {
     }
 
     fun getPreferredLocale(config: Configuration): Locale {
-        return if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
             return config.locales.get(0)
         } else {
             @Suppress("deprecation")
