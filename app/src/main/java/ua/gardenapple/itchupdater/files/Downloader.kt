@@ -12,6 +12,7 @@ import okhttp3.Request
 import okhttp3.Response
 import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD
+import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
 import java.io.BufferedInputStream
@@ -178,10 +179,12 @@ object Downloader : DownloadFileListener() {
                 return@withContext Result.failure()
             } catch (e: Exception) {
                 Log.e(LOGGING_TAG, "Caught while downloading", e)
-                //TODO: localize error name?
-                val errorName = if (e is IOException) "I/O error" else "Unknown error"
-                Downloader.onError(applicationContext, file,
-                    downloadId, uploadId, e.localizedMessage ?: errorName, e)
+                val errorName = if (e is IOException)
+                    R.string.notification_download_io_error
+                else
+                    R.string.notification_download_unknown_error
+                Downloader.onError(applicationContext, file, downloadId, uploadId,
+                    e.localizedMessage ?: applicationContext.getString(errorName), e)
                 Result.failure()
             }
 

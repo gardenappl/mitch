@@ -172,4 +172,6 @@
     <string name="settings_lang">Язык</string>
     <string name="dialog_lang_restart_title">Смена языка</string>
     <string name="dialog_lang_restart">Приложение перезапустится, чтобы сменить язык</string>
+    <string name="notification_download_io_error">Ошибка сети или диска</string>
+    <string name="notification_download_unknown_error">Неизвестная ошибка</string>
 </resources>

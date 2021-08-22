@@ -168,4 +168,6 @@
     <string name="settings_lang">Мова</string>
     <string name="dialog_lang_restart_title">Зміна мови</string>
     <string name="dialog_lang_restart">Додаток перезапуститься з новою мовою</string>
+    <string name="notification_download_io_error">Помилка мережі або диску</string>
+    <string name="notification_download_unknown_error">Невідома помилка</string>
 </resources>
