@@ -64,7 +64,7 @@ class DatabaseCleanup(private val context: Context) {
 
         val installsToUpdate = ArrayList<Installation>()
         //TODO: Get rid of this backwards compatibility with older versions of Mitch
-        if (sharedPrefs.getBoolean(PREF_DB_RAN_CLEANUP_ONCE, false)) {
+        if (!sharedPrefs.getBoolean(PREF_DB_RAN_CLEANUP_ONCE, false)) {
             for (i in installs.indices) {
                 var install = installs[i]
                 if (install.packageName != null && install.platforms and
