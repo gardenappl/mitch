@@ -72,7 +72,7 @@ const val PREF_WEB_ANDROID_FILTER = "ua.gardenapple.itchupdater.web_android_filt
 const val PREF_LANG = "mitch.lang"
 /**
  * Locale is not controlled directly by the user; instead, Mitch.kt applies
- * [PREF_LANG_LOCALE_NEXT], and then [PREF_LANG_LOCALE] gets applied on next app restart
+ * [PREF_LANG_LOCALE_NEXT], and then [PREF_LANG_LOCALE] gets applied on app restart
  */
 const val PREF_LANG_LOCALE = "mitch.lang_locale"
 const val PREF_LANG_LOCALE_NEXT = "mitch.lang_locale_next"
@@ -280,24 +280,24 @@ class Mitch : Application() {
                 ReportField.LOGCAT,
                 ReportField.SHARED_PREFERENCES
             )
-            setExcludeMatchingSharedPreferencesKeys(".*(justice|racial|palestine).*")
+            setExcludeMatchingSharedPreferencesKeys(".*(racial|justice|palestine).*")
 
             getPluginConfigurationBuilder(MailSenderConfigurationBuilder::class.java).apply {
                 setMailTo("~gardenapple/mitch-bug-reports@lists.sr.ht, gardenapple+mitch@posteo.net")
                 //Empty subject, user should write their own
                 setSubject("")
-                //Strings are English only, this is intentional
+                //Email body is English only, this is intentional
                 setBody("""
-                    > Your message will be published on SourceHut,
-                    > and also sent to the author's personal address.
+                    > Please describe what you were doing when you got the error.
                     
                     > Note: SourceHut does not accept email in HTML format,
                     > for security and privacy reasons.
                     > Please send this message as "plain text" if you can.
                     
-                    > Thank you for your help!
+                    > Your message will be published on SourceHut,
+                    > and also sent to the developer's personal address.
                     
-                    > Please describe what you were doing when you got the error:
+                    > Thank you for your help!
                 """.trimIndent())
                 setReportFileName("error-report-and-logs.txt")
                 setEnabled(true)
