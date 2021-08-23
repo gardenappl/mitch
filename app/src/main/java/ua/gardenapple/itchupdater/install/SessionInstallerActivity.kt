@@ -36,14 +36,6 @@ class SessionInstallerActivity : MitchActivity(), CoroutineScope by MainScope() 
             Installations.sessionInstaller.doInstall(this@SessionInstallerActivity,
                 downloadId, intent.data!!.toFile())
 
-            withContext(Dispatchers.IO) {
-                val db = AppDatabase.getDatabase(this@SessionInstallerActivity)
-                val installs = db.installDao.getAllKnownInstallationsSync()
-                Log.d(LOGGING_TAG, "Known installs:")
-                for (install in installs)
-                    Log.d(LOGGING_TAG, install.toString())
-            }
-
             this@SessionInstallerActivity.finish()
         }
     }

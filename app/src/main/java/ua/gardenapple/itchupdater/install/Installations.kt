@@ -125,16 +125,9 @@ object Installations {
         context: Context, installId: Long, packageName: String?,
         apk: File, status: Int
     ) {
-        Log.d(LOGGING_TAG, "oninstallresult $installId")
         var packageName = packageName
 
         val db = AppDatabase.getDatabase(context)
-        withContext(Dispatchers.IO) {
-            val installs = db.installDao.getAllKnownInstallationsSync()
-            Log.d(LOGGING_TAG, "Known installs:")
-            for (install in installs)
-                Log.d(LOGGING_TAG, install.toString())
-        }
         val install = db.installDao.getPendingInstallationByInstallId(installId)!!
 
         if (status == PackageInstaller.STATUS_SUCCESS && packageName == null) {
