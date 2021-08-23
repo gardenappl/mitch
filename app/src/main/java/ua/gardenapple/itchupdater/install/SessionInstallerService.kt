@@ -26,6 +26,7 @@ class SessionInstallerService : Service() {
         private const val LOGGING_TAG = "InstallerService"
 
         const val EXTRA_APK_PATH = "APK_PATH"
+        const val EXTRA_DOWNLOAD_ID = "DOWNLOAD_ID"
     }
 
     override fun onBind(p0: Intent?): IBinder? = null
@@ -34,7 +35,8 @@ class SessionInstallerService : Service() {
         Log.d(LOGGING_TAG, Utils.toString(intent.extras))
         val status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE)
         val packageName = intent.getStringExtra(PackageInstaller.EXTRA_PACKAGE_NAME)
-        val sessionId = intent.getIntExtra(PackageInstaller.EXTRA_SESSION_ID, -1)
+        val sessionId = Utils.getInt(intent.extras!!, PackageInstaller.EXTRA_SESSION_ID)!!
+        val downloadId = Utils.getInt(intent.extras!!, EXTRA_DOWNLOAD_ID)!!
         val apkPath = intent.getStringExtra(EXTRA_APK_PATH)!!
 
         //InstallerService shouldn't receive intent for Mitch anyway,
@@ -52,6 +54,9 @@ class SessionInstallerService : Service() {
                 startActivity(confirmationIntent)
             }
             else -> runBlocking(Dispatchers.IO) {
+                /** See comment in [SessionInstaller.doInstall] about why we call onStart here */
+                Mitch.databaseHandler.onInstallStart(downloadId, sessionId.toLong())
+
                 Installations.onInstallResult(applicationContext, sessionId.toLong(),
                     packageName, File(apkPath), status)
             }

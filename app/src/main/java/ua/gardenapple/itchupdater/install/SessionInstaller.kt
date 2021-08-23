@@ -29,7 +29,12 @@ class SessionInstaller : AbstractInstaller() {
         return pkgInstaller.createSession(params)
     }
 
-    private suspend fun doInstall(apkFile: File, sessionId: Int, context: Context) = withContext(Dispatchers.IO) {
+    private suspend fun doInstall(
+        apkFile: File,
+        downloadId: Int,
+        sessionId: Int,
+        context: Context
+    ) = withContext(Dispatchers.IO) {
         val pkgInstaller = context.packageManager.packageInstaller
 
         val session = pkgInstaller.openSession(sessionId)
@@ -48,6 +53,7 @@ class SessionInstaller : AbstractInstaller() {
 
         val callbackIntent = Intent(context, SessionInstallerService::class.java)
             .putExtra(SessionInstallerService.EXTRA_APK_PATH, apkFile.path)
+            .putExtra(SessionInstallerService.EXTRA_DOWNLOAD_ID, downloadId)
         val pendingIntent = PendingIntent.getService(
             context, sessionId, callbackIntent, PendingIntent.FLAG_UPDATE_CURRENT
         )
@@ -70,10 +76,16 @@ class SessionInstaller : AbstractInstaller() {
             val sessionID = createSession(context)
             Log.d(LOGGING_TAG, "Created session $sessionID")
 
-            Mitch.databaseHandler.onInstallStart(downloadId, sessionID.toLong())
-            Log.d(LOGGING_TAG, "Notified")
+            // Actually, if Android asks for permission to install apps, and
+            // the user presses "Cancel", then Mitch is not notified of this.
+            // So it's better to not call onInstallStart until the very last moment.
 
-            doInstall(apkFile, sessionID, context)
+            // Otherwise it's impossible to retry the installation (e.g. when Mitch has no
+            // permission to install apps on its first launch).
+//            Mitch.databaseHandler.onInstallStart(downloadId, sessionID.toLong())
+//            Log.d(LOGGING_TAG, "Notified")
+
+            doInstall(apkFile, downloadId, sessionID, context)
             Log.d(LOGGING_TAG, "Installed")
         }
 
