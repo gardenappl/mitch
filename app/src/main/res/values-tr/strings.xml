@@ -172,4 +172,9 @@
     <string name="settings_palestine_claim_all">Filistin Yardım paketi: hepsini talep et</string>
     <string name="game_bundle_palestine">Filistin Yardımı için bağımsız paket</string>
     <string name="game_palestine_bundle_claim_error">Filistin Yardım paketinden indirme bağlantısına erişilemedi.</string>
+    <string name="dialog_installer_please_wait">Lütfen bekleyin, uygulama kurulum için hazırlanıyor…</string>
+    <string name="notification_download_unknown_error">Bilinmeyen hata</string>
+    <string name="notification_download_io_error">Ağ veya disk hatası</string>
+    <string name="dialog_lang_restart">Uygulama, yeni dili uygulamak için yeniden başlatılacak</string>
+    <string name="dialog_lang_restart_title">Dil değişti</string>
 </resources>
