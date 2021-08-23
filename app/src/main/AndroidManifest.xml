@@ -27,6 +27,9 @@
             android:hardwareAccelerated="true"
             android:requestLegacyExternalStorage="true">
 
+        <!-- https://developer.android.com/guide/webapps/webview-privacy -->
+        <meta-data android:name="android.webkit.WebView.MetricsOptOut" android:value="true" />
+
         <activity
                 android:name=".ui.MainActivity"
                 android:theme="@style/SplashScreenTheme"
