@@ -39,11 +39,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
                         val readyToInstall = ArrayList<Installation>()
                         for (install in db.installDao.getAllKnownInstallationsSync()) {
-                            if (install.status == Installation.STATUS_INSTALLING) {
-                                Installations.getInstaller(context, install)
-                                    .tryCancel(context, install.downloadOrInstallId!!)
-                            } else if (install.status == Installation.STATUS_READY_TO_INSTALL) {
-                                readyToInstall.add(install)
+                            if (install.status == Installation.STATUS_INSTALLING ||
+                                install.status == Installation.STATUS_READY_TO_INSTALL) {
+
+                                Installations.cancelPending(context, install)
                             }
                         }
                         db.installDao.delete(readyToInstall)

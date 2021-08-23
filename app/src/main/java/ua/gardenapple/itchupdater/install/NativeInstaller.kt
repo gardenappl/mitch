@@ -27,12 +27,12 @@ class NativeInstaller : AbstractInstaller() {
         Log.d(LOGGING_TAG, "Turning ${pendingInstall.uploadId} into $installId")
         Mitch.databaseHandler.onInstallStart(downloadId, installId)
 
-        val intent = Intent(context, NativeInstallerActivity::class.java)
-        intent.action = NativeInstallerActivity.ACTION_INSTALL_PACKAGE
-        intent.data = apkFile.toUri()
-        intent.putExtra(NativeInstallerActivity.EXTRA_INSTALL_ID, installId)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
+        val intent = Intent(context, NativeInstallerActivity::class.java).apply {
+            action = NativeInstallerActivity.ACTION_INSTALL_PACKAGE
+            data = apkFile.toUri()
+            putExtra(NativeInstallerActivity.EXTRA_INSTALL_ID, installId)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
         context.startActivity(intent)
     }
 

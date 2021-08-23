@@ -111,7 +111,6 @@ class LibraryAdapter internal constructor(
             notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD,
                 gameInstall.downloadOrInstallId!!.toInt())
 
-            //TODO: Activity for SessionInstaller to avoid GlobalScope
             GlobalScope.launch {
                 val installer = Installations.getInstaller(context)
                 val file = Mitch.fileManager.getPendingFile(gameInstall.uploadId)!!

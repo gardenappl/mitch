@@ -81,6 +81,13 @@
                 android:excludeFromRecents="true"
                 android:finishOnTaskLaunch="true"
                 android:launchMode="singleInstance"/>
+        <activity
+                android:name=".install.SessionInstallerActivity"
+                android:exported="false"
+                android:theme="@style/DialogStyle"
+                android:excludeFromRecents="true"
+                android:finishOnTaskLaunch="true"
+                android:launchMode="singleInstance"/>
 
         <receiver
                 android:name=".install.InstallRequestBroadcastReceiver"

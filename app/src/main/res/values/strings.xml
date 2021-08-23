@@ -170,4 +170,5 @@
     <string name="dialog_lang_restart">The app will restart to apply the new language</string>
     <string name="notification_download_io_error">Network or disk error</string>
     <string name="notification_download_unknown_error">Unknown error</string>
+    <string name="dialog_installer_please_wait">Preparing game for installation, please wait...</string>
 </resources>

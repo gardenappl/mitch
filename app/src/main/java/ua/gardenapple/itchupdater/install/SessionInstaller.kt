@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.util.Log
+import androidx.core.net.toUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.Mitch
@@ -54,10 +55,20 @@ class SessionInstaller : AbstractInstaller() {
         session.close()
     }
 
-    override suspend fun requestInstall(context: Context, downloadId: Int, apkFile: File): Unit =
+    override suspend fun requestInstall(context: Context, downloadId: Int, apkFile: File) {
+        val intent = Intent(context, SessionInstallerActivity::class.java).apply {
+            data = apkFile.toUri()
+            putExtra(SessionInstallerActivity.EXTRA_DOWNLOAD_ID, downloadId)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+
+        context.startActivity(intent)
+    }
+
+    internal suspend fun doInstall(context: Context, downloadId: Int, apkFile: File): Unit =
         withContext(Dispatchers.IO) {
             val sessionID = createSession(context)
-            Log.d(LOGGING_TAG, "Created session")
+            Log.d(LOGGING_TAG, "Created session $sessionID")
 
             Mitch.databaseHandler.onInstallStart(downloadId, sessionID.toLong())
             Log.d(LOGGING_TAG, "Notified")
@@ -69,10 +80,10 @@ class SessionInstaller : AbstractInstaller() {
     override suspend fun tryCancel(context: Context, installId: Long): Boolean {
         try {
             context.packageManager.packageInstaller.abandonSession(installId.toInt())
+            return true
         } catch (e: SecurityException) {
             return false
         }
-        return true
     }
 
     override suspend fun isInstalling(context: Context, installId: Long): Boolean? {

@@ -20,8 +20,8 @@ import java.io.File
 
 object Installations {
     private const val LOGGING_TAG = "Installations"
-    private val nativeInstaller = NativeInstaller()
-    private val sessionInstaller = SessionInstaller()
+    internal val nativeInstaller = NativeInstaller()
+    internal val sessionInstaller = SessionInstaller()
 
     suspend fun deleteFinishedInstall(context: Context, uploadId: Int) =
         withContext(Dispatchers.IO) {
@@ -67,8 +67,23 @@ object Installations {
         if (status == Installation.STATUS_INSTALLED)
             throw IllegalArgumentException("Tried to cancel installed Installation")
 
+        if (status != Installation.STATUS_INSTALLING) {
+            val notificationService =
+                context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
+            notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, downloadOrInstallId.toInt())
+        }
+
+        withContext(Dispatchers.IO) {
+            val db = AppDatabase.getDatabase(context)
+            db.updateCheckDao.getUpdateCheckResultForUpload(uploadId)?.let {
+                it.isInstalling = false
+                db.updateCheckDao.insert(it)
+            }
+        }
+
         if (status == Installation.STATUS_INSTALLING) {
-            getInstaller(downloadOrInstallId).tryCancel(context, downloadOrInstallId)
+            if (getInstaller(downloadOrInstallId).tryCancel(context, downloadOrInstallId))
+                return
         }
 
         withContext(Dispatchers.IO) {
@@ -80,17 +95,6 @@ object Installations {
             }
             val db = AppDatabase.getDatabase(context)
             db.installDao.delete(installId)
-
-            db.updateCheckDao.getUpdateCheckResultForUpload(uploadId)?.let {
-                it.isInstalling = false
-                db.updateCheckDao.insert(it)
-            }
-        }
-
-        if (status != Installation.STATUS_INSTALLING) {
-            val notificationService =
-                context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-            notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, downloadOrInstallId.toInt())
         }
     }
 
@@ -121,9 +125,16 @@ object Installations {
         context: Context, installId: Long, packageName: String?,
         apk: File, status: Int
     ) {
+        Log.d(LOGGING_TAG, "oninstallresult $installId")
         var packageName = packageName
 
         val db = AppDatabase.getDatabase(context)
+        withContext(Dispatchers.IO) {
+            val installs = db.installDao.getAllKnownInstallationsSync()
+            Log.d(LOGGING_TAG, "Known installs:")
+            for (install in installs)
+                Log.d(LOGGING_TAG, install.toString())
+        }
         val install = db.installDao.getPendingInstallationByInstallId(installId)!!
 
         if (status == PackageInstaller.STATUS_SUCCESS && packageName == null) {
