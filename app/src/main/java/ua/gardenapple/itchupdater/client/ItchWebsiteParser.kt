@@ -145,7 +145,11 @@ object ItchWebsiteParser {
 
             val uploadNameDiv = uploadDiv.selectFirst(".upload_name")
             val name = uploadNameDiv.selectFirst(".name").attr("title")
-            val fileSize = uploadNameDiv.selectFirst(".file_size").child(0).html()
+
+            // TODO: External download link
+            val fileSize = uploadNameDiv.selectFirst(".file_size")?.child(0)?.html()
+                ?: continue
+
             val uploadId = requiredUploadId
                 ?: Integer.parseInt(uploadDiv.selectFirst(".download_btn").attr("data-upload_id"))
 
