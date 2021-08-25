@@ -262,20 +262,19 @@ object ItchWebsiteParser {
     /**
      * @return null if user does not have access
      */
-    suspend fun getDownloadUrl(doc: Document, storeUrl: String): DownloadUrl? =
-        withContext(Dispatchers.IO) {
-            //The game has been bought
-            val purchaseInfo = getPurchasedInfo(doc)
-            if (purchaseInfo != null)
-                return@withContext DownloadUrl(purchaseInfo.downloadPage, isPermanent = true, isStorePage = false)
+    suspend fun getDownloadUrl(doc: Document, storeUrl: String): DownloadUrl? {
+        //The game has been bought
+        val purchaseInfo = getPurchasedInfo(doc)
+        if (purchaseInfo != null)
+            return DownloadUrl(purchaseInfo.downloadPage, isPermanent = true, isStorePage = false)
 
-            //The game is free and the store page provides download links
-            if (doc.selectFirst("download_btn") != null)
-                return@withContext DownloadUrl(storeUrl, isPermanent = true, isStorePage = true)
+        //The game is free and the store page provides download links
+        if (doc.selectFirst("download_btn") != null)
+            return DownloadUrl(storeUrl, isPermanent = true, isStorePage = true)
 
-            //The game is free but accepts donations and hasn't been paid for
-            return@withContext fetchDownloadUrlFromStorePage(storeUrl)
-        }
+        //The game is free but accepts donations and hasn't been paid for
+        return fetchDownloadUrlFromStorePage(storeUrl)
+    }
 
     /**
      * Requests the URL of a web page with available downloads for an itch.io game.
@@ -283,8 +282,8 @@ object ItchWebsiteParser {
      * @param storeUrl URL of a game's store page.
      * @return For paid games, always returns null, otherwise returns a URL of a downloads page.
      */
-    suspend fun fetchDownloadUrlFromStorePage(storeUrl: String): DownloadUrl? =
-        withContext(Dispatchers.IO) {
+    suspend fun fetchDownloadUrlFromStorePage(storeUrl: String): DownloadUrl? {
+        val result = withContext(Dispatchers.IO) {
             Log.d(LOGGING_TAG, "Fetching download URL for $storeUrl")
             val storeUriParsed = Uri.parse(storeUrl)
 
@@ -306,36 +305,37 @@ object ItchWebsiteParser {
                     addHeader("Cookie", it)
                 }
                 post(form)
+
                 build()
             }
-            val result: String =
-                Mitch.httpClient.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful)
-                        throw IOException("Unexpected code $response")
+            Mitch.httpClient.newCall(request).execute().use { response ->
+                if (!response.isSuccessful)
+                    throw IOException("Unexpected code $response")
 
-                    //Log.d(LOGGING_TAG, "Response: ${response.body!!.string()}")
-                    response.body!!.string()
-                }
-            val resultJson = JSONObject(result)
-            Log.d(LOGGING_TAG, "Result for $storeUrl: $resultJson")
-            if (resultJson.has("errors")) {
-                val errorsArray = resultJson.getJSONArray("errors")
-                for (i in 0 until errorsArray.length()) {
-                    if (errorsArray.getString(i) == "you must buy this game to download")
-                        return@withContext null
-                }
-
+                //Log.d(LOGGING_TAG, "Response: ${response.body!!.string()}")
+                response.body!!.string()
             }
+        }
 
-            if (resultJson.has("url"))
-                return@withContext DownloadUrl(
+        val resultJson = JSONObject(result)
+        Log.d(LOGGING_TAG, "Result for $storeUrl: $resultJson")
+        if (resultJson.has("errors")) {
+            val errorsArray = resultJson.getJSONArray("errors")
+            for (i in 0 until errorsArray.length()) {
+                if (errorsArray.getString(i) == "you must buy this game to download")
+                    return null
+            }
+        }
+
+        if (resultJson.has("url"))
+            return DownloadUrl(
                     resultJson.getString("url"),
                     isPermanent = false,
                     isStorePage = false
-                )
-            else
-                throw RuntimeException("Unexpected JSON response")
-        }
+            )
+        else
+            throw RuntimeException("Unexpected JSON response")
+    }
 
     fun getLocale(doc: Document): String {
         val scripts = doc.head().getElementsByTag("script")

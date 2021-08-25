@@ -24,17 +24,18 @@ object ItchLibraryParser {
     /**
      * @return null if user is not logged in and has no access, otherwise a list of items (if size == [PAGE_SIZE], should request next page)
      */
-    suspend fun parsePage(page: Int): List<ItchLibraryItem>? = withContext(Dispatchers.IO) {
-        val request = Request.Builder().run {
-            url("https://itch.io/my-purchases?format=json&page=$page")
+    suspend fun parsePage(page: Int): List<ItchLibraryItem>? {
+        val result = withContext(Dispatchers.IO) {
+            val request = Request.Builder().run {
+                url("https://itch.io/my-purchases?format=json&page=$page")
 
-            CookieManager.getInstance()?.getCookie("https://itch.io")?.let { cookie ->
-                addHeader("Cookie", cookie)
+                CookieManager.getInstance()?.getCookie("https://itch.io")?.let { cookie ->
+                    addHeader("Cookie", cookie)
+                }
+                get()
+
+                build()
             }
-            get()
-            build()
-        }
-        val result: String =
             Mitch.httpClient.newCall(request).execute().use { response ->
                 if (!response.isSuccessful)
                     throw IOException("Unexpected code $response")
@@ -42,14 +43,16 @@ object ItchLibraryParser {
                 if (response.isRedirect)
                     return@withContext null
 
-                response.body?.string() ?: throw IOException("Expected response body, got null")
+                response.body?.string()
+                        ?: throw IOException("Expected response body, got null")
             }
+        } ?: return null
 
         val resultJson = try {
             JSONObject(result)
         } catch (e: JSONException) {
             //Invalid JSON == we got redirected to login page
-            return@withContext null
+            return null
         }
 
         val itemCount = resultJson.getInt("num_items")
@@ -92,6 +95,6 @@ object ItchLibraryParser {
             )
         }
 
-        return@withContext items
+        return items
     }
 }

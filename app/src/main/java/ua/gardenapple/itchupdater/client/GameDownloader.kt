@@ -63,18 +63,13 @@ object GameDownloader {
      */
     private suspend fun doUpdate(context: Context, update: UpdateCheckResult): Int {
         update.isInstalling = true
-        withContext(Dispatchers.IO) {
-            val db = AppDatabase.getDatabase(context)
-            db.updateCheckDao.insert(update)
-        }
+        val db = AppDatabase.getDatabase(context)
+        db.updateCheckDao.insert(update)
 
         val uploadId = update.uploadID!!
-        val game = withContext(Dispatchers.IO) {
-            val db = AppDatabase.getDatabase(context)
-            val install = db.installDao.getInstallationById(update.installationId)
 
-            db.gameDao.getGameById(install!!.gameId)!!
-        }
+        val install = db.installDao.getInstallationById(update.installationId)
+        val game = db.gameDao.getGameById(install!!.gameId)!!
 
         val fileRequestUrl = Uri.parse(game.storeUrl).buildUpon().run {
             appendPath("file")
@@ -174,7 +169,7 @@ object GameDownloader {
         downloadPageUrl: String,
         contentDisposition: String?,
         mimeType: String?
-    ) = withContext(Dispatchers.IO) {
+    ) {
         if (pendingInstall.internalId != 0)
             throw IllegalArgumentException("Pending installation already has internalId!")
 

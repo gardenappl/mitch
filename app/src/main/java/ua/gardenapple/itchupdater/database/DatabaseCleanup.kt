@@ -22,7 +22,7 @@ class DatabaseCleanup(private val context: Context) {
         private const val LOGGING_TAG = "CleanupWorker"
     }
 
-    suspend fun cleanAppDatabase(db: AppDatabase): Result = withContext(Dispatchers.IO) {
+    suspend fun cleanAppDatabase(db: AppDatabase): Result {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
 
         Log.d(LOGGING_TAG, "Started.")
@@ -78,9 +78,8 @@ class DatabaseCleanup(private val context: Context) {
             }
         }
 
-        for (install in installsToUpdate) {
+        for (install in installsToUpdate)
             Log.d(LOGGING_TAG, "To update: $install")
-        }
         if (installsToUpdate.isNotEmpty())
             db.installDao.update(installsToUpdate)
 
@@ -108,16 +107,16 @@ class DatabaseCleanup(private val context: Context) {
             commit()
         }
 
-        Result.success()
+        return Result.success()
     }
 
 
     class Worker(appContext: Context, params: WorkerParameters) :
         CoroutineWorker(appContext, params) {
 
-        override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+        override suspend fun doWork(): Result {
             val db = AppDatabase.getDatabase(applicationContext)
-            db.withTransaction {
+            return db.withTransaction {
                 DatabaseCleanup(applicationContext).cleanAppDatabase(db)
             }
         }

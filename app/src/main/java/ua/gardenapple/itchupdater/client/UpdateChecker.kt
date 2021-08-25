@@ -27,11 +27,11 @@ class UpdateChecker(private val context: Context) {
         private const val LOGGING_TAG = "UpdateCheckWorker"
     }
 
-    suspend fun checkUpdates(): Result = withContext(Dispatchers.IO) {
+    suspend fun checkUpdates(): Result {
         // Avoid a bunch of individual errors, if we just have no network connection
         if (!Utils.isNetworkConnected(context)) {
             Log.w(LOGGING_TAG, "No network connection detected, aborting")
-            return@withContext Result.failure()
+            return Result.failure()
         }
 
         val db = AppDatabase.getDatabase(context)
@@ -110,7 +110,7 @@ class UpdateChecker(private val context: Context) {
             commit()
         }
 
-        if (success)
+        return if (success)
             Result.success()
         else
             Result.failure()

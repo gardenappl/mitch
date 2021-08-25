@@ -5,8 +5,10 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.room.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.BuildConfig
 import ua.gardenapple.itchupdater.FLAVOR_FDROID
 import ua.gardenapple.itchupdater.PREF_DB_RAN_CLEANUP_ONCE
@@ -43,7 +45,7 @@ abstract class AppDatabase : RoomDatabase() {
                 INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
             }
         
-        private suspend fun buildDatabase(context: Context): AppDatabase =
+        private suspend fun buildDatabase(context: Context): AppDatabase = withContext(Dispatchers.IO) {
             Room.databaseBuilder(
                 context.applicationContext,
                 AppDatabase::class.java, "app_database"
@@ -64,6 +66,7 @@ abstract class AppDatabase : RoomDatabase() {
                     DatabaseCleanup(context).cleanAppDatabase(appDb)
                 }
             }
+        }
     }
 
 

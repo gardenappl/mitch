@@ -5,10 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.PREF_LANG_SITE_LOCALE
@@ -18,10 +15,7 @@ import ua.gardenapple.itchupdater.data.PalestineBundleGameIDs
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 
-class ItchBrowseHandler(
-    private val context: Context,
-    private val coroutineScope: CoroutineScope
-) {
+class ItchBrowseHandler(private val context: Context) {
     companion object {
         private const val LOGGING_TAG = "ItchBrowseHandler"
 
@@ -63,28 +57,26 @@ class ItchBrowseHandler(
         var hasAndroidVersion = false
 
         if (ItchWebsiteUtils.isStorePage(doc)) {
-            withContext(Dispatchers.IO) {
-                val db = AppDatabase.getDatabase(context)
-                ItchWebsiteParser.getGameInfoForStorePage(doc, url)?.let { gameInfo ->
-                    game = gameInfo
-                    Log.d(LOGGING_TAG, "Adding game $game")
-                    db.gameDao.upsert(gameInfo)
+            val db = AppDatabase.getDatabase(context)
+            ItchWebsiteParser.getGameInfoForStorePage(doc, url)?.let { gameInfo ->
+                game = gameInfo
+                Log.d(LOGGING_TAG, "Adding game $game")
+                db.gameDao.upsert(gameInfo)
 
-                    if (JusticeBundleGameIDs.belongsToJusticeBundle(gameInfo.gameId)) {
-                        Log.d(LOGGING_TAG, "Belongs to Racial Justice bundle!")
-                        val username = ItchWebsiteUtils.getLoggedInUserName(doc)
+                if (JusticeBundleGameIDs.belongsToJusticeBundle(gameInfo.gameId)) {
+                    Log.d(LOGGING_TAG, "Belongs to Racial Justice bundle!")
+                    val username = ItchWebsiteUtils.getLoggedInUserName(doc)
 
-                        bundleLink = SpecialBundleHandler.getLinkForUser(context, false, username)
-                        bundlePalestinian = false
-                    }
+                    bundleLink = SpecialBundleHandler.getLinkForUser(context, false, username)
+                    bundlePalestinian = false
+                }
 
-                    if (PalestineBundleGameIDs.belongsToPalestineBundle(gameInfo.gameId)) {
-                        Log.d(LOGGING_TAG, "Belongs to Palestinian Aid bundle!")
-                        val username = ItchWebsiteUtils.getLoggedInUserName(doc)
+                if (PalestineBundleGameIDs.belongsToPalestineBundle(gameInfo.gameId)) {
+                    Log.d(LOGGING_TAG, "Belongs to Palestinian Aid bundle!")
+                    val username = ItchWebsiteUtils.getLoggedInUserName(doc)
 
-                        bundleLink = SpecialBundleHandler.getLinkForUser(context, true, username)
-                        bundlePalestinian = true
-                    }
+                    bundleLink = SpecialBundleHandler.getLinkForUser(context, true, username)
+                    bundlePalestinian = true
                 }
             }
             purchasedInfo = ItchWebsiteParser.getPurchasedInfo(doc)
@@ -124,20 +116,20 @@ class ItchBrowseHandler(
         )
     }
 
-    suspend fun setClickedUploadId(uploadId: Int) = withContext(Dispatchers.IO) {
+    suspend fun setClickedUploadId(uploadId: Int) {
         Log.d(LOGGING_TAG, "Set upload ID: $uploadId")
         clickedUploadId = uploadId
         tryStartDownload()
     }
 
-    suspend fun onDownloadStarted(url: String, contentDisposition: String?, mimeType: String?) = withContext(Dispatchers.IO) {
+    suspend fun onDownloadStarted(url: String, contentDisposition: String?, mimeType: String?) {
         currentDownloadUrl = url
         currentDownloadContentDisposition = contentDisposition
         currentDownloadMimeType = mimeType
         tryStartDownload()
     }
 
-    private fun tryStartDownload() {
+    private suspend fun tryStartDownload() {
         Log.d(LOGGING_TAG, "Upload ID: $clickedUploadId")
 
         val downloadPageDoc = lastDownloadDoc ?: return
@@ -147,21 +139,24 @@ class ItchBrowseHandler(
         val contentDisposition = currentDownloadContentDisposition ?: return
         val mimeType = currentDownloadMimeType ?: return
 
-        coroutineScope.launch(Dispatchers.IO) {
-            val pendingInstall = ItchWebsiteParser.getPendingInstallation(downloadPageDoc, uploadId)
-
-            coroutineScope.launch(Dispatchers.Main) {
-                Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_LONG)
-                    .show()
-            }
-
-            GameDownloader.requestDownload(context, pendingInstall, downloadUrl, downloadPageUrl,
-                contentDisposition, mimeType)
-        }
-
         clickedUploadId = null
         currentDownloadUrl = null
         currentDownloadMimeType = null
         currentDownloadContentDisposition = null
+
+        coroutineScope {
+            launch(Dispatchers.Main) {
+                Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_LONG)
+                    .show()
+            }
+
+            launch {
+                val pendingInstall =
+                    ItchWebsiteParser.getPendingInstallation(downloadPageDoc, uploadId)
+
+                GameDownloader.requestDownload(context, pendingInstall, downloadUrl,
+                    downloadPageUrl, contentDisposition, mimeType)
+            }
+        }
     }
 }

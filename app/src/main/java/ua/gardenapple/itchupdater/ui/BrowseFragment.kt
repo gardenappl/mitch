@@ -61,7 +61,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        browseHandler = ItchBrowseHandler(context, this)
+        browseHandler = ItchBrowseHandler(context)
     }
 
     override fun onCreateView(
@@ -601,7 +601,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     private class ItchJavaScriptInterface(val fragment: BrowseFragment) {
         @JavascriptInterface
         fun onDownloadLinkClick(uploadId: String) {
-            fragment.launch(Dispatchers.IO) {
+            fragment.launch {
                 fragment.browseHandler?.setClickedUploadId(uploadId.toInt())
             }
         }

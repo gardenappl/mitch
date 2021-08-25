@@ -11,10 +11,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.work.ExistingPeriodicWorkPolicy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.DatabaseCleanup

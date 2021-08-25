@@ -23,12 +23,14 @@ object Installations {
     internal val nativeInstaller = NativeInstaller()
     internal val sessionInstaller = SessionInstaller()
 
-    suspend fun deleteFinishedInstall(context: Context, uploadId: Int) =
+    suspend fun deleteFinishedInstall(context: Context, uploadId: Int) {
+        val db = AppDatabase.getDatabase(context)
+        db.installDao.deleteFinishedInstallation(uploadId)
+
         withContext(Dispatchers.IO) {
-            val db = AppDatabase.getDatabase(context)
-            db.installDao.deleteFinishedInstallation(uploadId)
             Mitch.fileManager.deleteDownloadedFile(uploadId)
         }
+    }
 
     suspend fun deleteOutdatedInstalls(context: Context, pendingInstall: Installation) {
         deleteFinishedInstall(context, pendingInstall.uploadId)
@@ -36,15 +38,13 @@ object Installations {
         if (pendingInstall.availableUploadIds == null)
             return
 
-        withContext(Dispatchers.IO) {
-            val db = AppDatabase.getDatabase(context)
-            val finishedInstalls =
-                db.installDao.getFinishedInstallationsForGame(pendingInstall.gameId)
+        val db = AppDatabase.getDatabase(context)
+        val finishedInstalls =
+            db.installDao.getFinishedInstallationsForGame(pendingInstall.gameId)
 
-            for (finishedInstall in finishedInstalls) {
-                if (!pendingInstall.availableUploadIds.contains(finishedInstall.uploadId))
-                    deleteFinishedInstall(context, finishedInstall.uploadId)
-            }
+        for (finishedInstall in finishedInstalls) {
+            if (!pendingInstall.availableUploadIds.contains(finishedInstall.uploadId))
+                deleteFinishedInstall(context, finishedInstall.uploadId)
         }
     }
 
@@ -73,12 +73,10 @@ object Installations {
             notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, downloadOrInstallId.toInt())
         }
 
-        withContext(Dispatchers.IO) {
-            val db = AppDatabase.getDatabase(context)
-            db.updateCheckDao.getUpdateCheckResultForUpload(uploadId)?.let {
-                it.isInstalling = false
-                db.updateCheckDao.insert(it)
-            }
+        val db = AppDatabase.getDatabase(context)
+        db.updateCheckDao.getUpdateCheckResultForUpload(uploadId)?.let {
+            it.isInstalling = false
+            db.updateCheckDao.insert(it)
         }
 
         if (status == Installation.STATUS_INSTALLING) {
@@ -86,16 +84,15 @@ object Installations {
                 return
         }
 
-        withContext(Dispatchers.IO) {
-            if (status == Installation.STATUS_DOWNLOADING) {
-                Log.d(LOGGING_TAG, "Cancelling $downloadOrInstallId")
-                Mitch.fileManager.cancel(context, downloadOrInstallId, uploadId)
-            } else {
+        if (status == Installation.STATUS_DOWNLOADING) {
+            Log.d(LOGGING_TAG, "Cancelling $downloadOrInstallId")
+            Mitch.fileManager.cancel(context, downloadOrInstallId, uploadId)
+        } else {
+            withContext(Dispatchers.IO) {
                 Mitch.fileManager.deletePendingFile(uploadId)
             }
-            val db = AppDatabase.getDatabase(context)
-            db.installDao.delete(installId)
         }
+        db.installDao.delete(installId)
     }
 
     fun getInstaller(context: Context, install: Installation): AbstractInstaller {
@@ -208,11 +205,8 @@ object Installations {
             if (Utils.fitsInInt(installSessionId))
                 notify(NOTIFICATION_TAG_INSTALL_RESULT, installSessionId.toInt(), builder.build())
             else
-                notify(
-                    NOTIFICATION_TAG_INSTALL_RESULT_LONG,
-                    installSessionId.toInt(),
-                    builder.build()
-                )
+                notify(NOTIFICATION_TAG_INSTALL_RESULT_LONG, installSessionId.toInt(),
+                    builder.build())
         }
     }
 

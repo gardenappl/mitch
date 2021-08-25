@@ -28,9 +28,8 @@ object SpecialBundleHandler {
      * If a download link for this username has been cached, return it.
      * Otherwise, do network requests and parsing to get bundle download link.
      */
-    suspend fun getLinkForUser(context: Context, palestine: Boolean,
-                                 userName: String?): String? = withContext(Dispatchers.IO) {
-        when (palestine) {
+    suspend fun getLinkForUser(context: Context, palestine: Boolean, userName: String?): String? {
+        return when (palestine) {
             true -> getLinkForUser(context, PREF_PALESTINE_LINK, PREF_PREFIX_PALESTINE_LINK,
                 PREF_PREFIX_PALESTINE_LAST_CHECK, PALESTINE_BUNDLE_URL, userName)
             false -> getLinkForUser(context, PREF_JUSTICE_LINK, PREF_PREFIX_JUSTICE_LINK,
@@ -130,8 +129,7 @@ object SpecialBundleHandler {
     /**
      * @return download link for the newly or previously claimed game from the bundle.
      */
-    suspend fun claimGame(bundleDownloadLink: String,
-                          game: Game): String = withContext(Dispatchers.IO) {
+    suspend fun claimGame(bundleDownloadLink: String, game: Game): String {
         val searchUri = Uri.parse(bundleDownloadLink).buildUpon().run {
             appendQueryParameter("search", game.name)
             build()
@@ -146,7 +144,7 @@ object SpecialBundleHandler {
             if (rowData.getElementsByAttributeValueMatching("href", storePattern).isNotEmpty()) {
                 val downloadButton = rowData.getElementsByClass("game_download_btn").first()
                 if (downloadButton != null)
-                    return@withContext downloadButton.attr("href")
+                    return downloadButton.attr("href")
 
 
                 val formBuilder = FormBody.Builder()
@@ -166,14 +164,17 @@ object SpecialBundleHandler {
                     post(formBuilder.build())
                     build()
                 }
-                Mitch.httpClient.newCall(formRequest).execute().use { response ->
-                    if (response.isSuccessful) {
-                        Log.d(LOGGING_TAG, "Success: ${response.request.url}")
-                        return@withContext response.request.url.toString()
-                    }
-                    if (response.isRedirect) {
-                        Log.d(LOGGING_TAG, "Redirect: ${response.header("Location")}")
-                        return@withContext response.header("Location")!!
+                return withContext(Dispatchers.IO) {
+                    Mitch.httpClient.newCall(formRequest).execute().use { response ->
+                        if (response.isSuccessful) {
+                            Log.d(LOGGING_TAG, "Success: ${response.request.url}")
+                            response.request.url.toString()
+                        } else if (response.isRedirect) {
+                            Log.d(LOGGING_TAG, "Redirect: ${response.header("Location")}")
+                            response.header("Location")!!
+                        } else {
+                            throw RuntimeException("Could not find bundle download link for game $game")
+                        }
                     }
                 }
             }

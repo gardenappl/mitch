@@ -51,12 +51,11 @@ object Downloader : DownloadFileListener() {
         Log.d(LOGGING_TAG, "Download ID: $downloadId")
         install.downloadOrInstallId = downloadId.toLong()
         install.status = Installation.STATUS_DOWNLOADING
-        withContext(Dispatchers.IO) {
-            val db = AppDatabase.getDatabase(context)
-            db.installDao.insert(install)
-        }
 
-        val updateCheckRequest =
+        val db = AppDatabase.getDatabase(context)
+        db.installDao.insert(install)
+
+        val downloadRequest =
             OneTimeWorkRequestBuilder<Worker>().run {
                 setInputData(workDataOf(
                     Pair(WORKER_URL, url),
@@ -72,7 +71,7 @@ object Downloader : DownloadFileListener() {
         WorkManager.getInstance(context).enqueueUniqueWork(
             getWorkName(downloadId),
             ExistingWorkPolicy.APPEND_OR_REPLACE,
-            updateCheckRequest
+            downloadRequest
         )
         return null
     }

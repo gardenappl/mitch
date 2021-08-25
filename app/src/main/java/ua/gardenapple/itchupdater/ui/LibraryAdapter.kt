@@ -255,7 +255,7 @@ class LibraryAdapter internal constructor(
                                 }
                             }
 
-                            GlobalScope.launch(Dispatchers.IO) {
+                            GlobalScope.launch {
                                 val db = AppDatabase.getDatabase(context)
                                 val install =
                                     db.installDao.getInstallationById(gameInstall.installId)!!

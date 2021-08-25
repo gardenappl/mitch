@@ -181,7 +181,7 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
             setActiveFragment(LIBRARY_FRAGMENT_TAG)
         }
 
-        launch(Dispatchers.IO) {
+        launch {
             // Force lazy-init database to fully initialize, in the background
             val db = AppDatabase.getDatabase(this@MainActivity)
             if (!db.isOpen)

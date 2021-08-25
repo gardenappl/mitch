@@ -121,7 +121,7 @@ class OwnedGamesActivity : MitchActivity() {
     private fun loadItems(searchString: String, androidOnly: Boolean) {
         loadJob?.cancel()
 
-        loadJob = lifecycleScope.launch(Dispatchers.IO) {
+        loadJob = lifecycleScope.launch {
             viewModel.getOwnedItems(searchString, androidOnly).collectLatest {
                 adapter.submitData(it)
             }

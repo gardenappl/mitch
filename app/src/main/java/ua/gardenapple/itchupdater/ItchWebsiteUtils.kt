@@ -100,22 +100,25 @@ object ItchWebsiteUtils {
     }
 
 
-    suspend fun fetchAndParse(url: String): Document = withContext(Dispatchers.IO) {
-        val request = Request.Builder().run {
-            url(url)
-            CookieManager.getInstance()?.getCookie(url)?.let { cookie ->
-                addHeader("Cookie", cookie)
+    suspend fun fetchAndParse(url: String): Document {
+        val html = withContext(Dispatchers.IO) {
+            val request = Request.Builder().run {
+                url(url)
+                CookieManager.getInstance()?.getCookie(url)?.let { cookie ->
+                    addHeader("Cookie", cookie)
+                }
+
+                build()
             }
-            build()
-        }
-        var html = ""
-        Mitch.httpClient.newCall(request).execute().use { response ->
-            if (!response.isSuccessful)
-                throw IOException("Unexpected response $response")
-            html = response.body!!.string()
+            Mitch.httpClient.newCall(request).execute().use { response ->
+                if (!response.isSuccessful)
+                    throw IOException("Unexpected response $response")
+
+                response.body!!.string()
+            }
         }
 
-        return@withContext Jsoup.parse(html)
+        return Jsoup.parse(html)
     }
 
     /**

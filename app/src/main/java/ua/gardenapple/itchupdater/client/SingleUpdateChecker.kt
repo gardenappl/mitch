@@ -6,7 +6,6 @@ import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.BuildConfig
 import ua.gardenapple.itchupdater.FLAVOR_ITCHIO
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
-import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
@@ -48,60 +47,59 @@ class SingleUpdateChecker(val db: AppDatabase) {
     /**
      * @return null if access is denied
      */
-    private suspend fun tryGetDownloadInfo(currentGame: Game): Pair<Document, ItchWebsiteParser.DownloadUrl>? =
-        withContext(Dispatchers.IO) {
-            var updateCheckDoc: Document
-            var downloadPageInfo: ItchWebsiteParser.DownloadUrl
-            var storePageDoc: Document? = null
+    private suspend fun tryGetDownloadInfo(currentGame: Game): Pair<Document, ItchWebsiteParser.DownloadUrl>? {
+        var updateCheckDoc: Document
+        var downloadPageInfo: ItchWebsiteParser.DownloadUrl
+        var storePageDoc: Document? = null
 
-            if (currentGame.downloadPageUrl != null) {
-                //Have cached download URL
+        if (currentGame.downloadPageUrl != null) {
+            //Have cached download URL
 
-                updateCheckDoc = ItchWebsiteUtils.fetchAndParse(currentGame.downloadPageUrl)
-                downloadPageInfo = currentGame.downloadInfo!!
+            updateCheckDoc = ItchWebsiteUtils.fetchAndParse(currentGame.downloadPageUrl)
+            downloadPageInfo = currentGame.downloadInfo!!
 
-                if (!ItchWebsiteUtils.hasGameDownloadLinks(updateCheckDoc)) {
-                    //game info may be out-dated
-                    storePageDoc = if (downloadPageInfo.isStorePage)
-                        updateCheckDoc
-                    else
-                        ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
-
-                    downloadPageInfo =
-                        ItchWebsiteParser.getDownloadUrl(storePageDoc, currentGame.storeUrl)
-                            ?: return@withContext null
-
-                    updateCheckDoc = ItchWebsiteUtils.fetchAndParse(downloadPageInfo.url)
-                }
-            } else {
-                //Must get fresh download URL
-
-                storePageDoc = ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
-                downloadPageInfo =
-                    ItchWebsiteParser.getDownloadUrl(storePageDoc, currentGame.storeUrl)
-                        ?: return@withContext null
-                updateCheckDoc = ItchWebsiteUtils.fetchAndParse(downloadPageInfo.url)
-            }
-
-
-            //Update game metadata
-            if (storePageDoc == null) {
+            if (!ItchWebsiteUtils.hasGameDownloadLinks(updateCheckDoc)) {
+                //game info may be out-dated
                 storePageDoc = if (downloadPageInfo.isStorePage)
                     updateCheckDoc
                 else
                     ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
+
+                downloadPageInfo =
+                    ItchWebsiteParser.getDownloadUrl(storePageDoc, currentGame.storeUrl)
+                        ?: return null
+
+                updateCheckDoc = ItchWebsiteUtils.fetchAndParse(downloadPageInfo.url)
             }
+        } else {
+            //Must get fresh download URL
 
-            var newGameInfo = ItchWebsiteParser.getGameInfoForStorePage(storePageDoc, currentGame.storeUrl)!!
-            if (downloadPageInfo.isPermanent) {
-                newGameInfo = newGameInfo.copy(downloadPageUrl = downloadPageInfo.url)
-            }
-            db.gameDao.update(newGameInfo)
-            logD(currentGame, "Inserted new game info: $newGameInfo")
-
-
-            return@withContext Pair(updateCheckDoc, downloadPageInfo)
+            storePageDoc = ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
+            downloadPageInfo =
+                ItchWebsiteParser.getDownloadUrl(storePageDoc, currentGame.storeUrl)
+                    ?: return null
+            updateCheckDoc = ItchWebsiteUtils.fetchAndParse(downloadPageInfo.url)
         }
+
+
+        //Update game metadata
+        if (storePageDoc == null) {
+            storePageDoc = if (downloadPageInfo.isStorePage)
+                updateCheckDoc
+            else
+                ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
+        }
+
+        var newGameInfo =
+            ItchWebsiteParser.getGameInfoForStorePage(storePageDoc, currentGame.storeUrl)!!
+        if (downloadPageInfo.isPermanent) {
+            newGameInfo = newGameInfo.copy(downloadPageUrl = downloadPageInfo.url)
+        }
+        db.gameDao.update(newGameInfo)
+        logD(currentGame, "Inserted new game info: $newGameInfo")
+
+        return Pair(updateCheckDoc, downloadPageInfo)
+    }
 
 
     suspend fun checkUpdates(
@@ -127,29 +125,33 @@ class SingleUpdateChecker(val db: AppDatabase) {
         throw RuntimeException()
     }
 
-    private suspend fun tryCheckUpdates(
+    private fun tryCheckUpdates(
         currentGame: Game, 
         currentInstall: Installation,
         updateCheckDoc: Document,
         downloadPageInfo: ItchWebsiteParser.DownloadUrl
-    ): UpdateCheckResult =
-        withContext(Dispatchers.IO) {
-            if (!shouldCheck(currentInstall))
-                throw IllegalArgumentException("Should not be checking updates using itch.io for this")
+    ): UpdateCheckResult {
+        if (!shouldCheck(currentInstall))
+            throw IllegalArgumentException("Should not be checking updates using itch.io for this")
 
-            logD(currentGame, "Checking updates for ${currentGame.name}")
-            logD(currentGame, "Current install: $currentInstall")
+        logD(currentGame, "Checking updates for ${currentGame.name}")
+        logD(currentGame, "Current install: $currentInstall")
 
-            if (!ItchWebsiteUtils.hasGameDownloadLinks(updateCheckDoc)) {
-                logD(currentGame, "No download links!")
-                return@withContext UpdateCheckResult(
-                    installationId = currentInstall.internalId,
-                    code = UpdateCheckResult.EMPTY
-                )
-            }
-
-            return@withContext compareUploads(updateCheckDoc, currentInstall, currentGame, downloadPageInfo)
+        if (!ItchWebsiteUtils.hasGameDownloadLinks(updateCheckDoc)) {
+            logD(currentGame, "No download links!")
+            return UpdateCheckResult(
+                installationId = currentInstall.internalId,
+                code = UpdateCheckResult.EMPTY
+            )
         }
+
+        return compareUploads(
+            updateCheckDoc,
+            currentInstall,
+            currentGame,
+            downloadPageInfo
+        )
+    }
 
     private fun compareUploads(
         updateCheckDoc: Document,

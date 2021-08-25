@@ -31,8 +31,8 @@ class DownloadFileManager(context: Context) {
      * Direct request to start downloading a file.
      * Any pending installs for the same uploadId will be cancelled.
      */
-    suspend fun requestDownload(context: Context, url: String, fileName: String,
-                                install: Installation) = withContext(Dispatchers.IO) {
+    suspend fun requestDownload(context: Context, url: String,
+                                fileName: String, install: Installation) {
         val db = AppDatabase.getDatabase(context)
 
         //cancel download for current pending installation
@@ -43,7 +43,9 @@ class DownloadFileManager(context: Context) {
         }
 
         val uploadId = install.uploadId
-        deletePendingFile(uploadId)
+        withContext(Dispatchers.IO) {
+            deletePendingFile(uploadId)
+        }
 
         val file = File(File(pendingPath, uploadId.toString()), fileName)
         val errorString = Downloader.requestDownload(context, url, file, install)
@@ -67,6 +69,10 @@ class DownloadFileManager(context: Context) {
     }
 
     fun checkIsDownloading(context: Context, install: Installation): Boolean {
+        if (install.status != Installation.STATUS_DOWNLOADING
+            && install.status != Installation.STATUS_READY_TO_INSTALL)
+            return false
+
         return install.downloadOrInstallId?.let { downloadId ->
             Downloader.checkIsDownloading(context, downloadId.toInt())
         } ?: false

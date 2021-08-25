@@ -103,7 +103,7 @@ class UpdatesListAdapter internal constructor(
                 binding.updateProgressBar.visibility = View.INVISIBLE
 
                 binding.updateButton.setOnClickListener { _ ->
-                    GlobalScope.launch(Dispatchers.IO) {
+                    GlobalScope.launch {
                         GameDownloader.startUpdate(context, updateCheckResult)
 
                         val notificationManager =
