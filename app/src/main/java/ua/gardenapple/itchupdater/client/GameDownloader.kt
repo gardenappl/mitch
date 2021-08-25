@@ -19,8 +19,6 @@ import ua.gardenapple.itchupdater.database.installation.Installation
 import java.io.IOException
 
 
-class ItchAccessDeniedException(message: String) : Exception(message)
-
 object GameDownloader {
     private const val LOGGING_TAG = "GameDownloader"
 
