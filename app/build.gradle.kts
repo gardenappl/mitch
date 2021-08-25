@@ -93,7 +93,7 @@ dependencies {
     // Room components
     implementation("androidx.room:room-runtime:${Build.Versions.room}")
     implementation("androidx.room:room-ktx:${Build.Versions.room}")
-    kapt( "androidx.room:room-compiler:${Build.Versions.room}")
+    kapt("androidx.room:room-compiler:${Build.Versions.room}")
     androidTestImplementation("androidx.room:room-testing:${Build.Versions.room}")
 
     // Lifecycle components
@@ -115,7 +115,7 @@ dependencies {
     implementation("org.jsoup:jsoup:${Build.Versions.jsoup}")
     // Glide
     implementation("com.github.bumptech.glide:glide:${Build.Versions.glide}")
-    kapt( "com.github.bumptech.glide:compiler:${Build.Versions.glide}")
+    kapt("com.github.bumptech.glide:compiler:${Build.Versions.glide}")
     implementation("com.github.bumptech.glide:recyclerview-integration:${Build.Versions.glide}")
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:${Build.Versions.okHttp}")
