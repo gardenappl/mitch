@@ -174,5 +174,5 @@
     <string name="dialog_lang_restart">Приложение перезапустится, чтобы сменить язык</string>
     <string name="notification_download_io_error">Ошибка сети или диска</string>
     <string name="notification_download_unknown_error">Неизвестная ошибка</string>
-    <string name="dialog_installer_please_wait">Подождите, сейчас устанавлим приложение…</string>
+    <string name="dialog_installer_please_wait">Подождите, сейчас устанавливаем приложение…</string>
 </resources>

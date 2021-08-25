@@ -171,4 +171,5 @@
     <string name="notification_download_io_error">Network or disk error</string>
     <string name="notification_download_unknown_error">Unknown error</string>
     <string name="dialog_installer_please_wait">Please wait, preparing app for installation…</string>
+    <string name="dialog_installer_no_space">Not enough disk space for this app.</string>
 </resources>
