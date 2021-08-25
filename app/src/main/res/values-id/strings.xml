@@ -160,4 +160,13 @@
     <string name="game_install">Pasang</string>
     <string name="game_download">Unduh</string>
     <string name="popup_handler_app_not_found">Tidak tahu cara membuka %s</string>
+    <string name="dialog_installer_please_wait">Harap tunggu, menyiapkan aplikasi untuk pemasangan…</string>
+    <string name="notification_download_unknown_error">Kesalahan tak dikenal</string>
+    <string name="dialog_lang_restart">Aplikasi ini akan dimulai ulang untuk menerapkan bahasa baru</string>
+    <string name="dialog_lang_restart_title">Bahasa diubah</string>
+    <string name="settings_lang">Bahasa</string>
+    <string name="settings_lang_system">Tergantung sistem</string>
+    <string name="settings_lang_site">Tergantung situs</string>
+    <string name="settings_lang_default">Default</string>
+    <string name="popup_no_network_connection">Memeriksa pembaruan butuh koneksi jaringan</string>
 </resources>
