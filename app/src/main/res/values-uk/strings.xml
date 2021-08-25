@@ -171,4 +171,5 @@
     <string name="notification_download_io_error">Помилка мережі або диску</string>
     <string name="notification_download_unknown_error">Невідома помилка</string>
     <string name="dialog_installer_please_wait">Зачекайте, зараз почнемо встановлювати додаток…</string>
+    <string name="dialog_installer_no_space">Не вистачає місця на диску.</string>
 </resources>

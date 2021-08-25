@@ -6,13 +6,19 @@ import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.util.Log
 import androidx.core.net.toUri
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.Utils
+import ua.gardenapple.itchupdater.database.AppDatabase
 import java.io.File
+import java.io.IOException
 
+//TODO: major overfaul of SessionInstaller (allow streaming directly from download URL)
 class SessionInstaller : AbstractInstaller() {
+    class NotEnoughSpaceException(e: IOException) : IOException(e)
+
     companion object {
         private const val LOGGING_TAG = "SessionInstaller"
     }
@@ -48,7 +54,15 @@ class SessionInstaller : AbstractInstaller() {
             }
         } catch (e: Exception) {
             session.abandon()
-            Log.e(LOGGING_TAG, "Error occurred while creating install session", e)
+            if (e is IOException && e.message?.startsWith("Failed to allocate") == true) {
+                Log.w(LOGGING_TAG, "Looks like not enough space", e)
+                throw NotEnoughSpaceException(e)
+            } else if (e is CancellationException) {
+                Log.w(LOGGING_TAG, "Cancelled")
+                throw e
+            } else {
+                throw e
+            }
         }
 
         val callbackIntent = Intent(context, SessionInstallerService::class.java)

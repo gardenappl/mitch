@@ -175,4 +175,5 @@
     <string name="notification_download_io_error">Ошибка сети или диска</string>
     <string name="notification_download_unknown_error">Неизвестная ошибка</string>
     <string name="dialog_installer_please_wait">Подождите, сейчас устанавливаем приложение…</string>
+    <string name="dialog_installer_no_space">Не хватает места на диске.</string>
 </resources>

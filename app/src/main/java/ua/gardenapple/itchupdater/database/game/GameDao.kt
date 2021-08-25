@@ -66,6 +66,16 @@ abstract class GameDao {
     abstract fun getPendingGames(): LiveData<List<GameInstallation>>
 
 
+    @Query("""
+        SELECT games.name
+        FROM games INNER JOIN installations
+        ON games.$GAME_ID = installations.game_id
+        WHERE $STATUS != ${Installation.STATUS_INSTALLING} 
+            AND $DOWNLOAD_OR_INSTALL_ID = :downloadId
+        LIMIT 1""")
+    abstract suspend fun getNameForPendingInstallWithDownloadId(downloadId: Int): String?
+
+
     @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId LIMIT 1")
     abstract suspend fun getGameById(gameId: Int): Game?
 
