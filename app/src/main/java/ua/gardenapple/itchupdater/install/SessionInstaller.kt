@@ -14,8 +14,8 @@ import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.AppDatabase
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
 
-//TODO: major overfaul of SessionInstaller (allow streaming directly from download URL)
 class SessionInstaller : AbstractInstaller() {
     class NotEnoughSpaceException(e: IOException) : IOException(e)
 
@@ -35,22 +35,16 @@ class SessionInstaller : AbstractInstaller() {
         return pkgInstaller.createSession(params)
     }
 
-    private suspend fun doInstall(
-        apkFile: File,
-        downloadId: Int,
-        sessionId: Int,
-        context: Context
-    ) = withContext(Dispatchers.IO) {
+    private suspend fun doInstall(apkStream: InputStream, lengthBytes: Long, downloadId: Int,
+                                  sessionId: Int, context: Context) = withContext(Dispatchers.IO) {
         val pkgInstaller = context.packageManager.packageInstaller
 
         val session = pkgInstaller.openSession(sessionId)
 
         try {
-            apkFile.inputStream().use { inputStream ->
-                session.openWrite(apkFile.name, 0, apkFile.length()).use { outputStream ->
-                    Utils.copy(inputStream, outputStream)
-                    session.fsync(outputStream)
-                }
+            session.openWrite("$sessionId ${System.nanoTime()}", 0, lengthBytes).use { outputStream ->
+                Utils.copy(apkStream, outputStream)
+                session.fsync(outputStream)
             }
         } catch (e: Exception) {
             session.abandon()
@@ -66,13 +60,34 @@ class SessionInstaller : AbstractInstaller() {
         }
 
         val callbackIntent = Intent(context, SessionInstallerService::class.java)
-            .putExtra(SessionInstallerService.EXTRA_APK_PATH, apkFile.path)
             .putExtra(SessionInstallerService.EXTRA_DOWNLOAD_ID, downloadId)
         val pendingIntent = PendingIntent.getService(
             context, sessionId, callbackIntent, PendingIntent.FLAG_UPDATE_CURRENT
         )
         session.commit(pendingIntent.intentSender)
         session.close()
+    }
+
+    override fun acceptsInstallFromStream(): Boolean {
+        return true
+    }
+
+    override suspend fun installFromStream(context: Context, downloadId: Int,
+                                            apkStream: InputStream, lengthBytes: Long) {
+        val sessionID = createSession(context)
+        Log.d(LOGGING_TAG, "Created session $sessionID")
+
+        // Actually, if Android asks for permission to install apps, and
+        // the user presses "Cancel", then Mitch is not notified of this.
+        // So it's better to not call onInstallStart until the very last moment.
+
+        // Otherwise it's impossible to retry the installation (e.g. when Mitch has no
+        // permission to install apps on its first launch).
+//        Mitch.databaseHandler.onInstallStart(downloadId, sessionID.toLong())
+//        Log.d(LOGGING_TAG, "Notified")
+
+        doInstall(apkStream, lengthBytes, downloadId, sessionID, context)
+        Log.d(LOGGING_TAG, "Installed")
     }
 
     override suspend fun requestInstall(context: Context, downloadId: Int, apkFile: File) {
@@ -84,24 +99,6 @@ class SessionInstaller : AbstractInstaller() {
 
         context.startActivity(intent)
     }
-
-    internal suspend fun doInstall(context: Context, downloadId: Int, apkFile: File): Unit =
-        withContext(Dispatchers.IO) {
-            val sessionID = createSession(context)
-            Log.d(LOGGING_TAG, "Created session $sessionID")
-
-            // Actually, if Android asks for permission to install apps, and
-            // the user presses "Cancel", then Mitch is not notified of this.
-            // So it's better to not call onInstallStart until the very last moment.
-
-            // Otherwise it's impossible to retry the installation (e.g. when Mitch has no
-            // permission to install apps on its first launch).
-//            Mitch.databaseHandler.onInstallStart(downloadId, sessionID.toLong())
-//            Log.d(LOGGING_TAG, "Notified")
-
-            doInstall(apkFile, downloadId, sessionID, context)
-            Log.d(LOGGING_TAG, "Installed")
-        }
 
     override suspend fun tryCancel(context: Context, installId: Long): Boolean {
         try {

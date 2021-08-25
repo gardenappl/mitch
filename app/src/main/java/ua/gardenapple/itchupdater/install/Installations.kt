@@ -23,6 +23,11 @@ object Installations {
     internal val nativeInstaller = NativeInstaller()
     internal val sessionInstaller = SessionInstaller()
 
+
+    suspend fun downloadOrInstall() {
+
+    }
+
     suspend fun deleteFinishedInstall(context: Context, uploadId: Int) {
         val db = AppDatabase.getDatabase(context)
         db.installDao.deleteFinishedInstallation(uploadId)
@@ -118,10 +123,8 @@ object Installations {
             sessionInstaller
     }
 
-    suspend fun onInstallResult(
-        context: Context, installId: Long, packageName: String?,
-        apk: File, status: Int
-    ) {
+    suspend fun onInstallResult(context: Context, installId: Long,
+                                packageName: String?, apk: File?, status: Int) {
         var packageName = packageName
 
         val db = AppDatabase.getDatabase(context)
@@ -131,13 +134,10 @@ object Installations {
             if (install.packageName != null)
                 packageName = install.packageName
             else
-                packageName = tryGetPackageName(context, apk.path)!!
+                packageName = tryGetPackageName(context, apk!!.path)!!
         }
 
-        notifyInstallResult(
-            context, installId,
-            packageName, apk.name, status
-        )
+        notifyInstallResult(context, installId, packageName, apk?.name, status)
         Mitch.fileManager.deletePendingFile(install.uploadId)
         deleteOutdatedInstalls(context, install)
         Mitch.databaseHandler.onInstallResult(install, packageName, status)
@@ -154,7 +154,7 @@ object Installations {
      */
     private fun notifyInstallResult(
         context: Context, installSessionId: Long,
-        packageName: String?, apkName: String, status: Int
+        packageName: String?, apkName: String?, status: Int
     ) {
         val message = when (status) {
             PackageInstaller.STATUS_FAILURE_ABORTED -> context.resources.getString(R.string.notification_install_cancelled_title)
