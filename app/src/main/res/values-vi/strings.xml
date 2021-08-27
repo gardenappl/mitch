@@ -171,4 +171,9 @@
     <string name="settings_lang_system">Tùy vào hệ thống</string>
     <string name="settings_lang_site">Tùy vào trang</string>
     <string name="settings_lang_default">Mặc định</string>
+    <string name="dialog_installer_please_wait">Vui lòng đợi, đang chuẩn bị ứng dụng để cài đặt…</string>
+    <string name="notification_download_unknown_error">Lỗi không xác định</string>
+    <string name="notification_download_io_error">Lỗi mạng hoặc ổ đĩa</string>
+    <string name="dialog_lang_restart">Ứng dụng sẽ khởi động lại để áp dụng ngôn ngữ mới</string>
+    <string name="dialog_lang_restart_title">Đã đổi ngôn ngữ</string>
 </resources>
