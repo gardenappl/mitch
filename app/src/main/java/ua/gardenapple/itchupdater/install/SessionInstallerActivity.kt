@@ -45,10 +45,11 @@ class SessionInstallerActivity : MitchActivity(), CoroutineScope by MainScope() 
             title = db.gameDao.getNameForPendingInstallWithDownloadId(downloadId)
 
             try {
-                Installations.sessionInstaller.doInstall(
-                    this@SessionInstallerActivity,
-                    downloadId, intent.data!!.toFile()
-                )
+                val file = intent.data!!.toFile()
+                file.inputStream().use { inputStream ->
+                    Installations.sessionInstaller.installFromStream(
+                        this@SessionInstallerActivity, downloadId, inputStream, file.length())
+                }
 
                 this@SessionInstallerActivity.finish()
             } catch (e: SessionInstaller.NotEnoughSpaceException) {

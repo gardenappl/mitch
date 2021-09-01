@@ -154,7 +154,7 @@ object GameDownloader {
 
     /**
      * Direct request to start downloading file into internal storage.
-     * Once download (and/or installation) is complete, the files not in [Installation.availableUploadIds] will be deleted.
+     * Once download and/or installation is complete, the files not in [Installation.availableUploadIds] will be deleted.
      * @param pendingInstall the [Installation] which we're about to download. Must have internalId = 0
      * @param url URL of file to download
      * @param contentDisposition HTTP content disposition header

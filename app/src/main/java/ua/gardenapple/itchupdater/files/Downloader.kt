@@ -101,7 +101,8 @@ object Downloader : DownloadFileListener() {
 
             file.parentFile!!.mkdirs()
 
-            val input = BufferedInputStream(response.body!!.byteStream())
+            val body = response.body!!
+            val input = BufferedInputStream(body.byteStream())
             FileOutputStream(file, false).use { output ->
                 val buffer = ByteArray(1024)
                 var bytesRead: Long = 0

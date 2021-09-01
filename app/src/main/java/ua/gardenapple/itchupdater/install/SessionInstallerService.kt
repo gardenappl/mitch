@@ -25,7 +25,6 @@ class SessionInstallerService : Service() {
     companion object {
         private const val LOGGING_TAG = "InstallerService"
 
-        const val EXTRA_APK_PATH = "APK_PATH"
         const val EXTRA_DOWNLOAD_ID = "DOWNLOAD_ID"
     }
 
@@ -37,7 +36,6 @@ class SessionInstallerService : Service() {
         val packageName = intent.getStringExtra(PackageInstaller.EXTRA_PACKAGE_NAME)
         val sessionId = Utils.getInt(intent.extras!!, PackageInstaller.EXTRA_SESSION_ID)!!
         val downloadId = Utils.getInt(intent.extras!!, EXTRA_DOWNLOAD_ID)!!
-        val apkPath = intent.getStringExtra(EXTRA_APK_PATH)!!
 
         //InstallerService shouldn't receive intent for Mitch anyway,
         //this is handled by SelfUpdateBroadcastReceiver
@@ -58,7 +56,7 @@ class SessionInstallerService : Service() {
                 Mitch.databaseHandler.onInstallStart(downloadId, sessionId.toLong())
 
                 Installations.onInstallResult(applicationContext, sessionId.toLong(),
-                    packageName, File(apkPath), status)
+                    packageName, null, status)
             }
         }
 

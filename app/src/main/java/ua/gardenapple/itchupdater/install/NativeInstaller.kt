@@ -9,6 +9,7 @@ import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.AppDatabase
 import java.io.File
+import java.io.InputStream
 
 class NativeInstaller : AbstractInstaller() {
     companion object {
@@ -17,6 +18,15 @@ class NativeInstaller : AbstractInstaller() {
         fun makeInstallId(uploadId: Int): Long {
             return uploadId.toLong() or (1L shl 63)
         }
+    }
+
+    override fun acceptsInstallFromStream(): Boolean {
+        return false
+    }
+
+    override suspend fun installFromStream(context: Context, downloadId: Int,
+                                           apkStream: InputStream, lengthBytes: Long) {
+        throw NotImplementedError()
     }
 
     override suspend fun requestInstall(context: Context, downloadId: Int, apkFile: File) {
