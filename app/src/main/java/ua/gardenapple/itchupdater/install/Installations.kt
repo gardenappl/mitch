@@ -173,10 +173,10 @@ object Installations {
 
                 if (status == PackageInstaller.STATUS_SUCCESS) {
                     try {
-                        val appInfo = context.packageManager.getApplicationInfo(packageName, 0)
+                        val appInfo = context.packageManager.getApplicationInfo(packageName!!, 0)
                         setContentTitle(context.packageManager.getApplicationLabel(appInfo))
                     } catch (e: PackageManager.NameNotFoundException) {
-                        Log.w(LOGGING_TAG, "Error: application $packageName not found!", e)
+                        Log.w(LOGGING_TAG, "Error: no name for package name $packageName", e)
                         setContentTitle(apkName)
                     }
 
@@ -190,10 +190,10 @@ object Installations {
                     }
 
                     try {
-                        val icon = context.packageManager.getApplicationIcon(packageName)
+                        val icon = context.packageManager.getApplicationIcon(packageName!!)
                         setLargeIcon(Utils.drawableToBitmap(icon))
                     } catch (e: PackageManager.NameNotFoundException) {
-                        Log.w(LOGGING_TAG, "Could not load icon for $packageName", e)
+                        Log.w(LOGGING_TAG, "Could not load icon for package name $packageName", e)
                     }
                 } else {
                     setContentTitle(apkName)

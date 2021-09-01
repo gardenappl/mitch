@@ -30,7 +30,7 @@ android {
         }
     }
 
-    compileSdk = 29
+    compileSdk = 30
 
     defaultConfig {
         applicationId = "ua.gardenapple.itchupdater"

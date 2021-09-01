@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.BuildConfig
 import ua.gardenapple.itchupdater.FLAVOR_ITCHIO
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
+import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
@@ -189,8 +190,7 @@ class SingleUpdateChecker(val db: AppDatabase) {
                 if (currentInstall.version != null) {
                     logD(game, "Checking version tags...")
 
-                    val containsCurrentVersion = install.version?.contains(currentInstall.version)
-                    if (containsCurrentVersion == true) {
+                    if (currentInstall.version == install.version) {
                         logD(game, "Found same version tag")
                         
                         return UpdateCheckResult(currentInstall.internalId,
@@ -241,10 +241,14 @@ class SingleUpdateChecker(val db: AppDatabase) {
             if (currentInstall.uploadId == Installation.MITCH_UPLOAD_ID) {
                 logD(game, "Checking version tags for Mitch...")
 
-                if (install.version?.contains(BuildConfig.VERSION_NAME) == true) {
-                    logD(game, "Found same version tag")
+                if (install.version?.let { Utils.isVersionNewer(it, BuildConfig.VERSION_NAME) }
+                    == true) {
 
-                    return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
+                    logD(game, "Found newer Mitch version tag")
+                    return UpdateCheckResult(currentInstall.internalId,
+                        downloadPageUrl = downloadPageUrl,
+                        availableUpdateInstall = suggestedInstall
+                    )
                 }
             }
         }

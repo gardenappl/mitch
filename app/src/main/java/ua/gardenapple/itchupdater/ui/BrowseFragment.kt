@@ -202,8 +202,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
 
         //Load page, this will also update the UI
-        if(savedInstanceState?.getBundle(WEB_VIEW_STATE_KEY) != null) {
-            webView.restoreState(savedInstanceState.getBundle(WEB_VIEW_STATE_KEY))
+        val webViewBundle = savedInstanceState?.getBundle(WEB_VIEW_STATE_KEY)
+        if (webViewBundle != null) {
+            webView.restoreState(webViewBundle)
         } else {
             webView.loadUrl(ItchWebsiteUtils.getMainBrowsePage(requireContext()))
         }
