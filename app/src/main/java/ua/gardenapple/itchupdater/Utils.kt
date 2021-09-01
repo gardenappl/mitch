@@ -29,33 +29,15 @@ import kotlinx.coroutines.withContext
 import java.io.*
 import java.util.*
 import kotlin.math.min
+import android.annotation.SuppressLint
+import java.lang.Exception
 
 
 object Utils {
     class ErrorReport(message: String) : Throwable(message)
 
-    private const val LOG_LIMIT: Int = 1000
-
-    /**
-     * Logcat normally has a limit of 1000 characters.
-     * This function splits long strings into multiple log entries.
-     */
-    fun logPrintLong(priority: Int, tag: String, string: String) {
-        for (i in string.indices step LOG_LIMIT) {
-            Log.println(priority, tag, string.substring(i, min(string.length, i + LOG_LIMIT)))
-        }
-    }
-
-    /**
-     * logPrintLong with Debug priority
-     */
-    fun logLongD(tag: String, string: String) {
-        logPrintLong(Log.DEBUG, tag, string)
-    }
-
-    fun getCurrentUnixTime(): Long {
-        return System.currentTimeMillis() / 1000
-    }
+    private const val LOGGING_TAG = "Units"
+    private val versionNumbersRegex = Regex("""(?:\.?\d+)+""")
 
     suspend fun copy(input: InputStream, output: OutputStream) = withContext(Dispatchers.IO) {
         val BUFFER_SIZE = 1024 * 1024
@@ -70,10 +52,6 @@ object Utils {
             output.write(buffer, 0, n)
         }
     }
-
-//        fun Int.hasFlag(flag: Int): Boolean {
-//            return this and flag == flag
-//        }
 
     //https://stackoverflow.com/a/10600736/5701177
     fun drawableToBitmap(drawable: Drawable): Bitmap {
@@ -271,5 +249,47 @@ object Utils {
 
     fun shouldUseLightForeground(@ColorInt bgColor: Int): Boolean {
         return ColorUtils.calculateLuminance(bgColor) < 0.5
+    }
+
+    // Converted from Java:
+    // https://github.com/Aefyr/SAI/blob/55505d231b1390e824d1cc0c8f4fa35fd4677105/app/src/main/java/com/aefyr/sai/utils/Utils.java#L68
+    @SuppressLint("PrivateApi")
+    fun tryGetSystemProperty(key: String?): String? {
+        try {
+            return Class.forName("android.os.SystemProperties")
+                .getDeclaredMethod("get", String::class.java)
+                .invoke(null, key) as String
+        } catch (e: Exception) {
+            Log.w(LOGGING_TAG, "Unable to use SystemProperties.get", e)
+            return null
+        }
+    }
+
+    private fun parseVersionIntoParts(version: String): IntArray? {
+        val versionNumbers = versionNumbersRegex.find(version)?.value ?: return null
+
+        return versionNumbers.split('.').map { it.toInt() }.toIntArray()
+    }
+
+    /**
+     * @return 0 if versions are equal, values less than 0 if ver1 is lower than ver2, value more than 0 if ver1 is higher than ver2
+     */
+    fun compareVersions(version1: String, version2: String): Int? {
+        if (version1 == version2) return 0
+        val version1Parts = parseVersionIntoParts(version1) ?: return null
+        val version2Parts = parseVersionIntoParts(version2) ?: return null
+        for (i in version2Parts.indices) {
+            if (i >= version1Parts.size) return -1
+            if (version1Parts[i] < version2Parts[i]) return -1
+            if (version1Parts[i] > version2Parts[i]) return 1
+        }
+	if (version1Parts.size > version2Parts.size)
+		return 1
+        return 0
+    }
+
+    fun isVersionNewer(version1: String, version2: String): Boolean? {
+        val comparisonResult = compareVersions(version1, version2) ?: return null
+        return comparisonResult > 0
     }
 }
