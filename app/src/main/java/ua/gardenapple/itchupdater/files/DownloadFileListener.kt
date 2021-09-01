@@ -99,43 +99,38 @@ abstract class DownloadFileListener {
         }
     }
 
-    protected fun onCompleted(context: Context, fileName: String, uploadId: Int, downloadId: Int) {
+    protected suspend fun onCompleted(context: Context, fileName: String, uploadId: Int, downloadId: Int) {
         val isApk = fileName.endsWith(".apk")
         val downloadFileManager = Mitch.fileManager
 
-        runBlocking(Dispatchers.IO) {
-            val db = AppDatabase.getDatabase(context)
-            val pendingInstall = db.installDao.getPendingInstallationByDownloadId(downloadId)!!
-            val notificationFile: File
-            if (isApk) {
-                notificationFile = downloadFileManager.getPendingFile(uploadId)!!
-            } else {
-                Installations.deleteOutdatedInstalls(context, pendingInstall)
-                downloadFileManager.replacePendingFile(uploadId)
-                notificationFile = downloadFileManager.getDownloadedFile(uploadId)!!
-            }
-            createResultNotification(context, notificationFile, downloadId, isApk, null, null)
-            Mitch.databaseHandler.onDownloadComplete(pendingInstall, isApk)
+        val db = AppDatabase.getDatabase(context)
+        val pendingInstall = db.installDao.getPendingInstallationByDownloadId(downloadId)!!
+        val notificationFile: File
+        if (isApk) {
+            notificationFile = downloadFileManager.getPendingFile(uploadId)!!
+        } else {
+            Installations.deleteOutdatedInstalls(context, pendingInstall)
+            downloadFileManager.replacePendingFile(uploadId)
+            notificationFile = downloadFileManager.getDownloadedFile(uploadId)!!
         }
+        createResultNotification(context, notificationFile, downloadId, isApk, null, null)
+        Mitch.databaseHandler.onDownloadComplete(pendingInstall, isApk)
     }
 
-    protected fun onError(context: Context, file: File, downloadId: Int, uploadId: Int,
+    protected suspend fun onError(context: Context, file: File, downloadId: Int, uploadId: Int,
                           errorName: String, throwable: Throwable?) {
         val isApk = file.extension == "apk"
         createResultNotification(context, file, downloadId, isApk, errorName, Utils.toString(throwable))
 
-        runBlocking(Dispatchers.IO) {
-            val db = AppDatabase.getDatabase(context)
-            db.withTransaction {
-                Mitch.fileManager.deletePendingFile(uploadId)
-                Mitch.databaseHandler.onDownloadFailed(downloadId)
-            }
+        val db = AppDatabase.getDatabase(context)
+        db.withTransaction {
+            Mitch.fileManager.deletePendingFile(uploadId)
+            Mitch.databaseHandler.onDownloadFailed(downloadId)
         }
     }
 
     protected fun onProgress(context: Context, file: File, downloadId: Int, uploadId: Int,
-                   progressPercent: Int?) {
-        createProgressNotification(context, file, downloadId, uploadId,
-            progressPercent)
+                             progressPercent: Int?) {
+        createProgressNotification(context, file, downloadId, uploadId, progressPercent)
     }
 }

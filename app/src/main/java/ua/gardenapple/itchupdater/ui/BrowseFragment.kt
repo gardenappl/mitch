@@ -96,7 +96,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         webView.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
             Log.d(LOGGING_TAG, "Requesting download...")
-            runBlocking(Dispatchers.IO) {
+            launch(Dispatchers.IO) {
                 browseHandler?.onDownloadStarted(url, contentDisposition, mimeType)
             }
         }
