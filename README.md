@@ -1,6 +1,8 @@
 # Mitch
 
-Hosted on [itch.io](https://gardenapple.itch.io/mitch) and [SourceHut](https://sr.ht/~gardenapple/mitch/).
+#### Hosted on [itch.io](https://gardenapple.itch.io/mitch) and [SourceHut](https://sr.ht/~gardenapple/mitch/).
+
+**(mirrored on [GitHub](https://github.com/gardenappl/mitch) and [GitLab](https://gitlab.com/gardenappl/mitch))**
 
 **Mitch** is an unofficial mobile client for [itch.io](https://itch.io), the indie game storefront. The app allows you to install Android games from the store and keep them updated. Thus, this can act as an alternative to the Google Play Store for indie game developers and enthusiasts.
 
