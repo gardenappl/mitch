@@ -269,7 +269,7 @@ object ItchWebsiteParser {
             return DownloadUrl(purchaseInfo.downloadPage, isPermanent = true, isStorePage = false)
 
         //The game is free and the store page provides download links
-        if (doc.selectFirst("download_btn") != null)
+        if (doc.selectFirst(".download_btn") != null)
             return DownloadUrl(storeUrl, isPermanent = true, isStorePage = true)
 
         //The game is free but accepts donations and hasn't been paid for
