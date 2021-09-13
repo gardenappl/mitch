@@ -288,8 +288,8 @@ object Utils {
         return 0
     }
 
-    fun isVersionNewer(version1: String, version2: String): Boolean? {
-        val comparisonResult = compareVersions(version1, version2) ?: return null
+    fun isVersionNewer(maybeNewerVersion: String, currentVersion: String): Boolean? {
+        val comparisonResult = compareVersions(maybeNewerVersion, currentVersion) ?: return null
         return comparisonResult > 0
     }
 }
