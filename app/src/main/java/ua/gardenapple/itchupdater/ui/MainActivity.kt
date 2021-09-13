@@ -8,6 +8,8 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
@@ -60,17 +62,21 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
                 setMessage(R.string.dialog_lang_restart)
 
                 setPositiveButton(android.R.string.ok) { _, _ ->
-                    //Restart app https://stackoverflow.com/a/22345538/5701177
-                    val intent = Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(browseFragment.webView.url),
-                        context,
-                        MainActivity::class.java
-                    )
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    context.startActivity(intent)
-                    finish()
-                    Runtime.getRuntime().exit(0);
+                    this@MainActivity.finish()
+                    //Use 'post' method to make sure that Activity lifecycle events
+                    //run before the process exits
+                    val mainHandler = Handler(Looper.getMainLooper())
+                    mainHandler.post {
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(browseFragment.webView.url),
+                            applicationContext,
+                            MainActivity::class.java
+                        )
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        context.startActivity(intent)
+                        Runtime.getRuntime().exit(0)
+                    }
                 }
                 setNegativeButton(android.R.string.cancel) { _, _ -> /* No-op */ }
 
@@ -211,6 +217,8 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
         //super method handles fragment back stack
         super.onBackPressed()
     }
+
+
 
     override fun onDestroy() {
         super.onDestroy()
