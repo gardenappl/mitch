@@ -243,18 +243,16 @@ class SingleUpdateChecker(val db: AppDatabase) {
 
                 if (install.version?.let { Utils.isVersionNewer(it, BuildConfig.VERSION_NAME) }
                     == true) {
-
                     logD(game, "Found newer Mitch version tag")
+
                     return UpdateCheckResult(currentInstall.internalId,
                         downloadPageUrl = downloadPageUrl,
                         availableUpdateInstall = suggestedInstall
                     )
                 } else {
                     logD(game, "Mitch version tag is not newer: ${install.version}, current is ${BuildConfig.VERSION_NAME}")
-                    return UpdateCheckResult(currentInstall.internalId,
-                        downloadPageUrl = downloadPageUrl,
-                        availableUpdateInstall = suggestedInstall
-                    )
+
+                    return UpdateCheckResult(currentInstall.internalId, UpdateCheckResult.UP_TO_DATE)
                 }
             }
         }
