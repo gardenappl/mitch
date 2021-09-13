@@ -18,7 +18,6 @@ import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
-import ua.gardenapple.itchupdater.files.UpdateNotificationBroadcastReceiver
 import ua.gardenapple.itchupdater.ui.MainActivity
 import java.net.SocketTimeoutException
 

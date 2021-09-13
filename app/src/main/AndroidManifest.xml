@@ -99,7 +99,7 @@
                 android:name=".files.DownloadCancelBroadcastReceiver"
                 android:exported="false" />
         <receiver
-                android:name=".files.UpdateNotificationBroadcastReceiver"
+                android:name=".client.UpdateNotificationBroadcastReceiver"
                 android:exported="false" />
         <receiver
                 android:name=".ErrorReportBroadcastReciever"
