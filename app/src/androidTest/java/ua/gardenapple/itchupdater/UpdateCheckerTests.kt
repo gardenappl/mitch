@@ -5,8 +5,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import org.junit.Assert
+import org.junit.Assume
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -14,7 +14,6 @@ import ua.gardenapple.itchupdater.client.UpdateCheckResult
 import ua.gardenapple.itchupdater.client.SingleUpdateChecker
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
-import ua.gardenapple.itchupdater.database.installation.Installation
 
 @RunWith(AndroidJUnit4::class)
 class UpdateCheckerTests {
@@ -38,8 +37,7 @@ class UpdateCheckerTests {
 
     @Test
     fun testUpdateCheck_mitch_itchio() {
-        if (BuildConfig.FLAVOR != FLAVOR_ITCHIO)
-            return //skip
+        Assume.assumeTrue(BuildConfig.FLAVOR == FLAVOR_ITCHIO)
 
         val result: UpdateCheckResult = runBlocking(Dispatchers.IO) {
             val game = db.gameDao.getGameById(Game.MITCH_GAME_ID)!!
@@ -53,8 +51,7 @@ class UpdateCheckerTests {
 
     @Test(expected = IllegalArgumentException::class)
     fun testUpdateCheck_mitch_fdroid() {
-        if (BuildConfig.FLAVOR != FLAVOR_FDROID)
-            return //skip
+        Assume.assumeTrue(BuildConfig.FLAVOR == FLAVOR_FDROID)
 
         runBlocking(Dispatchers.IO) {
             val game = db.gameDao.getGameById(Game.MITCH_GAME_ID)!!
