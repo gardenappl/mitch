@@ -26,7 +26,7 @@ class UpdateCheckerTests {
             val context = InstrumentationRegistry.getInstrumentation().context
             db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
             runBlocking(Dispatchers.IO) {
-                db.addMitchToDatabase(context)
+                db.addMitchToDatabaseIfNeeded(context)
             }
 
             updateChecker = SingleUpdateChecker(db)
@@ -47,19 +47,5 @@ class UpdateCheckerTests {
             updateChecker.checkUpdates(game, install, updateCheckDoc, downloadUrlInfo)
         }
         Assert.assertEquals(UpdateCheckResult.UP_TO_DATE, result.code)
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun testUpdateCheck_mitch_fdroid() {
-        Assume.assumeTrue(BuildConfig.FLAVOR == FLAVOR_FDROID)
-
-        runBlocking(Dispatchers.IO) {
-            val game = db.gameDao.getGameById(Game.MITCH_GAME_ID)!!
-            val install = db.installDao.getFinishedInstallationsForGame(Game.MITCH_GAME_ID)[0]
-            val (updateCheckDoc, downloadUrlInfo) = updateChecker.getDownloadInfo(game)!!
-
-            //should crash
-            updateChecker.checkUpdates(game, install, updateCheckDoc, downloadUrlInfo)
-        }
     }
 }

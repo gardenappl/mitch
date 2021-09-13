@@ -53,7 +53,7 @@ object Downloader : DownloadFileListener() {
         install.status = Installation.STATUS_DOWNLOADING
 
         val db = AppDatabase.getDatabase(context)
-        db.installDao.insert(install)
+        db.installDao.upsert(install)
 
         val downloadRequest =
             OneTimeWorkRequestBuilder<Worker>().run {

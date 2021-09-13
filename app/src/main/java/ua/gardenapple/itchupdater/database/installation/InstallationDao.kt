@@ -29,32 +29,11 @@ abstract class InstallationDao {
     @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS = $STATUS_INSTALLED")
     abstract suspend fun getFinishedInstallationsForGame(gameId: Int): List<Installation>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(installation: Installation): Long
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(installations: List<Installation>)
-
     @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS != $STATUS_INSTALLED")
     abstract suspend fun getPendingInstallations(uploadId: Int): List<Installation>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS != $STATUS_INSTALLED")
     abstract suspend fun getPendingInstallation(uploadId: Int): Installation?
-
-    @Update
-    abstract suspend fun update(vararg installations: Installation)
-
-    @Update
-    abstract suspend fun update(installations: List<Installation>)
-
-    @Query("DELETE FROM $TABLE_NAME WHERE $INTERNAL_ID = :internalId")
-    abstract suspend fun delete(internalId: Int)
-
-    @Delete
-    abstract suspend fun delete(installation: Installation)
-
-    @Delete
-    abstract suspend fun delete(installations: List<Installation>)
 
     @Query("DELETE FROM $TABLE_NAME WHERE $PACKAGE_NAME = :packageName AND $STATUS = $STATUS_INSTALLED")
     abstract suspend fun deleteFinishedInstallation(packageName: String)
@@ -65,6 +44,9 @@ abstract class InstallationDao {
     @Query("SELECT * FROM $TABLE_NAME WHERE $PACKAGE_NAME = :packageName AND $STATUS = $STATUS_INSTALLED")
     abstract suspend fun getInstallationByPackageName(packageName: String): Installation?
 
+    @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS = $STATUS_INSTALLED LIMIT 1")
+    abstract suspend fun getFinishedInstallation(uploadId: Int): Installation?
+
     @Query("SELECT * FROM $TABLE_NAME WHERE $INTERNAL_ID = :internalId LIMIT 1")
     abstract suspend fun getInstallationById(internalId: Int): Installation?
 
@@ -73,4 +55,35 @@ abstract class InstallationDao {
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :installId AND $STATUS = $STATUS_INSTALLING")
     abstract suspend fun getPendingInstallationByInstallId(installId: Long): Installation?
+
+
+    @Query("DELETE FROM $TABLE_NAME WHERE $INTERNAL_ID = :internalId")
+    abstract suspend fun delete(internalId: Int)
+
+    @Delete
+    abstract suspend fun delete(installation: Installation)
+
+    @Delete
+    abstract suspend fun delete(installations: List<Installation>)
+
+
+    @Update
+    abstract suspend fun update(installation: Installation)
+
+    @Update
+    abstract suspend fun update(installations: List<Installation>)
+
+    /**
+     * @return -1 if an install with the same [Installation.internalId] already exists (no insertion)
+     */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract suspend fun insert(installation: Installation): Long
+
+    @Transaction
+    open suspend fun upsert(install: Installation) {
+        val id = insert(install)
+        if (id == -1L) {
+            update(install)
+        }
+    }
 }

@@ -1,7 +1,6 @@
 package ua.gardenapple.itchupdater.database
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.room.*
@@ -54,12 +53,7 @@ abstract class AppDatabase : RoomDatabase() {
                     addMigrations(migration)
                 build()
             }.also { appDb ->
-                Log.d(LOGGING_TAG, "Deleting info on Mitch")
-                appDb.installDao.deleteFinishedInstallation(context.packageName)
-
-                if (BuildConfig.FLAVOR != FLAVOR_FDROID) {
-                    appDb.addMitchToDatabase(context)
-                }
+                appDb.addMitchToDatabaseIfNeeded(context)
 
                 val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
                 if (!sharedPrefs.getBoolean(PREF_DB_RAN_CLEANUP_ONCE, false)) {
@@ -70,7 +64,12 @@ abstract class AppDatabase : RoomDatabase() {
     }
 
 
-    suspend fun addMitchToDatabase(context: Context) {
+    suspend fun addMitchToDatabaseIfNeeded(context: Context) {
+        if (BuildConfig.FLAVOR == FLAVOR_FDROID) {
+            installDao.deleteFinishedInstallation(context.packageName)
+            return
+        }
+
         val game = Game(
             gameId = Game.MITCH_GAME_ID,
             name = "Mitch",
@@ -79,10 +78,15 @@ abstract class AppDatabase : RoomDatabase() {
             thumbnailUrl = "https://img.itch.zone/aW1nLzY2OTY1OTIucG5n/315x250%23c/iuehUL.png",
             locale = Game.MITCH_LOCALE
         )
-        Log.d(LOGGING_TAG, "Adding game $game")
+        Log.d(LOGGING_TAG, "Adding Mitch game $game")
         gameDao.upsert(game)
 
-        val installation = Installation(
+        //Try to find already existing Installation for Mitch
+        val install = installDao.getInstallationByPackageName(context.packageName)
+        Log.d(LOGGING_TAG, "Current Mitch install is $install")
+
+        val newInstall = Installation(
+            internalId = install?.internalId ?: 0,
             gameId = Game.MITCH_GAME_ID,
             uploadId = Installation.MITCH_UPLOAD_ID,
             availableUploadIds = null,
@@ -93,7 +97,7 @@ abstract class AppDatabase : RoomDatabase() {
             fileSize = Installation.MITCH_FILE_SIZE,
             platforms = Installation.PLATFORM_ANDROID
         )
-        Log.d(LOGGING_TAG, "Adding install $installation")
-        installDao.insert(installation)
+        Log.d(LOGGING_TAG, "Upserting Mitch install: $newInstall")
+        installDao.upsert(newInstall)
     }
 }

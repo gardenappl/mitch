@@ -42,7 +42,11 @@ data class Installation(
     val gameId: Int,
 
     /**
-     * Corresponds to an Upload's uploadId (which should always be non-null for files which have actually been downloaded).
+     * There should only ever be a single Installation
+     * with a particular uploadId and with the status 'Installed'.
+     * (and, possibly, another Installation with the same uploadId
+     * with a pending status)
+     *
      * Mitch has a hardcoded upload ID. (see [Installation.MITCH_UPLOAD_ID])
      */
     @ColumnInfo(name = UPLOAD_ID)
