@@ -1,4 +1,4 @@
 * Tambahan terjemahan Bahasa Arab, Turki, Norwegia Bokmål
-* Perbaikan hasil pemeriksaan upate yang salah setelah mengubah bahasa
+* Perbaikan hasil pemeriksaan update yang salah setelah mengubah bahasa
 * Daftar pembaruan sekarang vertikal bukan horizontal (whoops)
-* Perbaikan kesalahan saat melaporkan kesalahan untuk pemeriksaan pembaruan (whoops)
+* Perbaikan kesalahan saat melaporkan galat untuk pemeriksaan pembaruan (whoops)
