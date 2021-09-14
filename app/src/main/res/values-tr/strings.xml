@@ -177,4 +177,5 @@
     <string name="notification_download_io_error">Ağ veya disk hatası</string>
     <string name="dialog_lang_restart">Uygulama, yeni dili uygulamak için yeniden başlatılacak</string>
     <string name="dialog_lang_restart_title">Dil değişti</string>
+    <string name="dialog_installer_no_space">Bu uygulama için yeterli disk alanı yok.</string>
 </resources>
