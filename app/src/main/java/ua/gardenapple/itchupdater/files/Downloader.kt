@@ -1,5 +1,6 @@
 package ua.gardenapple.itchupdater.files
 
+import android.app.NotificationManager
 import android.content.Context
 import android.util.Log
 import android.webkit.CookieManager
@@ -176,6 +177,7 @@ object Downloader : DownloadFileListener() {
                     Downloader.onCompleted(applicationContext, file.name, uploadId, downloadId)
                 }
             } catch (e: CancellationException) {
+                Downloader.onCancel(applicationContext, downloadId)
                 return@withContext Result.failure()
             } catch (e: Exception) {
                 Log.e(LOGGING_TAG, "Caught while downloading", e)

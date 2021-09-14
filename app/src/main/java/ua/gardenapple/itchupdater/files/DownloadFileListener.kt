@@ -1,5 +1,7 @@
 package ua.gardenapple.itchupdater.files
 
+import android.app.Activity
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -132,5 +134,14 @@ abstract class DownloadFileListener {
     protected fun onProgress(context: Context, file: File, downloadId: Int, uploadId: Int,
                              progressPercent: Int?) {
         createProgressNotification(context, file, downloadId, uploadId, progressPercent)
+    }
+
+    /**
+     * Quietly cancel download
+     */
+    protected fun onCancel(context: Context, downloadId: Int) {
+        with(context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager) {
+            cancel(NOTIFICATION_TAG_DOWNLOAD, downloadId)
+        }
     }
 }
