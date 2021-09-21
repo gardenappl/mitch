@@ -121,14 +121,14 @@
     <string name="settings_theme_system">Nach System</string>
     <string name="settings_theme_light">Hell</string>
     <string name="settings_theme_dark">Dunkel</string>
-    <string name="settings_theme">Design</string>
+    <string name="settings_theme">Farbschema</string>
     <string name="menu_game_author_generic">Mehr von diesem Ersteller</string>
     <string name="menu_game_author">Mehr aus %1$s</string>
     <string name="menu_game_gamejam">%1$s Eintrag</string>
     <string name="browser_open_in_browser">Im Browser öffnen</string>
     <string name="menu_game_related">Mehr Spiele wie dieses</string>
     <string name="menu_game_rate">Bewerten</string>
-    <string name="menu_game_devlog">Devlog</string>
+    <string name="menu_game_devlog">Entwicklerprotokoll</string>
     <string name="menu_game_collection">Zur Sammlung hinzufügen</string>
     <string name="popup_download_started">Das Herunterladen hat gestartet</string>
     <string name="search_games_hint">Nach Spielen oder Erstellern suchen</string>
@@ -168,4 +168,10 @@
     <string name="settings_android_only_filter_desc">Blenden Sie beim Durchsuchen von Android-Spielen Einträge aus, die nur in anderen Stores verfügbar sind.</string>
     <string name="settings_android_only_filter">Android: Filter nur zum Herunterladen</string>
     <string name="popup_no_network_connection">Die Überprüfung von Aktualisierungen erfordert eine Netzwerkverbindung</string>
+    <string name="dialog_installer_no_space">Nicht genug Speicherplatz für diese Anwendung.</string>
+    <string name="dialog_installer_please_wait">Bitte warten, die Anwendung wird für die Installation vorbereitet …</string>
+    <string name="notification_download_unknown_error">Unbekannter Fehler</string>
+    <string name="notification_download_io_error">Netzwerk- oder Festplattenfehler</string>
+    <string name="dialog_lang_restart">Die Anwendung wird neu gestartet, um die neue Sprache anzuwenden</string>
+    <string name="dialog_lang_restart_title">Sprache geändert</string>
 </resources>
