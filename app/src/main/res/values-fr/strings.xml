@@ -19,7 +19,7 @@
 \n
 \nCe processus est irréversible.</string>
     <string name="settings_justice_claim_all_desc">Réclamez tous les jeux de l’offre groupée Justice et égalité raciales.</string>
-    <string name="settings_justice_claim_all">Réclamer tous les jeux de l’offre groupée</string>
+    <string name="settings_justice_claim_all">Offre groupée pour la justice raciale : tout réclamer</string>
     <string name="settings_bundle_link_desc">Définir une URL de téléchargement personnalisée</string>
     <string name="game_justice_bundle_claim_error">Impossible d’accéder au lien de téléchargement à partir de l’offre groupée Racial Justice.</string>
     <string name="game_buy">Acheter</string>
@@ -170,4 +170,12 @@
     <string name="popup_no_network_connection">La vérification des mises à jour nécessite une connexion réseau</string>
     <string name="settings_palestine_claim_all_desc">Réclamez tous les jeux du lot indé pour l’aide à la Palestine.</string>
     <string name="game_palestine_bundle_claim_error">Impossible d’accéder au lien de téléchargement du paquet d’aide palestinienne.</string>
+    <string name="settings_palestine_claim_all">Offre groupée de l\'aide aux Palestiniens : tout réclamer</string>
+    <string name="game_bundle_palestine">Un offre groupée indé pour l\'aide aux Palestiniens</string>
+    <string name="dialog_installer_no_space">Pas assez d\'espace disque pour cette application.</string>
+    <string name="dialog_installer_please_wait">Veuillez patienter, préparation de l\'application pour l\'installation…</string>
+    <string name="notification_download_unknown_error">Erreur inconnue</string>
+    <string name="notification_download_io_error">Erreur de réseau ou de disque</string>
+    <string name="dialog_lang_restart">L\'application va redémarrer pour appliquer le changement de langue</string>
+    <string name="dialog_lang_restart_title">La langue a été changée</string>
 </resources>
