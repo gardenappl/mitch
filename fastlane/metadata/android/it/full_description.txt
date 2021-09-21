@@ -1,0 +1,14 @@
+Mitch è un cliente mobile non ufficiale per itch.io, la vetrina dei giochi indie. L'applicazione permette di installare giochi Android dal repository e tenerli aggiornati. Così, questo può agire come un'alternativa al Google Play Store per gli sviluppatori di giochi indie e gli appassionati.
+
+
+* Scarica i giochi da itch.io e tienili aggiornati
+* Supporto per lo scaricamento di APK e altri giochi
+* Può eseguire giochi HTML5 all'interno del browser integrato
+* L'account itch.io non è richiesto
+* Blocca i tracciatori e le analisi per impostazione predefinita (solo per la versione F-Droid)
+* Bella Material UI si adatta a schemi di colori personalizzati impostati dagli sviluppatori di giochi
+* Funzionalità completa del sito web mobile di itch.io
+
+L'app è ancora in sviluppo, alcune caratteristiche sono previste ma non ancora implementate.
+
+Se vuoi sostenere lo sviluppatore dell'app, considera l'acquisto su itch.io: https://gardenapple.itch.io/mitch
