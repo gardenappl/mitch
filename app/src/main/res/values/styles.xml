@@ -68,6 +68,7 @@
     
     <style name="DialogButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">0</item>
     </style>
 
