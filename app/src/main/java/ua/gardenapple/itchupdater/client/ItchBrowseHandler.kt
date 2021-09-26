@@ -42,7 +42,8 @@ class ItchBrowseHandler(private val context: Context) {
         val game: Game?,
         val purchasedInfo: ItchWebsiteParser.PurchasedInfo?,
         val paymentInfo: ItchWebsiteParser.PaymentInfo?,
-        val hasAndroidVersion: Boolean
+        val hasAndroidVersion: Boolean,
+        val hasWindowsMacOrLinuxVersion: Boolean
     )
 
     suspend fun onPageVisited(doc: Document, url: String): Info {
@@ -55,6 +56,7 @@ class ItchBrowseHandler(private val context: Context) {
         var purchasedInfo: ItchWebsiteParser.PurchasedInfo? = null
         var paymentInfo: ItchWebsiteParser.PaymentInfo? = null
         var hasAndroidVersion = false
+        var hasWindowsMacLinuxVersion = false
 
         if (ItchWebsiteUtils.isStorePage(doc)) {
             val db = AppDatabase.getDatabase(context)
@@ -82,7 +84,9 @@ class ItchBrowseHandler(private val context: Context) {
             purchasedInfo = ItchWebsiteParser.getPurchasedInfo(doc)
             if (purchasedInfo == null)
                 paymentInfo = ItchWebsiteParser.getPaymentInfo(doc)
+
             hasAndroidVersion = ItchWebsiteParser.hasAndroidInstallation(doc)
+            hasWindowsMacLinuxVersion = ItchWebsiteParser.hasWindowsMacLinuxInstallation(doc)
         }
         if (ItchWebsiteUtils.hasGameDownloadLinks(doc)) {
             lastDownloadDoc = doc
@@ -112,7 +116,8 @@ class ItchBrowseHandler(private val context: Context) {
             game = game,
             purchasedInfo = purchasedInfo,
             paymentInfo = paymentInfo,
-            hasAndroidVersion = hasAndroidVersion
+            hasAndroidVersion = hasAndroidVersion,
+            hasWindowsMacOrLinuxVersion = hasWindowsMacLinuxVersion
         )
     }
 

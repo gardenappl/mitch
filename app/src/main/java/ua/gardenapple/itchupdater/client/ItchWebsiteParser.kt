@@ -97,6 +97,14 @@ object ItchWebsiteParser {
         return doc.selectFirst(".icon-android") != null
     }
 
+    fun hasWindowsMacLinuxInstallation(doc: Document): Boolean {
+        return doc.selectFirst(".icon-windows8, .icon-apple, .icon-tux") != null
+    }
+
+    fun getInstallationsPlatforms(doc: Document): List<Int> {
+        return doc.getElementsByClass("upload").map { upload -> getPlatformsForUpload(upload) }
+    }
+
     private fun parseInstallations(doc: Document, requiredUploadId: Int?): List<Installation> {
         if (!ItchWebsiteUtils.hasGameDownloadLinks(doc))
             throw IllegalStateException("Unparse-able game page")
@@ -129,19 +137,7 @@ object ItchWebsiteParser {
         val result = ArrayList<Installation>()
 
         for (uploadDiv in uploadDivs) {
-            val icons = uploadDiv.getElementsByClass("icon")
-            var platforms = Installation.PLATFORM_NONE
-
-            for (icon in icons) {
-                if (icon.hasClass("icon-android"))
-                    platforms = platforms or Installation.PLATFORM_ANDROID
-                else if (icon.hasClass("icon-windows8"))
-                    platforms = platforms or Installation.PLATFORM_WINDOWS
-                else if (icon.hasClass("icon-apple"))
-                    platforms = platforms or Installation.PLATFORM_MAC
-                else if (icon.hasClass("icon-tux"))
-                    platforms = platforms or Installation.PLATFORM_LINUX
-            }
+            val platforms = getPlatformsForUpload(uploadDiv)
 
             val uploadNameDiv = uploadDiv.selectFirst(".upload_name")
             val name = uploadNameDiv.selectFirst(".name").attr("title")
@@ -185,6 +181,23 @@ object ItchWebsiteParser {
             )
         }
         return result
+    }
+
+    private fun getPlatformsForUpload(uploadDiv: Element): Int {
+        val icons = uploadDiv.getElementsByClass("icon")
+        var platforms = Installation.PLATFORM_NONE
+
+        for (icon in icons) {
+            if (icon.hasClass("icon-android"))
+                platforms = platforms or Installation.PLATFORM_ANDROID
+            else if (icon.hasClass("icon-windows8"))
+                platforms = platforms or Installation.PLATFORM_WINDOWS
+            else if (icon.hasClass("icon-apple"))
+                platforms = platforms or Installation.PLATFORM_MAC
+            else if (icon.hasClass("icon-tux"))
+                platforms = platforms or Installation.PLATFORM_LINUX
+        }
+        return platforms
     }
 
     fun getStoreUrlFromDownloadPage(downloadUri: Uri): String {

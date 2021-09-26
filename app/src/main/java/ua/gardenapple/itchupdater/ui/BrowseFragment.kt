@@ -34,6 +34,7 @@ import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.client.ItchBrowseHandler
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.client.SpecialBundleHandler
+import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.databinding.BrowseFragmentBinding
 import ua.gardenapple.itchupdater.databinding.DialogWebPromptBinding
 import java.io.ByteArrayInputStream
@@ -328,7 +329,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         Utils.spannedFromHtml(info.purchasedInfo.ownershipReasonHtml)
 
                     gameButton.setOnClickListener {
-                        mainActivity.browseUrl(info.purchasedInfo.downloadPage)
+                        goToDownloadOrPurchase(doc, info, info.purchasedInfo.downloadPage)
                     }
                 } else if (info?.isFromSpecialBundle == true) {
                     bottomGameBar.visibility = View.VISIBLE
@@ -365,7 +366,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         val purchaseUri = Uri.parse(info.game!!.storeUrl)
                             .buildUpon()
                             .appendPath("purchase")
-                        mainActivity.browseUrl(purchaseUri.toString())
+                        goToDownloadOrPurchase(doc, info, purchaseUri.toString())
                     }
                 } else {
                     bottomGameBar.visibility = View.GONE
@@ -477,6 +478,50 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 mainActivity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             else
                 mainActivity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+        }
+    }
+
+    /**
+     * Go to a game's download or purchase page, and possibly show a warning dialog
+     * if the game is not an Android game
+     */
+    private fun goToDownloadOrPurchase(doc: Document, info: ItchBrowseHandler.Info, url: String) {
+        val mainActivity = activity as? MainActivity ?: return
+        if (!info.hasAndroidVersion && info.hasWindowsMacOrLinuxVersion) {
+            val platforms = ItchWebsiteParser.getInstallationsPlatforms(doc)
+
+            var foundExtras = false
+            for (platformBitmap in platforms) {
+                if (platformBitmap == Installation.PLATFORM_NONE) {
+                    foundExtras = true
+                    break
+                }
+            }
+
+            val dialog = AlertDialog.Builder(mainActivity).run {
+                setTitle(android.R.string.dialog_alert_title)
+                setIconAttribute(android.R.attr.alertDialogIcon)
+
+                if (foundExtras) {
+                    setMessage(getString(R.string.dialog_download_wrong_os_has_extras, info.game!!.name))
+                    setPositiveButton(android.R.string.ok) { _, _ ->
+                        mainActivity.browseUrl(url)
+                    }
+                } else {
+                    setMessage(getString(R.string.dialog_download_wrong_os, info.game!!.name))
+                    setPositiveButton(R.string.dialog_yes) { _, _ ->
+                        mainActivity.browseUrl(url)
+                    }
+                }
+                setNegativeButton(R.string.dialog_no) { _, _ ->
+                    //no-op
+                }
+
+                create()
+            }
+            dialog.show()
+        } else {
+            mainActivity.browseUrl(url)
         }
     }
 
