@@ -74,6 +74,7 @@ class UpdateChecker(private val context: Context) {
                         }
 
                         if (downloadInfo == null) {
+                            Log.d(LOGGING_TAG, "null download info for $game")
                             result = UpdateCheckResult(install.internalId,
                                 UpdateCheckResult.ACCESS_DENIED)
                         } else {
@@ -96,6 +97,7 @@ class UpdateChecker(private val context: Context) {
                     }
 
                     launch(Dispatchers.IO) {
+                        Log.d(LOGGING_TAG, "Inserting $result")
                         db.updateCheckDao.insert(result)
                     }
                     handleNotification(game, install, result)
