@@ -754,7 +754,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                             ytBanner.style.visibility = "hidden";
                             
                         // remove game purchase banners, we implement our own
-                        let elements = document.querySelectorAll(".purchase_banner, .header_buy_row .buy_row, .donate_btn");
+                        let elements = document.querySelectorAll(".purchase_banner, .header_buy_row, .buy_row, .donate_btn");
                         for (var element of elements)
                             element.style.display = "none";
                     });
