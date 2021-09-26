@@ -1,2 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="notification_install_title">Haga clic para instalar</string>
+    <string name="notification_channel_updates_desc">Notificar cuando un juego de itch.io reciba una actualización.</string>
+    <string name="notification_channel_install_desc">Notificar cuando una aplicación de itch.io requiera ser instalada.</string>
+    <string name="notification_channel_install">Instalación de la aplicación</string>
+    <string name="notification_channel_updates">Actualizaciones del juego</string>
+</resources>
