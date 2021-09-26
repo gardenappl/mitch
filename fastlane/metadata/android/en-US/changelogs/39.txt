@@ -1,0 +1,2 @@
+* Added warnings when trying to download a non-Android game
+* Moved 'Allow analytics' setting into Advanced section

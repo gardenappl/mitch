@@ -172,4 +172,7 @@
     <string name="notification_download_unknown_error">Unknown error</string>
     <string name="dialog_installer_please_wait">Please wait, preparing app for installation…</string>
     <string name="dialog_installer_no_space">Not enough disk space for this app.</string>
+    <string name="dialog_download_wrong_os">%s is not compatible with Android. You won\'t be able to install it as an app.\nDo you want to download it anyway?</string>
+    <string name="dialog_download_wrong_os_has_extras">%s is not compatible with Android. You won\'t be able to install it as an app.\nYou may still view additional content, such as art, music, or manuals.</string>
+    <string name="settings_warn_os">Warn when downloading non-Android apps</string>
 </resources>

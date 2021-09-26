@@ -172,4 +172,7 @@
     <string name="notification_download_unknown_error">Невідома помилка</string>
     <string name="dialog_installer_please_wait">Зачекайте, зараз почнемо встановлювати додаток…</string>
     <string name="dialog_installer_no_space">Не вистачає місця на диску.</string>
+    <string name="dialog_download_wrong_os">%s не сумісно з Android. Ви не зможете встановити це як додаток.\nВи все одно бажаєте це завантажити?</string>
+    <string name="dialog_download_wrong_os_has_extras">%s не сумісно з Android. Ви не зможете встановити це як додаток.\nМожна переглянути додатковий контент, наприклад, ілюстрації, музику, та інструкції.</string>
+    <string name="settings_warn_os">Попереджати, коли гра не сумісна з Android</string>
 </resources>

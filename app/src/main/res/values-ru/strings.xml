@@ -176,4 +176,7 @@
     <string name="notification_download_unknown_error">Неизвестная ошибка</string>
     <string name="dialog_installer_please_wait">Подождите, сейчас устанавливаем приложение…</string>
     <string name="dialog_installer_no_space">Не хватает места на диске.</string>
+    <string name="dialog_download_wrong_os">%s не совместимо с Android. Вы не сможете установить это как приложение.\nВсё равно загрузить?</string>
+    <string name="dialog_download_wrong_os_has_extras">%s не совместимо с Android. Вы не сможете установить это как приложение.\nМожно просмотреть дополнительный контент, например, музыку или иллюстрации.</string>
+    <string name="settings_warn_os">Предупреждать, если игра не совместима с Android</string>
 </resources>
