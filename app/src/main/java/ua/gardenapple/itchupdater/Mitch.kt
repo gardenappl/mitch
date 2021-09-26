@@ -77,6 +77,7 @@ const val PREF_LANG = "mitch.lang"
 const val PREF_LANG_LOCALE = "mitch.lang_locale"
 const val PREF_LANG_LOCALE_NEXT = "mitch.lang_locale_next"
 const val PREF_LANG_SITE_LOCALE = "mitch.lang_site_locale"
+const val PREF_WARN_WRONG_OS = "mitch.warn_wrong_os"
 
 
 

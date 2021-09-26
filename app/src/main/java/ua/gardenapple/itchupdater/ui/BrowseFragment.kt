@@ -27,10 +27,7 @@ import com.leinardi.android.speeddial.SpeedDialActionItem
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import ua.gardenapple.itchupdater.ItchWebsiteUtils
-import ua.gardenapple.itchupdater.PREF_WEB_ANDROID_FILTER
-import ua.gardenapple.itchupdater.R
-import ua.gardenapple.itchupdater.Utils
+import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.client.ItchBrowseHandler
 import ua.gardenapple.itchupdater.client.ItchWebsiteParser
 import ua.gardenapple.itchupdater.client.SpecialBundleHandler
@@ -487,7 +484,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
      */
     private fun goToDownloadOrPurchase(doc: Document, info: ItchBrowseHandler.Info, url: String) {
         val mainActivity = activity as? MainActivity ?: return
-        if (!info.hasAndroidVersion && info.hasWindowsMacOrLinuxVersion) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity)
+        
+        if (!info.hasAndroidVersion && info.hasWindowsMacOrLinuxVersion
+            && prefs.getBoolean(PREF_WARN_WRONG_OS, true)) {
+
             val platforms = ItchWebsiteParser.getInstallationsPlatforms(doc)
 
             var foundExtras = false

@@ -18,6 +18,10 @@
     <PreferenceCategory android:title="@string/settings_category_updater">
         <SwitchPreference
                 android:defaultValue="true"
+                android:key="mitch.warn_wrong_os"
+                android:title="@string/settings_warn_os" />
+        <SwitchPreference
+                android:defaultValue="true"
                 android:key="preference_update_check_if_metered"
                 android:summary="@string/settings_update_check_metered_desc"
                 android:title="@string/settings_update_check_metered" />
