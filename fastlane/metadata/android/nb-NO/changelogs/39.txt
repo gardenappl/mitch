@@ -1,0 +1,2 @@
+* Advarsel lagt til ved forsøk på å laste ned spill som ikke er til Android
+* Flyttet «Tillat statistikkinnhenting» til den avanserte delen
