@@ -1,0 +1,2 @@
+* Android olmayan bir oyunu indirmeye çalışırken uyarılar eklendi
+* 'Analizlere izin ver' ayarı Gelişmiş bölümüne taşındı
