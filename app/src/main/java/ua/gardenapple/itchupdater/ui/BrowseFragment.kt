@@ -485,7 +485,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     private fun goToDownloadOrPurchase(doc: Document, info: ItchBrowseHandler.Info, url: String) {
         val mainActivity = activity as? MainActivity ?: return
         val prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity)
-        
+
         if (!info.hasAndroidVersion && info.hasWindowsMacOrLinuxVersion
             && prefs.getBoolean(PREF_WARN_WRONG_OS, true)) {
 
@@ -811,7 +811,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             webView.visibility = View.GONE
             
             (activity as? MainActivity)?.apply {
-                binding.bottomNavigationView.visibility = View.GONE
+                binding.bottomView.visibility = View.GONE
                 binding.speedDial.visibility = View.GONE
                 binding.toolbar.visibility = View.GONE
 
@@ -842,6 +842,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
             webView.visibility = View.VISIBLE
             (activity as? MainActivity)?.apply {
+                binding.bottomView.visibility = View.VISIBLE
+
                 binding.fragmentContainer.removeView(customView)
                 binding.root.systemUiVisibility = originalUiVisibility
             }
