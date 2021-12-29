@@ -19,6 +19,7 @@ import androidx.annotation.Keep
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ShareCompat
+import androidx.core.view.MenuCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
@@ -43,6 +44,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     companion object {
         private const val LOGGING_TAG = "BrowseFragment"
         private const val WEB_VIEW_STATE_KEY: String = "WebView"
+
+        private const val APP_BAR_ACTIONS_DEFAULT = 1
+        private const val APP_BAR_ACTIONS_FROM_HTML = 2
+        private const val APP_BAR_ACTIONS_GAME_JAM = 3
     }
     
     private var _binding: BrowseFragmentBinding? = null
@@ -379,20 +384,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 Utils.spannedFromHtml("<b>${Html.escapeHtml(ItchWebsiteParser.getGameName(doc))}</b>")
 
             appBar.menu.clear()
-            addAppBarActions(appBar, doc)
+            MenuCompat.setGroupDividerEnabled(appBar.menu, true)
+            addAppBarActionsFromHtml(appBar, doc)
             addDefaultAppBarActions(appBar)
             supportAppBar.show()
-        } else if (doc?.let { ItchWebsiteUtils.isUserPage(it) } == true) {
-            val appBarTitle =
-                "<b>${Html.escapeHtml(ItchWebsiteParser.getUserName(doc))}</b>"
-            supportAppBar.title = Utils.spannedFromHtml(appBarTitle)
-
-            appBar.menu.clear()
-            addDefaultAppBarActions(appBar)
-            supportAppBar.show()
-
-            bottomGameBar.visibility = View.GONE
-            navBar.visibility = View.GONE
         } else if (doc?.let { ItchWebsiteUtils.isUserPage(it) } == true) {
             val appBarTitle =
                 "<b>${Html.escapeHtml(ItchWebsiteParser.getUserName(doc))}</b>"
@@ -535,7 +530,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
      * @param doc the parsed HTML document of a game store page or devlog page
      * @param appBar the app UI's top Toolbar
      */
-    private fun addAppBarActions(appBar: Toolbar, doc: Document) {
+    private fun addAppBarActionsFromHtml(appBar: Toolbar, doc: Document) {
         appBar.menu.clear()
 
         val navbarItems = doc.getElementById("user_tools")?.children() ?: return
@@ -545,14 +540,14 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             val url = item.child(0).attr("href")
 
             if (item.getElementsByClass("related_games_btn").isNotEmpty()) {
-                appBar.menu.add(Menu.NONE, 5, 5, R.string.menu_game_related)
+                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 5, 5, R.string.menu_game_related)
                     .setOnMenuItemClickListener {
                         webView.loadUrl(url)
                         true
                     }
 
             } else if (item.getElementsByClass("rate_game_btn").isNotEmpty()) {
-                appBar.menu.add(Menu.NONE, 4, 4, R.string.menu_game_rate)
+                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 4, 4, R.string.menu_game_rate)
                     .setOnMenuItemClickListener {
                         webView.loadUrl(url)
                         true
@@ -561,14 +556,14 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM)
 
             } else if (item.hasClass("devlog_link")) {
-                appBar.menu.add(Menu.NONE, 3, 3, R.string.menu_game_devlog)
+                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 3, 3, R.string.menu_game_devlog)
                     .setOnMenuItemClickListener {
                         webView.loadUrl(url)
                         true
                     }
 
             } else if (item.getElementsByClass("add_to_collection_btn").isNotEmpty()) {
-                appBar.menu.add(Menu.NONE, 2, 2, R.string.menu_game_collection)
+                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 2, 2, R.string.menu_game_collection)
                     .setOnMenuItemClickListener {
                         webView.loadUrl(url)
                         true
@@ -578,7 +573,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 //TODO: handle multiple jam entries nicely
                 val menuItemName = item.child(0).text()
 
-                appBar.menu.add(Menu.NONE, 1, 1, menuItemName)
+                appBar.menu.add(APP_BAR_ACTIONS_GAME_JAM, 1, 1, menuItemName)
                     .setOnMenuItemClickListener {
                         webView.loadUrl(url)
                         true
@@ -598,7 +593,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     else
                         resources.getString(R.string.menu_game_author_generic)
 
-                appBar.menu.add(Menu.NONE, 0, 0, menuItemName).setOnMenuItemClickListener {
+                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 0, 0, menuItemName).setOnMenuItemClickListener {
                     webView.loadUrl(url)
                     true
                 }
@@ -615,15 +610,15 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
      * @param appBar the application's top toolbar
      */
     private fun addDefaultAppBarActions(appBar: Toolbar) {
-        appBar.menu.add(Menu.NONE, 10, 10, R.string.nav_installed).setOnMenuItemClickListener {
+        appBar.menu.add(APP_BAR_ACTIONS_DEFAULT, 10, 10, R.string.nav_installed).setOnMenuItemClickListener {
             (activity as MainActivity).setActiveFragment(MainActivity.LIBRARY_FRAGMENT_TAG, true)
             true
         }
-        appBar.menu.add(Menu.NONE, 11, 11, R.string.nav_updates).setOnMenuItemClickListener {
+        appBar.menu.add(APP_BAR_ACTIONS_DEFAULT, 11, 11, R.string.nav_updates).setOnMenuItemClickListener {
             (activity as MainActivity).setActiveFragment(MainActivity.UPDATES_FRAGMENT_TAG, true)
             true
         }
-        appBar.menu.add(Menu.NONE, 12, 12, R.string.nav_settings).setOnMenuItemClickListener {
+        appBar.menu.add(APP_BAR_ACTIONS_DEFAULT, 12, 12, R.string.nav_settings).setOnMenuItemClickListener {
             (activity as MainActivity).setActiveFragment(MainActivity.SETTINGS_FRAGMENT_TAG, true)
             true
         }
