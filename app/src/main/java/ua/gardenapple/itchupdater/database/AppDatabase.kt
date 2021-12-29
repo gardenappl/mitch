@@ -3,7 +3,10 @@ package ua.gardenapple.itchupdater.database
 import android.content.Context
 import android.util.Log
 import androidx.preference.PreferenceManager
-import androidx.room.*
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock

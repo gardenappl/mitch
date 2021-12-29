@@ -4,9 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.net.toUri
-import ua.gardenapple.itchupdater.FILE_PROVIDER
 import ua.gardenapple.itchupdater.Mitch
-import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.AppDatabase
 import java.io.File
 import java.io.InputStream

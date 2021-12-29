@@ -3,8 +3,6 @@ package ua.gardenapple.itchupdater.install
 import android.content.Context
 import android.content.pm.PackageInstaller
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
 

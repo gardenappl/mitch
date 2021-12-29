@@ -7,8 +7,6 @@ import androidx.room.withTransaction
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker.Result
 import androidx.work.WorkerParameters
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.PREF_DB_RAN_CLEANUP_ONCE
 import ua.gardenapple.itchupdater.Utils

@@ -5,7 +5,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.PREF_LANG_SITE_LOCALE

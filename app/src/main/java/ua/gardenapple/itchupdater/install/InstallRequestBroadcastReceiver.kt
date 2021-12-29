@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import kotlinx.coroutines.runBlocking
-import ua.gardenapple.itchupdater.Mitch
 import java.io.File
 
 /**

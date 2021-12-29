@@ -1,6 +1,5 @@
 package ua.gardenapple.itchupdater.client
 
-import android.util.Log
 import android.webkit.CookieManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -10,7 +9,6 @@ import org.json.JSONObject
 import org.jsoup.Jsoup
 import ua.gardenapple.itchupdater.Mitch
 import java.io.IOException
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 

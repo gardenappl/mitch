@@ -1,5 +1,6 @@
 package ua.gardenapple.itchupdater.client
 
+import ua.gardenapple.itchupdater.client.UpdateCheckResult.Companion.UPDATE_AVAILABLE
 import ua.gardenapple.itchupdater.database.installation.Installation
 
 

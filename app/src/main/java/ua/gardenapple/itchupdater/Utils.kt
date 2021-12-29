@@ -1,5 +1,6 @@
 package ua.gardenapple.itchupdater
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -28,9 +29,6 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.*
 import java.util.*
-import kotlin.math.min
-import android.annotation.SuppressLint
-import java.lang.Exception
 
 
 object Utils {

@@ -1,10 +1,7 @@
 package ua.gardenapple.itchupdater
 
 import android.annotation.SuppressLint
-
 import android.os.Build
-
-import java.lang.Exception
 
 // Converted from Java from https://github.com/Aefyr/SAI/blob/master/app/src/main/java/com/aefyr/sai/utils/MiuiUtils.java
 object MiuiUtils {

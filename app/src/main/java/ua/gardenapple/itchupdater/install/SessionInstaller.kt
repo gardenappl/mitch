@@ -9,9 +9,7 @@ import androidx.core.net.toUri
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.Utils
-import ua.gardenapple.itchupdater.database.AppDatabase
 import java.io.File
 import java.io.IOException
 import java.io.InputStream

@@ -1,20 +1,15 @@
 package ua.gardenapple.itchupdater
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
-import android.util.Log
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import androidx.work.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import org.acra.ACRA
@@ -24,14 +19,11 @@ import org.acra.config.DialogConfigurationBuilder
 import org.acra.config.MailSenderConfigurationBuilder
 import org.acra.data.StringFormat
 import ua.gardenapple.itchupdater.client.UpdateChecker
-import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.DatabaseCleanup
-import ua.gardenapple.itchupdater.database.installation.Installation
-import ua.gardenapple.itchupdater.files.*
-import ua.gardenapple.itchupdater.install.Installations
+import ua.gardenapple.itchupdater.files.DownloadFileManager
+import ua.gardenapple.itchupdater.files.ExternalFileManager
 import ua.gardenapple.itchupdater.install.InstallerDatabaseHandler
 import ua.gardenapple.itchupdater.ui.CrashDialog
-import ua.gardenapple.itchupdater.ui.MainActivity
 import ua.gardenapple.itchupdater.ui.MitchContextWrapper
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -59,7 +51,6 @@ const val FLAVOR_FDROID = "fdroid"
 const val FLAVOR_ITCHIO = "itchio"
 
 // Remember to exclude sensitive info from ACRA reports
-
 const val PREF_DB_RAN_CLEANUP_ONCE = "ua.gardenapple.itchupdater.db_cleanup_once"
 const val PREF_INSTALLER = "ua.gardenapple.itchupdater.installer"
 const val PREF_JUSTICE_LINK = "mitch.racial"
@@ -70,6 +61,7 @@ const val PREF_PREFIX_PALESTINE_LINK = "mitch.palestine_"
 const val PREF_PREFIX_PALESTINE_LAST_CHECK = "mitch.palestinetimestamp_"
 const val PREF_WEB_ANDROID_FILTER = "ua.gardenapple.itchupdater.web_android_filter"
 const val PREF_LANG = "mitch.lang"
+
 /**
  * Locale is not controlled directly by the user; instead, Mitch.kt applies
  * [PREF_LANG_LOCALE_NEXT], and then [PREF_LANG_LOCALE] gets applied on app restart

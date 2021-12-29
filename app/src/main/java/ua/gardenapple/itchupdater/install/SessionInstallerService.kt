@@ -1,20 +1,14 @@
 package ua.gardenapple.itchupdater.install
 
-import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageInstaller
-import android.content.pm.PackageManager
 import android.os.IBinder
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import androidx.room.withTransaction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import ua.gardenapple.itchupdater.*
-import ua.gardenapple.itchupdater.database.AppDatabase
-import java.io.File
+import ua.gardenapple.itchupdater.Mitch
+import ua.gardenapple.itchupdater.Utils
 
 /**
  * This service gets started after an APK gets installed by an Installer.

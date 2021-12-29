@@ -1,11 +1,9 @@
 package ua.gardenapple.itchupdater.ui
 
-import android.annotation.TargetApi
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.os.Build
-import android.util.Log
 import ua.gardenapple.itchupdater.Utils
 import java.util.*
 

@@ -1,6 +1,5 @@
 package ua.gardenapple.itchupdater.files
 
-import android.app.NotificationManager
 import android.content.Context
 import android.util.Log
 import android.webkit.CookieManager
@@ -20,7 +19,6 @@ import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.lang.Exception
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 

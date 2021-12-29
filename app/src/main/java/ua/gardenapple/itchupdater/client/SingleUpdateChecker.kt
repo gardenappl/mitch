@@ -1,7 +1,7 @@
 package ua.gardenapple.itchupdater.client
 
 import android.util.Log
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.BuildConfig
 import ua.gardenapple.itchupdater.FLAVOR_ITCHIO
@@ -11,8 +11,6 @@ import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 import java.io.IOException
-import java.lang.RuntimeException
-import java.util.*
 import kotlin.random.Random
 
 class SingleUpdateChecker(val db: AppDatabase) {

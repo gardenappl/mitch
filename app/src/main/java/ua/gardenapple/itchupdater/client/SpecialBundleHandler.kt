@@ -12,7 +12,6 @@ import okhttp3.Request
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.game.Game
-import java.lang.RuntimeException
 import java.net.URL
 import java.util.regex.Pattern
 

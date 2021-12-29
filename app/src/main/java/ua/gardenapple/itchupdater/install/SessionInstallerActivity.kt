@@ -1,7 +1,6 @@
 package ua.gardenapple.itchupdater.install
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.core.net.toFile
 import kotlinx.coroutines.*
@@ -10,7 +9,6 @@ import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.databinding.SessionInstallerActivityBinding
 import ua.gardenapple.itchupdater.ui.MitchActivity
-import java.lang.IllegalArgumentException
 
 /**
  * Loads the APK into the [SessionInstaller] while displaying a loading screen.
