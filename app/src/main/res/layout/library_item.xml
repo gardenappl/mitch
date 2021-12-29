@@ -24,7 +24,8 @@
                 app:layout_constraintBottom_toTopOf="@+id/gameName"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="?colorPrimary" />
+                app:srcCompat="?colorPrimary"
+                tools:visibility="invisible" />
 
         <ImageView
                 android:id="@+id/gameThumbnailEmpty"
@@ -34,10 +35,11 @@
                 android:visibility="invisible"
 
                 app:layout_constraintBottom_toBottomOf="@id/gameThumbnail"
-                app:layout_constraintTop_toTopOf="@id/gameThumbnail"
                 app:layout_constraintLeft_toLeftOf="@id/gameThumbnail"
                 app:layout_constraintRight_toRightOf="@id/gameThumbnail"
-                app:srcCompat="@drawable/ic_baseline_star_border_24" />
+                app:layout_constraintTop_toTopOf="@id/gameThumbnail"
+                app:srcCompat="@drawable/ic_baseline_star_border_24"
+                tools:visibility="visible" />
 
         <TextView
                 android:id="@+id/gameName"

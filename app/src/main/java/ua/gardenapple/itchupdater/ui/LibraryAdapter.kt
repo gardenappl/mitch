@@ -86,14 +86,15 @@ class LibraryAdapter internal constructor(
 
         holder.overflowMenuButton.setOnClickListener { view -> onCardOverflowClick(view, position) }
 
-        holder.thumbnailView.isVisible = game.thumbnailUrl != null
         if (game.thumbnailUrl != null) {
             Glide.with(context)
                 .load(game.thumbnailUrl)
                 .override(LibraryFragment.THUMBNAIL_WIDTH, LibraryFragment.THUMBNAIL_HEIGHT)
                 .into(holder.thumbnailView)
+            holder.thumbnailView.visibility = View.VISIBLE
             holder.emptyThumbnailView.visibility = View.INVISIBLE
         } else {
+            holder.thumbnailView.visibility = View.INVISIBLE
             holder.emptyThumbnailView.visibility = View.VISIBLE
         }
     }
