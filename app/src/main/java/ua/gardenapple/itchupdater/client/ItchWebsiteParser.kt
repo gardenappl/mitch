@@ -246,10 +246,24 @@ object ItchWebsiteParser {
      */
     fun getPaymentInfo(doc: Document): PaymentInfo? {
         val message = doc.selectFirst(".buy_message")?.clone() ?: return null
-        val price = message.selectFirst("[itemprop=price]")
-        val sub = message.selectFirst(".sub")
+        Log.d(LOGGING_TAG, "Original: $message")
 
-        if (sub != null) {
+        //TODO: show URL for sale link?
+        message.selectFirst(".sale_link").remove()
+
+        message.selectFirst(".original_price")?.let { originalPrice ->
+            val color = Utils.asHexCode(ColorUtils.blendARGB(
+                ItchWebsiteUtils.getBackgroundUIColor(doc)!!,
+                Color.WHITE,
+                0.5f
+            ))
+            originalPrice.replaceWith(Element("strike")
+                .text(originalPrice.text())
+                .attr("style", "color: $color")
+            )
+        }
+
+        message.selectFirst(".sub")?.let { sub ->
             val color = Utils.asHexCode(ColorUtils.blendARGB(
                 ItchWebsiteUtils.getBackgroundUIColor(doc)!!,
                 Color.WHITE,
@@ -261,15 +275,17 @@ object ItchWebsiteParser {
             )
         }
 
-        if (price != null) {
+        val isPaymentOptional = message.selectFirst("[itemprop=price]")?.let { price ->
             val color = Utils.asHexCode(ItchWebsiteUtils.getAccentFgUIColor(doc)!!)
             price.replaceWith(Element("b")
                 .text(price.ownText())
                 .attr("style", "color: $color")
             )
-            return PaymentInfo(messageHtml = message.html(), isPaymentOptional = false)
-        }
-        return PaymentInfo(messageHtml = message.html(), isPaymentOptional = true)
+            return@let false
+        } ?: true
+        val html = message.html().lines().joinToString(separator = "")
+        Log.d(LOGGING_TAG, "Modified: $html")
+        return PaymentInfo(html, isPaymentOptional)
     }
 
     /**
