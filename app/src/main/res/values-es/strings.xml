@@ -99,4 +99,88 @@
     <string name="dialog_missing_file">El archivo %1$s fue movido o eliminado de la carpeta de descargas.
 \n
 \n¿Deseas eliminarlo de la aplicación Mitch\? Ya no recibirás actualizaciones para %2$s.</string>
+    <string name="dialog_web_alert">La página web en %s dice:</string>
+    <string name="library_games_search">Buscar</string>
+    <string name="library_no_games">Parece que no tienes ningún juego de itch.io.</string>
+    <string name="bug_report_dialog">Lo siento, parece que ha habido un error en Mitch. Pulsa OK para enviar un informe de error al desarrollador.</string>
+    <string name="settings_cancel_downloads_message">Esto sólo debe hacerse con fines de prueba o de resolución de problemas.</string>
+    <string name="dialog_no">No</string>
+    <string name="settings_installer">Método de instalación</string>
+    <string name="settings_bundle_claim_dialog">Advertencia: estás a punto de llenar tu biblioteca con más de 1000 juegos. ¿Estás seguro de que quieres hacerlo\?
+\n
+\nEsto llevará mucho, muuucho tiempo.
+\n
+\nEste proceso es irreversible.</string>
+    <string name="settings_android_only_filter_desc">Al navegar por los juegos de Android, ocultar las entradas que sólo están disponibles en otras tiendas.</string>
+    <string name="settings_lang_site">Depende del sitio</string>
+    <string name="game_bundle_justice">Paquete de Justicia e Igualdad Racial</string>
+    <string name="notification_download_unknown_error">Error desconocido</string>
+    <string name="dialog_installer_please_wait">Por favor, espera, preparando la aplicación para su instalación…</string>
+    <string name="dialog_installer_no_space">No hay suficiente espacio en el disco para esta aplicación.</string>
+    <string name="popup_moving_to_downloads">Moviendo el archivo a la carpeta de Descargas…</string>
+    <string name="popup_move_to_download_error">Error al mover a la carpeta de Descargas</string>
+    <string name="updates_all_up_to_date">Todo está actualizado</string>
+    <string name="updates_last_check_time">Última comprobación %s</string>
+    <string name="updates_pull_to_refresh">Tira hacia abajo para actualizar</string>
+    <string name="nav_updates">Actualizaciones</string>
+    <string name="updates_error">Error al comprobar las actualizaciones</string>
+    <plurals name="updates_available">
+        <item quantity="one">¡%d actualización disponible!</item>
+        <item quantity="other">¡%d actualizaciones disponibles!</item>
+    </plurals>
+    <string name="updates_do_update">Actualizar</string>
+    <string name="updates_size_and_name">%1$s · %2$s</string>
+    <string name="updates_version_change">%1$s → %2$s</string>
+    <string name="updates_multiple">Varias versiones disponibles</string>
+    <string name="library_no_apps">No hay aplicaciones instaladas.</string>
+    <string name="library_no_downloads">No se ha descargado nada.</string>
+    <string name="dialog_dont_show_again">No mostrar esto de nuevo</string>
+    <string name="dialog_web_prompt">La página web en %s pregunta:</string>
+    <string name="library_category_owned">Artículos propios</string>
+    <string name="library_category_owned_see">Ver →</string>
+    <string name="platform_android">Android</string>
+    <string name="library_install">Instalar</string>
+    <string name="library_download">Descargar</string>
+    <string name="network_request_retry">Reintentar</string>
+    <string name="library_not_logged_in">Para acceder a los ítems propios, debes iniciar sesión en tu cuenta de itch.io.</string>
+    <string name="log_in">Iniciar sesión</string>
+    <string name="library_options_show_only_android">Sólo Android</string>
+    <string name="library_no_android_games">Parece que no tienes ningún juego para Android.</string>
+    <string name="library_go_to_store">Ir a la tienda</string>
+    <string name="bug_report_dialog_title">Algo salió mal</string>
+    <string name="library_open_app_failed">Esta aplicación no se ha podido abrir.</string>
+    <string name="settings_category_advanced">Avanzado</string>
+    <string name="settings_cancel_downloads">Restablecer todas las descargas</string>
+    <string name="settings_cancel_downloads_title">¿Restablecer todas las descargas actuales\?</string>
+    <string name="settings_installer_desc">Intenta cambiar esto si tienes problemas para instalar aplicaciones.</string>
+    <string name="settings_installer_session">Instalador de sesiones</string>
+    <string name="settings_installer_native">Instalador nativo (por defecto)</string>
+    <string name="popup_handler_app_not_found">No se sabe cómo abrir %s</string>
+    <string name="game_bundle_claim">Reclamar</string>
+    <string name="game_buy">Comprar</string>
+    <string name="game_download">Descargar</string>
+    <string name="game_install">Instalar</string>
+    <string name="game_price">%s o más</string>
+    <string name="game_justice_bundle_claim_error">No se pudo acceder al enlace de descarga del paquete de Justicia Racial.</string>
+    <string name="game_palestine_bundle_claim_error">No se ha podido acceder al enlace de descarga del paquete de ayuda a Palestina.</string>
+    <string name="settings_bundle_link_desc">Establecer una URL de descarga personalizada</string>
+    <string name="settings_justice_claim_all">Paquete de Justicia Racial: reclamar todo</string>
+    <string name="settings_palestine_claim_all">Paquete de Ayuda Palestina: reclamar todo</string>
+    <string name="game_bundle_palestine">Paquete de juegos indie para la Ayuda a Palestina</string>
+    <string name="settings_justice_claim_all_desc">Reclama todos los juegos del paquete Justicia e Igualdad Racial.</string>
+    <string name="settings_palestine_claim_all_desc">Reclama todos los juegos del paquete Indie para la Ayuda a Palestina.</string>
+    <string name="settings_bundle_claim_dialog_title">¿Estás seguro\?</string>
+    <string name="popup_no_network_connection">La comprobación de las actualizaciones requiere una conexión de red</string>
+    <string name="settings_android_only_filter">Android: filtro descargable únicamente</string>
+    <string name="settings_lang_default">Predeterminado</string>
+    <string name="settings_lang_system">Depende del sistema</string>
+    <string name="settings_lang">Idioma</string>
+    <string name="dialog_lang_restart_title">Idioma cambiado</string>
+    <string name="dialog_lang_restart">La aplicación se reiniciará para aplicar el nuevo idioma</string>
+    <string name="notification_download_io_error">Error de red o de disco</string>
+    <string name="dialog_download_wrong_os">%s no es compatible con Android. No podrás instalarlo como una aplicación.
+\n¿Quieres descargarlo de todos modos\?</string>
+    <string name="dialog_download_wrong_os_has_extras">%s no es compatible con Android. No podrás instalarlo como una aplicación.
+\nAun así, podrás ver los contenidos adicionales, como arte, música o manuales.</string>
+    <string name="settings_warn_os">Advertir al descargar aplicaciones que no son de Android</string>
 </resources>
