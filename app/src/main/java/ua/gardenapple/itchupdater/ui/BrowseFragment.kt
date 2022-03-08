@@ -611,15 +611,19 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
      * @param appBar the application's top toolbar
      */
     private fun addDefaultAppBarActions(appBar: Toolbar) {
-        appBar.menu.add(APP_BAR_ACTIONS_DEFAULT, 10, 10, R.string.nav_installed).setOnMenuItemClickListener {
+        appBar.menu.add(APP_BAR_ACTIONS_DEFAULT, 10, 10, R.string.nav_website_view).setOnMenuItemClickListener {
+            webView.loadUrl(ItchWebsiteUtils.getMainBrowsePage(requireContext()))
+            true
+        }
+        appBar.menu.add(APP_BAR_ACTIONS_DEFAULT, 11, 11, R.string.nav_installed).setOnMenuItemClickListener {
             (activity as MainActivity).setActiveFragment(MainActivity.LIBRARY_FRAGMENT_TAG, true)
             true
         }
-        appBar.menu.add(APP_BAR_ACTIONS_DEFAULT, 11, 11, R.string.nav_updates).setOnMenuItemClickListener {
+        appBar.menu.add(APP_BAR_ACTIONS_DEFAULT, 12, 12, R.string.nav_updates).setOnMenuItemClickListener {
             (activity as MainActivity).setActiveFragment(MainActivity.UPDATES_FRAGMENT_TAG, true)
             true
         }
-        appBar.menu.add(APP_BAR_ACTIONS_DEFAULT, 12, 12, R.string.nav_settings).setOnMenuItemClickListener {
+        appBar.menu.add(APP_BAR_ACTIONS_DEFAULT, 13, 13, R.string.nav_settings).setOnMenuItemClickListener {
             (activity as MainActivity).setActiveFragment(MainActivity.SETTINGS_FRAGMENT_TAG, true)
             true
         }
