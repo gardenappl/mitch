@@ -19,8 +19,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.preferences, rootKey)
     }
 
-    override fun onPreferenceTreeClick(preference: Preference?): Boolean {
-        if (preference?.key == "cancel_all_downloads") {
+    override fun onPreferenceTreeClick(preference: Preference): Boolean {
+        if (preference.key == "cancel_all_downloads") {
             val dialog = AlertDialog.Builder(requireContext()).run {
                 setTitle(R.string.settings_cancel_downloads_title)
                 setMessage(R.string.settings_cancel_downloads_message)

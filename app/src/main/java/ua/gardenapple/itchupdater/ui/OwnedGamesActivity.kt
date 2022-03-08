@@ -68,7 +68,7 @@ class OwnedGamesActivity : MitchActivity() {
         // get view model
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return ItchLibraryViewModel(repository) as T
             }
         }).get(ItchLibraryViewModel::class.java)

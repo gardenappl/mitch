@@ -126,9 +126,9 @@ object ItchWebsiteParser {
                 else
                     throw IllegalStateException("Unparse-able game page")
             }
-            uploadDivs = Collections.singletonList(uploadButton.parent())
+            uploadDivs = Collections.singletonList(uploadButton.parent()!!)
         } else {
-            uploadDivs = uploadButtons.first().parent().parent().children()
+            uploadDivs = uploadButtons.first()!!.parent()!!.parent()!!.children()
         }
 
         val locale = getLocale(doc)
@@ -139,15 +139,15 @@ object ItchWebsiteParser {
         for (uploadDiv in uploadDivs) {
             val platforms = getPlatformsForUpload(uploadDiv)
 
-            val uploadNameDiv = uploadDiv.selectFirst(".upload_name")
-            val name = uploadNameDiv.selectFirst(".name").attr("title")
+            val uploadNameDiv = uploadDiv.selectFirst(".upload_name")!!
+            val name = uploadNameDiv.selectFirst(".name")!!.attr("title")
 
             // TODO: External download link
             val fileSize = uploadNameDiv.selectFirst(".file_size")?.child(0)?.html()
                 ?: continue
 
             val uploadId = requiredUploadId
-                ?: Integer.parseInt(uploadDiv.selectFirst(".download_btn").attr("data-upload_id"))
+                ?: Integer.parseInt(uploadDiv.selectFirst(".download_btn")!!.attr("data-upload_id"))
 
             //These may or may not exist
             var versionName: String? = null
@@ -225,7 +225,7 @@ object ItchWebsiteParser {
 
         //Reformat cloned element
 
-        val ownershipReason = downloadButtonRow.selectFirst(".ownership_reason").clone()
+        val ownershipReason = downloadButtonRow.selectFirst(".ownership_reason")!!.clone()
 
         val purchasedPrice: Element? = ownershipReason.selectFirst(".purchase_price")
         purchasedPrice?.replaceWith(Element("b").text(purchasedPrice.ownText()))
@@ -236,7 +236,7 @@ object ItchWebsiteParser {
 
         return PurchasedInfo(
             ownershipReasonHtml = ownershipReason.html(),
-            downloadPage = downloadButtonRow.selectFirst(".button").attr("href")
+            downloadPage = downloadButtonRow.selectFirst(".button")!!.attr("href")
         )
     }
 
@@ -249,7 +249,7 @@ object ItchWebsiteParser {
         Log.d(LOGGING_TAG, "Original: $message")
 
         //TODO: show URL for sale link?
-        message.selectFirst(".sale_link").remove()
+        message.selectFirst(".sale_link")!!.remove()
 
         message.selectFirst(".original_price")?.let { originalPrice ->
             val color = Utils.asHexCode(ColorUtils.blendARGB(
@@ -389,7 +389,7 @@ object ItchWebsiteParser {
 
     private fun getAuthorName(gamePageUri: Uri, infoTable: Element): String {
         Log.d(LOGGING_TAG, "Author URL: ${getAuthorUrlFromGamePage(gamePageUri)}")
-        return infoTable.selectFirst("[href=\"${getAuthorUrlFromGamePage(gamePageUri)}\"]").html()
+        return infoTable.selectFirst("[href=\"${getAuthorUrlFromGamePage(gamePageUri)}\"]")!!.html()
     }
 
     /*fun getAuthorName(doc: Document, gamePageUri: Uri): String {
@@ -397,16 +397,16 @@ object ItchWebsiteParser {
     }*/
 
     private fun getInfoTable(doc: Document): Element {
-        return doc.body().selectFirst(".game_info_panel_widget").child(0).child(0)
+        return doc.body().selectFirst(".game_info_panel_widget")!!.child(0).child(0)
     }
 
     fun getGameName(doc: Document): String {
         if (ItchWebsiteUtils.isPurchasePage(doc)) {
-            return doc.selectFirst("h1").child(0).text()
+            return doc.selectFirst("h1")!!.child(0).text()
         }
 
         if (ItchWebsiteUtils.isDownloadPage(doc)) {
-            return doc.selectFirst("h2").child(0).text()
+            return doc.selectFirst("h2")!!.child(0).text()
         }
 
         if (ItchWebsiteUtils.isStorePage(doc)) {
@@ -419,7 +419,7 @@ object ItchWebsiteParser {
 
         if (ItchWebsiteUtils.isDevlogPage(doc)) {
             return (doc.selectFirst(".game_title")
-                ?: doc.selectFirst(".game_metadata").selectFirst("h3"))
+                ?: doc.selectFirst(".game_metadata")!!.selectFirst("h3"))!!
                 .html()
         }
 
@@ -428,7 +428,7 @@ object ItchWebsiteParser {
 
     fun getUserName(doc: Document): String {
         if (ItchWebsiteUtils.isUserPage(doc)) {
-            return doc.getElementById("profile_header").selectFirst("h1").text()
+            return doc.getElementById("profile_header")!!.selectFirst("h1")!!.text()
         }
 
         throw IllegalArgumentException("Document is not a user page")

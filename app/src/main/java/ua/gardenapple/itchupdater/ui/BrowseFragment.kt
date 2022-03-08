@@ -536,7 +536,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val navbarItems = doc.getElementById("user_tools")?.children() ?: return
 
         while (navbarItems.isNotEmpty()) {
-            val item = navbarItems.last()
+            val item = navbarItems.last()!!
             val url = item.child(0).attr("href")
 
             if (item.getElementsByClass("related_games_btn").isNotEmpty()) {
@@ -762,7 +762,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
             val uri = Uri.parse(url)
             if (uri.pathSegments.containsAll(listOf("games", "platform-android"))) {
-                val preferenceManager = PreferenceManager.getDefaultSharedPreferences(context)
+                val preferenceManager = PreferenceManager.getDefaultSharedPreferences(requireContext())
                 val androidOnlyFilter = preferenceManager.getBoolean(PREF_WEB_ANDROID_FILTER, true)
                 if (androidOnlyFilter) {
                     webView.evaluateJavascript("""

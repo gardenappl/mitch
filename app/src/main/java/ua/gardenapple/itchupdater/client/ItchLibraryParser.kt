@@ -68,16 +68,16 @@ object ItchLibraryParser {
             else
                 lastPurchaseDate = purchaseDate
 
-            val thumbnailLink = gameDiv.selectFirst(".thumb_link")
+            val thumbnailLink = gameDiv.selectFirst(".thumb_link")!!
             val downloadUrl = thumbnailLink.attr("href")
             val thumbnailUrl = thumbnailCssPattern.find(thumbnailLink.child(0).attr("style"))
                 ?.groupValues?.get(1)
-            val title = gameDiv.selectFirst(".game_title").text()
+            val title = gameDiv.selectFirst(".game_title")!!.text()
 //            val description = gameDiv.selectFirst(".game_text").attr("title")
 //            if (gameDiv.selectFirst(".game_text") == null) {
 //                Log.d(LOGGING_TAG, "Game $title has no description, hmm")
 //            }
-            val author = gameDiv.selectFirst(".game_author").text()
+            val author = gameDiv.selectFirst(".game_author")!!.text()
             val isAndroid = gameDiv.selectFirst(".icon-android") != null
 
             items.add(
