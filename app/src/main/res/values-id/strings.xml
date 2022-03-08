@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_bundle_claim_dialog">Peringatan: kamu akan mengisi perpustakaanmu dengan 1000+ game. Apakah kamu yakin ingin melakukan ini\?
+    <string name="bundle_claim_dialog">Peringatan: kamu akan mengisi perpustakaanmu dengan 1000+ game. Apakah kamu yakin ingin melakukan ini\?
 \n
 \nIni akan memakan sangat, sangat banyak waktu.
 \n
 \nProses ini tidak dapat dibatalkan.</string>
-    <string name="settings_bundle_claim_dialog_title">Apakah kamu yakin\?</string>
-    <string name="settings_bundle_link_desc">Tetapkan URL pengunduhan kustom</string>
+    <string name="bundle_claim_dialog_title">Apakah kamu yakin\?</string>
+    <string name="bundle_custom_link">Tetapkan URL pengunduhan kustom</string>
     <string name="game_buy">Beli</string>
     <string name="game_bundle_claim">Klaim</string>
     <string name="settings_installer">Metode pemasangan</string>
@@ -135,9 +135,9 @@
     <string name="notification_channel_updates">Pembaruan game</string>
     <string name="library_category_installed">Aplikasi terpasang</string>
     <string name="settings_installer_native">Pemasang asli (default)</string>
-    <string name="settings_justice_claim_all">Klaim semua game Bundel</string>
-    <string name="game_bundle_justice">Bundel untuk Keadilan dan Kesetaraan Rasial</string>
-    <string name="game_justice_bundle_claim_error">Tak bisa mengakses tautan unduhan dari bundel Keadilan Rasial.</string>
+    <string name="bundle_claim_all_racial">Klaim semua game Bundel</string>
+    <string name="game_bundle_racial">Bundel untuk Keadilan dan Kesetaraan Rasial</string>
+    <string name="bundle_claim_error_justice">Tak bisa mengakses tautan unduhan dari bundel Keadilan Rasial.</string>
     <string name="settings_installer_session">Pemasang sesi</string>
     <string name="settings_cancel_downloads_title">Setel ulang semua unduhan saat ini\?</string>
     <string name="settings_cancel_downloads">Setel ulang semua unduhan</string>
@@ -155,7 +155,7 @@
     <string name="dialog_game_remove">File %1$s akan tetap berada di folder Unduhan Anda.</string>
     <string name="notification_install_conflict_title">Aplikasi bentrok dengan paket lain</string>
     <string name="settings_category_browse">Menjelajah</string>
-    <string name="settings_justice_claim_all_desc">Klaim setiap game dari bundel Keadilan dan Kesetaraan Rasial.</string>
+    <string name="bundle_claim_all_desc_racial">Klaim setiap game dari bundel Keadilan dan Kesetaraan Rasial.</string>
     <string name="game_price">%s atau lebih</string>
     <string name="game_install">Pasang</string>
     <string name="game_download">Unduh</string>

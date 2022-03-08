@@ -249,7 +249,7 @@ object ItchWebsiteParser {
         Log.d(LOGGING_TAG, "Original: $message")
 
         //TODO: show URL for sale link?
-        message.selectFirst(".sale_link")!!.remove()
+        message.selectFirst(".sale_link")?.remove()
 
         message.selectFirst(".original_price")?.let { originalPrice ->
             val color = Utils.asHexCode(ColorUtils.blendARGB(
@@ -381,7 +381,7 @@ object ItchWebsiteParser {
 
     private fun getTimestamp(infoTable: Element): String? {
         var timestamp = infoTable.child(0).child(1).child(0).attr("title")
-        if (timestamp?.contains('@') != true)
+        if (timestamp.contains('@') != true)
             timestamp = null
 
         return timestamp

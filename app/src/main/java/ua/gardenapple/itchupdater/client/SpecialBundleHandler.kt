@@ -11,6 +11,7 @@ import okhttp3.FormBody
 import okhttp3.Request
 import org.jsoup.nodes.Document
 import ua.gardenapple.itchupdater.*
+import ua.gardenapple.itchupdater.data.SpecialBundle
 import ua.gardenapple.itchupdater.database.game.Game
 import java.net.URL
 import java.util.regex.Pattern
@@ -18,33 +19,40 @@ import java.util.regex.Pattern
 object SpecialBundleHandler {
     private const val LOGGING_TAG = "SpeicalBundleHandler"
 
-    private const val JUSTICE_BUNDLE_URL = "https://itch.io/b/520/bundle-for-racial-justice-and-equality"
-    private const val PALESTINE_BUNDLE_URL = "https://itch.io/b/902/indie-bundle-for-palestinian-aid"
     private const val LINK_EMPTY = "NONE"
     private const val CACHE_KEEP_DAYS = 3
+
+
+    private fun getLinkPreferencesKeyPrefix(bundle: SpecialBundle): String {
+        val prefLink = "mitch." + bundle.slug
+        if (bundle == SpecialBundle.RacialJustice || bundle == SpecialBundle.Palestine)
+            return prefLink + "_"
+        else
+            return prefLink + "."
+    }
+
+    private fun getTimestampPreferencesKey(bundle: SpecialBundle): String {
+        val prefLink = "mitch." + bundle.slug
+        if (bundle == SpecialBundle.RacialJustice || bundle == SpecialBundle.Palestine)
+            return prefLink + "timestamp_"
+        else
+            return prefLink + "_timestamp."
+    }
 
     /**
      * If a download link for this username has been cached, return it.
      * Otherwise, do network requests and parsing to get bundle download link.
      */
-    suspend fun getLinkForUser(context: Context, palestine: Boolean, userName: String?): String? {
-        return when (palestine) {
-            true -> getLinkForUser(context, PREF_PALESTINE_LINK, PREF_PREFIX_PALESTINE_LINK,
-                PREF_PREFIX_PALESTINE_LAST_CHECK, PALESTINE_BUNDLE_URL, userName)
-            false -> getLinkForUser(context, PREF_JUSTICE_LINK, PREF_PREFIX_JUSTICE_LINK,
-                PREF_PREFIX_JUSTICE_LAST_CHECK, JUSTICE_BUNDLE_URL, userName)
-        }
-    }
-
-    private suspend fun getLinkForUser(context: Context, prefLink: String, prefLinkPrefix: String,
-                                       prefTimestamp: String, bundleUrl: String,
-                                       userName: String?): String? {
+    suspend fun getLinkForUser(context: Context, bundle: SpecialBundle, userName: String?): String? {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+
+        val prefLink = "mitch." + bundle.slug
+        val prefLinkPrefix = getLinkPreferencesKeyPrefix(bundle)
+        val prefTimestamp = getTimestampPreferencesKey(bundle)
 
         var link = sharedPrefs.getString(prefLink, LINK_EMPTY)
         if (link != LINK_EMPTY)
             return link
-
 
         if (userName == null)
             return null
@@ -56,7 +64,7 @@ object SpecialBundleHandler {
             if (System.currentTimeMillis() - timestamp < 1000L * 60 * 60 * 24 * CACHE_KEEP_DAYS)
                 return null
 
-            link = getBundleDownloadLink(bundleUrl)
+            link = getBundleDownloadLink(bundle.url)
 
             sharedPrefs.edit().apply {
                 putLong(prefTimestamp + userName, System.currentTimeMillis())
@@ -89,37 +97,29 @@ object SpecialBundleHandler {
         if (doc.body().attr("data-page_name") != "bundle_download")
             return false
 
-        var palestine: Boolean? = null
+        var bundle: SpecialBundle? = null
 
         val titles = doc.getElementsByClass("object_title")
         for (title in titles) {
             val links = title.getElementsByTag("a")
             for (link in links) {
-                if (link.attr("href").contains("/520/")) {
-                    //Racial Justice bundle
-                    palestine = false
-                    break
-                } else if (link.attr("href").contains("/902/")) {
-                    //Palestinian Aid
-                    palestine = true
-                    break
+                for (possibleBundle in SpecialBundle.values()) {
+                    if (link.attr("href").contains('/' + possibleBundle.bundleId.toString() + '/')) {
+                        bundle = possibleBundle
+                        break
+                    }
                 }
             }
         }
-        if (palestine == null)
+        if (bundle == null)
             return false
 
-        val name = ItchWebsiteUtils.getLoggedInUserName(doc)
+        val userName = ItchWebsiteUtils.getLoggedInUserName(doc)
 
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
         sharedPrefs.edit().apply {
-            if (palestine) {
-                putString(PREF_PREFIX_PALESTINE_LINK + name, url)
-                putLong(PREF_PREFIX_PALESTINE_LAST_CHECK + name, System.currentTimeMillis())
-            } else {
-                putString(PREF_PREFIX_JUSTICE_LINK + name, url)
-                putLong(PREF_PREFIX_JUSTICE_LAST_CHECK + name, System.currentTimeMillis())
-            }
+            putString(getLinkPreferencesKeyPrefix(bundle) + userName, url)
+            putLong(getTimestampPreferencesKey(bundle) + userName, System.currentTimeMillis())
             apply()
         }
         return true

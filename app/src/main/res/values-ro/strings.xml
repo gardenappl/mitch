@@ -7,14 +7,14 @@
     <string name="settings_lang_default">Mod implicit</string>
     <string name="settings_android_only_filter">Android: numai filtru descărcabil</string>
     <string name="popup_no_network_connection">Verificarea actualizărilor necesită o conexiune la rețea</string>
-    <string name="game_justice_bundle_claim_error">Nu s-a putut accesa linkul de descărcare din pachetul Justiție rasială.</string>
-    <string name="settings_bundle_claim_dialog">Atenție: sunteți pe punctul de a vă umple biblioteca cu peste 1000 de jocuri. Ești sigur că vrei să faci asta\?
+    <string name="bundle_claim_error_justice">Nu s-a putut accesa linkul de descărcare din pachetul Justiție rasială.</string>
+    <string name="bundle_claim_dialog">Atenție: sunteți pe punctul de a vă umple biblioteca cu peste 1000 de jocuri. Ești sigur că vrei să faci asta\?
 \n
 \nAcest lucru va dura foarte mult.
 \n
 \nAcest proces este ireversibil.</string>
-    <string name="settings_bundle_claim_dialog_title">Ești sigur\?</string>
-    <string name="settings_bundle_link_desc">Setați adresa URL de descărcare personalizată</string>
+    <string name="bundle_claim_dialog_title">Ești sigur\?</string>
+    <string name="bundle_custom_link">Setați adresa URL de descărcare personalizată</string>
     <string name="game_price">%s sau mai mult</string>
     <string name="game_install">Instalare</string>
     <string name="game_download">Descarcă</string>
@@ -161,13 +161,13 @@
     <string name="settings_update_check_metered_desc">Dacă această opțiune este dezactivată, Mitch nu va verifica dacă există actualizări pe conexiunile cu limite de date.</string>
     <string name="nav_website_view">Navigare</string>
     <string name="settings_android_only_filter_desc">Când răsfoiți jocuri Android, ascundeți intrările care sunt disponibile numai în alte magazine.</string>
-    <string name="settings_palestine_claim_all_desc">Revendicați fiecare joc din pachetul Indie pentru ajutorarea Palestinei.</string>
-    <string name="settings_justice_claim_all_desc">Revendicați fiecare joc din pachetul Justiție rasială și egalitate.</string>
-    <string name="settings_palestine_claim_all">Pachet de ajutor palestinian: revendicați toate</string>
-    <string name="settings_justice_claim_all">Pachet de justiție rasială: revendicați-le pe toate</string>
+    <string name="bundle_claim_all_desc_palestine">Revendicați fiecare joc din pachetul Indie pentru ajutorarea Palestinei.</string>
+    <string name="bundle_claim_all_desc_racial">Revendicați fiecare joc din pachetul Justiție rasială și egalitate.</string>
+    <string name="bundle_claim_all_palestine">Pachet de ajutor palestinian: revendicați toate</string>
+    <string name="bundle_claim_all_racial">Pachet de justiție rasială: revendicați-le pe toate</string>
     <string name="game_bundle_palestine">Pachet independent pentru ajutorul palestinian</string>
-    <string name="game_bundle_justice">Pachet pentru Justiție și Egalitate Rasială</string>
-    <string name="game_palestine_bundle_claim_error">Nu a putut accesa link-ul de descărcare din pachetul de ajutor palestinian.</string>
+    <string name="game_bundle_racial">Pachet pentru Justiție și Egalitate Rasială</string>
+    <string name="bundle_claim_error_palestine">Nu a putut accesa link-ul de descărcare din pachetul de ajutor palestinian.</string>
     <string name="platform_android">Android</string>
     <string name="updates_version_change">%1$s → %2$s</string>
     <string name="updates_size_and_name">%1$s - %2$s</string>

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_bundle_claim_dialog">Cảnh báo: Bạn sắp lấp đầy thư viện của bạn bằng hơn 1000 trò chơi. Bạn có chắc bạn muốn làm việc này không\?
+    <string name="bundle_claim_dialog">Cảnh báo: Bạn sắp lấp đầy thư viện của bạn bằng hơn 1000 trò chơi. Bạn có chắc bạn muốn làm việc này không\?
 \n
 \nViệc này sẽ mất rất nhiều thời gian.
 \n
 \nQuá trình này không thể được đảo ngược.</string>
-    <string name="settings_justice_claim_all_desc">Nhận mọi trò chơi từ gói Công lý và Bình đẳng chủng tộc.</string>
-    <string name="game_bundle_justice">Gói vì Công lý và Bình đẳng chủng tộc</string>
-    <string name="settings_bundle_claim_dialog_title">Bạn có chắc không\?</string>
-    <string name="settings_justice_claim_all">Gói Racial Justice: nhận tất cả</string>
-    <string name="settings_bundle_link_desc">Đặt URL tải xuống tuỳ chỉnh</string>
-    <string name="game_justice_bundle_claim_error">Không thể truy cập liên kết tải xuống từ gói Racial Justice.</string>
+    <string name="bundle_claim_all_desc_racial">Nhận mọi trò chơi từ gói Công lý và Bình đẳng chủng tộc.</string>
+    <string name="game_bundle_racial">Gói vì Công lý và Bình đẳng chủng tộc</string>
+    <string name="bundle_claim_dialog_title">Bạn có chắc không\?</string>
+    <string name="bundle_claim_all_racial">Gói Racial Justice: nhận tất cả</string>
+    <string name="bundle_custom_link">Đặt URL tải xuống tuỳ chỉnh</string>
+    <string name="bundle_claim_error_justice">Không thể truy cập liên kết tải xuống từ gói Racial Justice.</string>
     <string name="game_buy">Mua</string>
     <string name="game_bundle_claim">Nhận</string>
     <string name="settings_installer_native">Trình cài đặt của hệ thống (mặc định)</string>
@@ -163,10 +163,10 @@
     <string name="settings_android_only_filter_desc">Khi duyệt các trò chơi trên Android, ẩn các mục chỉ có sẵn trên các cửa hàng khác.</string>
     <string name="settings_android_only_filter">Android: chỉ lọc mục có thể tải xuống</string>
     <string name="popup_no_network_connection">Việc kiểm tra cập nhật yêu cầu có kết nối mạng</string>
-    <string name="settings_palestine_claim_all_desc">Nhận mọi trò chơi từ gói độc lập cho Palestinian Aid.</string>
-    <string name="settings_palestine_claim_all">Gói Palestinian Aid: nhận tất cả</string>
+    <string name="bundle_claim_all_desc_palestine">Nhận mọi trò chơi từ gói độc lập cho Palestinian Aid.</string>
+    <string name="bundle_claim_all_palestine">Gói Palestinian Aid: nhận tất cả</string>
     <string name="game_bundle_palestine">Gói độc lập cho Palestinian Aid</string>
-    <string name="game_palestine_bundle_claim_error">Không thể truy cập liên kết tải xuống từ gói Palestinian Aid.</string>
+    <string name="bundle_claim_error_palestine">Không thể truy cập liên kết tải xuống từ gói Palestinian Aid.</string>
     <string name="settings_lang">Ngôn ngữ</string>
     <string name="settings_lang_system">Tùy vào hệ thống</string>
     <string name="settings_lang_site">Tùy vào trang</string>

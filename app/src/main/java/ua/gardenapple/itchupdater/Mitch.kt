@@ -53,13 +53,8 @@ const val FLAVOR_ITCHIO = "itchio"
 // Remember to exclude sensitive info from ACRA reports
 const val PREF_DB_RAN_CLEANUP_ONCE = "ua.gardenapple.itchupdater.db_cleanup_once"
 const val PREF_INSTALLER = "ua.gardenapple.itchupdater.installer"
-const val PREF_JUSTICE_LINK = "mitch.racial"
-const val PREF_PREFIX_JUSTICE_LINK = "mitch.racial_"
-const val PREF_PREFIX_JUSTICE_LAST_CHECK = "mitch.racialtimestamp_"
-const val PREF_PALESTINE_LINK = "mitch.palestine"
-const val PREF_PREFIX_PALESTINE_LINK = "mitch.palestine_"
-const val PREF_PREFIX_PALESTINE_LAST_CHECK = "mitch.palestinetimestamp_"
 const val PREF_WEB_ANDROID_FILTER = "ua.gardenapple.itchupdater.web_android_filter"
+// Bundles: mitch.{racial, palestine, ukraine, trans_texas}
 const val PREF_LANG = "mitch.lang"
 
 /**
@@ -273,7 +268,7 @@ class Mitch : Application() {
                 ReportField.LOGCAT,
                 ReportField.SHARED_PREFERENCES
             )
-            setExcludeMatchingSharedPreferencesKeys(".*(racial|justice|palestine).*")
+            setExcludeMatchingSharedPreferencesKeys(".*(racial|justice|palestine|ukraine|trans_texas).*")
 
             getPluginConfigurationBuilder(MailSenderConfigurationBuilder::class.java).apply {
                 setMailTo("~gardenapple/mitch-bug-reports@lists.sr.ht, gardenapple+mitch@posteo.net")

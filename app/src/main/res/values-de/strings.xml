@@ -9,7 +9,7 @@
     <string name="nav_website_view">Durchsuchen</string>
     <string name="notification_download_complete_title">Komplett heruntergeladen</string>
     <string name="notification_install_title">Zum Installieren anklicken</string>
-    <string name="settings_bundle_claim_dialog">Warnung: Du bist dabei, deine Bibliothek mit 1000+ Spielen zu füllen. Bist du sicher, dass du dies tun willst\?
+    <string name="bundle_claim_dialog">Warnung: Du bist dabei, deine Bibliothek mit 1000+ Spielen zu füllen. Bist du sicher, dass du dies tun willst\?
 \n
 \nDies wird sehr, sehr lange dauern.
 \n
@@ -20,8 +20,8 @@
     <string name="library_not_logged_in">Du musst sich bei deinem itch.io-Konto anmelden, um auf eigene Elemente zugreifen zu können.</string>
     <string name="dialog_app_delete">Bist du sicher, dass du %1$s löschen willst\?</string>
     <string name="dialog_game_delete">Bist du sicher, dass du die Datei %1$s löschen willst\?</string>
-    <string name="settings_bundle_claim_dialog_title">Bist du sicher\?</string>
-    <string name="game_justice_bundle_claim_error">Der Herunterladen-Link aus dem Racial Justice-Bundle konnte nicht aufgerufen werden.</string>
+    <string name="bundle_claim_dialog_title">Bist du sicher\?</string>
+    <string name="bundle_claim_error_justice">Der Herunterladen-Link aus dem Racial Justice-Bundle konnte nicht aufgerufen werden.</string>
     <string name="game_buy">Kaufen</string>
     <string name="settings_installer_native">Natives Installationsprogramm (Standard)</string>
     <string name="settings_installer_session">Sitzungsinstallationsprogramm</string>
@@ -74,9 +74,9 @@
     <string name="notification_channel_install_desc">Benachrichtigen, wenn eine itch.io-Anwendung installiert werden muss.</string>
     <string name="notification_channel_install">Anwendungsinstallation</string>
     <string name="notification_channel_updates">Spielaktualisierungen</string>
-    <string name="settings_justice_claim_all">Alle Bundle-Spiele anfordern</string>
-    <string name="settings_bundle_link_desc">Benutzerdefinierte Herunterladen-URL einstellen</string>
-    <string name="game_bundle_justice">Bündel für Rassengerechtigkeit und Gleichberechtigung</string>
+    <string name="bundle_claim_all_racial">Alle Bundle-Spiele anfordern</string>
+    <string name="bundle_custom_link">Benutzerdefinierte Herunterladen-URL einstellen</string>
+    <string name="game_bundle_racial">Bündel für Rassengerechtigkeit und Gleichberechtigung</string>
     <string name="game_bundle_claim">Anspruch</string>
     <string name="game_go_to_store">Store-Seite anzeigen</string>
     <string name="notification_install_conflict_title">Anwendung kollidiert mit einem anderen Paket</string>
@@ -156,7 +156,7 @@
     <string name="library_category_installed">Installierte Anwendungen</string>
     <string name="notification_install_storage_title">Installation fehlgeschlagen: Speicherprobleme</string>
     <string name="notification_install_invalid_title">Ungültige Datei</string>
-    <string name="settings_justice_claim_all_desc">Beanspruche jedes Spiel aus dem Paket Rassengerechtigkeit und Gleichheit.</string>
+    <string name="bundle_claim_all_desc_racial">Beanspruche jedes Spiel aus dem Paket Rassengerechtigkeit und Gleichheit.</string>
     <string name="game_price">%s oder mehr</string>
     <string name="game_install">Installieren</string>
     <string name="game_download">Herunterladen</string>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_bundle_claim_dialog_title">Êtes-vous sûr·e \?</string>
-    <string name="game_bundle_justice">Offre groupée pour la justice raciale et l’égalité</string>
+    <string name="bundle_claim_dialog_title">Êtes-vous sûr·e \?</string>
+    <string name="game_bundle_racial">Offre groupée pour la justice raciale et l’égalité</string>
     <string name="settings_update_check_mode">Mode de vérification des mises à jour</string>
     <string name="settings_category_updater">Installation et mises à jour</string>
     <string name="nav_settings">Paramètres</string>
@@ -13,15 +13,15 @@
     <string name="notification_channel_install_desc">Prévenir lorsqu’une application itch.io nécessite une installation.</string>
     <string name="notification_channel_install">Installation de l’appli</string>
     <string name="notification_channel_updates">Mises à jour de jeu</string>
-    <string name="settings_bundle_claim_dialog">Attention : vous êtes sur le point de remplir votre ludothèque avec plus de 1000 jeux. Êtes-vous sûr·e de vouloir faire ceci \?
+    <string name="bundle_claim_dialog">Attention : vous êtes sur le point de remplir votre ludothèque avec plus de 1000 jeux. Êtes-vous sûr·e de vouloir faire ceci \?
 \n
 \nCeci va prendre beaucoup, beaucoup de temps.
 \n
 \nCe processus est irréversible.</string>
-    <string name="settings_justice_claim_all_desc">Réclamez tous les jeux de l’offre groupée Justice et égalité raciales.</string>
-    <string name="settings_justice_claim_all">Offre groupée pour la justice raciale : tout réclamer</string>
-    <string name="settings_bundle_link_desc">Définir une URL de téléchargement personnalisée</string>
-    <string name="game_justice_bundle_claim_error">Impossible d’accéder au lien de téléchargement à partir de l’offre groupée Racial Justice.</string>
+    <string name="bundle_claim_all_desc_racial">Réclamez tous les jeux de l’offre groupée Justice et égalité raciales.</string>
+    <string name="bundle_claim_all_racial">Offre groupée pour la justice raciale : tout réclamer</string>
+    <string name="bundle_custom_link">Définir une URL de téléchargement personnalisée</string>
+    <string name="bundle_claim_error_justice">Impossible d’accéder au lien de téléchargement à partir de l’offre groupée Racial Justice.</string>
     <string name="game_buy">Acheter</string>
     <string name="game_bundle_claim">Réclamer</string>
     <string name="settings_installer_native">Installateur natif (par défaut)</string>
@@ -168,9 +168,9 @@
     <string name="settings_android_only_filter_desc">Lorsque vous parcourez les jeux Android, masquez les entrées qui ne sont disponibles que sur d’autres magasins.</string>
     <string name="settings_android_only_filter">Android : filtre téléchargeable uniquement</string>
     <string name="popup_no_network_connection">La vérification des mises à jour nécessite une connexion réseau</string>
-    <string name="settings_palestine_claim_all_desc">Réclamez tous les jeux du lot indé pour l’aide à la Palestine.</string>
-    <string name="game_palestine_bundle_claim_error">Impossible d’accéder au lien de téléchargement du paquet d’aide palestinienne.</string>
-    <string name="settings_palestine_claim_all">Offre groupée de l\'aide aux Palestiniens : tout réclamer</string>
+    <string name="bundle_claim_all_desc_palestine">Réclamez tous les jeux du lot indé pour l’aide à la Palestine.</string>
+    <string name="bundle_claim_error_palestine">Impossible d’accéder au lien de téléchargement du paquet d’aide palestinienne.</string>
+    <string name="bundle_claim_all_palestine">Offre groupée de l\'aide aux Palestiniens : tout réclamer</string>
     <string name="game_bundle_palestine">Un offre groupée indé pour l\'aide aux Palestiniens</string>
     <string name="dialog_installer_no_space">Pas assez d\'espace disque pour cette application.</string>
     <string name="dialog_installer_please_wait">Veuillez patienter, préparation de l\'application pour l\'installation…</string>

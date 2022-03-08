@@ -144,17 +144,17 @@
     <string name="notification_channel_install_desc">Bir itch.io uygulaması kurulum gerektirdiğinde bildirimde bulun.</string>
     <string name="notification_channel_install">Uygulama kurulumu</string>
     <string name="notification_channel_updates">Oyun güncellemeleri</string>
-    <string name="settings_bundle_claim_dialog">Uyarı: Kitaplığınızı 1000\'den fazla oyunla doldurmak üzeresiniz. Bunu yapmak istediğinize emin misiniz\?
+    <string name="bundle_claim_dialog">Uyarı: Kitaplığınızı 1000\'den fazla oyunla doldurmak üzeresiniz. Bunu yapmak istediğinize emin misiniz\?
 \n
 \nBu gerçekten çok uzun bir zaman alacak.
 \n
 \nBu süreç geri alınamaz.</string>
-    <string name="settings_bundle_claim_dialog_title">Emin misiniz\?</string>
-    <string name="settings_justice_claim_all_desc">Irksal Adalet ve Eşitlik paketindeki tüm oyunları talep edin.</string>
-    <string name="settings_justice_claim_all">Irksal Adalet paketi: hepsini talep et</string>
-    <string name="settings_bundle_link_desc">Özel indirme URL\'si ayarlayın</string>
-    <string name="game_bundle_justice">Irksal Adalet ve Eşitlik Paketi</string>
-    <string name="game_justice_bundle_claim_error">Irksal Adalet paketinden indirme bağlantısına erişilemedi.</string>
+    <string name="bundle_claim_dialog_title">Emin misiniz\?</string>
+    <string name="bundle_claim_all_desc_racial">Irksal Adalet ve Eşitlik paketindeki tüm oyunları talep edin.</string>
+    <string name="bundle_claim_all_racial">Irksal Adalet paketi: hepsini talep et</string>
+    <string name="bundle_custom_link">Özel indirme URL\'si ayarlayın</string>
+    <string name="game_bundle_racial">Irksal Adalet ve Eşitlik Paketi</string>
+    <string name="bundle_claim_error_justice">Irksal Adalet paketinden indirme bağlantısına erişilemedi.</string>
     <string name="game_buy">Satın al</string>
     <string name="game_bundle_claim">Talep et</string>
     <string name="game_price">%s veya daha fazla</string>
@@ -168,10 +168,10 @@
     <string name="settings_android_only_filter_desc">Android oyunlarına göz atarken, yalnızca diğer mağazalarda bulunan girdileri gizleyin.</string>
     <string name="settings_android_only_filter">Android: yalnızca indirilebilenleri filtrele</string>
     <string name="popup_no_network_connection">Güncellemeleri denetlemek için ağ bağlantısı gerekir</string>
-    <string name="settings_palestine_claim_all_desc">Filistin Yardımı için bağımsız paketteki her oyunu talep edin.</string>
-    <string name="settings_palestine_claim_all">Filistin Yardım paketi: hepsini talep et</string>
+    <string name="bundle_claim_all_desc_palestine">Filistin Yardımı için bağımsız paketteki her oyunu talep edin.</string>
+    <string name="bundle_claim_all_palestine">Filistin Yardım paketi: hepsini talep et</string>
     <string name="game_bundle_palestine">Filistin Yardımı için bağımsız paket</string>
-    <string name="game_palestine_bundle_claim_error">Filistin Yardım paketinden indirme bağlantısına erişilemedi.</string>
+    <string name="bundle_claim_error_palestine">Filistin Yardım paketinden indirme bağlantısına erişilemedi.</string>
     <string name="dialog_installer_please_wait">Lütfen bekleyin, uygulama kurulum için hazırlanıyor…</string>
     <string name="notification_download_unknown_error">Bilinmeyen hata</string>
     <string name="notification_download_io_error">Ağ veya disk hatası</string>

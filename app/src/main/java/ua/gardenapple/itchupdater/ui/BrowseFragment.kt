@@ -333,19 +333,20 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     gameButton.setOnClickListener {
                         goToDownloadOrPurchase(doc, info, info.purchasedInfo.downloadPage)
                     }
-                } else if (info?.isFromSpecialBundle == true) {
+                } else if (info?.bundleDownloadLink != null) {
                     bottomGameBar.visibility = View.VISIBLE
 
                     gameButton.text = getString(R.string.game_bundle_claim)
-                    if (info.isSpecialBundlePalestinian)
-                        gameButtonInfo.text = getString(R.string.game_bundle_palestine)
-                    else
-                        gameButtonInfo.text = getString(R.string.game_bundle_justice)
+                    gameButtonInfo.text = getString(resources.getIdentifier(
+                        "game_bundle_" + info.specialBundle!!.slug,
+                        "string",
+                        requireContext().packageName
+                    ))
 
                     gameButton.setOnClickListener {
                         lifecycleScope.launch {
                             SpecialBundleHandler.claimGame(
-                                info.bundleDownloadLink!!,
+                                info.bundleDownloadLink,
                                 info.game!!
                             )
                             webView.reload()
@@ -714,14 +715,18 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     "google-analytics.com",
                     "adservice.google.com",
                     "googlesyndication.com",
-                    "doubleclick.net"
+                    "doubleclick.net",
+                    "crashlytics.com"
                 ).forEach { trackerHostUrl ->
-                    if (request.url.host?.contains(trackerHostUrl) == true)
+                    if (request.url.host?.contains('.' + trackerHostUrl) == true ||
+                        request.url.host == trackerHostUrl) {
+
                         return WebResourceResponse(
                             "text/plain",
                             "utf-8",
                             ByteArrayInputStream("tracker_blocked".toByteArray())
                         )
+                    }
                 }
             }
 //            Log.d(LOGGING_TAG, request.url.host)

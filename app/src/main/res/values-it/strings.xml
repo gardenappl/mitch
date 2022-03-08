@@ -3,9 +3,9 @@
     <string name="library_not_logged_in">Devi accedere al tuo account itch.io per accedere agli elementi che possiedi.</string>
     <string name="library_category_owned">Elementi posseduti</string>
     <string name="library_category_downloads">Scaricamenti</string>
-    <string name="settings_palestine_claim_all_desc">Richiedi ogni gioco del pacchetto indie per l’aiuto ai palestinesi.</string>
-    <string name="settings_justice_claim_all_desc">Richiedi ogni gioco del pacchetto Giustizia razziale e uguaglianza.</string>
-    <string name="settings_palestine_claim_all">Pacchetto di Aiuto ai palestinesi: richiedi tutto</string>
+    <string name="bundle_claim_all_desc_palestine">Richiedi ogni gioco del pacchetto indie per l’aiuto ai palestinesi.</string>
+    <string name="bundle_claim_all_desc_racial">Richiedi ogni gioco del pacchetto Giustizia razziale e uguaglianza.</string>
+    <string name="bundle_claim_all_palestine">Pacchetto di Aiuto ai palestinesi: richiedi tutto</string>
     <string name="game_go_to_store">Mostra la pagina store</string>
     <string name="dialog_installer_no_space">Non c’è abbastanza spazio su disco per questa app.</string>
     <string name="dialog_installer_please_wait">Si prega di attendere, preparando l’app per l’installazione…</string>
@@ -20,18 +20,18 @@
     <string name="settings_android_only_filter_desc">Quando si sfogliano i giochi Android, nascondere le voci che sono disponibili solo su altre applicazioni di acquisto.</string>
     <string name="settings_android_only_filter">Android: filtro solo scaricabile</string>
     <string name="popup_no_network_connection">Il controllo degli aggiornamenti richiede una connessione di rete</string>
-    <string name="settings_bundle_claim_dialog">Attenzione: stai per riempire la tua ludoteca con più di 1000 giochi. Sei sicura/o di volerlo fare\?
+    <string name="bundle_claim_dialog">Attenzione: stai per riempire la tua ludoteca con più di 1000 giochi. Sei sicura/o di volerlo fare\?
 \n
 \nCi vorrà molto, molto tempo.
 \n
 \nQuesto processo è irreversibile.</string>
-    <string name="settings_bundle_claim_dialog_title">Sei sicura/o\?</string>
-    <string name="settings_justice_claim_all">Pacchetto Giustizia razziale: richiedi tutto</string>
-    <string name="settings_bundle_link_desc">Imposta un URL di scaricamento personalizzato</string>
+    <string name="bundle_claim_dialog_title">Sei sicura/o\?</string>
+    <string name="bundle_claim_all_racial">Pacchetto Giustizia razziale: richiedi tutto</string>
+    <string name="bundle_custom_link">Imposta un URL di scaricamento personalizzato</string>
     <string name="game_bundle_palestine">Pacchetto indie per l’Aiuto ai palestinesi</string>
-    <string name="game_bundle_justice">Pacchetto per la giustizia e l’uguaglianza razziale</string>
-    <string name="game_justice_bundle_claim_error">Impossibile accedere al collegamento di scaricamento dal pacchetto Giustizia razziale.</string>
-    <string name="game_palestine_bundle_claim_error">Impossibile accedere al collegamento di scaricamento dal pacchetto Aiuto ai palestinesi.</string>
+    <string name="game_bundle_racial">Pacchetto per la giustizia e l’uguaglianza razziale</string>
+    <string name="bundle_claim_error_justice">Impossibile accedere al collegamento di scaricamento dal pacchetto Giustizia razziale.</string>
+    <string name="bundle_claim_error_palestine">Impossibile accedere al collegamento di scaricamento dal pacchetto Aiuto ai palestinesi.</string>
     <string name="game_price">%s o più</string>
     <string name="game_install">Installa</string>
     <string name="game_download">Scarica</string>
