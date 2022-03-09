@@ -380,16 +380,21 @@ object ItchWebsiteParser {
     }
 
     private fun getTimestamp(infoTable: Element): String? {
-        var timestamp = infoTable.child(0).child(1).child(0).attr("title")
-        if (timestamp.contains('@') != true)
+        var timestamp: String? = infoTable.child(0).child(1).child(0).attr("title")
+        if (timestamp?.contains('@') != true)
             timestamp = null
 
         return timestamp
     }
 
     private fun getAuthorName(gamePageUri: Uri, infoTable: Element): String {
-        Log.d(LOGGING_TAG, "Author URL: ${getAuthorUrlFromGamePage(gamePageUri)}")
-        return infoTable.selectFirst("[href=\"${getAuthorUrlFromGamePage(gamePageUri)}\"]")!!.html()
+        val authorUrl = getAuthorUrlFromGamePage(gamePageUri)
+        // Hardcoded for tools published by itch.io themselves,
+        // such as https://itchio.itch.io/butler
+        if (authorUrl == "https://itchio.itch.io")
+            return "itch.io"
+        Log.d(LOGGING_TAG, "Author URL: $authorUrl")
+        return infoTable.selectFirst("[href=\"$authorUrl\"]")!!.html()
     }
 
     /*fun getAuthorName(doc: Document, gamePageUri: Uri): String {
