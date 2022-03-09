@@ -1,2 +1,5 @@
+* Allow claiming games from the Bundle for Ukraine and TTRPGs for Trans Rights in Texas
+* New method for game installation, should be faster and reduce disk space usage
 * Added warnings when trying to download a non-Android game
-* Moved 'Allow analytics' setting into Advanced section
+* Make search dialog wider
+* Numerous small bug fixes and UI improvements
