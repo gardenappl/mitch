@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_installer_native">Yerel kurucu (öntanımlı)</string>
-    <string name="settings_installer_session">Oturum kurucusu</string>
+    <string name="settings_installer_native">Yerel kurucu (bazı MIUI aygıtları için gereklidir)</string>
+    <string name="settings_installer_session">Oturum kurucusu (öntanımlı)</string>
     <string name="settings_installer">Kurulum yöntemi</string>
     <string name="settings_installer_desc">Uygulamaları kurarken sorun yaşıyorsanız bunu değiştirmeyi deneyin.</string>
     <string name="dialog_no">Hayır</string>
@@ -178,4 +178,14 @@
     <string name="dialog_lang_restart">Uygulama, yeni dili uygulamak için yeniden başlatılacak</string>
     <string name="dialog_lang_restart_title">Dil değişti</string>
     <string name="dialog_installer_no_space">Bu uygulama için yeterli disk alanı yok.</string>
+    <string name="settings_warn_os">Android olmayan uygulamaları indirirken uyar</string>
+    <string name="dialog_download_wrong_os_has_extras">%s, Android ile uyumlu değil. Onu uygulama olarak kuramayacaksınız.
+\nResim, müzik veya kılavuz gibi ek içerikleri görüntülemeye devam edebilirsiniz.</string>
+    <string name="dialog_download_wrong_os">%s, Android ile uyumlu değil. Onu uygulama olarak kuramayacaksınız.
+\nYine de indirmek istiyor musunuz\?</string>
+    <string name="game_bundle_ukraine">Ukrayna paketi</string>
+    <string name="bundle_claim_error">Paket için indirme bağlantısına erişilemedi.</string>
+    <string name="bundle_claim_all_desc">Bu paketteki her oyunu şimdi talep edin.</string>
+    <string name="notification_download_no_space">Bu dosya için yeterli depolama alanı yok</string>
+    <string name="bundle_claim_all">Hepsini talep et</string>
 </resources>

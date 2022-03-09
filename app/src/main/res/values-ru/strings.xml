@@ -179,7 +179,7 @@
     <string name="dialog_download_wrong_os">%s не совместимо с Android. Вы не сможете установить это как приложение.\nВсё равно загрузить?</string>
     <string name="dialog_download_wrong_os_has_extras">%s не совместимо с Android. Вы не сможете установить это как приложение.\nМожно просмотреть дополнительный контент, например, музыку или иллюстрации.</string>
     <string name="settings_warn_os">Предупреждать, если игра не совместима с Android</string>
-    <string name="notification_download_no_space">Не достаточно места в хранилище для файла.</string>
+    <string name="notification_download_no_space">Не достаточно места в хранилище для файла</string>
     <string name="game_bundle_ukraine">Бандл на помощь Украине</string>
     <string name="game_bundle_trans_texas">Бандл Trans Rights in Texas!</string>
     <string name="bundle_claim_error">Не удалось получить доступ к ссылке бандла.</string>

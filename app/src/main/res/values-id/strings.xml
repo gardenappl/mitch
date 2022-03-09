@@ -169,4 +169,7 @@
     <string name="settings_lang_site">Tergantung situs</string>
     <string name="settings_lang_default">Default</string>
     <string name="popup_no_network_connection">Memeriksa pembaruan butuh koneksi jaringan</string>
+    <string name="settings_warn_os">Peringati ketika mengunduh aplikasi non-Android</string>
+    <string name="dialog_download_wrong_os">%s tidak kompatibel dengan Android. Kamu tidak akan bisa memasangnya sebagai sebuah aplikasi.
+\nApakah kamu tetap ingin mengunduhnya\?</string>
 </resources>

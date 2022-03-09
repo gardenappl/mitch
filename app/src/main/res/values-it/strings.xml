@@ -178,4 +178,9 @@
     <string name="notification_channel_install_desc">Notifica quando un’app di itch.io richiede l’installazione.</string>
     <string name="notification_channel_install">Installazione dell’app</string>
     <string name="notification_channel_updates">Aggiornamenti di gioco</string>
+    <string name="settings_warn_os">Avvertisci quando si scaricano applicazioni non Android</string>
+    <string name="dialog_download_wrong_os_has_extras">%s non è compatibile con Android. Non sarai in grado di installarlo come applicazione.
+\nPuoi comunque visualizzare contenuti aggiuntivi, come arte, musica o manuali.</string>
+    <string name="dialog_download_wrong_os">%s non è compatibile con Android. Non sarai in grado di installarlo come applicazione.
+\nVuoi scaricarlo comunque\?</string>
 </resources>

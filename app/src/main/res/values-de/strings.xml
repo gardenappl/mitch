@@ -174,4 +174,9 @@
     <string name="notification_download_io_error">Netzwerk- oder Festplattenfehler</string>
     <string name="dialog_lang_restart">Die Anwendung wird neu gestartet, um die neue Sprache anzuwenden</string>
     <string name="dialog_lang_restart_title">Sprache geändert</string>
+    <string name="settings_warn_os">Beim Herunterladen von Nicht-Android-Anwendungen warnen</string>
+    <string name="dialog_download_wrong_os_has_extras">%s ist nicht mit Android kompatibel. Sie können es nicht als Anwendung installieren.
+\nSie können dennoch zusätzliche Inhalte wie Kunst, Musik oder Handbücher anzeigen.</string>
+    <string name="dialog_download_wrong_os">%s ist nicht mit Android kompatibel. Sie können es nicht als Anwendung installieren.
+\nMöchten Sie es trotzdem herunterladen\?</string>
 </resources>
