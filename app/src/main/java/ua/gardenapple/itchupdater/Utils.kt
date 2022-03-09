@@ -35,7 +35,7 @@ import java.util.*
 object Utils {
     class ErrorReport(message: String) : Throwable(message)
 
-    private const val LOGGING_TAG = "Units"
+    private const val LOGGING_TAG = "Utils"
     private val versionNumbersRegex = Regex("""(?:\.?\d+)+""")
 
     suspend fun cancellableCopy(

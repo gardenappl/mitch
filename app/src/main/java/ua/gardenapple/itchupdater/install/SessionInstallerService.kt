@@ -43,7 +43,11 @@ class SessionInstallerService : Service() {
                 val confirmationIntent = intent.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
                 confirmationIntent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
-                startActivity(confirmationIntent)
+                try {
+                    startActivity(confirmationIntent)
+                } catch (e: Exception) {
+                    Log.e(LOGGING_TAG, e.message, e)
+                }
             }
             else -> runBlocking(Dispatchers.IO) {
                 Installations.onInstallResult(applicationContext, sessionId.toLong(),

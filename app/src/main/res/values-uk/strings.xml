@@ -181,4 +181,5 @@
     <string name="bundle_claim_all">Присвоїти все</string>
     <string name="bundle_claim_all_desc">Присвоїти всі ігри з набору зараз.</string>
     <string name="bundle_claim_error">Не вдалося завантажити сторінку набору.</string>
+    <string name="bundle">Особливі бандли ігор</string>
 </resources>

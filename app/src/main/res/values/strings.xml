@@ -181,4 +181,5 @@
     <string name="bundle_claim_all_desc">Claim every game from this bundle now.</string>
     <string name="bundle_claim_error">Could not access download link for the bundle.</string>
     <string name="notification_download_no_space">Not enough storage space for this file</string>
+    <string name="bundle">Special bundles</string>
 </resources>

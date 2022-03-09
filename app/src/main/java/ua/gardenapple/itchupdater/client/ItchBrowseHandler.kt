@@ -174,4 +174,16 @@ class ItchBrowseHandler(private val context: Context) {
             }
         }
     }
+
+    suspend fun getGameEmbedInfoFromId(gameId: Int): Game {
+        val doc = ItchWebsiteUtils.fetchAndParse("https://itch.io/embed/$gameId")
+
+        return Game(
+            gameId = gameId,
+            name = doc.selectFirst("h1")!!.text(),
+            author = doc.selectFirst(".author_row a")!!.text(),
+            storeUrl = doc.selectFirst(".button_row a")!!.absUrl("href"),
+            thumbnailUrl = doc.selectFirst(".thumb")!!.absUrl("src")
+        )
+    }
 }

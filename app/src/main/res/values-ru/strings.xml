@@ -155,17 +155,17 @@
 \nЭтот процесс необратим.</string>
     <string name="bundle_claim_dialog_title">Вы уверены?</string>
     <string name="bundle_custom_link">Установка пользовательского URL-адреса загрузки</string>
-    <string name="game_bundle_racial">Набор Racial Justice and Equality</string>
-    <string name="bundle_claim_all_desc_racial">Присвоить все игры из набора Racial Justice and Equality.</string>
-    <string name="bundle_claim_all_racial">Набор Racial Justice: присвоить всё</string>
-    <string name="bundle_claim_error_justice">Не удалось получить доступ к ссылке из набора Racial Justice.</string>
+    <string name="game_bundle_racial">Бандл Racial Justice and Equality</string>
+    <string name="bundle_claim_all_desc_racial">Присвоить все игры из бандла Racial Justice and Equality.</string>
+    <string name="bundle_claim_all_racial">Бандл Racial Justice: присвоить всё</string>
+    <string name="bundle_claim_error_justice">Не удалось получить доступ к ссылке из бандла Racial Justice.</string>
     <string name="popup_no_network_connection">Нет соединения с сетью</string>
     <string name="settings_android_only_filter">Android: показывать только загружаемое</string>
     <string name="settings_android_only_filter_desc">При просмотре игр для Android будут скрываться приложения, доступные только через сторонние источники.</string>
-    <string name="bundle_claim_all_desc_palestine">Присвоить все игры из набора Indie bundle for Palestinian Aid.</string>
-    <string name="bundle_claim_all_palestine">Набор Palestinian Aid: присвоить всё</string>
-    <string name="game_bundle_palestine">Набор Indie bundle for Palestinian Aid</string>
-    <string name="bundle_claim_error_palestine">Не удалось получить доступ к ссылке из набора Palestinian Aid.</string>
+    <string name="bundle_claim_all_desc_palestine">Присвоить все игры из бандла Indie bundle for Palestinian Aid.</string>
+    <string name="bundle_claim_all_palestine">Бандл Palestinian Aid: присвоить всё</string>
+    <string name="game_bundle_palestine">Бандл Indie bundle for Palestinian Aid</string>
+    <string name="bundle_claim_error_palestine">Не удалось получить доступ к ссылке из бандла Palestinian Aid.</string>
     <string name="settings_lang_default">По умолчанию</string>
     <string name="settings_lang_site">Как у сайта</string>
     <string name="settings_lang_system">Как у системы</string>
@@ -180,9 +180,11 @@
     <string name="dialog_download_wrong_os_has_extras">%s не совместимо с Android. Вы не сможете установить это как приложение.\nМожно просмотреть дополнительный контент, например, музыку или иллюстрации.</string>
     <string name="settings_warn_os">Предупреждать, если игра не совместима с Android</string>
     <string name="notification_download_no_space">Не достаточно места в хранилище для файла.</string>
-    <string name="game_bundle_ukraine">Набор на помощь Украине</string>
-    <string name="game_bundle_trans_texas">Набор Trans Rights in Texas!</string>
-    <string name="bundle_claim_error">Не удалось получить доступ к ссылке набора.</string>
-    <string name="bundle_claim_all_desc">Присвоить все игры из набора сейчас.</string>
+    <string name="game_bundle_ukraine">Бандл на помощь Украине</string>
+    <string name="game_bundle_trans_texas">Бандл Trans Rights in Texas!</string>
+    <string name="bundle_claim_error">Не удалось получить доступ к ссылке бандла.</string>
+    <string name="bundle_claim_all_desc">Присвоить все игры из бандла сейчас.</string>
     <string name="bundle_claim_all">Присвоить всё</string>
+    <string name="bundle">Особенные бандлы</string>
+    <string name="bundle">О</string>
 </resources>
