@@ -30,6 +30,9 @@
         <!-- https://developer.android.com/guide/webapps/webview-privacy -->
         <meta-data android:name="android.webkit.WebView.MetricsOptOut" android:value="true" />
 
+        <meta-data android:name="android.webkit.WebView.EnableSafeBrowsing" android:value="false" />
+
+
         <activity
                 android:name=".ui.MainActivity"
                 android:theme="@style/SplashScreenTheme"
