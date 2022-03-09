@@ -38,6 +38,7 @@ class LibraryAdapter internal constructor(
     }
     
     private val context: Context = activity
+    private val mainActivityScope: CoroutineScope = activity as MainActivity
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     var gameInstalls = emptyList<GameInstallation>() // Cached copy of games
@@ -117,7 +118,7 @@ class LibraryAdapter internal constructor(
                     gameInstall.downloadOrInstallId.toInt())
             }
 
-            GlobalScope.launch {
+            mainActivityScope.launch {
                 val installer = Installations.getInstaller(gameInstall.downloadOrInstallId)
                 when (installer.type) {
                     AbstractInstaller.Type.File -> {
@@ -251,14 +252,14 @@ class LibraryAdapter internal constructor(
             R.id.move_to_downloads -> {
                 Toast.makeText(context, R.string.popup_moving_to_downloads, Toast.LENGTH_LONG)
                     .show()
-                GlobalScope.launch(Dispatchers.IO) {
+                mainActivityScope.launch(Dispatchers.IO) {
                     try {
                         Mitch.externalFileManager.moveToDownloads(activity, gameInstall.uploadId) { externalName ->
                             if (externalName == null) {
                                 Log.e(LOGGING_TAG, "externalName is null! " +
                                         "This should only happen with old downloads")
 
-                                GlobalScope.launch(Dispatchers.Main) {
+                                mainActivityScope.launch(Dispatchers.Main) {
                                     Toast.makeText(
                                         context,
                                         R.string.popup_move_to_download_error,
@@ -267,7 +268,7 @@ class LibraryAdapter internal constructor(
                                 }
                             }
 
-                            GlobalScope.launch {
+                            mainActivityScope.launch {
                                 val db = AppDatabase.getDatabase(context)
                                 val install =
                                     db.installDao.getInstallationById(gameInstall.installId)!!
@@ -316,7 +317,7 @@ class LibraryAdapter internal constructor(
                     }
 
                     setPositiveButton(R.string.dialog_delete) { _, _ ->
-                        GlobalScope.launch(Dispatchers.Main) {
+                        mainActivityScope.launch(Dispatchers.Main) {
                             Installations.deleteFinishedInstall(context, gameInstall.uploadId)
 
                             Toast.makeText(
@@ -345,7 +346,7 @@ class LibraryAdapter internal constructor(
                     setMessage(context.getString(R.string.dialog_game_remove, gameInstall.externalFileName))
 
                     setPositiveButton(R.string.dialog_remove) { _, _ ->
-                        GlobalScope.launch(Dispatchers.Main) {
+                        mainActivityScope.launch(Dispatchers.Main) {
                             Installations.deleteFinishedInstall(context, gameInstall.uploadId)
                             Toast.makeText(
                                 context,
@@ -368,7 +369,7 @@ class LibraryAdapter internal constructor(
                 return true
             }
             R.id.cancel -> {
-                GlobalScope.launch(Dispatchers.Main) {
+                mainActivityScope.launch(Dispatchers.Main) {
                     Installations.cancelPending(
                         context,
                         gameInstall.status,
