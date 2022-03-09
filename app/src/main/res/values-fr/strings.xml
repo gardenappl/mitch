@@ -24,8 +24,8 @@
     <string name="bundle_claim_error_justice">Impossible d’accéder au lien de téléchargement à partir de l’offre groupée Racial Justice.</string>
     <string name="game_buy">Acheter</string>
     <string name="game_bundle_claim">Réclamer</string>
-    <string name="settings_installer_native">Installateur natif (par défaut)</string>
-    <string name="settings_installer_session">Installateur de session</string>
+    <string name="settings_installer_native">Installateur natif (nécessaire pour certains appareils MIUI)</string>
+    <string name="settings_installer_session">Installateur de session (par défaut)</string>
     <string name="settings_installer">Méthode d’installation</string>
     <string name="settings_installer_desc">Essayez de modifier ce paramètre si vous avez des difficultés à installer des applications.</string>
     <string name="dialog_no">Non</string>
@@ -183,4 +183,11 @@
 \nVous pouvez néanmoins afficher du contenu supplémentaire, comme des illustrations, de la musique ou des manuels.</string>
     <string name="dialog_download_wrong_os">%s n\'est pas compatible avec Android. Vous ne pourrez pas l\'installer en tant qu\'application.
 \nVoulez-vous quand même le télécharger \?</string>
+    <string name="game_bundle_trans_texas">Offre groupée Les droits des trans au Texas !</string>
+    <string name="game_bundle_ukraine">Forfait pour l\'Ukraine</string>
+    <string name="bundle_claim_all">Tout réclamer</string>
+    <string name="bundle_claim_error">Impossible d\'accéder au lien de téléchargement de l\'offre groupée.</string>
+    <string name="bundle_claim_all_desc">Réclamer tous les jeux de cette offre groupée dès maintenant.</string>
+    <string name="notification_download_no_space">Pas assez d\'espace de stockage pour ce fichier</string>
+    <string name="bundle">Offres spéciales</string>
 </resources>
