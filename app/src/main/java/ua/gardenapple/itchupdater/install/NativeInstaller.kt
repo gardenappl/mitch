@@ -8,6 +8,8 @@ import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.database.AppDatabase
 import java.io.File
 import java.io.InputStream
+import java.io.OutputStream
+import java.io.PipedOutputStream
 
 class NativeInstaller : AbstractInstaller() {
     companion object {
@@ -18,16 +20,21 @@ class NativeInstaller : AbstractInstaller() {
         }
     }
 
-    override fun acceptsInstallFromStream(): Boolean {
-        return false
-    }
+    override val type = Type.File
 
-    override suspend fun installFromStream(context: Context, downloadId: Int,
-                                           apkStream: InputStream, lengthBytes: Long) {
+    override fun createSessionForStreamInstall(context: Context): Int {
         throw NotImplementedError()
     }
 
-    override suspend fun requestInstall(context: Context, downloadId: Int, apkFile: File) {
+    override suspend fun openWriteStream(context: Context, sessionId: Int, lengthBytes: Long): OutputStream {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun finishStreamInstall(context: Context, sessionId: Int, appName: String) {
+        throw NotImplementedError()
+    }
+
+    override suspend fun requestInstall(context: Context, downloadId: Long, apkFile: File) {
         val db = AppDatabase.getDatabase(context)
 
         val pendingInstall = db.installDao.getPendingInstallationByDownloadId(downloadId)!!

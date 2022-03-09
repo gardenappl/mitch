@@ -140,8 +140,8 @@
     <string name="settings_cancel_downloads_message">Это стоит делать только в целях тестирования или починки неполадок.</string>
     <string name="settings_installer_desc">Меняйте в том случае, если у вас проблемы с установкой приложений.</string>
     <string name="settings_installer">Метод установки</string>
-    <string name="settings_installer_native">Системный установщик (по умолчанию)</string>
-    <string name="settings_installer_session">Установка сессией</string>
+    <string name="settings_installer_native">Системный установщик (нужно для некоторых устройств MIUI)</string>
+    <string name="settings_installer_session">Установка сессией (по умолчанию)</string>
     <string name="game_bundle_claim">Присвоить</string>
     <string name="game_buy">Купить</string>
     <string name="popup_handler_app_not_found">Не знаю, как открыть %s</string>
@@ -179,4 +179,10 @@
     <string name="dialog_download_wrong_os">%s не совместимо с Android. Вы не сможете установить это как приложение.\nВсё равно загрузить?</string>
     <string name="dialog_download_wrong_os_has_extras">%s не совместимо с Android. Вы не сможете установить это как приложение.\nМожно просмотреть дополнительный контент, например, музыку или иллюстрации.</string>
     <string name="settings_warn_os">Предупреждать, если игра не совместима с Android</string>
+    <string name="notification_download_no_space">Не достаточно места в хранилище для файла.</string>
+    <string name="game_bundle_ukraine">Набор на помощь Украине</string>
+    <string name="game_bundle_trans_texas">Набор Trans Rights in Texas!</string>
+    <string name="bundle_claim_error">Не удалось получить доступ к ссылке набора.</string>
+    <string name="bundle_claim_all_desc">Присвоить все игры из набора сейчас.</string>
+    <string name="bundle_claim_all">Присвоить всё</string>
 </resources>

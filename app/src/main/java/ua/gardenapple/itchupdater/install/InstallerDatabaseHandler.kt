@@ -5,6 +5,7 @@ import android.content.pm.PackageInstaller
 import android.util.Log
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
+import ua.gardenapple.itchupdater.files.DownloadType
 
 
 class InstallerDatabaseHandler(val context: Context)  {
@@ -40,22 +41,27 @@ class InstallerDatabaseHandler(val context: Context)  {
                 db.installDao.insert(newInstall)
             }
         }
+
+        db.updateCheckDao.getUpdateCheckResultForUpload(pendingInstall.uploadId)?.let {
+            it.isInstalling = false
+            db.updateCheckDao.insert(it)
+        }
     }
 
-    suspend fun onDownloadComplete(pendingInstall: Installation, isInstallable: Boolean) {
+    suspend fun onDownloadComplete(pendingInstall: Installation, downloadType: DownloadType) {
         val db = AppDatabase.getDatabase(context)
 
-        if (isInstallable) {
-            pendingInstall.status = Installation.STATUS_READY_TO_INSTALL
-            db.installDao.update(pendingInstall)
-        } else {
+        if (downloadType == DownloadType.FILE) {
             pendingInstall.status = Installation.STATUS_INSTALLED
             pendingInstall.downloadOrInstallId = null
+            db.installDao.update(pendingInstall)
+        } else {
+            pendingInstall.status = Installation.STATUS_READY_TO_INSTALL
             db.installDao.update(pendingInstall)
         }
     }
 
-    suspend fun onDownloadFailed(downloadId: Int) {
+    suspend fun onDownloadFailed(downloadId: Long) {
         val db = AppDatabase.getDatabase(context)
         Log.d(LOGGING_TAG, "onDownloadFailed")
 
@@ -64,7 +70,7 @@ class InstallerDatabaseHandler(val context: Context)  {
         db.installDao.delete(pendingInstall)
     }
 
-    suspend fun onInstallStart(downloadId: Int, pendingInstallId: Long) {
+    suspend fun onInstallStart(downloadId: Long, pendingInstallId: Long) {
         Log.d(LOGGING_TAG, "onInstallStart")
 
         val db = AppDatabase.getDatabase(context)
@@ -73,5 +79,9 @@ class InstallerDatabaseHandler(val context: Context)  {
         pendingInstall.status = Installation.STATUS_INSTALLING
         pendingInstall.downloadOrInstallId = pendingInstallId
         db.installDao.update(pendingInstall)
+    }
+
+    suspend fun onInstallStart(sessionId: Int) {
+        onInstallStart(sessionId.toLong(), sessionId.toLong())
     }
 }

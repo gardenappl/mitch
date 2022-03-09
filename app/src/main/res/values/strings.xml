@@ -140,21 +140,21 @@
     <string name="dialog_no">No</string>
     <string name="settings_installer_desc">Try changing this if you have trouble installing apps.</string>
     <string name="settings_installer">Installation method</string>
-    <string name="settings_installer_session">Session installer</string>
-    <string name="settings_installer_native">Native installer (default)</string>
+    <string name="settings_installer_session">Session installer (default)</string>
+    <string name="settings_installer_native">Native installer (needed for some MIUI devices)</string>
     <string name="popup_handler_app_not_found">Don\'t know how to open %s</string>
     <string name="game_bundle_claim">Claim</string>
     <string name="game_buy">Purchase</string>
     <string name="game_download">Download</string>
     <string name="game_install">Install</string>
     <string name="game_price">%s or more</string>
-    <string name="bundle_claim_error_justice">Could not access download link from the Racial Justice bundle.</string>
-    <string name="bundle_claim_error_palestine">Could not access download link from the Palestinian Aid bundle.</string>
+    <string name="bundle_claim_error_justice" translatable="false">Could not access download link from the Racial Justice bundle.</string>
+    <string name="bundle_claim_error_palestine" translatable="false">Could not access download link from the Palestinian Aid bundle.</string>
     <string name="game_bundle_racial">Bundle for Racial Justice and Equality</string>
     <string name="game_bundle_palestine">Indie bundle for Palestinian Aid</string>
     <string name="bundle_custom_link">Set custom download URL</string>
-    <string name="bundle_claim_all_racial">Racial Justice bundle: claim all</string>
-    <string name="bundle_claim_all_palestine">Palestinian Aid bundle: claim all</string>
+    <string name="bundle_claim_all_racial" translatable="false">Racial Justice bundle: claim all</string>
+    <string name="bundle_claim_all_palestine" translatable="false">Palestinian Aid bundle: claim all</string>
     <string name="bundle_claim_all_desc_racial" translatable="false">Claim every game from the Racial Justice and Equality bundle.</string>
     <string name="bundle_claim_all_desc_palestine" translatable="false">Claim every game from the Indie bundle for Palestinian Aid.</string>
     <string name="bundle_claim_dialog_title">Are you sure?</string>
@@ -180,4 +180,5 @@
     <string name="bundle_claim_all">Claim all</string>
     <string name="bundle_claim_all_desc">Claim every game from this bundle now.</string>
     <string name="bundle_claim_error">Could not access download link for the bundle.</string>
+    <string name="notification_download_no_space">Not enough storage space for this file</string>
 </resources>

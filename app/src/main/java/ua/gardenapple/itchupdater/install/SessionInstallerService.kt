@@ -19,7 +19,7 @@ class SessionInstallerService : Service() {
     companion object {
         private const val LOGGING_TAG = "InstallerService"
 
-        const val EXTRA_DOWNLOAD_ID = "DOWNLOAD_ID"
+        const val EXTRA_APP_NAME = "app_name"
     }
 
     override fun onBind(p0: Intent?): IBinder? = null
@@ -28,8 +28,8 @@ class SessionInstallerService : Service() {
         Log.d(LOGGING_TAG, Utils.toString(intent.extras))
         val status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE)
         val packageName = intent.getStringExtra(PackageInstaller.EXTRA_PACKAGE_NAME)
+        val appName = intent.getStringExtra(EXTRA_APP_NAME)!!
         val sessionId = Utils.getInt(intent.extras!!, PackageInstaller.EXTRA_SESSION_ID)!!
-        val downloadId = Utils.getInt(intent.extras!!, EXTRA_DOWNLOAD_ID)!!
 
         //InstallerService shouldn't receive intent for Mitch anyway,
         //this is handled by SelfUpdateBroadcastReceiver
@@ -46,11 +46,8 @@ class SessionInstallerService : Service() {
                 startActivity(confirmationIntent)
             }
             else -> runBlocking(Dispatchers.IO) {
-                /** See comment in [SessionInstaller.doInstall] about why we call onStart here */
-                Mitch.databaseHandler.onInstallStart(downloadId, sessionId.toLong())
-
                 Installations.onInstallResult(applicationContext, sessionId.toLong(),
-                    packageName, null, status)
+                    appName, packageName, null, status)
             }
         }
 

@@ -23,6 +23,7 @@ import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.game.GameRepository
 import ua.gardenapple.itchupdater.database.installation.GameInstallation
 import ua.gardenapple.itchupdater.database.installation.Installation
+import ua.gardenapple.itchupdater.install.AbstractInstaller
 import ua.gardenapple.itchupdater.install.Installations
 
 
@@ -108,13 +109,24 @@ class LibraryAdapter internal constructor(
             val notificationService = context.getSystemService(Activity.NOTIFICATION_SERVICE)
                     as NotificationManager
 
-            notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD,
-                gameInstall.downloadOrInstallId!!.toInt())
+            if (Utils.fitsInInt(gameInstall.downloadOrInstallId!!)) {
+                notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD,
+                    gameInstall.downloadOrInstallId.toInt())
+            } else {
+                notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD_LONG,
+                    gameInstall.downloadOrInstallId.toInt())
+            }
 
             GlobalScope.launch {
-                val installer = Installations.getInstaller(context)
-                val file = Mitch.fileManager.getPendingFile(gameInstall.uploadId)!!
-                installer.requestInstall(context, gameInstall.downloadOrInstallId.toInt(), file)
+                val installer = Installations.getInstaller(gameInstall.downloadOrInstallId)
+                when (installer.type) {
+                    AbstractInstaller.Type.File -> {
+                        val file = Mitch.fileManager.getPendingFile(gameInstall.uploadId)!!
+                        installer.requestInstall(context, gameInstall.downloadOrInstallId, file)
+                    }
+                    AbstractInstaller.Type.Stream ->
+                        installer.finishStreamInstall(context, gameInstall.downloadOrInstallId.toInt(), gameInstall.game.name)
+                }
             }
         } else if (gameInstall.packageName != null) {
             val launchIntent = context.packageManager.getLaunchIntentForPackage(gameInstall.packageName)

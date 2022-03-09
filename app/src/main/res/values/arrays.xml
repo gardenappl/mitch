@@ -33,12 +33,12 @@
     </string-array>
 
     <string-array name="pref_installer_entries">
-        <item>@string/settings_installer_native</item>
         <item>@string/settings_installer_session</item>
+        <item>@string/settings_installer_native</item>
     </string-array>
     <string-array name="pref_installer_values">
-        <item>native</item>
         <item>session</item>
+        <item>native</item>
     </string-array>
 
     <string-array name="pref_lang_entries">

@@ -25,7 +25,7 @@ import java.io.File
  */
 class NativeInstallerActivity : FragmentActivity() {
     companion object {
-        private const val LOGGING_TAG = "DefaultInstallerActivit"
+        private const val LOGGING_TAG = "NativeInstallerActivity"
         const val ACTION_INSTALL_PACKAGE =
             "ua.gardenapple.itchupdater.install.NativeInstaller.INSTALL_PACKAGE"
         private const val REQUEST_CODE_INSTALL = 0
@@ -94,8 +94,8 @@ class NativeInstallerActivity : FragmentActivity() {
         } catch (e: ActivityNotFoundException) {
             Log.e(LOGGING_TAG, "ActivityNotFoundException", e)
             runBlocking(Dispatchers.IO) {
-                Installations.onInstallResult(applicationContext, installId, null,
-                    file, PackageInstaller.STATUS_FAILURE)
+                Installations.onInstallResult(applicationContext, installId, file.name,
+                    null, file, PackageInstaller.STATUS_FAILURE)
             }
             finish()
         }
@@ -113,17 +113,21 @@ class NativeInstallerActivity : FragmentActivity() {
             REQUEST_CODE_INSTALL -> when (resultCode) {
                 RESULT_OK -> runBlocking(Dispatchers.IO) {
                     Log.d(LOGGING_TAG, "OK, intent data: ${intent.data}")
-                    Installations.onInstallResult(applicationContext, installId, null,
+                    Installations.onInstallResult(applicationContext, installId, apk.name, null,
                         apk, PackageInstaller.STATUS_SUCCESS)
                 }
                 RESULT_CANCELED -> runBlocking(Dispatchers.IO) {
-                    Installations.onInstallResult(applicationContext, installId, null,
+                    Installations.onInstallResult(applicationContext, installId, apk.name, null,
                         apk, PackageInstaller.STATUS_FAILURE_ABORTED)
                 }
-                //RESULT_FIRST_USER // AOSP returns AppCompatActivity.RESULT_FIRST_USER on error
                 else -> runBlocking(Dispatchers.IO) {
-                    Installations.onInstallResult(applicationContext, installId, null,
-                        apk, PackageInstaller.STATUS_FAILURE)
+                    // Undocumented AOSP stuff
+                    when (data?.extras?.getLong("android.intent.extra.INSTALL_RESULT")) {
+                        -4L -> Installations.onInstallResult(applicationContext, installId, apk.name, null,
+                                apk, PackageInstaller.STATUS_FAILURE_STORAGE)
+                        else -> Installations.onInstallResult(applicationContext, installId, apk.name, null,
+                            apk, PackageInstaller.STATUS_FAILURE)
+                    }
                 }
             }
             else -> throw RuntimeException("Invalid request code!")

@@ -41,6 +41,7 @@ const val NOTIFICATION_CHANNEL_ID_WEB_RUNNING = "web_running"
 
 const val NOTIFICATION_TAG_UPDATE_CHECK = "UpdateCheck"
 const val NOTIFICATION_TAG_DOWNLOAD = "DownloadResult"
+const val NOTIFICATION_TAG_DOWNLOAD_LONG = "DownloadResultLong"
 const val NOTIFICATION_TAG_INSTALL_RESULT = "InstallResult"
 const val NOTIFICATION_TAG_INSTALL_RESULT_LONG = "NativeInstallResult"
 

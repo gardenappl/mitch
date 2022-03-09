@@ -97,10 +97,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         webView.addJavascriptInterface(ItchJavaScriptInterface(this), "mitchCustomJS")
 
-        webView.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
+        webView.setDownloadListener { url, _, contentDisposition, mimeType, contentLength ->
             Log.d(LOGGING_TAG, "Requesting download...")
             launch(Dispatchers.IO) {
-                browseHandler?.onDownloadStarted(url, contentDisposition, mimeType)
+                browseHandler?.onDownloadStarted(url, contentDisposition, mimeType,
+                    if (contentLength > 0) contentLength else null)
             }
         }
 

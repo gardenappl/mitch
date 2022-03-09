@@ -1,27 +1,40 @@
 package ua.gardenapple.itchupdater.install
 
 import android.content.Context
-import java.io.File
-import java.io.InputStream
+import java.io.*
 
 abstract class AbstractInstaller {
+    enum class Type {
+        Stream,
+        File
+    }
+    abstract val type: Type
+
     /**
-     * Start quietly installing APK from a byte stream.
-     * If [acceptsInstallFromStream] returns false then this may throw a [NotImplementedError]
-     * Implementations should call [InstallerDatabaseHandler.onInstallStart] when they have a
-     * meaningful "install ID", and call [Installations.onInstallResult] on completion.
+     * @throws NotImplementedError if [type] is [Type.File].
      */
-    abstract suspend fun installFromStream(context: Context, downloadId: Int, apkStream: InputStream, lengthBytes: Long)
-
-    abstract fun acceptsInstallFromStream(): Boolean
-
+    abstract fun createSessionForStreamInstall(context: Context): Int
+    
     /**
-     * Same as the other [requestInstall] but works with a file in private storage.
-     * Unlike the stream-based version, this should be supported by all installers.
+     * Write an APK file into the install session. The caller should then call [finishStreamInstall].
      *
-     * This should exit quickly, and may start a new Intent if needed.
+     * @param lengthBytes file size, -1 if unknown
+     * @throws NotImplementedError if [type] is [Type.File].
      */
-    abstract suspend fun requestInstall(context: Context, downloadId: Int, apkFile: File)
+    abstract suspend fun openWriteStream(context: Context, sessionId: Int, lengthBytes: Long): OutputStream
+
+    /**
+     * Implementations should call [InstallerDatabaseHandler.onInstallStart] at the beginning,
+     * and [Installations.onInstallResult] on completion.
+     *
+     * @throws NotImplementedError if [type] is [Type.File].
+     */
+    abstract suspend fun finishStreamInstall(context: Context, sessionId: Int, appName: String)
+
+    /**
+     * @throws NotImplementedError if [type] is [Type.Stream]
+     */
+    abstract suspend fun requestInstall(context: Context, downloadId: Long, apkFile: File)
 
     /**
      * @return true if installation was cancelled. If true, the installation file

@@ -22,6 +22,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.core.content.FileProvider
 import androidx.core.graphics.ColorUtils
+import androidx.work.Data
 import com.github.ajalt.colormath.ConvertibleColor
 import com.github.ajalt.colormath.fromCss
 import kotlinx.coroutines.Dispatchers
@@ -37,18 +38,26 @@ object Utils {
     private const val LOGGING_TAG = "Units"
     private val versionNumbersRegex = Regex("""(?:\.?\d+)+""")
 
-    suspend fun copy(input: InputStream, output: OutputStream) = withContext(Dispatchers.IO) {
+    suspend fun cancellableCopy(
+        input: InputStream,
+        output: OutputStream,
+        progressCallback: ((Long) -> Unit)? = null
+    ) = withContext(Dispatchers.IO) {
         val BUFFER_SIZE = 1024 * 1024
 
         val buffer = ByteArray(BUFFER_SIZE)
-        var n: Int
+        var bytesRead: Long = 0
         while (true) {
             ensureActive()
-            n = input.read(buffer)
-            if (n == -1)
+            val count = input.read(buffer)
+            if (count == -1)
                 break
-            output.write(buffer, 0, n)
+            bytesRead += count
+
+            output.write(buffer, 0, count)
+            progressCallback?.invoke(bytesRead)
         }
+        output.flush()
     }
 
     //https://stackoverflow.com/a/10600736/5701177

@@ -140,8 +140,8 @@
     <string name="settings_cancel_downloads_message">Взагалі, це варто робити лише в цілях тестування або вирішення проблем з Mitch.</string>
     <string name="settings_installer_desc">Змініть це у випадку, коли у вас виникають проблеми зі встановленням додатків.</string>
     <string name="settings_installer">Метод встановлення</string>
-    <string name="settings_installer_native">Системний встановлювач (за замовчуванням)</string>
-    <string name="settings_installer_session">Встановлення сесією</string>
+    <string name="settings_installer_native">Системний встановлювач (необхідно для деяких пристроїв MIUI)</string>
+    <string name="settings_installer_session">Встановлення сесією (за замовчуванням)</string>
     <string name="game_bundle_claim">Присвоїти</string>
     <string name="game_buy">Купити</string>
     <string name="popup_handler_app_not_found">Не знаю, як відкрити %s</string>
@@ -175,4 +175,10 @@
     <string name="dialog_download_wrong_os">%s не сумісно з Android. Ви не зможете встановити це як додаток.\nВи все одно бажаєте це завантажити?</string>
     <string name="dialog_download_wrong_os_has_extras">%s не сумісно з Android. Ви не зможете встановити це як додаток.\nМожна переглянути додатковий контент, наприклад, ілюстрації, музику, та інструкції.</string>
     <string name="settings_warn_os">Попереджати, коли гра не сумісна з Android</string>
+    <string name="notification_download_no_space">Недосатньо місця в сховищі для цього файлу.</string>
+    <string name="game_bundle_ukraine">Благодійний набір Україні</string>
+    <string name="game_bundle_trans_texas">Набір Trans Rights in Texas!</string>
+    <string name="bundle_claim_all">Присвоїти все</string>
+    <string name="bundle_claim_all_desc">Присвоїти всі ігри з набору зараз.</string>
+    <string name="bundle_claim_error">Не вдалося завантажити сторінку набору.</string>
 </resources>

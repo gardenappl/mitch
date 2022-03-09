@@ -11,6 +11,7 @@ import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD
 import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
+import ua.gardenapple.itchupdater.install.AbstractInstaller
 import ua.gardenapple.itchupdater.install.Installations
 import java.io.File
 
@@ -32,9 +33,11 @@ class DownloadFileManager(context: Context) {
     /**
      * Direct request to start downloading a file.
      * Any pending installs for the same uploadId will be cancelled.
+     *
+     * @param contentLength file size, null if unknown
      */
     suspend fun requestDownload(context: Context, url: String,
-                                fileName: String, install: Installation) {
+                                fileName: String, contentLength: Long?, install: Installation) {
         val db = AppDatabase.getDatabase(context)
 
         //cancel download for current pending installation
@@ -50,23 +53,16 @@ class DownloadFileManager(context: Context) {
         }
 
         val file = File(File(pendingPath, uploadId.toString()), fileName)
-        val errorString = Downloader.requestDownload(context, url, file, install)
+        if (fileName.endsWith(".apk")) {
+            val installer = Installations.getInstaller(context)
 
-        if (errorString != null) {
-            val builder =
-                NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
-                    setContentTitle(install.uploadName)
-                    setContentText(
-                        context.resources.getString(
-                            R.string.notification_download_error,
-                            errorString
-                        )
-                    )
-                    priority = NotificationCompat.PRIORITY_HIGH
-                }
-            with(NotificationManagerCompat.from(context)) {
-                notify(NOTIFICATION_TAG_DOWNLOAD, 0, builder.build())
-            }
+            Log.d(LOGGING_TAG, "content length: $contentLength")
+            if (installer.type == AbstractInstaller.Type.Stream)
+                Downloader.requestDownload(context, url, install, fileName, contentLength, null, installer)
+            else
+                Downloader.requestDownload(context, url, install, fileName, contentLength,  file, null)
+        } else {
+            Downloader.requestDownload(context, url, install, fileName, contentLength, file, null)
         }
     }
 
@@ -76,7 +72,7 @@ class DownloadFileManager(context: Context) {
             return false
 
         return install.downloadOrInstallId?.let { downloadId ->
-            Downloader.checkIsDownloading(context, downloadId.toInt())
+            Downloader.checkIsDownloading(context, downloadId)
         } ?: false
     }
 
@@ -98,7 +94,7 @@ class DownloadFileManager(context: Context) {
     }
 
     suspend fun cancel(context: Context, downloadId: Long, uploadId: Int) {
-        Downloader.cancel(context, downloadId.toInt())
+        Downloader.cancel(context, downloadId)
         deletePendingFile(uploadId)
     }
     

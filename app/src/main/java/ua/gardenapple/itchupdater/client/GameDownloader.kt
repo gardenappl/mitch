@@ -119,7 +119,10 @@ object GameDownloader {
 
         var mimeType: String? = null
         var contentDisposition: String? = null
+        var contentLength: Long? = null
 
+        // Make one request here to get metadata,
+        // then another request inside of a DownloadWorker later
         withContext(Dispatchers.IO) {
             Mitch.httpClient.newCall(request).execute().use { response ->
                 if (!response.isSuccessful)
@@ -127,6 +130,9 @@ object GameDownloader {
 
                 mimeType = response.header("Content-Type")?.split(';')!![0]
                 contentDisposition = response.header("Content-Disposition")
+                contentLength = response.body?.contentLength()
+                if (contentLength?.equals(-1L) == true)
+                    contentLength = null
             }
         }
 
@@ -149,7 +155,7 @@ object GameDownloader {
             return UpdateCheckResult.EMPTY
         }
 
-        requestDownload(context, pendingInstall, downloadUrl, url, contentDisposition, mimeType)
+        requestDownload(context, pendingInstall, downloadUrl, url, contentDisposition, mimeType, contentLength)
         return UpdateCheckResult.UPDATE_AVAILABLE
     }
 
@@ -160,6 +166,7 @@ object GameDownloader {
      * @param url URL of file to download
      * @param contentDisposition HTTP content disposition header
      * @param mimeType MIME type
+     * @param contentLength file size, null if unknown
      */
     suspend fun requestDownload(
         context: Context,
@@ -167,7 +174,8 @@ object GameDownloader {
         url: String,
         downloadPageUrl: String,
         contentDisposition: String?,
-        mimeType: String?
+        mimeType: String?,
+        contentLength: Long?
     ) {
         if (pendingInstall.internalId != 0)
             throw IllegalArgumentException("Pending installation already has internalId!")
@@ -193,6 +201,7 @@ object GameDownloader {
             URLUtil.guessFileName(url, contentDisposition, mimeType)
         }
 
-        Mitch.fileManager.requestDownload(context, url, fileName, pendingInstall)
+        Log.d(LOGGING_TAG, "content length: $contentLength")
+        Mitch.fileManager.requestDownload(context, url, fileName, contentLength, pendingInstall)
     }
 }

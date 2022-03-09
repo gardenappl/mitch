@@ -35,6 +35,8 @@ class ItchBrowseHandler(private val context: Context) {
         private var currentDownloadContentDisposition: String? = null
         @Volatile
         private var currentDownloadMimeType: String? = null
+        @Volatile
+        private var currentDownloadContentLength: Long? = null
     }
 
     data class Info(
@@ -126,10 +128,16 @@ class ItchBrowseHandler(private val context: Context) {
         tryStartDownload()
     }
 
-    suspend fun onDownloadStarted(url: String, contentDisposition: String?, mimeType: String?) {
+    suspend fun onDownloadStarted(
+        url: String,
+        contentDisposition: String?,
+        mimeType: String?,
+        contentLength: Long?
+    ) {
         currentDownloadUrl = url
         currentDownloadContentDisposition = contentDisposition
         currentDownloadMimeType = mimeType
+        currentDownloadContentLength = contentLength
         tryStartDownload()
     }
 
@@ -142,11 +150,13 @@ class ItchBrowseHandler(private val context: Context) {
         val downloadUrl = currentDownloadUrl ?: return
         val contentDisposition = currentDownloadContentDisposition ?: return
         val mimeType = currentDownloadMimeType ?: return
+        val contentLength = currentDownloadContentLength ?: return
 
         clickedUploadId = null
         currentDownloadUrl = null
-        currentDownloadMimeType = null
         currentDownloadContentDisposition = null
+        currentDownloadMimeType = null
+        currentDownloadContentLength = null
 
         coroutineScope {
             launch(Dispatchers.Main) {
@@ -158,8 +168,9 @@ class ItchBrowseHandler(private val context: Context) {
                 val pendingInstall =
                     ItchWebsiteParser.getPendingInstallation(downloadPageDoc, uploadId)
 
+                Log.d(LOGGING_TAG, "content length: $contentLength")
                 GameDownloader.requestDownload(context, pendingInstall, downloadUrl,
-                    downloadPageUrl, contentDisposition, mimeType)
+                    downloadPageUrl, contentDisposition, mimeType, contentLength)
             }
         }
     }

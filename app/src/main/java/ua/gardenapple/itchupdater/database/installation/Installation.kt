@@ -72,12 +72,17 @@ data class Installation(
     var status: Int,
 
     /**
-     * null if [STATUS_INSTALLED]
-     * downloadId if [STATUS_DOWNLOADING] or [STATUS_READY_TO_INSTALL]
-     * installId if [STATUS_INSTALLING]
-     *
-     * If installId fits within an Int then it's handled by [SessionInstaller],
-     * otherwise, it's handled by [NativeInstaller]
+     * If [STATUS_INSTALLED]:
+     *   value is null.
+     * Else if value fits within an Int:
+     *   value is the sessionId from the [SessionInstaller], we are downloading an APK
+     *   directly into an install session.
+     * Else if [STATUS_DOWNLOADING] or [STATUS_READY_TO_INSTALL]:
+     *   value is a unique "download ID" assigned by Mitch; we are downloading either a generic file,
+     *   or maybe an APK for the [NativeInstaller].
+     * Else if [STATUS_INSTALLING]:
+     *   value is a unique "install ID" assigned by Mitch, we are installing an APK
+     *   with the [NativeInstaller].
      */
     @ColumnInfo(name = DOWNLOAD_OR_INSTALL_ID)
     var downloadOrInstallId: Long?,

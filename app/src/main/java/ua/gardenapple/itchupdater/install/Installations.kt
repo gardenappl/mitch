@@ -23,10 +23,6 @@ object Installations {
     internal val sessionInstaller = SessionInstaller()
 
 
-    suspend fun downloadOrInstall() {
-
-    }
-
     suspend fun deleteFinishedInstall(context: Context, uploadId: Int) {
         val db = AppDatabase.getDatabase(context)
         db.installDao.deleteFinishedInstallation(uploadId)
@@ -74,7 +70,10 @@ object Installations {
         if (status != Installation.STATUS_INSTALLING) {
             val notificationService =
                 context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-            notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, downloadOrInstallId.toInt())
+            if (Utils.fitsInInt(downloadOrInstallId))
+                notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD, downloadOrInstallId.toInt())
+            else
+                notificationService.cancel(NOTIFICATION_TAG_DOWNLOAD_LONG, downloadOrInstallId.toInt())
         }
 
         val db = AppDatabase.getDatabase(context)
@@ -99,14 +98,6 @@ object Installations {
         db.installDao.delete(installId)
     }
 
-    fun getInstaller(context: Context, install: Installation): AbstractInstaller {
-        return when (install.status) {
-            Installation.STATUS_INSTALLING -> getInstaller(install.downloadOrInstallId!!)
-            Installation.STATUS_READY_TO_INSTALL -> getInstaller(context)
-            else -> throw IllegalArgumentException("Can't get installer for $install")
-        }
-    }
-
     fun getInstaller(installId: Long): AbstractInstaller {
         return if (Utils.fitsInInt(installId))
             sessionInstaller
@@ -116,18 +107,33 @@ object Installations {
 
     fun getInstaller(context: Context): AbstractInstaller {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
-        return if (sharedPrefs.getString(PREF_INSTALLER, "native") == "native")
+
+        val defaultInstaller = if (MiuiUtils.doesSessionInstallerWork())
+            "session"
+        else
+            "native"
+
+        return if (sharedPrefs.getString(PREF_INSTALLER, defaultInstaller) == "native")
             nativeInstaller
         else
             sessionInstaller
     }
 
-    suspend fun onInstallResult(context: Context, installId: Long,
+    suspend fun onInstallResult(context: Context, installId: Long, appName: String,
                                 packageName: String?, apk: File?, status: Int) {
         var packageName = packageName
 
         val db = AppDatabase.getDatabase(context)
-        val install = db.installDao.getPendingInstallationByInstallId(installId)!!
+        val install = db.installDao.getPendingInstallationByInstallId(installId)
+
+        //TODO: this seems to only happen when
+        // 1. we request permission to install
+        // 2. Android launches installation twice???
+        // 3. First one finishes, pending install is deleted
+        // 4. Second one fails and install is null
+        // This is a workaround, but is there a better solution? Or maybe the bug is my fault?
+        if (install == null)
+            return
 
         if (status == PackageInstaller.STATUS_SUCCESS && packageName == null) {
             if (install.packageName != null)
@@ -136,15 +142,9 @@ object Installations {
                 packageName = tryGetPackageName(context, apk!!.path)!!
         }
 
-        notifyInstallResult(context, installId, packageName, apk?.name, status)
+        notifyInstallResult(context, installId, packageName, appName, status)
         Mitch.fileManager.deletePendingFile(install.uploadId)
-        deleteOutdatedInstalls(context, install)
         Mitch.databaseHandler.onInstallResult(install, packageName, status)
-
-        db.updateCheckDao.getUpdateCheckResultForUpload(install.uploadId)?.let {
-            it.isInstalling = false
-            db.updateCheckDao.insert(it)
-        }
     }
 
     /**
@@ -153,7 +153,7 @@ object Installations {
      */
     private fun notifyInstallResult(
         context: Context, installSessionId: Long,
-        packageName: String?, apkName: String?, status: Int
+        packageName: String?, appName: String, status: Int
     ) {
         val message = when (status) {
             PackageInstaller.STATUS_FAILURE_ABORTED -> context.resources.getString(R.string.notification_install_cancelled_title)
@@ -163,7 +163,7 @@ object Installations {
             PackageInstaller.STATUS_FAILURE_INVALID -> context.resources.getString(R.string.notification_install_invalid_title)
             PackageInstaller.STATUS_FAILURE_STORAGE -> context.resources.getString(R.string.notification_install_storage_title)
             PackageInstaller.STATUS_SUCCESS -> context.resources.getString(R.string.notification_install_complete_title)
-            else -> context.resources.getString(R.string.notification_install_complete_title)
+            else -> context.resources.getString(R.string.notification_install_unknown_title)
         }
         val builder =
             NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
@@ -176,7 +176,7 @@ object Installations {
                         setContentTitle(context.packageManager.getApplicationLabel(appInfo))
                     } catch (e: PackageManager.NameNotFoundException) {
                         Log.w(LOGGING_TAG, "Error: no name for package name $packageName", e)
-                        setContentTitle(apkName)
+                        setContentTitle(appName)
                     }
 
                     packageName?.let {
@@ -195,7 +195,7 @@ object Installations {
                         Log.w(LOGGING_TAG, "Could not load icon for package name $packageName", e)
                     }
                 } else {
-                    setContentTitle(apkName)
+                    setContentTitle(appName)
                 }
 //                priority = NotificationCompat.PRIORITY_HIGH
             }

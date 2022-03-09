@@ -49,7 +49,7 @@
                 android:summary="@string/settings_block_trackers_desc"
                 android:title="@string/settings_block_trackers" />
         <ListPreference
-                android:defaultValue="native"
+                android:defaultValue="session"
                 android:entries="@array/pref_installer_entries"
                 android:entryValues="@array/pref_installer_values"
                 android:key="ua.gardenapple.itchupdater.installer"
