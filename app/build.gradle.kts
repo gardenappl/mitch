@@ -38,8 +38,8 @@ android {
         targetSdk = 29
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        versionCode = 38
-        versionName = "1.4.6"
+        versionCode = 39
+        versionName = "1.4.7"
     }
     buildTypes {
         named("release").configure {
