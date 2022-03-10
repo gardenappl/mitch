@@ -106,14 +106,14 @@
     <string name="settings_cancel_downloads_message">Esto sólo debe hacerse con fines de prueba o de resolución de problemas.</string>
     <string name="dialog_no">No</string>
     <string name="settings_installer">Método de instalación</string>
-    <string name="settings_bundle_claim_dialog">Advertencia: estás a punto de llenar tu biblioteca con más de 1000 juegos. ¿Estás seguro de que quieres hacerlo\?
+    <string name="bundle_claim_dialog">Advertencia: estás a punto de llenar tu biblioteca con más de 1000 juegos. ¿Estás seguro de que quieres hacerlo\?
 \n
 \nEsto llevará mucho, muuucho tiempo.
 \n
 \nEste proceso es irreversible.</string>
     <string name="settings_android_only_filter_desc">Al navegar por los juegos de Android, ocultar las entradas que sólo están disponibles en otras tiendas.</string>
     <string name="settings_lang_site">Depende del sitio</string>
-    <string name="game_bundle_justice">Paquete de Justicia e Igualdad Racial</string>
+    <string name="game_bundle_racial">Paquete de Justicia e Igualdad Racial</string>
     <string name="notification_download_unknown_error">Error desconocido</string>
     <string name="dialog_installer_please_wait">Por favor, espera, preparando la aplicación para su instalación…</string>
     <string name="dialog_installer_no_space">No hay suficiente espacio en el disco para esta aplicación.</string>
@@ -161,15 +161,9 @@
     <string name="game_download">Descargar</string>
     <string name="game_install">Instalar</string>
     <string name="game_price">%s o más</string>
-    <string name="game_justice_bundle_claim_error">No se pudo acceder al enlace de descarga del paquete de Justicia Racial.</string>
-    <string name="game_palestine_bundle_claim_error">No se ha podido acceder al enlace de descarga del paquete de ayuda a Palestina.</string>
-    <string name="settings_bundle_link_desc">Establecer una URL de descarga personalizada</string>
-    <string name="settings_justice_claim_all">Paquete de Justicia Racial: reclamar todo</string>
-    <string name="settings_palestine_claim_all">Paquete de Ayuda Palestina: reclamar todo</string>
+    <string name="bundle_custom_link">Establecer una URL de descarga personalizada</string>
     <string name="game_bundle_palestine">Paquete de juegos indie para la Ayuda a Palestina</string>
-    <string name="settings_justice_claim_all_desc">Reclama todos los juegos del paquete Justicia e Igualdad Racial.</string>
-    <string name="settings_palestine_claim_all_desc">Reclama todos los juegos del paquete Indie para la Ayuda a Palestina.</string>
-    <string name="settings_bundle_claim_dialog_title">¿Estás seguro\?</string>
+    <string name="bundle_claim_dialog_title">¿Estás seguro\?</string>
     <string name="popup_no_network_connection">La comprobación de las actualizaciones requiere una conexión de red</string>
     <string name="settings_android_only_filter">Android: filtro descargable únicamente</string>
     <string name="settings_lang_default">Predeterminado</string>
