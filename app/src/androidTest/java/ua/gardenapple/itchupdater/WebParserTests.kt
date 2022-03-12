@@ -45,9 +45,9 @@ class WebParserTests {
         assertEquals(4, installs.size)
 
         assertEquals("Super Hexagon [Android]", installs[3].uploadName)
-        assertEquals("01 July 2015 @ 01:00", installs[3].uploadTimestamp)
-        assertEquals("26 MB", installs[3].fileSize)
-        assertEquals(74588, installs[3].uploadId)
+        assertEquals("16 December 2021 @ 11:48", installs[3].uploadTimestamp)
+        assertEquals("143 MB", installs[3].fileSize)
+        assertEquals(4942166, installs[3].uploadId)
         assertEquals(null, installs[3].version)
     }
 
