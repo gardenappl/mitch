@@ -2,13 +2,8 @@ package ua.gardenapple.itchupdater.files
 
 import android.content.Context
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ua.gardenapple.itchupdater.NOTIFICATION_CHANNEL_ID_INSTALLING
-import ua.gardenapple.itchupdater.NOTIFICATION_TAG_DOWNLOAD
-import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.database.AppDatabase
 import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.install.AbstractInstaller

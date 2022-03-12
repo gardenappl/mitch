@@ -7,9 +7,7 @@ import androidx.core.net.toUri
 import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.database.AppDatabase
 import java.io.File
-import java.io.InputStream
 import java.io.OutputStream
-import java.io.PipedOutputStream
 
 class NativeInstaller : AbstractInstaller() {
     companion object {

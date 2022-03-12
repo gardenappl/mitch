@@ -9,8 +9,6 @@ import org.json.JSONObject
 import org.jsoup.Jsoup
 import ua.gardenapple.itchupdater.Mitch
 import java.io.IOException
-import java.util.*
-import kotlin.collections.ArrayList
 
 object ItchLibraryParser {
     private const val LOGGING_TAG = "ItchLibraryParser"

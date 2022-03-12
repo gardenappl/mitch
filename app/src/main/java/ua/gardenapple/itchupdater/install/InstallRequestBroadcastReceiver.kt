@@ -7,6 +7,8 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import ua.gardenapple.itchupdater.Utils
+import ua.gardenapple.itchupdater.install.InstallRequestBroadcastReceiver.Companion.EXTRA_DOWNLOAD_ID
+import ua.gardenapple.itchupdater.install.InstallRequestBroadcastReceiver.Companion.EXTRA_STREAM_SESSION_ID
 import java.io.File
 
 /**

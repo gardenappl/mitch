@@ -7,7 +7,6 @@ import android.os.IBinder
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import ua.gardenapple.itchupdater.Mitch
 import ua.gardenapple.itchupdater.Utils
 
 /**

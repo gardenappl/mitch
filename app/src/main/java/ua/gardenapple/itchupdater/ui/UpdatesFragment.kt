@@ -13,7 +13,10 @@ import com.bumptech.glide.ListPreloader
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
 import com.bumptech.glide.util.FixedPreloadSizeProvider
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import ua.gardenapple.itchupdater.client.UpdateChecker
 import ua.gardenapple.itchupdater.database.updatecheck.InstallUpdateCheckResult
 import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultViewModel

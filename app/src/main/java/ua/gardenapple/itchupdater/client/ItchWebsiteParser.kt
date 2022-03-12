@@ -19,7 +19,6 @@ import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
 import java.io.IOException
 import java.util.*
-import kotlin.collections.ArrayList
 
 object ItchWebsiteParser {
     class UploadNotFoundException(uploadId: Int) : RuntimeException(uploadId.toString())

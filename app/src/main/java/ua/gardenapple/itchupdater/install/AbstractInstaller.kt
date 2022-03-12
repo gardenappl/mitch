@@ -1,7 +1,8 @@
 package ua.gardenapple.itchupdater.install
 
 import android.content.Context
-import java.io.*
+import java.io.File
+import java.io.OutputStream
 
 abstract class AbstractInstaller {
     enum class Type {
