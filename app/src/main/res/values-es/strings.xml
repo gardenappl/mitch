@@ -153,8 +153,8 @@
     <string name="settings_cancel_downloads">Restablecer todas las descargas</string>
     <string name="settings_cancel_downloads_title">¿Restablecer todas las descargas actuales\?</string>
     <string name="settings_installer_desc">Intenta cambiar esto si tienes problemas para instalar aplicaciones.</string>
-    <string name="settings_installer_session">Instalador de sesiones</string>
-    <string name="settings_installer_native">Instalador nativo (por defecto)</string>
+    <string name="settings_installer_session">Instalador de sesiones (predeterminado)</string>
+    <string name="settings_installer_native">Instalador nativo (necesario para algunos dispositivos MIUI)</string>
     <string name="popup_handler_app_not_found">No se sabe cómo abrir %s</string>
     <string name="game_bundle_claim">Reclamar</string>
     <string name="game_buy">Comprar</string>
@@ -177,4 +177,11 @@
     <string name="dialog_download_wrong_os_has_extras">%s no es compatible con Android. No podrás instalarlo como una aplicación.
 \nAun así, podrás ver los contenidos adicionales, como arte, música o manuales.</string>
     <string name="settings_warn_os">Advertir al descargar aplicaciones que no son de Android</string>
+    <string name="bundle">Paquetes especiales</string>
+    <string name="game_bundle_ukraine">Paquete para Ucrania</string>
+    <string name="game_bundle_trans_texas">Paquete ¡Derechos de los transexuales en Texas!</string>
+    <string name="bundle_claim_all">Reclamar todo</string>
+    <string name="bundle_claim_all_desc">Reclamar todos los juegos de este paquete ahora.</string>
+    <string name="bundle_claim_error">No se ha podido acceder al enlace de descarga del paquete.</string>
+    <string name="notification_download_no_space">No hay suficiente espacio de almacenamiento para este archivo</string>
 </resources>
