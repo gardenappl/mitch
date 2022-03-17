@@ -1,0 +1,4 @@
+* Adicione traduções em árabe, turco e norueguês em bokmål
+* Corrige o resultado incorreto da verificação de atualização após alterar o idioma
+* A lista de atualizações agora é vertical em vez de horizontal (whoops)
+* Corrigir erro ao relatar erro para verificação de atualização (whoops)

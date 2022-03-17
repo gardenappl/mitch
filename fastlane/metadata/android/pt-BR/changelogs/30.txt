@@ -1,0 +1,2 @@
+* Adicionado novo mecanismo de instalação, que deve funcionar para usuários MIUI.
+* Você pode alternar para o mecanismo antigo no menu Configurações.

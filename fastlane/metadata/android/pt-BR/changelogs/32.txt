@@ -1,0 +1,6 @@
+* Adicione UI nativa para baixar, comprar jogos e reivindicar jogos dos grandes pacotes famosos
+* Ocultar jogos que afirmam ser compatíveis com Android, mas estão disponíveis apenas por meio de links do Google Play
+* Novas traduções: holandês, vietnamita, indonésio, francês, alemão, hindi
+* Corrigir o login através do GitHub
+
+Além de muitas outras correções, veja o changelog completo aqui: https://gardenapple.itch.io/mitch/devlog
