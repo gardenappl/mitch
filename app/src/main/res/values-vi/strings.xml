@@ -13,8 +13,8 @@
     <string name="bundle_claim_error_justice">Không thể truy cập liên kết tải xuống từ gói Racial Justice.</string>
     <string name="game_buy">Mua</string>
     <string name="game_bundle_claim">Nhận</string>
-    <string name="settings_installer_native">Trình cài đặt của hệ thống (mặc định)</string>
-    <string name="settings_installer_session">Trình cài đặt phiên làm việc</string>
+    <string name="settings_installer_native">Trình cài đặt của hệ thống (một số thiết bị chạy MIUI cần dùng)</string>
+    <string name="settings_installer_session">Trình cài đặt phiên làm việc (mặc định)</string>
     <string name="settings_installer">Phương pháp cài đặt</string>
     <string name="settings_installer_desc">Hãy thử thay đổi tuỳ chọn này nếu bạn gặp rắc rối trong việc cài đặt ứng dụng.</string>
     <string name="dialog_no">Không</string>
@@ -182,4 +182,11 @@
 \nBạn vẫn có thể xem nội dung bổ sung, như là tranh vẽ, nhạc, hoặc hướng dẫn.</string>
     <string name="dialog_download_wrong_os">%s không tương thích với Android. Bạn sẽ không thể cài đặt dưới dạng ứng dụng.
 \nBạn có vẫn muốn tải xuống không\?</string>
+    <string name="bundle">Gói đặc biệt</string>
+    <string name="game_bundle_ukraine">Gói cho Ukraine</string>
+    <string name="game_bundle_trans_texas">Gói Trans Rights in Texas!</string>
+    <string name="bundle_claim_all">Nhận tất cả</string>
+    <string name="bundle_claim_all_desc">Nhận tất cả trò chơi từ gói này ngay.</string>
+    <string name="bundle_claim_error">Không thể truy cập liên kết tải xuống cho gói này.</string>
+    <string name="notification_download_no_space">Không đủ dung lượng bộ nhớ cho tệp này</string>
 </resources>
