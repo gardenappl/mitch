@@ -128,4 +128,14 @@
     <string name="library_install">Instalar</string>
     <string name="network_request_retry">Repetir</string>
     <string name="library_options_show_only_android">Apenas Android</string>
+    <string name="library_go_to_store">Ir para a loja</string>
+    <string name="bug_report_dialog">Desculpe, parece que houve um erro no Mitch. Pressione OK para enviar um relatório de erro para o desenvolvedor.</string>
+    <string name="library_games_search">Buscar</string>
+    <string name="library_open_app_failed">Esta aplicação não pôde ser aberta.</string>
+    <string name="settings_category_advanced">Avançado</string>
+    <string name="settings_cancel_downloads">Redefinir todos os downloads</string>
+    <string name="settings_cancel_downloads_title">Redefinir todos os downloads atuais\?</string>
+    <string name="game_install">Instalar</string>
+    <string name="bundle_claim_dialog_title">Tem certeza\?</string>
+    <string name="bug_report_dialog_title">Algo deu errado</string>
 </resources>
