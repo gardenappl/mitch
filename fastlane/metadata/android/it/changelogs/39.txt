@@ -1,0 +1,5 @@
+* Consenti la rivendicazione di giochi dal Bundle per l'Ucraina e dai TTRPG per i diritti trans in Texas
+* Nuovo metodo per l'installazione del gioco, dovrebbe essere più veloce e ridurre l'utilizzo dello spazio su disco
+* Aggiunti avvisi quando si tenta di scaricare un gioco non Android
+* Amplia la finestra di ricerca
+* Numerose piccole correzioni di bug e miglioramenti dell'interfaccia utente

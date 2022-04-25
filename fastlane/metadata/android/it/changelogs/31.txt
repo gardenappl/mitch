@@ -1,0 +1,4 @@
+* Aggiunte traduzioni in arabo, turco, norvegese Bokmål
+* Risolto il risultato errato del controllo dell'aggiornamento dopo aver cambiato la lingua
+* L'elenco degli aggiornamenti ora è verticale anziché orizzontale (ops)
+* Risolto l'errore durante la segnalazione dell'errore per il controllo degli aggiornamenti (ops)

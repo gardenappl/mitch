@@ -1,0 +1,6 @@
+* Aggiunta l'interfaccia utente nativa per scaricare, acquistare giochi e rivendicare giochi dai grandi pacchetti famosi
+* Nascondi i giochi che affermano di supportare Android ma sono disponibili solo tramite i collegamenti di Google Play
+* Nuove traduzioni: olandese, vietnamita, indonesiano, francese, tedesco, hindi
+* Correzione dell'accesso tramite GitHub
+
+Oltre a molte altre correzioni, vedi il registro completo delle modifiche qui: https://gardenapple.itch.io/mitch/devlog
