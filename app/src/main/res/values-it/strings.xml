@@ -38,8 +38,8 @@
     <string name="game_buy">Compra</string>
     <string name="game_bundle_claim">Richiedi</string>
     <string name="popup_handler_app_not_found">Non so come aprire %s</string>
-    <string name="settings_installer_native">Installatore nativo (predefinito)</string>
-    <string name="settings_installer_session">Installatore di sessioni</string>
+    <string name="settings_installer_native">Installatore nativo (necessario per alcuni dispositivi MIUI)</string>
+    <string name="settings_installer_session">Installatore di sessioni (predefinito)</string>
     <string name="settings_installer">Metodo di installazione</string>
     <string name="settings_installer_desc">Prova a cambiare questo se hai problemi con l’installazione delle applicazioni.</string>
     <string name="dialog_no">No</string>
@@ -183,4 +183,11 @@
 \nPuoi comunque visualizzare contenuti aggiuntivi, come arte, musica o manuali.</string>
     <string name="dialog_download_wrong_os">%s non è compatibile con Android. Non sarai in grado di installarlo come applicazione.
 \nVuoi scaricarlo comunque\?</string>
+    <string name="bundle">Pacchetti speciali</string>
+    <string name="game_bundle_trans_texas">Diritti trans in Texas! Pacchetto</string>
+    <string name="bundle_claim_all">Rivendica tutto</string>
+    <string name="game_bundle_ukraine">Pacchetto per l\'Ucraina</string>
+    <string name="bundle_claim_all_desc">Richiedi ora tutti i giochi di questo pacchetto.</string>
+    <string name="bundle_claim_error">Impossibile accedere al collegamento per il download del pacchetto.</string>
+    <string name="notification_download_no_space">Spazio di archiviazione insufficiente per questo file</string>
 </resources>
