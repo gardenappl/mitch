@@ -186,4 +186,16 @@
     <string name="bundle_claim_all_desc">Присвоить все игры из бандла сейчас.</string>
     <string name="bundle_claim_all">Присвоить всё</string>
     <string name="bundle">Особенные бандлы</string>
+    <string name="library_category_web_cached">Веб-игры</string>
+    <string name="dialog_web_cache_info_title">Установка веб-игр</string>
+    <string name="dialog_web_cache_info">Mitch может автоматически сохранять веб-игры для их запуска в режиме оффлайн.</string>
+    <string name="settings_web_cache_enable">Сохранять веб-игры</string>
+    <string name="settings_web_cache_enable_desc">Устанавливать все запущенные веб-игры для их дальнейшего запуска в режиме оффлайн.</string>
+    <string name="settings_web_cache_update">Обновлять сохранённые веб-игры</string>
+    <string name="settings_web_cache_update_never">Никогда</string>
+    <string name="settings_web_cache_update_unmetered">При запуске с безлимитным подключением</string>
+    <string name="settings_web_cache_update_always">При любом запуске</string>
+    <string name="dialog_web_cache_delete_title">Удалить игру?</string>
+    <string name="dialog_web_cache_delete_fail_title">Нельзя сейчас удалить</string>
+    <string name="dialog_web_cache_delete_fail">%1$s нельзя удалить так как эта игра сейчас запущена.</string>
 </resources>

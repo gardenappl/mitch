@@ -85,15 +85,21 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-        <TextView
-                android:id="@+id/installed_nothing"
+        <FrameLayout
+                android:id="@+id/installed_nothing_web_wrapper"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:padding="0dp"
-                android:text="@string/library_no_apps"
-                android:visibility="gone"
-                tools:visibility="visible" />
+                android:visibility="gone">
+            <TextView
+                    android:id="@+id/installed_nothing"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:padding="0dp"
+                    android:text="@string/library_no_apps"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+        </FrameLayout>
 
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/installed_list"
@@ -104,12 +110,36 @@
                 tools:listitem="@layout/library_item"
                 tools:visibility="gone" />
 
+        <TextView
+                android:id="@+id/web_cached_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:text="@string/library_category_web_cached"
+                android:textColor="?colorPrimaryDark"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/web_cached_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbarAlwaysDrawHorizontalTrack="true"
+                tools:itemCount="1"
+                tools:listitem="@layout/library_item"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
         <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginVertical="5dp"
                 android:layout_marginHorizontal="10dp"
-                android:background="@color/colorForegroundSecondary" />
+                android:layout_marginVertical="5dp"
+                android:background="@color/colorForegroundSecondary"
+                tools:visibility="visible" />
 
         <TextView
                 android:id="@+id/downloads_label"

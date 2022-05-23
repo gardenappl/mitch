@@ -22,6 +22,7 @@ import ua.gardenapple.itchupdater.client.UpdateChecker
 import ua.gardenapple.itchupdater.database.DatabaseCleanup
 import ua.gardenapple.itchupdater.files.DownloadFileManager
 import ua.gardenapple.itchupdater.files.ExternalFileManager
+import ua.gardenapple.itchupdater.files.WebGameCache
 import ua.gardenapple.itchupdater.install.InstallerDatabaseHandler
 import ua.gardenapple.itchupdater.ui.CrashDialog
 import ua.gardenapple.itchupdater.ui.MitchContextWrapper
@@ -66,6 +67,14 @@ const val PREF_LANG_LOCALE = "mitch.lang_locale"
 const val PREF_LANG_LOCALE_NEXT = "mitch.lang_locale_next"
 const val PREF_LANG_SITE_LOCALE = "mitch.lang_site_locale"
 const val PREF_WARN_WRONG_OS = "mitch.warn_wrong_os"
+const val PREF_WEB_CACHE_ENABLE = "mitch.web_cache_enable"
+const val PREF_WEB_CACHE_UPDATE = "mitch.web_cache_update"
+const val PREF_WEB_CACHE_DIALOG_HIDE = "mitch.web_cache_dialog_hide"
+object PreferenceWebCacheUpdate {
+    const val NEVER = "never"
+    const val UNMETERED = "unmetered"
+    const val ALWAYS ="always"
+}
 
 
 
@@ -99,6 +108,9 @@ class Mitch : Application() {
         val externalFileManager = ExternalFileManager()
         val databaseHandler: InstallerDatabaseHandler by lazy {
             InstallerDatabaseHandler(mitchContext)
+        }
+        val webGameCache: WebGameCache by lazy {
+            WebGameCache(mitchContext)
         }
     }
 

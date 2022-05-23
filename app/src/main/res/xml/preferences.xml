@@ -25,6 +25,18 @@
                 android:key="preference_update_check_if_metered"
                 android:summary="@string/settings_update_check_metered_desc"
                 android:title="@string/settings_update_check_metered" />
+        <SwitchPreference
+                android:defaultValue="true"
+                android:key="mitch.web_cache_enable"
+                android:summary="@string/settings_web_cache_enable_desc"
+                android:title="@string/settings_web_cache_enable" />
+        <ListPreference
+                android:defaultValue="always"
+                android:entries="@array/pref_web_cache_update_entries"
+                android:entryValues="@array/pref_web_cache_update_values"
+                android:key="mitch.web_cache_update"
+                android:summary="%s"
+                android:title="@string/settings_web_cache_update" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_category_ui">
         <ListPreference

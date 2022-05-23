@@ -24,7 +24,7 @@ import ua.gardenapple.itchupdater.database.updatecheck.UpdateCheckResultModel
 
 @Database(
     entities = [Game::class, Installation::class, UpdateCheckResultModel::class],
-    version = 10,
+    version = 11,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

@@ -111,7 +111,7 @@ dependencies {
     kapt("com.github.bumptech.glide:compiler:4.13.1")
     implementation("com.github.bumptech.glide:recyclerview-integration:4.13.1")
     // OkHttp
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.5")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.7")
     // FAB Speed Dial
     implementation("com.leinardi.android:speed-dial:3.2.0")
     // Material Progress Bar

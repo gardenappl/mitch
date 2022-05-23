@@ -82,7 +82,7 @@ class UpdatesFragment : Fragment(), CoroutineScope by MainScope() {
         })
 
         binding.root.setOnRefreshListener {
-            GlobalScope.launch {
+            (activity as MainActivity).launch {
                 UpdateChecker(requireContext()).checkUpdates()
                 _binding?.root?.isRefreshing = false
             }

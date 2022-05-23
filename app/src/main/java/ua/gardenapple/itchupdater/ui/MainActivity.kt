@@ -19,12 +19,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import ua.gardenapple.itchupdater.*
 import ua.gardenapple.itchupdater.database.AppDatabase
+import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.databinding.ActivityMainBinding
 
 /**
@@ -38,6 +36,9 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
 
     lateinit var binding: ActivityMainBinding
     private set
+
+    val runningCachedWebGame: Game?
+        get() = browseFragment.runningCachedWebGame
 
     /**
      * The restart dialog is handled here.
@@ -67,7 +68,7 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
                     mainHandler.post {
                         val intent = Intent(
                             Intent.ACTION_VIEW,
-                            Uri.parse(browseFragment.webView.url),
+                            Uri.parse(browseFragment.url),
                             applicationContext,
                             MainActivity::class.java
                         )
@@ -86,6 +87,7 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
         const val LOGGING_TAG = "MainActivity"
 
         const val EXTRA_SHOULD_OPEN_LIBRARY = "SHOULD_OPEN_LIBRARY"
+//        const val EXTRA_LAUNCH_OFFLINE_WEB_GAME_ID = "LAUNCH_OFFLINE_WEB_GAME_ID"
         
         private const val ACTIVE_FRAGMENT_KEY: String = "fragment"
 
@@ -167,7 +169,7 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
             val fragmentChanged = setActiveFragment(getFragmentTag(item.itemId), false)
 
             if (!fragmentChanged && currentFragmentTag == BROWSE_FRAGMENT_TAG)
-                browseFragment.webView.loadUrl(ItchWebsiteUtils.getMainBrowsePage(this))
+                browseFragment.loadUrl(ItchWebsiteUtils.getMainBrowsePage(this))
 
             return@setOnNavigationItemSelectedListener fragmentChanged
         }
@@ -183,6 +185,10 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
             browseUrl(intent.data.toString())
         } else if (intent.getBooleanExtra(EXTRA_SHOULD_OPEN_LIBRARY, false)) {
             setActiveFragment(LIBRARY_FRAGMENT_TAG)
+        } else {
+//            val launchOfflineWebGameId = intent.getIntExtra(EXTRA_LAUNCH_OFFLINE_WEB_GAME_ID, -1)
+//            if (launchOfflineWebGameId != -1)
+//                launchWebGame(launchOfflineWebGameId)
         }
 
         launch {
@@ -208,9 +214,9 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
     override fun onBackPressed() {
         if (browseFragment.isVisible) {
             val cantGoBack = browseFragment.onBackPressed()
-            if (cantGoBack)
-                finish()
-            return
+//            if (cantGoBack)
+//                finish()
+//            return
         }
         //super method handles fragment back stack
         super.onBackPressed()
@@ -304,7 +310,18 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
 
     fun browseUrl(url: String) {
         setActiveFragment(BROWSE_FRAGMENT_TAG)
-        browseFragment.webView.loadUrl(url)
+        browseFragment.loadUrl(url)
+    }
+
+//    private fun launchWebGame(gameId: Int) = launch {
+//        val db = AppDatabase.getDatabase(this@MainActivity)
+//        val game = db.gameDao.getGameById(gameId)!!
+//        launchWebGame(db.gameDao.getGameById(gameId)!!)
+//    }
+
+    fun launchWebGame(game: Game) {
+        setActiveFragment(BROWSE_FRAGMENT_TAG)
+        browseFragment.launchWebGame(game)
     }
 
     private fun onFragmentSet(newFragmentTag: String, resetNavBar: Boolean) {

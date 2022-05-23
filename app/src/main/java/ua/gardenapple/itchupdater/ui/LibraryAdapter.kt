@@ -129,6 +129,8 @@ class LibraryAdapter internal constructor(
                         installer.finishStreamInstall(context, gameInstall.downloadOrInstallId.toInt(), gameInstall.game.name)
                 }
             }
+        } else if (type == GameRepository.Type.WebCached) {
+            (activity as? MainActivity)?.launchWebGame(gameInstall.game)
         } else if (gameInstall.packageName != null) {
             val launchIntent = context.packageManager.getLaunchIntentForPackage(gameInstall.packageName)
             if (launchIntent != null) {
@@ -204,7 +206,8 @@ class LibraryAdapter internal constructor(
             if (!(type == GameRepository.Type.Downloads && gameInstall.externalFileName == null))
                 removeItem(R.id.move_to_downloads)
             if (!((type == GameRepository.Type.Downloads && gameInstall.externalFileName == null) ||
-                        type == GameRepository.Type.Installed))
+                        type == GameRepository.Type.Installed ||
+                        type == GameRepository.Type.WebCached))
                 removeItem(R.id.delete)
             if (!(type == GameRepository.Type.Downloads && gameInstall.externalFileName != null))
                 removeItem(R.id.remove)
@@ -300,44 +303,91 @@ class LibraryAdapter internal constructor(
                     val intent = Intent(Intent.ACTION_DELETE,
                         Uri.parse("package:${gameInstall.packageName}"))
                     context.startActivity(intent)
-                    return true
-                }
+                } else if (type == GameRepository.Type.WebCached) {
+                    if (game.gameId == (activity as? MainActivity)?.runningCachedWebGame?.gameId) {
+                        val dialog = AlertDialog.Builder(context).apply {
+                            setTitle(R.string.dialog_web_cache_delete_fail_title)
+                            setMessage(context.getString(R.string.dialog_web_cache_delete_fail, game.name))
+                            setPositiveButton(android.R.string.ok) { _, _ -> }
+                            setCancelable(true)
 
-                val dialog = AlertDialog.Builder(context).apply {
-                    runBlocking(Dispatchers.IO) {
-                        if (Mitch.fileManager.getDownloadedFile(
-                                gameInstall.uploadId)?.exists() == true) {
-                            setTitle(R.string.dialog_game_delete_title)
-                            setMessage(context.getString(R.string.dialog_game_delete, gameInstall.uploadName))
-                        } else {
-                            //this should only be possible in old versions of Mitch
-                            setTitle(R.string.dialog_game_remove_title)
-                            setMessage(context.getString(R.string.dialog_game_remove, gameInstall.uploadName))
+                            create()
                         }
+                        dialog.show()
+                    } else {
+                        val dialog = AlertDialog.Builder(context).apply {
+                            setTitle(R.string.dialog_web_cache_delete_title)
+                            setMessage(context.getString(R.string.dialog_app_delete, game.name))
+                            setPositiveButton(R.string.dialog_yes) { _, _ ->
+                                mainActivityScope.launch {
+                                    Mitch.webGameCache.deleteCacheForGame(context, game)
+
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(
+                                            R.string.popup_game_deleted,
+                                            game.name
+                                        ),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                            setNegativeButton(R.string.dialog_no) { _, _ -> }
+                            setCancelable(true)
+
+                            create()
+                        }
+                        dialog.show()
                     }
+                } else {
+                    val dialog = AlertDialog.Builder(context).apply {
+                        runBlocking(Dispatchers.IO) {
+                            if (Mitch.fileManager.getDownloadedFile(
+                                    gameInstall.uploadId
+                                )?.exists() == true
+                            ) {
+                                setTitle(R.string.dialog_game_delete_title)
+                                setMessage(
+                                    context.getString(
+                                        R.string.dialog_game_delete,
+                                        gameInstall.uploadName
+                                    )
+                                )
+                            } else {
+                                //this should only be possible in old versions of Mitch
+                                setTitle(R.string.dialog_game_remove_title)
+                                setMessage(
+                                    context.getString(
+                                        R.string.dialog_game_remove,
+                                        gameInstall.uploadName
+                                    )
+                                )
+                            }
+                        }
 
-                    setPositiveButton(R.string.dialog_delete) { _, _ ->
-                        mainActivityScope.launch(Dispatchers.Main) {
-                            Installations.deleteFinishedInstall(context, gameInstall.uploadId)
+                        setPositiveButton(R.string.dialog_delete) { _, _ ->
+                            mainActivityScope.launch(Dispatchers.Main) {
+                                Installations.deleteFinishedInstall(context, gameInstall.uploadId)
 
-                            Toast.makeText(
-                                context,
-                                context.getString(
+                                Toast.makeText(
+                                    context,
+                                    context.getString(
                                         R.string.popup_game_deleted,
                                         gameInstall.uploadName
                                     ),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
-                    }
 
-                    setNegativeButton(R.string.dialog_cancel) { _, _ ->
-                        //no-op
-                    }
+                        setNegativeButton(R.string.dialog_cancel) { _, _ ->
+                            //no-op
+                        }
 
-                    create()
+                        create()
+                    }
+                    dialog.show()
                 }
-                dialog.show()
                 return true
             }
             R.id.remove -> {

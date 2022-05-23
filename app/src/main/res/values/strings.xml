@@ -31,6 +31,7 @@
     <string name="notification_install_storage_title">Installation failed: storage issues</string>
     <string name="library_category_installed">Installed apps</string>
     <string name="library_category_downloads">Downloads</string>
+    <string name="library_category_web_cached">Web games</string>
     <string name="game_go_to_store">Show store page</string>
     <string name="game_package_info">Show app info</string>
     <string name="game_download_remove">Remove from app</string>
@@ -182,4 +183,15 @@
     <string name="bundle_claim_error">Could not access download link for the bundle.</string>
     <string name="notification_download_no_space">Not enough storage space for this file</string>
     <string name="bundle">Special bundles</string>
+    <string name="dialog_web_cache_info_title">Installing web games</string>
+    <string name="dialog_web_cache_info">Mitch can automatically save web games for later offline playing.</string>
+    <string name="settings_web_cache_enable">Save web games</string>
+    <string name="settings_web_cache_enable_desc">Install all played web-games for later offline playing.</string>
+    <string name="settings_web_cache_update">Update saved web games</string>
+    <string name="settings_web_cache_update_never">Never</string>
+    <string name="settings_web_cache_update_unmetered">When launched on an unmetered connection</string>
+    <string name="settings_web_cache_update_always">When launched anytime</string>
+    <string name="dialog_web_cache_delete_title">Delete this game?</string>
+    <string name="dialog_web_cache_delete_fail_title">Can\'t delete now</string>
+    <string name="dialog_web_cache_delete_fail">%1$s cannot be deleted because it is currently running.</string>
 </resources>

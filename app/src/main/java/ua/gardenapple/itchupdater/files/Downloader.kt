@@ -234,10 +234,10 @@ object Downloader : DownloadFileListener() {
             response: Response, outputStream: OutputStream, fileName: String,
             downloadId: Long, uploadId: Int
         ) = withContext(Dispatchers.IO) {
-            val totalBytes = response.body!!.contentLength()
+            val totalBytes = response.body.contentLength()
             var progressPercent: Long = 0
 
-            val body = response.body!!
+            val body = response.body
 
             BufferedInputStream(body.byteStream()).use { inputStream ->
                 Utils.cancellableCopy(inputStream, outputStream) { bytesRead ->

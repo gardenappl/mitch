@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import ua.gardenapple.itchupdater.database.game.Game.Companion.GAME_ID
 import ua.gardenapple.itchupdater.database.game.Game.Companion.TABLE_NAME
+import ua.gardenapple.itchupdater.database.game.Game.Companion.WEB_ENTRY_POINT
 import ua.gardenapple.itchupdater.database.installation.GameInstallation
 import ua.gardenapple.itchupdater.database.installation.Installation
 import ua.gardenapple.itchupdater.database.installation.Installation.Companion.DOWNLOAD_OR_INSTALL_ID
@@ -21,6 +22,7 @@ abstract class GameDao {
 
     @Query("SELECT * FROM $TABLE_NAME")
     abstract suspend fun getAllKnownGamesSync(): List<Game>
+
 
     @Query("""
         SELECT games.*, installations.$STATUS as status, 
@@ -64,6 +66,10 @@ abstract class GameDao {
         ON games.$GAME_ID = installations.game_id
         WHERE $STATUS != ${Installation.STATUS_INSTALLED}""")
     abstract fun getPendingGames(): LiveData<List<GameInstallation>>
+
+
+    @Query("SELECT * FROM $TABLE_NAME WHERE $WEB_ENTRY_POINT IS NOT NULL")
+    abstract fun getCachedWebGames(): LiveData<List<Game>>
 
 
     @Query("""
