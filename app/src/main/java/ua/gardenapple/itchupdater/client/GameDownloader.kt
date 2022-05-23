@@ -98,7 +98,7 @@ object GameDownloader {
                     throw IOException("Unexpected code $response")
 
                 //Log.d(LOGGING_TAG, "Response: ${response.body!!.string()}")
-                response.body!!.string()
+                response.body.string()
             }
         }
 
@@ -130,7 +130,7 @@ object GameDownloader {
 
                 mimeType = response.header("Content-Type")?.split(';')!![0]
                 contentDisposition = response.header("Content-Disposition")
-                contentLength = response.body?.contentLength()
+                contentLength = response.body.contentLength()
                 if (contentLength?.equals(-1L) == true)
                     contentLength = null
             }

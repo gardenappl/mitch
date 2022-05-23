@@ -113,7 +113,7 @@ object ItchWebsiteUtils {
             if (!response.isSuccessful)
                 throw IOException("Unexpected response $response")
 
-            val body = response.body!!
+            val body = response.body
             body.byteStream().use { bodyStream ->
                 return@withContext Jsoup.parse(bodyStream, body.contentType()?.charset()?.name(), url)
             }

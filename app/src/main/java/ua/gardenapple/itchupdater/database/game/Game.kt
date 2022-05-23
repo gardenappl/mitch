@@ -48,7 +48,18 @@ data class Game(
      * Set to null for projects where the timestamp is not available.
      */
     @ColumnInfo(name = LAST_UPDATED_TIMESTAMP)
-    val lastUpdatedTimestamp: String? = null
+    val lastUpdatedTimestamp: String? = null,
+
+    /*
+     * URL of the initial HTML page for a (cached) web game
+     * Set to null for games which are not cached web games
+     */
+    @ColumnInfo(name = WEB_ENTRY_POINT)
+    val webEntryPoint: String? = null,
+
+    @Deprecated("Currently unused field")
+    @ColumnInfo(name = WEB_CACHED)
+    val webCached: Boolean = false
 ) {
     companion object {
         const val MITCH_GAME_ID = 544475
@@ -65,6 +76,8 @@ data class Game(
         const val LOCALE = "locale"
         const val THUMBNAIL_URL = "thumbnail_url"
         const val LAST_UPDATED_TIMESTAMP = "last_timestamp"
+        const val WEB_ENTRY_POINT = "web_entry_point"
+        const val WEB_CACHED = "web_cached"
     }
 
     @Ignore

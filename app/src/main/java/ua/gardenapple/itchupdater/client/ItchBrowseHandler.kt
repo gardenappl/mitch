@@ -46,7 +46,9 @@ class ItchBrowseHandler(private val context: Context) {
         val purchasedInfo: ItchWebsiteParser.PurchasedInfo?,
         val paymentInfo: ItchWebsiteParser.PaymentInfo?,
         val hasAndroidVersion: Boolean,
-        val hasWindowsMacOrLinuxVersion: Boolean
+        val hasWindowsMacOrLinuxVersion: Boolean,
+        val isRunningCachedWebGame: Boolean = false,
+        val isCachedWebGameOffline: Boolean = false
     )
 
     suspend fun onPageVisited(doc: Document, url: String): Info {
@@ -64,9 +66,11 @@ class ItchBrowseHandler(private val context: Context) {
         if (ItchWebsiteUtils.isStorePage(doc)) {
             val db = AppDatabase.getDatabase(context)
             ItchWebsiteParser.getGameInfoForStorePage(doc, url)?.let { gameInfo ->
-                game = gameInfo
+                game = gameInfo.copy(
+                    webEntryPoint = db.gameDao.getGameById(gameInfo.gameId)?.webEntryPoint
+                )
                 Log.d(LOGGING_TAG, "Adding game $game")
-                db.gameDao.upsert(gameInfo)
+                db.gameDao.upsert(game!!)
 
                 for (bundle in SpecialBundle.values()) {
                     if (bundle.containsGame(gameInfo.gameId)) {
@@ -119,6 +123,20 @@ class ItchBrowseHandler(private val context: Context) {
             paymentInfo = paymentInfo,
             hasAndroidVersion = hasAndroidVersion,
             hasWindowsMacOrLinuxVersion = hasWindowsMacLinuxVersion
+        )
+    }
+
+    fun onStartedOfflineWebGame(game: Game): Info {
+        return Info(
+            game = game,
+            specialBundle = null,
+            bundleDownloadLink = null,
+            purchasedInfo = null,
+            paymentInfo = null,
+            hasAndroidVersion = false,
+            hasWindowsMacOrLinuxVersion = false,
+            isRunningCachedWebGame = true,
+            isCachedWebGameOffline = true
         )
     }
 

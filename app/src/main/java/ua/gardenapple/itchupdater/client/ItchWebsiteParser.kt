@@ -341,7 +341,7 @@ object ItchWebsiteParser {
                     throw IOException("Unexpected code $response")
 
                 //Log.d(LOGGING_TAG, "Response: ${response.body!!.string()}")
-                response.body!!.string()
+                response.body.string()
             }
         }
 

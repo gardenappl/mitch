@@ -182,4 +182,16 @@
     <string name="bundle_claim_all_desc">Присвоїти всі ігри з набору зараз.</string>
     <string name="bundle_claim_error">Не вдалося завантажити сторінку набору.</string>
     <string name="bundle">Особливі бандли ігор</string>
+    <string name="library_category_web_cached">Веб-ігри</string>
+    <string name="dialog_web_cache_info_title">Встановлення веб-ігор</string>
+    <string name="dialog_web_cache_info">Mitch може автоматично встановлювати веб-ігри для їх запуску в офлайн-режимі.</string>
+    <string name="settings_web_cache_enable">Завантажувати веб-ігри</string>
+    <string name="settings_web_cache_enable_desc">Встановлювати всі запущені веб-ігри для їх подальшого запуску в офлайн-режимі.</string>
+    <string name="settings_web_cache_update">Оновлювати збережені веб-ігри</string>
+    <string name="settings_web_cache_update_never">Ніколи</string>
+    <string name="settings_web_cache_update_unmetered">При запуску з безлімітним підключенням</string>
+    <string name="settings_web_cache_update_always">При будь-якому запуску</string>
+    <string name="dialog_web_cache_delete_title">Видалити гру?</string>
+    <string name="dialog_web_cache_delete_fail_title">Неможливо зараз видалити</string>
+    <string name="dialog_web_cache_delete_fail">%1$s не можна видалити оскільки ця гра зараз запущена.</string>
 </resources>

@@ -199,27 +199,28 @@ object Utils {
      *
      * https://stackoverflow.com/a/53532456/5701177
      */
-    fun isNetworkConnected(context: Context): Boolean {
+    fun isNetworkConnected(context: Context, requireUnmetered: Boolean = false): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val activeNetwork = connectivityManager.activeNetwork ?: return false
             val networkCapabilities =
                 connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
-            return when {
+            val isInternet = when {
                 networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
                 networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
                 networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
                 else -> false
             }
+            return isInternet && (!requireUnmetered
+                    || networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED))
         } else {
             @Suppress("DEPRECATION")
             val networkInfo = connectivityManager.activeNetworkInfo ?: return false
-
             @Suppress("DEPRECATION")
             return when (networkInfo.type) {
                 ConnectivityManager.TYPE_WIFI -> true
-                ConnectivityManager.TYPE_MOBILE -> true
+                ConnectivityManager.TYPE_MOBILE -> !requireUnmetered
                 ConnectivityManager.TYPE_ETHERNET -> true
                 else -> false
             }

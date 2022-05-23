@@ -8,17 +8,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.ListPreloader
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
 import com.bumptech.glide.util.FixedPreloadSizeProvider
-import ua.gardenapple.itchupdater.database.game.GameDownloadsViewModel
-import ua.gardenapple.itchupdater.database.game.GameRepository
-import ua.gardenapple.itchupdater.database.game.InstalledGameViewModel
-import ua.gardenapple.itchupdater.database.game.PendingGameViewModel
+import ua.gardenapple.itchupdater.database.game.*
+import ua.gardenapple.itchupdater.database.game.GameViewModel
 import ua.gardenapple.itchupdater.database.installation.GameInstallation
 import ua.gardenapple.itchupdater.databinding.LibraryFragmentBinding
 import java.util.*
@@ -29,10 +29,9 @@ class LibraryFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-
-    private lateinit var pendingViewModel: PendingGameViewModel
-    private lateinit var installedViewModel: InstalledGameViewModel
-    private lateinit var downloadsViewModel: GameDownloadsViewModel
+//    private lateinit var pendingViewModel: PendingGameViewModel
+//    private lateinit var installedViewModel: InstalledGameViewModel
+//    private lateinit var downloadsViewModel: GameDownloadsViewModel
 
     companion object {
         //2x of 315x250
@@ -50,88 +49,34 @@ class LibraryFragment : Fragment() {
         _binding = LibraryFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        val pendingAdapter = LibraryAdapter(requireActivity(), binding.pendingList, GameRepository.Type.Pending)
-        binding.pendingList.adapter = pendingAdapter
-        binding.pendingList.layoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-
-        //Glide thumbnail handling
-        var sizeProvider = FixedPreloadSizeProvider<GameInstallation>(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT)
-        var modelProvider = LibraryPreloadModelProvider(pendingAdapter)
-        var preloader = RecyclerViewPreloader(
-            Glide.with(this), modelProvider, sizeProvider, 6
-        )
-        binding.pendingList.addOnScrollListener(preloader)
-
-        pendingViewModel = ViewModelProvider(this).get(PendingGameViewModel::class.java)
-        pendingViewModel.pendingGames.observe(viewLifecycleOwner, { gameInstalls ->
-            gameInstalls?.let { pendingAdapter.gameInstalls = gameInstalls }
+        addList(
+            GameRepository.Type.Pending,
+            binding.pendingList,
+            GameViewModel.Pending::class.java
+        ) { gameInstalls ->
             view.post {
                 _binding?.let { binding ->
-                    if (gameInstalls?.isNotEmpty() == true) {
-                        binding.pendingList.visibility = View.VISIBLE
+                    if (gameInstalls.isNotEmpty()) {
                         binding.pendingLabel.visibility = View.VISIBLE
+                        binding.pendingList.visibility = View.VISIBLE
                         binding.pendingDivider.visibility = View.VISIBLE
                     } else {
-                        binding.pendingList.visibility = View.GONE
                         binding.pendingLabel.visibility = View.GONE
+                        binding.pendingList.visibility = View.GONE
                         binding.pendingDivider.visibility = View.GONE
                     }
                 }
             }
-        })
+        }
 
-
-        val downloadsAdapter = LibraryAdapter(requireActivity(), binding.downloadsList, GameRepository.Type.Downloads)
-        binding.downloadsList.adapter = downloadsAdapter
-        binding.downloadsList.layoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-
-        //Glide thumbnail handling
-        sizeProvider = FixedPreloadSizeProvider<GameInstallation>(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT)
-        modelProvider = LibraryPreloadModelProvider(downloadsAdapter)
-        preloader = RecyclerViewPreloader(
-            Glide.with(this), modelProvider, sizeProvider, 6
-        )
-        binding.downloadsList.addOnScrollListener(preloader)
-
-        downloadsViewModel = ViewModelProvider(this).get(GameDownloadsViewModel::class.java)
-        downloadsViewModel.gameDownloads.observe(viewLifecycleOwner, { gameInstalls ->
-            gameInstalls?.let { downloadsAdapter.gameInstalls = gameInstalls }
+        addList(
+            GameRepository.Type.Installed,
+            binding.installedList,
+            GameViewModel.Installed::class.java
+        ) { gameInstalls ->
             view.post {
                 _binding?.let { binding ->
-                    if (gameInstalls?.isNotEmpty() == true) {
-                        binding.downloadsNothing.visibility = View.VISIBLE
-                        binding.downloadsNothing.visibility = View.GONE
-                    } else {
-                        binding.downloadsNothing.visibility = View.GONE
-                        binding.downloadsNothing.visibility = View.VISIBLE
-                    }
-                }
-            }
-        })
-
-
-
-        val installedAdapter = LibraryAdapter(requireActivity(), binding.installedList, GameRepository.Type.Installed)
-        binding.installedList.adapter = installedAdapter
-        binding.installedList.layoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-
-        //Glide thumbnail handling
-        sizeProvider = FixedPreloadSizeProvider<GameInstallation>(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT)
-        modelProvider = LibraryPreloadModelProvider(installedAdapter)
-        preloader = RecyclerViewPreloader(
-            Glide.with(this), modelProvider, sizeProvider, 6
-        )
-        binding.installedList.addOnScrollListener(preloader)
-
-        installedViewModel = ViewModelProvider(this).get(InstalledGameViewModel::class.java)
-        installedViewModel.installedGames.observe(viewLifecycleOwner, Observer { gameInstalls ->
-            gameInstalls?.let { installedAdapter.gameInstalls = gameInstalls }
-            view.post {
-                _binding?.let { binding ->
-                    if (gameInstalls?.isNotEmpty() == true) {
+                    if (gameInstalls.isNotEmpty()) {
                         binding.installedList.visibility = View.VISIBLE
                         binding.installedNothing.visibility = View.GONE
                     } else {
@@ -140,7 +85,45 @@ class LibraryFragment : Fragment() {
                     }
                 }
             }
-        })
+        }
+
+        addList(
+            GameRepository.Type.WebCached,
+            binding.webCachedList,
+            GameViewModel.WebCached::class.java
+        ) { gameInstalls ->
+            view.post {
+                _binding?.let { binding ->
+                    if (gameInstalls.isNotEmpty()) {
+                        binding.webCachedLabel.visibility = View.VISIBLE
+                        binding.webCachedList.visibility = View.VISIBLE
+                        binding.installedNothingWebWrapper.visibility = View.GONE
+                    } else {
+                        binding.webCachedLabel.visibility = View.GONE
+                        binding.webCachedList.visibility = View.GONE
+                        binding.installedNothingWebWrapper.visibility = View.VISIBLE
+                    }
+                }
+            }
+        }
+
+        addList(
+            GameRepository.Type.Downloads,
+            binding.downloadsList,
+            GameViewModel.Downloads::class.java
+        ) { gameInstalls ->
+            view.post {
+                _binding?.let { binding ->
+                    if (gameInstalls.isNotEmpty()) {
+                        binding.downloadsList.visibility = View.VISIBLE
+                        binding.downloadsNothing.visibility = View.GONE
+                    } else {
+                        binding.downloadsList.visibility = View.GONE
+                        binding.downloadsNothing.visibility = View.VISIBLE
+                    }
+                }
+            }
+        }
 
         // Owned items
         binding.ownedButton.setOnClickListener { 
@@ -151,11 +134,40 @@ class LibraryFragment : Fragment() {
         return view
     }
 
+    private fun <T : GameViewModel> addList(
+        type: GameRepository.Type,
+        list: RecyclerView,
+        viewModelClass: Class<T>,
+        onObserve: (List<GameInstallation>) -> Unit
+    ) {
+        val adapter = LibraryAdapter(requireActivity(), list, type)
+        list.adapter = adapter
+        list.layoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+
+        //Glide thumbnail handling
+        val sizeProvider =
+            FixedPreloadSizeProvider<GameInstallation>(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT)
+        val modelProvider = LibraryPreloadModelProvider(adapter)
+        val preloader = RecyclerViewPreloader(
+            Glide.with(this), modelProvider, sizeProvider, 6
+        )
+        list.addOnScrollListener(preloader)
+
+        val viewModel = ViewModelProvider(this).get(viewModelClass)
+        viewModel.games.observe(viewLifecycleOwner) { gameInstalls ->
+            gameInstalls?.let {
+                adapter.gameInstalls = gameInstalls
+                onObserve(gameInstalls)
+            }
+        }
+    }
+
     private inner class LibraryPreloadModelProvider(
         val adapter: LibraryAdapter
     ) : ListPreloader.PreloadModelProvider<GameInstallation> {
         override fun getPreloadItems(position: Int): MutableList<GameInstallation> {
-            if(adapter.gameInstalls.isEmpty())
+            if (adapter.gameInstalls.isEmpty())
                 return Collections.emptyList()
             else
                 return Collections.singletonList(adapter.gameInstalls[position])

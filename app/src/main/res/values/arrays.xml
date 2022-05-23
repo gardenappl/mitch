@@ -51,4 +51,15 @@
         <item>site</item>
         <item>system</item>
     </string-array>
+
+    <string-array name="pref_web_cache_update_entries">
+        <item>@string/settings_web_cache_update_always</item>
+        <item>@string/settings_web_cache_update_unmetered</item>
+        <item>@string/settings_web_cache_update_never</item>
+    </string-array>
+    <string-array name="pref_web_cache_update_values">
+        <item>always</item>
+        <item>unmetered</item>
+        <item>never</item>
+    </string-array>
 </resources>

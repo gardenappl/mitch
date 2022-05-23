@@ -39,8 +39,7 @@ object ItchLibraryParser {
                 if (response.isRedirect)
                     return@withContext null
 
-                response.body?.string()
-                        ?: throw IOException("Expected response body, got null")
+                response.body.string()
             }
         } ?: return null
 
