@@ -25,13 +25,9 @@ import java.util.*
 
 class LibraryFragment : Fragment() {
     private var _binding: LibraryFragmentBinding? = null
-    // This property is only valid between onCreateView and
-    // onDestroyView.
+    /** This property is only valid between onCreateView and
+     *  onDestroyView. */
     private val binding get() = _binding!!
-
-//    private lateinit var pendingViewModel: PendingGameViewModel
-//    private lateinit var installedViewModel: InstalledGameViewModel
-//    private lateinit var downloadsViewModel: GameDownloadsViewModel
 
     companion object {
         //2x of 315x250
@@ -119,7 +115,8 @@ class LibraryFragment : Fragment() {
                         binding.downloadsNothing.visibility = View.GONE
                     } else {
                         binding.downloadsList.visibility = View.GONE
-                        binding.downloadsNothing.visibility = View.VISIBLE
+//                        binding.downloadsNothing.visibility = View.VISIBLE
+                        binding.downloadsNothing.visibility = View.GONE
                     }
                 }
             }

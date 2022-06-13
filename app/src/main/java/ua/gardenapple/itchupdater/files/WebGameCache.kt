@@ -31,12 +31,13 @@ class WebGameCache(context: Context) {
     private val cacheHttpClients = HashMap<Int, OkHttpClient>()
 
     fun shouldHandleRequest(
-        context: Context,
+        context: Context?,
         game: Game?,
         request: WebResourceRequest,
         isOfflineWebGame: Boolean
-    ) = (isOfflineWebGame || PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREF_WEB_CACHE_ENABLE, true))
-            && game != null && request.url.host?.endsWith(".ssl.hwcdn.net") == true
+    ) = context != null && game != null
+            && (isOfflineWebGame || PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREF_WEB_CACHE_ENABLE, true))
+            && request.url.host?.endsWith(".ssl.hwcdn.net") == true
 
     suspend fun request(
         context: Context,

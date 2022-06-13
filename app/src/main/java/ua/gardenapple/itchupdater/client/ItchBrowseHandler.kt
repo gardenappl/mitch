@@ -43,10 +43,11 @@ class ItchBrowseHandler(private val context: Context) {
         val specialBundle: SpecialBundle?,
         val bundleDownloadLink: String?,
         val game: Game?,
-        val purchasedInfo: ItchWebsiteParser.PurchasedInfo?,
+        val purchasedInfo: List<ItchWebsiteParser.PurchasedInfo>,
         val paymentInfo: ItchWebsiteParser.PaymentInfo?,
         val hasAndroidVersion: Boolean,
         val hasWindowsMacOrLinuxVersion: Boolean,
+        val webLaunchLabel: String? = null,
         val isRunningCachedWebGame: Boolean = false,
         val isCachedWebGameOffline: Boolean = false
     )
@@ -58,16 +59,19 @@ class ItchBrowseHandler(private val context: Context) {
         var game: Game? = null
         var specialBundle: SpecialBundle? = null
         var bundleLink: String? = null
-        var purchasedInfo: ItchWebsiteParser.PurchasedInfo? = null
+        var purchasedInfo: List<ItchWebsiteParser.PurchasedInfo> = emptyList()
         var paymentInfo: ItchWebsiteParser.PaymentInfo? = null
         var hasAndroidVersion = false
         var hasWindowsMacLinuxVersion = false
+        var webLaunchLabel: String? = null
 
         if (ItchWebsiteUtils.isStorePage(doc)) {
             val db = AppDatabase.getDatabase(context)
             ItchWebsiteParser.getGameInfoForStorePage(doc, url)?.let { gameInfo ->
+                val (webEntryPoint, webLabel) = ItchWebsiteParser.getWebGameUrlAndLabel(context, doc)
+                webLaunchLabel = webLabel
                 game = gameInfo.copy(
-                    webEntryPoint = db.gameDao.getGameById(gameInfo.gameId)?.webEntryPoint
+                    webEntryPoint = webEntryPoint
                 )
                 Log.d(LOGGING_TAG, "Adding game $game")
                 db.gameDao.upsert(game!!)
@@ -88,8 +92,7 @@ class ItchBrowseHandler(private val context: Context) {
                 }
             }
             purchasedInfo = ItchWebsiteParser.getPurchasedInfo(doc)
-            if (purchasedInfo == null)
-                paymentInfo = ItchWebsiteParser.getPaymentInfo(doc)
+            paymentInfo = ItchWebsiteParser.getPaymentInfo(doc)
 
             hasAndroidVersion = ItchWebsiteParser.hasAndroidInstallation(doc)
             hasWindowsMacLinuxVersion = ItchWebsiteParser.hasWindowsMacLinuxInstallation(doc)
@@ -122,7 +125,8 @@ class ItchBrowseHandler(private val context: Context) {
             purchasedInfo = purchasedInfo,
             paymentInfo = paymentInfo,
             hasAndroidVersion = hasAndroidVersion,
-            hasWindowsMacOrLinuxVersion = hasWindowsMacLinuxVersion
+            hasWindowsMacOrLinuxVersion = hasWindowsMacLinuxVersion,
+            webLaunchLabel = webLaunchLabel
         )
     }
 
@@ -131,7 +135,7 @@ class ItchBrowseHandler(private val context: Context) {
             game = game,
             specialBundle = null,
             bundleDownloadLink = null,
-            purchasedInfo = null,
+            purchasedInfo = emptyList(),
             paymentInfo = null,
             hasAndroidVersion = false,
             hasWindowsMacOrLinuxVersion = false,

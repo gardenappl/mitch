@@ -130,7 +130,15 @@ class LibraryAdapter internal constructor(
                 }
             }
         } else if (type == GameRepository.Type.WebCached) {
-            (activity as? MainActivity)?.launchWebGame(gameInstall.game)
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse(gameInstall.game.webEntryPoint),
+                context,
+                GameActivity::class.java
+            )
+            intent.putExtra(GameActivity.EXTRA_GAME_ID, gameInstall.game.gameId)
+            intent.putExtra(GameActivity.EXTRA_IS_OFFLINE, true)
+            context.startActivity(intent)
         } else if (gameInstall.packageName != null) {
             val launchIntent = context.packageManager.getLaunchIntentForPackage(gameInstall.packageName)
             if (launchIntent != null) {

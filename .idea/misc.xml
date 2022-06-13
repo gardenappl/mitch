@@ -3,8 +3,14 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/activity_game.xml" value="0.1" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/activity_main.xml" value="0.15833333333333333" />
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/browse_fragment.xml" value="0.1" />
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/bundles_activity.xml" value="0.15" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/dialog_game_get.xml" value="0.5" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/dialog_game_get_button.xml" value="0.5" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/dialog_game_get_item.xml" value="1.0" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/dialog_game_get_label.xml" value="0.4803921568627451" />
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/dialog_search.xml" value="0.1" />
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/dialog_web_prompt.xml" value="0.1" />
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/library_fragment.xml" value="0.22" />

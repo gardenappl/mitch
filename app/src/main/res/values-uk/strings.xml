@@ -194,4 +194,6 @@
     <string name="dialog_web_cache_delete_title">Видалити гру?</string>
     <string name="dialog_web_cache_delete_fail_title">Неможливо зараз видалити</string>
     <string name="dialog_web_cache_delete_fail">%1$s не можна видалити оскільки ця гра зараз запущена.</string>
+    <string name="game_web_play_desc">Запустити веб-версію</string>
+    <string name="game_web_play_default_type">Грати</string>
 </resources>

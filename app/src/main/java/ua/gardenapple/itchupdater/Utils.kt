@@ -290,8 +290,8 @@ object Utils {
             if (version1Parts[i] < version2Parts[i]) return -1
             if (version1Parts[i] > version2Parts[i]) return 1
         }
-	if (version1Parts.size > version2Parts.size)
-		return 1
+        if (version1Parts.size > version2Parts.size)
+            return 1
         return 0
     }
 

@@ -47,7 +47,8 @@
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
             <TextView
                     android:id="@+id/owned_label"
                     android:layout_width="wrap_content"
@@ -72,7 +73,8 @@
                 android:layout_height="1dp"
                 android:layout_marginVertical="5dp"
                 android:layout_marginHorizontal="10dp"
-                android:background="@color/colorForegroundSecondary" />
+                android:background="@color/colorForegroundSecondary"
+                android:visibility="gone" />
 
         <TextView
                 android:id="@+id/installed_label"
@@ -143,6 +145,7 @@
 
         <TextView
                 android:id="@+id/downloads_label"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="10dp"
@@ -170,12 +173,6 @@
                 tools:listitem="@layout/library_item" >
 
         </androidx.recyclerview.widget.RecyclerView>
-
-<!--        <View-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="1dp"-->
-<!--                android:layout_marginVertical="5dp"-->
-<!--                android:background="@color/colorForegroundSecondary" />-->
     </LinearLayout>
 
 </ScrollView>
