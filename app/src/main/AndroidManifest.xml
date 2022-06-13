@@ -36,7 +36,6 @@
         <activity
                 android:name=".ui.MainActivity"
                 android:theme="@style/SplashScreenTheme"
-                android:label="@string/app_name"
                 android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|uiMode" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -88,12 +87,9 @@
                 android:finishOnTaskLaunch="true"
                 android:launchMode="singleInstance"/>
         <activity
-                android:name=".install.SessionInstallerActivity"
-                android:exported="false"
-                android:theme="@style/DialogStyle"
-                android:excludeFromRecents="true"
-                android:finishOnTaskLaunch="true"
-                android:launchMode="singleInstance"/>
+                android:name=".ui.GameActivity"
+                android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+                android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|uiMode"/>
 
         <receiver
                 android:name=".install.InstallRequestBroadcastReceiver"

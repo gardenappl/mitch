@@ -1,5 +1,6 @@
 package ua.gardenapple.itchupdater.client
 
+import android.content.Context
 import android.graphics.Color
 import android.net.Uri
 import android.util.Log
@@ -10,10 +11,12 @@ import kotlinx.coroutines.withContext
 import okhttp3.FormBody
 import okhttp3.Request
 import org.json.JSONObject
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import ua.gardenapple.itchupdater.ItchWebsiteUtils
 import ua.gardenapple.itchupdater.Mitch
+import ua.gardenapple.itchupdater.R
 import ua.gardenapple.itchupdater.Utils
 import ua.gardenapple.itchupdater.database.game.Game
 import ua.gardenapple.itchupdater.database.installation.Installation
@@ -207,36 +210,31 @@ object ItchWebsiteParser {
         return "https://${gamePageUri.host}"
     }
 
-    /**
-     * @return null if the user did not purchase this item
-     */
-    fun getPurchasedInfo(doc: Document): PurchasedInfo? {
-        val purchaseBanner = doc.selectFirst(".purchase_banner_inner") ?: return null
+    fun getPurchasedInfo(doc: Document): List<PurchasedInfo> {
+        val purchaseBanner = doc.selectFirst(".purchase_banner_inner") ?: return emptyList()
 
         Log.d(LOGGING_TAG, "Purchased game")
-        val downloadButtonRow = purchaseBanner.getElementsByClass("key_row").sortedBy {
+        return purchaseBanner.getElementsByClass("key_row").sortedBy {
             val price = it.selectFirst(".purchase_price") ?: return@sortedBy 0
 
             Log.d(LOGGING_TAG, "Paid: ${price.html().removePrefix("$").replace(".", "")}")
             return@sortedBy price.html().removePrefix("$").replace(".", "").toInt()
-        }.last()
+        }.map { downloadButtonRow ->
+            //Reformat cloned element
 
+            val ownershipReason = downloadButtonRow.selectFirst(".ownership_reason")!!.clone()
 
-        //Reformat cloned element
+            val purchasedPrice: Element? = ownershipReason.selectFirst(".purchase_price")
+            purchasedPrice?.replaceWith(Element("b").text(purchasedPrice.ownText()))
 
-        val ownershipReason = downloadButtonRow.selectFirst(".ownership_reason")!!.clone()
+            val ownDate: Element? = ownershipReason.selectFirst(".own_date")
+            ownDate?.replaceWith(Element("i").text(ownDate.ownText()))
 
-        val purchasedPrice: Element? = ownershipReason.selectFirst(".purchase_price")
-        purchasedPrice?.replaceWith(Element("b").text(purchasedPrice.ownText()))
-
-        val ownDate: Element? = ownershipReason.selectFirst(".own_date")
-        ownDate?.replaceWith(Element("i").text(ownDate.ownText()))
-
-
-        return PurchasedInfo(
-            ownershipReasonHtml = ownershipReason.html(),
-            downloadPage = downloadButtonRow.selectFirst(".button")!!.attr("href")
-        )
+            PurchasedInfo(
+                ownershipReasonHtml = ownershipReason.html(),
+                downloadPage = downloadButtonRow.selectFirst(".button")!!.attr("href")
+            )
+        }
     }
 
     /**
@@ -293,8 +291,8 @@ object ItchWebsiteParser {
     suspend fun getDownloadUrl(doc: Document, storeUrl: String): DownloadUrl? {
         //The game has been bought
         val purchaseInfo = getPurchasedInfo(doc)
-        if (purchaseInfo != null)
-            return DownloadUrl(purchaseInfo.downloadPage, isPermanent = true, isStorePage = false)
+        if (purchaseInfo.isNotEmpty())
+            return DownloadUrl(purchaseInfo.first().downloadPage, isPermanent = true, isStorePage = false)
 
         //The game is free and the store page provides download links
         if (doc.selectFirst(".download_btn") != null)
@@ -441,5 +439,18 @@ object ItchWebsiteParser {
     fun getForumOrJamName(doc: Document): String {
         return doc.selectFirst(".jam_title_header, .game_summary h1")?.text()
             ?: throw IllegalArgumentException("Could not find game jam or forum name")
+    }
+
+    fun getWebGameUrlAndLabel(context: Context, doc: Document): Pair<String?, String?> {
+        val placeholder = doc.selectFirst(".iframe_placeholder")
+        if (placeholder != null) {
+            val sourceUrl = placeholder.attr("data-iframe").let { value ->
+                Jsoup.parse(value).selectFirst("iframe")
+            }?.attr("src")
+            return Pair(sourceUrl, placeholder.selectFirst(".load_iframe_btn")?.text())
+        } else {
+            val sourceUrl = doc.getElementById("game_drop")?.attr("src")
+            return Pair(sourceUrl, context.getString(R.string.game_web_play_default_type))
+        }
     }
 }

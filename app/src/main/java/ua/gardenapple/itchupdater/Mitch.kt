@@ -75,6 +75,7 @@ object PreferenceWebCacheUpdate {
     const val UNMETERED = "unmetered"
     const val ALWAYS ="always"
 }
+const val PREF_BROWSE_START_PAGE = "mitch.browse_start_page"
 
 
 

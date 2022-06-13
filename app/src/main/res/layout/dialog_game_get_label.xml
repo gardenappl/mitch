@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="50dp"
+        android:layout_width="wrap_content">
+
+    <TextView
+            android:id="@+id/game_get_dialog_option_label"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="10dp"
+            android:maxLines="2"
+            android:text="$5.10 or more, or maybe there is a lot of text in here, I don't really know" />
+</FrameLayout>

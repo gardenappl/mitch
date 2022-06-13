@@ -194,4 +194,10 @@
     <string name="dialog_web_cache_delete_title">Delete this game?</string>
     <string name="dialog_web_cache_delete_fail_title">Can\'t delete now</string>
     <string name="dialog_web_cache_delete_fail">%1$s cannot be deleted because it is currently running.</string>
+    <string name="game_web_play_default_type">Play</string>
+    <string name="game_web_play_desc">Play the web version now</string>
+    <string name="game_multiple_options_get">Get →</string>
+    <string name="game_multiple_options_desc_web_or_download">Play now or download</string>
+    <string name="game_multiple_options_desc_web_or_buy">Play now or purchase</string>
+    <string name="game_multiple_options_desc_multiple_purchases">Multiple purchases</string>
 </resources>

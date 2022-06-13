@@ -198,4 +198,6 @@
     <string name="dialog_web_cache_delete_title">Удалить игру?</string>
     <string name="dialog_web_cache_delete_fail_title">Нельзя сейчас удалить</string>
     <string name="dialog_web_cache_delete_fail">%1$s нельзя удалить так как эта игра сейчас запущена.</string>
+    <string name="game_web_play_desc">Запустить веб-версию</string>
+    <string name="game_web_play_default_type">Играть</string>
 </resources>

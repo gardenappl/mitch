@@ -214,9 +214,9 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
     override fun onBackPressed() {
         if (browseFragment.isVisible) {
             val cantGoBack = browseFragment.onBackPressed()
-//            if (cantGoBack)
-//                finish()
-//            return
+            if (cantGoBack)
+                finish()
+            return
         }
         //super method handles fragment back stack
         super.onBackPressed()

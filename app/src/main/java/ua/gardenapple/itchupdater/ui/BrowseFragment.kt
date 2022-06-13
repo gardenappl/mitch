@@ -7,14 +7,16 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.text.Html
+import android.text.Spanned
+import android.text.SpannedString
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.*
-import android.widget.ProgressBar
-import android.widget.Toast
+import android.widget.*
 import androidx.annotation.Keep
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
@@ -334,32 +336,30 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             val navBarHideCallback: (String) -> Unit = navBarHide@{
                 if (!isVisible)
                     return@navBarHide
-
                 navBar.visibility = View.GONE
-                if (info?.purchasedInfo != null) {
-                    bottomGameBar.visibility = View.VISIBLE
 
-                    if (info.hasAndroidVersion)
-                        gameButton.text = getString(R.string.game_install)
-                    else
-                        gameButton.text = getString(R.string.game_download)
-                    gameButtonInfo.text =
-                        Utils.spannedFromHtml(info.purchasedInfo.ownershipReasonHtml)
-
-                    gameButton.setOnClickListener {
-                        goToDownloadOrPurchase(doc, info, info.purchasedInfo.downloadPage)
+                val actions = ArrayList<Triple<String, Spanned, View.OnClickListener>>()
+                var filesRequirePayment = false
+                if (info?.purchasedInfo?.isNotEmpty() == true) {
+                    for (purchasedInfo in info.purchasedInfo) {
+                        val buttonText = if (info.hasAndroidVersion)
+                            getString(R.string.game_install)
+                        else
+                            getString(R.string.game_download)
+                        val buttonLabel = Utils.spannedFromHtml(purchasedInfo.ownershipReasonHtml)
+                        val onButtonClick = View.OnClickListener {
+                            goToDownloadOrPurchase(doc, info, purchasedInfo.downloadPage)
+                        }
+                        actions.add(Triple(buttonText, buttonLabel, onButtonClick))
                     }
                 } else if (info?.bundleDownloadLink != null) {
-                    bottomGameBar.visibility = View.VISIBLE
-
-                    gameButton.text = getString(R.string.game_bundle_claim)
-                    gameButtonInfo.text = getString(resources.getIdentifier(
+                    val buttonText = getString(R.string.game_bundle_claim)
+                    val buttonLabel = SpannedString(getString(resources.getIdentifier(
                         "game_bundle_" + info.specialBundle!!.slug,
                         "string",
                         requireContext().packageName
-                    ))
-
-                    gameButton.setOnClickListener {
+                    )))
+                    val onButtonClick = View.OnClickListener {
                         lifecycleScope.launch {
                             SpecialBundleHandler.claimGame(
                                 info.bundleDownloadLink,
@@ -368,25 +368,101 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                             webView.reload()
                         }
                     }
+                    actions.add(Triple(buttonText, buttonLabel, onButtonClick))
                 } else if (info?.paymentInfo != null) {
-                    bottomGameBar.visibility = View.VISIBLE
+                    val buttonText = if (!info.paymentInfo.isPaymentOptional) {
+                        getString(R.string.game_buy)
+                    } else {
+                        filesRequirePayment = true
+                        if (info.hasAndroidVersion)
+                            getString(R.string.game_install)
+                        else
+                            getString(R.string.game_download)
+                    }
 
-                    if (!info.paymentInfo.isPaymentOptional)
-                        gameButton.text = getString(R.string.game_buy)
-                    else if (info.hasAndroidVersion)
-                        gameButton.text = getString(R.string.game_install)
-                    else
-                        gameButton.text = getString(R.string.game_download)
-
-                    gameButtonInfo.text =
-                        Utils.spannedFromHtml(info.paymentInfo.messageHtml)
-
-                    gameButton.setOnClickListener {
+                    val buttonLabel = Utils.spannedFromHtml(info.paymentInfo.messageHtml)
+                    val onButtonClick = View.OnClickListener {
                         val purchaseUri = Uri.parse(info.game!!.storeUrl)
                             .buildUpon()
                             .appendPath("purchase")
                         goToDownloadOrPurchase(doc, info, purchaseUri.toString())
                     }
+                    actions.add(Triple(buttonText, buttonLabel, onButtonClick))
+                }
+                if (info?.game?.webEntryPoint != null && info.webLaunchLabel != null) {
+                    val buttonText = info.webLaunchLabel
+                    val buttonLabel = SpannedString(getString(R.string.game_web_play_desc))
+                    val onButtonClick = View.OnClickListener {
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(info.game.webEntryPoint),
+                            mainActivity,
+                            GameActivity::class.java
+                        )
+                        intent.putExtra(GameActivity.EXTRA_GAME_ID, info.game.gameId)
+                        intent.putExtra(GameActivity.EXTRA_IS_OFFLINE, true)
+                        mainActivity.startActivity(intent)
+                    }
+                    actions.add(Triple(buttonText, buttonLabel, onButtonClick))
+                }
+
+                if (actions.size > 1) {
+                    bottomGameBar.visibility = View.VISIBLE
+
+                    gameButton.text = getString(R.string.game_multiple_options_get)
+                    gameButtonInfo.text = if (info?.game?.webEntryPoint == null)
+                        getString(R.string.game_multiple_options_desc_multiple_purchases)
+                    else if (filesRequirePayment)
+                        getString(R.string.game_multiple_options_desc_web_or_buy)
+                    else
+                        getString(R.string.game_multiple_options_desc_web_or_download)
+                    gameButton.setOnClickListener {
+                        val viewInflated: View = LayoutInflater.from(context)
+                            .inflate(R.layout.dialog_game_get, view as ViewGroup, false)
+                        val dialog = AlertDialog.Builder(requireContext()).run {
+                            setTitle(info?.game?.name)
+                            setView(viewInflated)
+                            show()
+                        }
+                        val buttonsColumn =
+                            viewInflated.findViewById<LinearLayout>(R.id.dialog_game_get_button_column)
+                        val labelsColumn =
+                            viewInflated.findViewById<LinearLayout>(R.id.dialog_game_get_desc_column)
+
+                        for ((buttonText, label, onButtonClick) in actions) {
+                            val button = LayoutInflater.from(context)
+                                .inflate(
+                                    R.layout.dialog_game_get_button,
+                                    view as ViewGroup,
+                                    false
+                                )
+                            (button as Button).apply {
+                                text = buttonText
+                                setOnClickListener { view ->
+                                    dialog.hide()
+                                    onButtonClick.onClick(view)
+                                }
+                                buttonsColumn.addView(this)
+                            }
+
+                            val labelView = LayoutInflater.from(context)
+                                .inflate(
+                                    R.layout.dialog_game_get_label,
+                                    view as ViewGroup,
+                                    false
+                                )
+                            labelView.findViewById<TextView>(R.id.game_get_dialog_option_label)
+                                .text = label
+                            labelsColumn.addView(labelView)
+                        }
+                    }
+                } else if (actions.size == 1) {
+                    bottomGameBar.visibility = View.VISIBLE
+
+                    val (text, label, onButtonClick) = actions[0]
+                    gameButton.text = text
+                    gameButtonInfo.text = label
+                    gameButton.setOnClickListener(onButtonClick)
                 } else {
                     bottomGameBar.visibility = View.GONE
                 }
@@ -688,7 +764,19 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 }
             } else {
                 fragment.activity?.runOnUiThread {
-                    fragment.chromeClient.setForcedFullscreen()
+//                    fragment.chromeClient.setForcedFullscreen()
+                    fragment.webView.evaluateJavascript("""
+             document.getElementById("container").addEventListener("click", (event) => {
+            console.log("fullsc");
+  if (document.getElementById("container").requestFullscreen) {
+    document.getElementById("container").requestFullscreen();
+  } else if (document.getElementById("container").webkitRequestFullscreen) { /* Safari */
+    document.getElementById("container").webkitRequestFullscreen();
+  } else if (document.getElementById("container").msRequestFullscreen) { /* IE11 */
+    document.getElementById("container").msRequestFullscreen();
+  }
+            });
+        """.trimIndent(), null)
                 }
             }
         }
@@ -737,7 +825,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
             val isOfflineWebGame = currentInfo?.isCachedWebGameOffline == true
             if (Mitch.webGameCache.shouldHandleRequest(
-                    requireContext(), currentInfo?.game, request, isOfflineWebGame)) {
+                    context, currentInfo?.game, request, isOfflineWebGame)) {
                 requireActivity().runOnUiThread {
                     showWebGameLaunchDialog(requireContext())
                 }
@@ -824,7 +912,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                             ytBanner.style.visibility = "hidden";
                             
                         // remove game purchase banners, we implement our own
-                        let elements = document.querySelectorAll(".purchase_banner, .header_buy_row, .buy_row, .donate_btn");
+                        let elements = document.querySelectorAll(".purchase_banner, .header_buy_row, .buy_row, .donate_btn, .embed_wrapper, .load_iframe_btn");
                         for (var element of elements)
                             element.style.display = "none";
                     });
@@ -865,9 +953,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         override fun onShowCustomView(view: View, callback: CustomViewCallback) =
             this.setFullscreen(view, callback)
-
-        fun setForcedFullscreen() =
-            this.setFullscreen(null, this::onHideCustomView)
 
         private fun setFullscreen(view: View?, callback: CustomViewCallback) {
             val foregroundServiceIntent = Intent(context, WebViewForegroundService::class.java)
@@ -938,7 +1023,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             if (newProgress == 100)
                 progressBar.visibility = ProgressBar.GONE
         }
-        
+
         fun onResume() {
             if (isWebFullscreen) {
                 binding.root.systemUiVisibility =

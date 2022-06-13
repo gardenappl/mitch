@@ -125,7 +125,7 @@ object ItchWebsiteUtils {
      */
     fun getMainBrowsePage(context: Context): String {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-        return when (prefs.getString("preference_start_page", "android")) {
+        return when (prefs.getString(PREF_BROWSE_START_PAGE, "web_touch")) {
             "android" -> "https://itch.io/games/platform-android"
             "web" -> "https://itch.io/games/platform-web"
             "web_touch" -> "https://itch.io/games/input-touchscreen/platform-web"
