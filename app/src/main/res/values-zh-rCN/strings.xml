@@ -1,2 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="notification_installing">下载应用中</string>
+    <string name="browser_search">网页搜索</string>
+    <string name="notification_download_complete_title">下载完成</string>
+    <string name="notification_install_title">点击下载</string>
+    <string name="nav_website_view">浏览</string>
+    <string name="settings_category_browse">浏览中</string>
+    <string name="settings_category_updater">下载和更新</string>
+    <string name="settings_category_ui">外观</string>
+    <string name="notification_channel_installing">下载或下载过程</string>
+    <string name="notification_channel_installing_desc">下载时显示游戏状态。</string>
+    <string name="notification_install_complete_title">应用已下载</string>
+    <string name="notification_install_cancelled_title">下载已取消</string>
+    <string name="notification_install_unknown_title">未知错误</string>
+    <string name="notification_install_conflict_title">应用和另一个包装冲突</string>
+    <string name="library_category_downloads">下载</string>
+    <string name="game_go_to_store">显示储存页面</string>
+    <string name="game_package_info">显示应用信息</string>
+    <string name="game_download_remove">从应用中移除</string>
+    <string name="game_download_delete">删除</string>
+    <string name="game_package_info_fail">您的系统不可以显示应用信息。</string>
+    <string name="dialog_game_delete">您确定您要删除%1$s文件吗？</string>
+    <string name="dialog_game_remove">%1$s会被留在您的下载文件夹里。</string>
+    <string name="dialog_remove">移除</string>
+    <string name="dialog_delete">删除</string>
+    <string name="dialog_cancel">取消</string>
+    <string name="dialog_yes">是</string>
+    <string name="popup_game_removed">%1$s已从Mitch中移除。</string>
+    <string name="browser_share">分享链接</string>
+    <string name="search_games_hint">搜索游戏或作者</string>
+    <string name="notification_channel_install">下载应用</string>
+    <string name="nav_settings">设置</string>
+    <string name="notification_install_blocked_title">下载被阻止</string>
+    <string name="notification_install_incompatible_title">应用和您的设备不兼容</string>
+    <string name="notification_install_storage_title">下载失败：储存错误</string>
+    <string name="library_category_installed">下载的应用</string>
+    <string name="browser_reload">重新加载页面</string>
+</resources>
