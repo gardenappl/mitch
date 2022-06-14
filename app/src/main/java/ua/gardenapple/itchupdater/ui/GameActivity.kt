@@ -31,7 +31,7 @@ class GameActivity : Activity() {
 
     private lateinit var binding: ActivityGameBinding
     private lateinit var webView: WebView
-    private lateinit var chromeClient: WebChromeClient
+    private lateinit var chromeClient: GameChromeClient
 
     private var originalUiVisibility: Int = View.VISIBLE
 
@@ -50,7 +50,7 @@ class GameActivity : Activity() {
             webView.loadUrl(intent.data.toString())
         }
 
-        chromeClient = WebChromeClient()
+        chromeClient = GameChromeClient()
 
         @SuppressLint("SetJavaScriptEnabled")
         webView.settings.javaScriptEnabled = true
@@ -124,24 +124,19 @@ class GameActivity : Activity() {
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
             if (ItchWebsiteUtils.isItchWebPage(request.url)) {
                 return false
-            } else if (request.url.host == "github.com"
-                && request.url.path?.matches(githubLoginPathRegex) == true
-            ) {
-                return false
-            } else {
-                val intent = Intent(Intent.ACTION_VIEW, request.url)
-                if (intent.resolveActivity(packageManager) != null) {
-                    startActivity(intent)
-                } else {
-                    Log.i(LOGGING_TAG, "No app found that can handle ${request.url}")
-                    Toast.makeText(
-                        applicationContext,
-                        resources.getString(R.string.popup_handler_app_not_found, request.url),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                return true
             }
+            val intent = Intent(Intent.ACTION_VIEW, request.url)
+            if (intent.resolveActivity(packageManager) != null) {
+                startActivity(intent)
+            } else {
+                Log.i(LOGGING_TAG, "No app found that can handle ${request.url}")
+                Toast.makeText(
+                    applicationContext,
+                    resources.getString(R.string.popup_handler_app_not_found, request.url),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            return true
         }
 
         override fun shouldInterceptRequest(

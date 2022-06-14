@@ -128,7 +128,7 @@ object ItchWebsiteUtils {
         return when (prefs.getString(PREF_BROWSE_START_PAGE, "web_touch")) {
             "android" -> "https://itch.io/games/platform-android"
             "web" -> "https://itch.io/games/platform-web"
-            "web_touch" -> "https://itch.io/games/input-touchscreen/platform-web"
+            "web_touch" -> "https://itch.io/games/top-sellers/input-touchscreen/platform-web"
             "all_games" -> "https://itch.io/games"
             "library" -> "https://itch.io/my-collections"
             "feed" -> "https://itch.io/my-feed"

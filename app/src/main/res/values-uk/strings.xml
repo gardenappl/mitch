@@ -196,4 +196,8 @@
     <string name="dialog_web_cache_delete_fail">%1$s не можна видалити оскільки ця гра зараз запущена.</string>
     <string name="game_web_play_desc">Запустити веб-версію</string>
     <string name="game_web_play_default_type">Грати</string>
+    <string name="game_multiple_options_get">Грати →</string>
+    <string name="game_multiple_options_desc_web_or_download">Грати зараз або завантажити</string>
+    <string name="game_multiple_options_desc_web_or_buy">Грати зараз або купити</string>
+    <string name="game_multiple_options_desc_multiple_purchases">Декулька покупок</string>
 </resources>

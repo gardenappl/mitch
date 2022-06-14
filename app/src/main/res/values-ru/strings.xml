@@ -200,4 +200,8 @@
     <string name="dialog_web_cache_delete_fail">%1$s нельзя удалить так как эта игра сейчас запущена.</string>
     <string name="game_web_play_desc">Запустить веб-версию</string>
     <string name="game_web_play_default_type">Играть</string>
+    <string name="game_multiple_options_get">Получить →</string>
+    <string name="game_multiple_options_desc_web_or_download">Играть сейчас или загрузить</string>
+    <string name="game_multiple_options_desc_web_or_buy">Играть сейчас или купить</string>
+    <string name="game_multiple_options_desc_multiple_purchases">Несколько покупок</string>
 </resources>

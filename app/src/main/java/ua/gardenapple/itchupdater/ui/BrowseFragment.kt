@@ -371,9 +371,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     actions.add(Triple(buttonText, buttonLabel, onButtonClick))
                 } else if (info?.paymentInfo != null) {
                     val buttonText = if (!info.paymentInfo.isPaymentOptional) {
+                        filesRequirePayment = true
                         getString(R.string.game_buy)
                     } else {
-                        filesRequirePayment = true
                         if (info.hasAndroidVersion)
                             getString(R.string.game_install)
                         else
