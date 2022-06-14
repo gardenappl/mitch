@@ -30,33 +30,12 @@ class WebGameCache(context: Context) {
     private val cacheDir = File(context.cacheDir, "webgames")
     private val cacheHttpClients = HashMap<Int, OkHttpClient>()
 
-    fun shouldHandleRequest(
-        context: Context?,
-        game: Game?,
-        request: WebResourceRequest,
-        isOfflineWebGame: Boolean
-    ) = context != null && game != null
-            && (isOfflineWebGame || PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREF_WEB_CACHE_ENABLE, true))
-            && request.url.host?.endsWith(".ssl.hwcdn.net") == true
-
     suspend fun request(
         context: Context,
         game: Game,
         request: WebResourceRequest,
         isOfflineWebGame: Boolean
     ): WebResourceResponse? = withContext(Dispatchers.IO) {
-        Log.d(LOGGING_TAG, "Handling request... ${request.url}")
-        val referer = request.requestHeaders["Referer"]?.let(Uri::parse)
-        Log.d(LOGGING_TAG, "Referer: $referer")
-        if (referer?.host?.endsWith(".itch.io") == true) {
-            val db = AppDatabase.getDatabase(context)
-            db.gameDao.upsert(
-                game.copy(
-                    webEntryPoint = request.url.toString()
-                )
-            )
-            Log.d(LOGGING_TAG, "Web game ${game.name} is now cached!")
-        }
         val updateWebCache = if (isOfflineWebGame) {
             Log.d(LOGGING_TAG, "Currently in offline mode")
             val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
@@ -84,6 +63,7 @@ class WebGameCache(context: Context) {
             build()
         }
         val httpClient = getOkHttpClientForGame(game)
+        Log.d(LOGGING_TAG, "current cache in ${httpClient.cache?.directory}")
 
         request(httpClient, httpRequest, forceCache = !updateWebCache)
     }
@@ -135,7 +115,12 @@ class WebGameCache(context: Context) {
                 }
             })
         }
-        Log.d(LOGGING_TAG, "response is null? ${response?.statusCode}")
+        Log.d(LOGGING_TAG, "response code for ${request.url}: ${response?.statusCode}")
+        if (response != null) {
+            for (header in response.responseHeaders) {
+                Log.d(LOGGING_TAG, "${header.key}: ${header.value}")
+            }
+        }
         return if (response == null && !forceCache)
             request(httpClient, request, forceCache = true)
         else
@@ -168,5 +153,11 @@ class WebGameCache(context: Context) {
         db.gameDao.upsert(game.copy(
             webEntryPoint = null
         ))
+    }
+
+    suspend fun flush() = withContext(Dispatchers.IO) {
+        for (httpClient in cacheHttpClients.values) {
+            httpClient.cache?.flush()
+        }
     }
 }

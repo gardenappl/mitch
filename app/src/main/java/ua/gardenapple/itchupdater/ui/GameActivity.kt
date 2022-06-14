@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -88,10 +89,15 @@ class GameActivity : Activity() {
         super.onPause()
         binding.root.systemUiVisibility = originalUiVisibility
         CookieManager.getInstance().flush()
+        runBlocking(Dispatchers.IO) {
+            Mitch.webGameCache.flush()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        webView.settings.javaScriptEnabled = false
+        webView.destroy()
         stopService(Intent(this, WebViewForegroundService::class.java))
     }
 
@@ -144,10 +150,6 @@ class GameActivity : Activity() {
         ): WebResourceResponse? {
             val isOffline = this@GameActivity.intent.getBooleanExtra(EXTRA_IS_OFFLINE, false)
 
-            runOnUiThread {
-                showWebGameLaunchDialog(applicationContext)
-            }
-
             return runBlocking(Dispatchers.IO) {
                 val db = AppDatabase.getDatabase(this@GameActivity)
                 val game =
@@ -157,33 +159,37 @@ class GameActivity : Activity() {
             }
         }
 
-        private fun showWebGameLaunchDialog(context: Context) {
-            val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+            view.evaluateJavascript(
+                """
+                    document.addEventListener("DOMContentLoaded", (event) => {
+                        console.log("content loaded!");
+                        let body = document.body;
+                        body.addEventListener("click", (event) => {
+                            console.log("fullscreen!");
+                            body.requestFullscreen().catch(err => {
+                                console.log("Error attempting to enable fullscreen mode:" + err.message + ' ' + err.name);
+                            });
+                        });
+                    });
+                """, null
+            )
+        }
+    }
 
-            if (!prefs.getBoolean(PREF_WEB_CACHE_DIALOG_HIDE, false)) {
-                val dialog = AlertDialog.Builder(context).apply {
-                    setTitle(R.string.dialog_web_cache_info_title)
-                    setMessage(R.string.dialog_web_cache_info)
-                    setPositiveButton(android.R.string.ok) { _, _ ->
-                        prefs.edit().run {
-                            putBoolean(PREF_WEB_CACHE_ENABLE, true)
-                            putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
-                            apply()
-                        }
-                    }
-                    setNegativeButton(android.R.string.cancel) { _, _ ->
-                        prefs.edit().run {
-                            putBoolean(PREF_WEB_CACHE_ENABLE, false)
-                            putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
-                            apply()
-                        }
-                    }
-                    setCancelable(true)
+    inner class GameChromeClient : WebChromeClient() {
+        private var customView: View? = null
 
-                    create()
-                }
-                dialog.show()
-            }
+        override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
+            Log.d(LOGGING_TAG, "Doing fullscreen...")
+            webView.visibility = View.GONE
+            binding.root.addView(view)
+        }
+
+        override fun onHideCustomView() {
+            Log.d(LOGGING_TAG, "Doing NOT fullscreen...")
+            webView.visibility = View.VISIBLE
+            customView?.let { binding.root.removeView(it) }
         }
     }
 }
