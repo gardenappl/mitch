@@ -137,7 +137,7 @@ class LibraryAdapter internal constructor(
                 GameActivity::class.java
             )
             intent.putExtra(GameActivity.EXTRA_GAME_ID, gameInstall.game.gameId)
-            intent.putExtra(GameActivity.EXTRA_IS_OFFLINE, true)
+            intent.putExtra(GameActivity.EXTRA_IS_OFFLINE, false)
             context.startActivity(intent)
         } else if (gameInstall.packageName != null) {
             val launchIntent = context.packageManager.getLaunchIntentForPackage(gameInstall.packageName)

@@ -823,20 +823,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(view.context)
             val blockTrackers = sharedPreferences.getBoolean("preference_block_trackers", true)
 
-            val isOfflineWebGame = currentInfo?.isCachedWebGameOffline == true
-            if (Mitch.webGameCache.shouldHandleRequest(
-                    context, currentInfo?.game, request, isOfflineWebGame)) {
-                requireActivity().runOnUiThread {
-                    showWebGameLaunchDialog(requireContext())
-                }
-
-                currentInfo = currentInfo?.copy(isRunningCachedWebGame = true)
-                return runBlocking(Dispatchers.IO) {
-                    Mitch.webGameCache.request(
-                        requireContext(), currentInfo!!.game!!, request, isOfflineWebGame
-                    )
-                }
-            }
             if (blockTrackers) {
                 arrayOf(
                     "google-analytics.com",
