@@ -88,6 +88,7 @@
                 android:launchMode="singleInstance"/>
         <activity
                 android:name=".ui.GameActivity"
+                android:launchMode="singleInstance"
                 android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
                 android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|uiMode"/>
 

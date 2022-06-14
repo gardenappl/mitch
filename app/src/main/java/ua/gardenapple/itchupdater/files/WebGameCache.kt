@@ -156,8 +156,9 @@ class WebGameCache(context: Context) {
     }
 
     suspend fun flush() = withContext(Dispatchers.IO) {
-        for (httpClient in cacheHttpClients.values) {
-            httpClient.cache?.flush()
+        for (httpClient in cacheHttpClients) {
+            httpClient.value.cache?.flush()
+            Log.d(LOGGING_TAG, "flushed for ID ${httpClient.key}")
         }
     }
 }
