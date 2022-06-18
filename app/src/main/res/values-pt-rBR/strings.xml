@@ -138,4 +138,47 @@
     <string name="game_install">Instalar</string>
     <string name="bundle_claim_dialog_title">Tem certeza\?</string>
     <string name="bug_report_dialog_title">Algo deu errado</string>
+    <string name="menu_game_gamejam">%1$s entrada</string>
+    <string name="dialog_no">Não</string>
+    <string name="settings_cancel_downloads_message">Isso deve ser feito apenas para fins de teste ou solução de problemas.</string>
+    <string name="settings_installer_desc">Tente alterar isso se tiver problemas para instalar aplicativos.</string>
+    <string name="settings_installer">Método de instalação</string>
+    <string name="settings_installer_session">Instalador de sessão (padrão)</string>
+    <string name="settings_installer_native">Instalador nativo (necessário para alguns dispositivos MIUI)</string>
+    <string name="popup_handler_app_not_found">Não sei como abrir %s</string>
+    <string name="game_bundle_claim">Alegar</string>
+    <string name="game_buy">Comprar</string>
+    <string name="game_download">Download</string>
+    <string name="game_price">%s ou mais</string>
+    <string name="game_bundle_racial">Pacote para Justiça Racial e Igualdade</string>
+    <string name="bundle_custom_link">Definir URL de download personalizado</string>
+    <string name="game_bundle_palestine">Pacote indie para a ajuda palestina</string>
+    <string name="bundle_claim_dialog">Aviso: você está prestes a encher sua biblioteca com mais de 1.000 jogos. Você tem certeza de que quer fazer isso\?
+\nIsso vai levar muito, muito tempo.
+\nEste processo é irreversível.</string>
+    <string name="popup_no_network_connection">A verificação de atualizações requer uma conexão de rede</string>
+    <string name="settings_android_only_filter">Android: filtro apenas para download</string>
+    <string name="settings_android_only_filter_desc">Ao navegar em jogos Android, oculte entradas que estão disponíveis apenas em outras lojas.</string>
+    <string name="settings_lang_default">Padrão</string>
+    <string name="settings_lang_site">Depende do site</string>
+    <string name="settings_lang_system">Depende do sistema</string>
+    <string name="settings_lang">Linguagem</string>
+    <string name="dialog_lang_restart_title">Idioma alterado</string>
+    <string name="dialog_lang_restart">O aplicativo será reiniciado para aplicar o novo idioma</string>
+    <string name="notification_download_io_error">Erro de rede ou disco</string>
+    <string name="notification_download_unknown_error">Erro desconhecido</string>
+    <string name="dialog_installer_please_wait">Aguarde, preparando o aplicativo para instalação…</string>
+    <string name="dialog_download_wrong_os">%s não é compatível com Android. Você não poderá instalá-lo como um aplicativo.
+\nVocê quer baixá-lo mesmo assim\?</string>
+    <string name="dialog_installer_no_space">Não há espaço em disco suficiente para este aplicativo.</string>
+    <string name="dialog_download_wrong_os_has_extras">%s não é compatível com Android. Você não poderá instalá-lo como um aplicativo.
+\nVocê ainda pode visualizar conteúdo adicional, como arte, música ou manuais.</string>
+    <string name="settings_warn_os">Avisar ao baixar aplicativos não Android</string>
+    <string name="game_bundle_ukraine">Pacote para a Ucrânia</string>
+    <string name="game_bundle_trans_texas">Direitos Trans no Texas! Pacote</string>
+    <string name="bundle_claim_all">Reivindicar todos</string>
+    <string name="bundle_claim_all_desc">Reivindique todos os jogos deste pacote agora.</string>
+    <string name="bundle_claim_error">Não foi possível acessar o link de download do pacote.</string>
+    <string name="notification_download_no_space">Não há espaço de armazenamento suficiente para este arquivo</string>
+    <string name="bundle">Pacotes especiais</string>
 </resources>
