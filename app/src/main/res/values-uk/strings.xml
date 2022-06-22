@@ -91,13 +91,15 @@
     <string name="notification_download_time_remaining">Залишилося %1$d хв. %2$d с.</string>
     <string name="dialog_app_delete_title">Видалити додаток?</string>
     <string name="dialog_app_delete">Ви впевнені, що хочете видалити %1$s?</string>
-    <string name="game_move_to_downloads">Перемістити в папку Завантаження</string>
+    <string name="game_move_to_downloads">Перемістити в теку Завантаження</string>
     <string name="dialog_game_remove_title">Перестати отримувати оновлення?</string>
     <string name="dialog_missing_file_title">Файл не знайдено</string>
-    <string name="dialog_missing_file">Файл %1$s або перемітили, або видалили з папки завантажень.\n\nЧи варто його видалити з колекції Mitch? Ви більше не будете отримувати оновлення для %2$s.</string>
-    <string name="popup_moved_to_downloads">Файл %1$s перемістили в папку завантажень.</string>
-    <string name="popup_moving_to_downloads">Переміщуємо файл у папку завантажень…</string>
-    <string name="popup_move_to_download_error">Помилка під час переміщення в папку завантажень</string>
+    <string name="dialog_missing_file">Файл %1$s або перемістили, або видалили з теки завантажень.
+\n
+\nЧи варто його видалити з колекції Mitch\? Ви більше не будете отримувати оновлення для %2$s.</string>
+    <string name="popup_moved_to_downloads">Файл %1$s перемістили в теку завантажень.</string>
+    <string name="popup_moving_to_downloads">Переміщуємо файл у теку Завантаження…</string>
+    <string name="popup_move_to_download_error">Помилка під час переміщення в теку Завантаження</string>
     <string name="updates_all_up_to_date">Оновлень немає</string>
     <string name="updates_last_check_time">Остання перевірка: %s</string>
     <string name="updates_pull_to_refresh">Потягніть униз, щоб перевірити</string>
