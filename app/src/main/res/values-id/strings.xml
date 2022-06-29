@@ -134,11 +134,11 @@
     <string name="notification_channel_install">Pemasangan aplikasi</string>
     <string name="notification_channel_updates">Pembaruan game</string>
     <string name="library_category_installed">Aplikasi terpasang</string>
-    <string name="settings_installer_native">Pemasang asli (default)</string>
+    <string name="settings_installer_native">Pemasang native (dibutuhkan untuk beberapa perangkat MIUI)</string>
     <string name="bundle_claim_all_racial">Klaim semua game Bundel</string>
     <string name="game_bundle_racial">Bundel untuk Keadilan dan Kesetaraan Rasial</string>
     <string name="bundle_claim_error_justice">Tak bisa mengakses tautan unduhan dari bundel Keadilan Rasial.</string>
-    <string name="settings_installer_session">Pemasang sesi</string>
+    <string name="settings_installer_session">Pemasang sesi (bawaan)</string>
     <string name="settings_cancel_downloads_title">Setel ulang semua unduhan saat ini\?</string>
     <string name="settings_cancel_downloads">Setel ulang semua unduhan</string>
     <string name="settings_category_advanced">Lanjutan</string>
@@ -147,12 +147,12 @@
     <string name="popup_moved_to_downloads">Memindahkan file %1$s ke folder Unduhan.</string>
     <string name="dialog_missing_file">File %1$s dipindahkan atau dihapus dari folder Unduhan.
 \n
-\nApakah Anda ingin menghapusnya dari aplikasi Mitch\? Anda tidak akan lagi menerima pembaruan untuk %2$s.</string>
+\nApakah kamu ingin menghapusnya dari aplikasi Mitch\? Kamu tidak akan lagi menerima pembaruan untuk %2$s.</string>
     <string name="game_move_to_downloads">Pindahkan ke folder Unduhan</string>
     <string name="library_category_pending">Sedang berlangsung</string>
     <string name="settings_start_page_feed">Umpan berita</string>
     <string name="menu_game_gamejam">%1$s entri</string>
-    <string name="dialog_game_remove">File %1$s akan tetap berada di folder Unduhan Anda.</string>
+    <string name="dialog_game_remove">Berkas %1$s akan tetap berada di folder Unduhan kamu.</string>
     <string name="notification_install_conflict_title">Aplikasi bentrok dengan paket lain</string>
     <string name="settings_category_browse">Menjelajah</string>
     <string name="bundle_claim_all_desc_racial">Klaim setiap game dari bundel Keadilan dan Kesetaraan Rasial.</string>
@@ -172,4 +172,9 @@
     <string name="settings_warn_os">Peringati ketika mengunduh aplikasi non-Android</string>
     <string name="dialog_download_wrong_os">%s tidak kompatibel dengan Android. Kamu tidak akan bisa memasangnya sebagai sebuah aplikasi.
 \nApakah kamu tetap ingin mengunduhnya\?</string>
+    <string name="dialog_installer_no_space">Tidak ada ruang disk yang cukup untuk aplikasi ini.</string>
+    <string name="settings_android_only_filter">Android: saring hanya yang dapat diunduh</string>
+    <string name="dialog_download_wrong_os_has_extras">%s tidak kompatibel dengan Android. Kamu tidak akan bisa memasangnya sebagai aplikasi.
+\nKamu mungkin masih bisa melihat konten tambahan, seperti seni, musik, atau panduan.</string>
+    <string name="notification_download_io_error">Kesalahan jaringan atau disk</string>
 </resources>
