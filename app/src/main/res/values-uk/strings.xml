@@ -151,7 +151,7 @@
     <string name="game_install">Встановити</string>
     <string name="game_price">%s чи більше</string>
     <string name="bundle_claim_error_justice">Не вдалося завантажити сторінку набору Racial Justice.</string>
-    <string name="game_bundle_racial">Bundle for Racial Justice and Equality</string>
+    <string name="game_bundle_racial">Набір для «Racial Justice and Equality»</string>
     <string name="bundle_custom_link">Встановити власне посилання для завантаження</string>
     <string name="bundle_claim_all_racial">Набір Racial Justice: присвоїти все</string>
     <string name="bundle_claim_all_desc_racial">Присвоїти всі ігри з набору Racial Justice and Equality.</string>
@@ -177,9 +177,9 @@
     <string name="dialog_download_wrong_os">%s не сумісно з Android. Ви не зможете встановити це як додаток.\nВи все одно бажаєте це завантажити?</string>
     <string name="dialog_download_wrong_os_has_extras">%s не сумісно з Android. Ви не зможете встановити це як додаток.\nМожна переглянути додатковий контент, наприклад, ілюстрації, музику, та інструкції.</string>
     <string name="settings_warn_os">Попереджати, коли гра не сумісна з Android</string>
-    <string name="notification_download_no_space">Недосатньо місця в сховищі для цього файлу.</string>
+    <string name="notification_download_no_space">В сховищі недостатньо місця для цього файлу</string>
     <string name="game_bundle_ukraine">Благодійний набір Україні</string>
-    <string name="game_bundle_trans_texas">Набір Trans Rights in Texas!</string>
+    <string name="game_bundle_trans_texas">Набір «Trans Rights in Texas!»</string>
     <string name="bundle_claim_all">Присвоїти все</string>
     <string name="bundle_claim_all_desc">Присвоїти всі ігри з набору зараз.</string>
     <string name="bundle_claim_error">Не вдалося завантажити сторінку набору.</string>
