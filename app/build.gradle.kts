@@ -30,6 +30,7 @@ android {
         }
     }
 
+    namespace = "garden.appl.mitch"
     compileSdk = 31
 
     defaultConfig {

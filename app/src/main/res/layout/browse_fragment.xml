@@ -7,7 +7,7 @@
         android:focusable="auto"
         android:orientation="vertical">
 
-    <ua.gardenapple.itchupdater.ui.MitchWebView
+    <garden.appl.mitch.ui.MitchWebView
             android:id="@+id/webView"
             android:layout_width="0dp"
             android:layout_height="0dp"

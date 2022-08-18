@@ -10,7 +10,7 @@
 # and specify the fully qualified class name to the JavaScript interface
 # class:
 
--keepclassmembers class ua.gardenapple.itchupdater.ui.BrowseFragment$ItchJavaScriptInterface {
+-keepclassmembers class garden.appl.mitch.ui.BrowseFragment$ItchJavaScriptInterface {
    public *;
 }
 
