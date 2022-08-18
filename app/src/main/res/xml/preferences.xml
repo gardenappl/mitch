@@ -3,7 +3,7 @@
 
     <PreferenceCategory android:title="@string/settings_category_browse">
         <ListPreference
-                android:defaultValue="web_touch"
+                android:defaultValue="android"
                 android:entries="@array/pref_start_page_entries"
                 android:entryValues="@array/pref_start_page_values"
                 android:key="mitch.browse_start_page"
@@ -26,7 +26,7 @@
                 android:summary="@string/settings_update_check_metered_desc"
                 android:title="@string/settings_update_check_metered" />
         <SwitchPreference
-                android:defaultValue="true"
+                android:defaultValue="false"
                 android:key="mitch.web_cache_enable"
                 android:summary="@string/settings_web_cache_enable_desc"
                 android:title="@string/settings_web_cache_enable" />
