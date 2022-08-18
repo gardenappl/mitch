@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.webkit.CookieManager
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -67,10 +68,9 @@ object SpecialBundleHandler {
 
             link = getBundleDownloadLink(bundle.url)
 
-            sharedPrefs.edit().apply {
+            sharedPrefs.edit(commit = true) {
                 putLong(prefTimestamp + userName, System.currentTimeMillis())
                 putString(prefLinkPrefix + userName, link ?: LINK_EMPTY)
-                commit() //TODO: clean up commit/apply
             }
         }
         return link
@@ -118,10 +118,9 @@ object SpecialBundleHandler {
         val userName = ItchWebsiteUtils.getLoggedInUserName(doc)
 
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
-        sharedPrefs.edit().apply {
+        sharedPrefs.edit {
             putString(getLinkPreferencesKeyPrefix(bundle) + userName, url)
             putLong(getTimestampPreferencesKey(bundle) + userName, System.currentTimeMillis())
-            apply()
         }
         return true
     }

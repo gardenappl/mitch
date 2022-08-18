@@ -2,6 +2,7 @@ package garden.appl.mitch.database
 
 import android.content.Context
 import android.util.Log
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import androidx.room.withTransaction
 import androidx.work.CoroutineWorker
@@ -100,9 +101,8 @@ class DatabaseCleanup(private val context: Context) {
 
         Log.d(LOGGING_TAG, "Done.")
 
-        sharedPrefs.edit().run {
+        sharedPrefs.edit(commit = true) {
             putBoolean(PREF_DB_RAN_CLEANUP_ONCE, true)
-            commit()
         }
 
         Mitch.webGameCache.cleanCaches(db)

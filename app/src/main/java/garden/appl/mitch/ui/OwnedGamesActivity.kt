@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -180,9 +181,8 @@ class OwnedGamesActivity : MitchActivity() {
                 androidOnlyFilter = !item.isChecked
                 loadItems(searchString, androidOnlyFilter)
                 val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
-                sharedPrefs.edit().run {
+                sharedPrefs.edit {
                     putBoolean(LAST_ANDROID_ONLY_FILTER, androidOnlyFilter)
-                    apply()
                 }
                 item.isChecked = androidOnlyFilter
                 return true

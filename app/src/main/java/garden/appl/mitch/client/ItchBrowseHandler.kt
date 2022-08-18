@@ -101,7 +101,7 @@ class ItchBrowseHandler(private val context: Context) {
             tryStartDownload()
         }
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-        prefs.edit(true) {
+        prefs.edit(commit = true) {
             if (ItchWebsiteUtils.shouldHandleDayNightThemes(doc)) {
                 if (ItchWebsiteUtils.isDarkTheme(doc))
                     putString("current_site_theme", "dark")

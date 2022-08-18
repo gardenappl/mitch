@@ -850,8 +850,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
             val uri = Uri.parse(url)
             if (uri.pathSegments.containsAll(listOf("games", "platform-android"))) {
-                val preferenceManager = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                val androidOnlyFilter = preferenceManager.getBoolean(PREF_WEB_ANDROID_FILTER, true)
+                val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                val androidOnlyFilter = sharedPrefs.getBoolean(PREF_WEB_ANDROID_FILTER, true)
                 if (androidOnlyFilter) {
                     webView.evaluateJavascript("""
                     document.addEventListener("DOMContentLoaded", (event) => {
