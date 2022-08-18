@@ -23,14 +23,9 @@ class SelfUpdateBroadcastReceiver : BroadcastReceiver() {
             
         runBlocking(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(context)
-            val mitchInstalling =
-                db.installDao.getPendingInstallations(Installation.MITCH_UPLOAD_ID).filter { install ->
-                    install.status == Installation.STATUS_INSTALLING
-                }
-
-            for (pendingInstall in mitchInstalling)
-                Installations.deleteOutdatedInstalls(context, pendingInstall)
-            db.installDao.delete(mitchInstalling)
+            val mitchInstall = db.installDao.getPendingInstallation(Installation.MITCH_UPLOAD_ID)
+            if (mitchInstall != null)
+                db.installDao.delete(mitchInstall)
         }
     }
 }

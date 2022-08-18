@@ -47,9 +47,7 @@ class ItchBrowseHandler(private val context: Context) {
         val paymentInfo: ItchWebsiteParser.PaymentInfo?,
         val hasAndroidVersion: Boolean,
         val hasWindowsMacOrLinuxVersion: Boolean,
-        val webLaunchLabel: String? = null,
-        val isRunningCachedWebGame: Boolean = false,
-        val isCachedWebGameOffline: Boolean = false
+        val webLaunchLabel: String? = null
     )
 
     suspend fun onPageVisited(doc: Document, url: String): Info {
@@ -127,20 +125,6 @@ class ItchBrowseHandler(private val context: Context) {
             hasAndroidVersion = hasAndroidVersion,
             hasWindowsMacOrLinuxVersion = hasWindowsMacLinuxVersion,
             webLaunchLabel = webLaunchLabel
-        )
-    }
-
-    fun onStartedOfflineWebGame(game: Game): Info {
-        return Info(
-            game = game,
-            specialBundle = null,
-            bundleDownloadLink = null,
-            purchasedInfo = emptyList(),
-            paymentInfo = null,
-            hasAndroidVersion = false,
-            hasWindowsMacOrLinuxVersion = false,
-            isRunningCachedWebGame = true,
-            isCachedWebGameOffline = true
         )
     }
 

@@ -13,10 +13,13 @@ import okhttp3.*
 import garden.appl.mitch.*
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
+import garden.appl.mitch.database.installation.Installation
 import java.io.File
 import java.io.IOException
 import java.net.UnknownHostException
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.HashMap
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -129,7 +132,7 @@ class WebGameCache(context: Context) {
         return cacheHttpClients.getOrPut(game.gameId) { ->
             Log.d(LOGGING_TAG, "making new client for $game")
             Mitch.httpClient.newBuilder().let {
-                val gameCacheDir = getCacheDir(game)
+                val gameCacheDir = getCacheDir(game.gameId)
                 gameCacheDir.mkdirs()
                 it.cache(Cache(gameCacheDir, Long.MAX_VALUE))
                 it.build()
@@ -137,20 +140,41 @@ class WebGameCache(context: Context) {
         }
     }
 
-    private fun getCacheDir(game: Game): File = File(cacheDir, game.gameId.toString())
+    private fun getCacheDir(gameId: Int): File = File(cacheDir, gameId.toString())
 
-    suspend fun deleteCacheForGame(context: Context, game: Game) {
+    suspend fun makeGameWebCached(context: Context, gameId: Int): Game {
+        val db = AppDatabase.getDatabase(context)
+        val install = db.installDao.getWebInstallationForGame(gameId)
+        Log.d(LOGGING_TAG, "Current web install is $install")
+
+        val newInstall = Installation(
+            internalId = install?.internalId ?: 0,
+            gameId = gameId,
+            uploadId = Installation.WEB_UPLOAD_ID,
+            availableUploadIds = null,
+            status = Installation.STATUS_WEB_CACHED,
+            uploadName = Installation.WEB_UPLOAD_NAME,
+            fileSize = Installation.WEB_FILE_SIZE
+        )
+        db.installDao.upsert(newInstall)
+        return db.gameDao.getGameById(gameId)!!
+    }
+
+    suspend fun isGameWebCached(context: Context, gameId: Int): Boolean {
+        val db = AppDatabase.getDatabase(context)
+        return db.installDao.getWebInstallationForGame(gameId) != null
+    }
+
+    suspend fun deleteCacheForGame(context: Context, gameId: Int) {
         withContext(Dispatchers.IO) {
-            cacheHttpClients.remove(game.gameId)?.run {
+            cacheHttpClients.remove(gameId)?.run {
                 cache?.delete()
-            } ?: getCacheDir(game).deleteRecursively()
-            Log.d(LOGGING_TAG, "deleted ${getCacheDir(game)}")
+            } ?: getCacheDir(gameId).deleteRecursively()
+            Log.d(LOGGING_TAG, "deleted ${getCacheDir(gameId)}")
         }
 
         val db = AppDatabase.getDatabase(context)
-        db.gameDao.upsert(game.copy(
-            webEntryPoint = null
-        ))
+        db.installDao.deleteWebInstallationForGame(gameId)
     }
 
     suspend fun flush() = withContext(Dispatchers.IO) {
@@ -158,5 +182,25 @@ class WebGameCache(context: Context) {
             httpClient.value.cache?.flush()
             Log.d(LOGGING_TAG, "flushed for ID ${httpClient.key}")
         }
+    }
+
+    suspend fun cleanCaches(db: AppDatabase) {
+        val installs = db.installDao.getWebInstallationsSync()
+        val dirs = cacheDir.listFiles() ?: return
+
+        Log.d(LOGGING_TAG, "Cleaning up...")
+        for (cacheDir in dirs) {
+            try {
+                val cacheGameId = Integer.parseInt(cacheDir.name)
+                if (installs.find { install -> install.gameId == cacheGameId } == null) {
+                    Log.d(LOGGING_TAG, "Cleaning up $cacheGameId")
+                    cacheDir.deleteRecursively()
+                }
+            } catch (e: NumberFormatException) {
+                //Directory name is not a number; assume it's not a game cache directory
+                continue
+            }
+        }
+        Log.d(LOGGING_TAG, "Cleaning up done.")
     }
 }

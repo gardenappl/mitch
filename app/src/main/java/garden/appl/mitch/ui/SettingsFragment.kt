@@ -2,12 +2,17 @@ package garden.appl.mitch.ui
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.edit
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import garden.appl.mitch.Mitch
+import garden.appl.mitch.PREF_WEB_CACHE_DIALOG_HIDE
+import garden.appl.mitch.PREF_WEB_CACHE_ENABLE
 import garden.appl.mitch.R
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.DatabaseCleanup
@@ -15,6 +20,11 @@ import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.install.Installations
 
 class SettingsFragment : PreferenceFragmentCompat() {
+    companion object {
+        private const val LOGGING_TAG = "SettingsFrag"
+    }
+
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
     }
@@ -52,6 +62,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
             dialog.show()
             return true
+        } else if (preference.key == PREF_WEB_CACHE_ENABLE) {
+            val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            sharedPrefs.edit {
+                putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
+            }
+            Log.d(LOGGING_TAG, "will now hide web cache dialog")
         }
         return false
     }

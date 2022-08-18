@@ -15,26 +15,10 @@ data class GameInstallation(
     val externalFileName: String? = null
 ) {
     @Ignore
-    val librarySubtitle = if (packageName != null)
+    val librarySubtitle = if (packageName != null || status == Installation.STATUS_WEB_CACHED)
         game.author
     else if (uploadName == "-" || uploadName.isEmpty())
         game.author
     else
         uploadName
-
-    companion object {
-        val WEB_CACHE_DOWNLOAD_ID: Long? = null
-        const val WEB_CACHE_INSTALL_ID = -1
-        const val WEB_CACHE_UPLOAD_ID = -1
-        const val WEB_CACHE_UPLOAD_NAME = ""
-
-        fun createCachedWebGameInstallation(game: Game) = GameInstallation(
-            game,
-            Installation.STATUS_INSTALLED,
-            installId = WEB_CACHE_INSTALL_ID,
-            downloadOrInstallId = WEB_CACHE_DOWNLOAD_ID,
-            uploadId = WEB_CACHE_UPLOAD_ID,
-            uploadName = WEB_CACHE_UPLOAD_NAME
-        )
-    }
 }

@@ -9,6 +9,7 @@ import garden.appl.mitch.database.installation.Installation.Companion.PACKAGE_NA
 import garden.appl.mitch.database.installation.Installation.Companion.STATUS
 import garden.appl.mitch.database.installation.Installation.Companion.STATUS_INSTALLED
 import garden.appl.mitch.database.installation.Installation.Companion.STATUS_INSTALLING
+import garden.appl.mitch.database.installation.Installation.Companion.STATUS_WEB_CACHED
 import garden.appl.mitch.database.installation.Installation.Companion.TABLE_NAME
 import garden.appl.mitch.database.installation.Installation.Companion.UPLOAD_ID
 
@@ -29,10 +30,10 @@ abstract class InstallationDao {
     @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS = $STATUS_INSTALLED")
     abstract suspend fun getFinishedInstallationsForGame(gameId: Int): List<Installation>
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS != $STATUS_INSTALLED")
-    abstract suspend fun getPendingInstallations(uploadId: Int): List<Installation>
-
-    @Query("SELECT * FROM $TABLE_NAME WHERE $UPLOAD_ID = :uploadId AND $STATUS != $STATUS_INSTALLED")
+    @Query("""
+        SELECT * FROM $TABLE_NAME 
+        WHERE $UPLOAD_ID = :uploadId 
+            AND $STATUS != $STATUS_INSTALLED AND $STATUS != $STATUS_WEB_CACHED""")
     abstract suspend fun getPendingInstallation(uploadId: Int): Installation?
 
     @Query("DELETE FROM $TABLE_NAME WHERE $PACKAGE_NAME = :packageName AND $STATUS = $STATUS_INSTALLED")
@@ -55,6 +56,15 @@ abstract class InstallationDao {
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $DOWNLOAD_OR_INSTALL_ID = :installId AND $STATUS = $STATUS_INSTALLING")
     abstract suspend fun getPendingInstallationByInstallId(installId: Long): Installation?
+
+    @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS = $STATUS_WEB_CACHED")
+    abstract suspend fun getWebInstallationForGame(gameId: Int): Installation?
+
+    @Query("DELETE FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS = $STATUS_WEB_CACHED")
+    abstract suspend fun deleteWebInstallationForGame(gameId: Int)
+
+    @Query("SELECT * FROM $TABLE_NAME WHERE $STATUS = $STATUS_WEB_CACHED")
+    abstract suspend fun getWebInstallationsSync(): List<Installation>
 
 
     @Query("DELETE FROM $TABLE_NAME WHERE $INTERNAL_ID = :internalId")

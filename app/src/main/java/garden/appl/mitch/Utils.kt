@@ -1,6 +1,8 @@
 package garden.appl.mitch
 
 import android.annotation.SuppressLint
+import android.app.ActivityManager
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -298,5 +300,15 @@ object Utils {
     fun isVersionNewer(maybeNewerVersion: String, currentVersion: String): Boolean? {
         val comparisonResult = compareVersions(maybeNewerVersion, currentVersion) ?: return null
         return comparisonResult > 0
+    }
+
+    fun <T : Service> checkServiceRunning(context: Context, serviceClass: Class<T>): Boolean {
+        val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
     }
 }

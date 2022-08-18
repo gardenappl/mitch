@@ -11,14 +11,14 @@ import garden.appl.mitch.R
 
 
 /**
- * This is just a dummy foreground service, which is started when the WebView is showing
- * fullscreen content. Hopefully this will prevent Android form killing the app while an HTML5 game
- * is running in the background.
+ * This is just a dummy foreground service, which is started while the [GameActivity] is running.
+ * Hopefully this will prevent Android form killing the app while
+ * an HTML5 game is running in the background.
  */
-class WebViewForegroundService : Service() {
+class GameForegroundService : Service() {
     companion object {
         private const val LOGGING_TAG = "WebViewForeground"
-        
+
         const val EXTRA_ORIGINAL_INTENT = "original_intent"
     }
 

@@ -43,11 +43,12 @@ data class Installation(
 
     /**
      * There should only ever be a single Installation
-     * with a particular uploadId and with the status 'Installed'.
+     * with a particular uploadId and with [STATUS_INSTALLED].
      * (and, possibly, another Installation with the same uploadId
      * with a pending status)
      *
      * Mitch has a hardcoded upload ID. (see [Installation.MITCH_UPLOAD_ID])
+     * Web games all share a hardcoded upload ID. (see [Installation.WEB_UPLOAD_ID])
      */
     @ColumnInfo(name = UPLOAD_ID)
     val uploadId: Int,
@@ -165,6 +166,10 @@ data class Installation(
         const val MITCH_FILE_SIZE = "[Mitch file size]"
         const val MITCH_UPLOAD_ID = 1_000_000_000
 
+        const val WEB_UPLOAD_NAME = "[Web release name]"
+        const val WEB_FILE_SIZE = "[Web file size]"
+        const val WEB_UPLOAD_ID = 2_000_000_000
+
         const val INTERNAL_ID = "internal_id"
         const val GAME_ID = "game_id"
         const val UPLOAD_ID = "upload_id"
@@ -184,6 +189,7 @@ data class Installation(
         const val STATUS_DOWNLOADING = 1
         const val STATUS_INSTALLING = 2
         const val STATUS_READY_TO_INSTALL = 3
+        const val STATUS_WEB_CACHED = 4
 
         const val PLATFORM_NONE = 0
         const val PLATFORM_WINDOWS = 1

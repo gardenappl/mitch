@@ -113,8 +113,7 @@ class LibraryFragment : Fragment() {
                         binding.downloadsNothing.visibility = View.GONE
                     } else {
                         binding.downloadsList.visibility = View.GONE
-//                        binding.downloadsNothing.visibility = View.VISIBLE
-                        binding.downloadsNothing.visibility = View.GONE
+                        binding.downloadsNothing.visibility = View.VISIBLE
                     }
                 }
             }

@@ -137,7 +137,7 @@ class LibraryAdapter internal constructor(
                 GameActivity::class.java
             )
             intent.putExtra(GameActivity.EXTRA_GAME_ID, gameInstall.game.gameId)
-            intent.putExtra(GameActivity.EXTRA_IS_OFFLINE, false)
+            intent.putExtra(GameActivity.EXTRA_IS_OFFLINE, true)
             context.startActivity(intent)
         } else if (gameInstall.packageName != null) {
             val launchIntent = context.packageManager.getLaunchIntentForPackage(gameInstall.packageName)
@@ -312,7 +312,7 @@ class LibraryAdapter internal constructor(
                         Uri.parse("package:${gameInstall.packageName}"))
                     context.startActivity(intent)
                 } else if (type == GameRepository.Type.WebCached) {
-                    if (game.gameId == (activity as? MainActivity)?.runningCachedWebGame?.gameId) {
+                    if (Utils.checkServiceRunning(context, GameForegroundService::class.java)) {
                         val dialog = AlertDialog.Builder(context).apply {
                             setTitle(R.string.dialog_web_cache_delete_fail_title)
                             setMessage(context.getString(R.string.dialog_web_cache_delete_fail, game.name))
@@ -328,7 +328,7 @@ class LibraryAdapter internal constructor(
                             setMessage(context.getString(R.string.dialog_app_delete, game.name))
                             setPositiveButton(R.string.dialog_yes) { _, _ ->
                                 mainActivityScope.launch {
-                                    Mitch.webGameCache.deleteCacheForGame(context, game)
+                                    Mitch.webGameCache.deleteCacheForGame(context, game.gameId)
 
                                     Toast.makeText(
                                         context,

@@ -86,8 +86,6 @@ class DatabaseCleanup(private val context: Context) {
         val gamesToDelete = ArrayList<Game>()
         for (game in games) {
             Log.d(LOGGING_TAG, "Game: $game")
-            if (game.webEntryPoint != null)
-                continue
             if (installs.find { install -> install.gameId == game.gameId } == null)
                 gamesToDelete.add(game)
         }
@@ -106,6 +104,8 @@ class DatabaseCleanup(private val context: Context) {
             putBoolean(PREF_DB_RAN_CLEANUP_ONCE, true)
             commit()
         }
+
+        Mitch.webGameCache.cleanCaches(db)
 
         return Result.success()
     }

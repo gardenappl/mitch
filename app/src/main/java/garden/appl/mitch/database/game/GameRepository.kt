@@ -16,8 +16,6 @@ class GameRepository(gameDao: GameDao, val type: Type) {
         Type.Downloads -> gameDao.getGameDownloads()
         Type.Installed -> gameDao.getInstalledAndroidGames()
         Type.Pending -> gameDao.getPendingGames()
-        Type.WebCached -> gameDao.getCachedWebGames().map { games ->
-            games.map(GameInstallation::createCachedWebGameInstallation)
-        }
+        Type.WebCached -> gameDao.getCachedWebGames()
     }
 }

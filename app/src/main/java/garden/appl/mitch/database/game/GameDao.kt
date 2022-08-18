@@ -64,12 +64,23 @@ abstract class GameDao {
             installations.$EXTERNAL_FILE_NAME as externalFileName
         FROM games INNER JOIN installations
         ON games.$GAME_ID = installations.game_id
-        WHERE $STATUS != ${Installation.STATUS_INSTALLED}""")
+        WHERE $STATUS != ${Installation.STATUS_INSTALLED} 
+            AND $STATUS != ${Installation.STATUS_WEB_CACHED}""")
     abstract fun getPendingGames(): LiveData<List<GameInstallation>>
 
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $WEB_ENTRY_POINT IS NOT NULL")
-    abstract fun getCachedWebGames(): LiveData<List<Game>>
+    @Query("""
+        SELECT games.*, installations.$STATUS as status, 
+            installations.$DOWNLOAD_OR_INSTALL_ID as downloadOrInstallId,
+            installations.$PACKAGE_NAME as packageName,
+            installations.$INTERNAL_ID as installId,
+            installations.$UPLOAD_NAME as uploadName,
+            installations.$UPLOAD_ID as uploadId,
+            installations.$EXTERNAL_FILE_NAME as externalFileName
+        FROM games INNER JOIN installations
+        ON games.$GAME_ID = installations.game_id
+        WHERE $STATUS = ${Installation.STATUS_WEB_CACHED}""")
+    abstract fun getCachedWebGames(): LiveData<List<GameInstallation>>
 
 
     @Query("""

@@ -66,8 +66,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         get() = chromeClient.customViewCallback != null
     val url: String?
         get() = webView.url
-    val runningCachedWebGame: Game?
-        get() = currentInfo?.let { if (it.isRunningCachedWebGame) it.game else null }
 
 
     override fun onAttach(context: Context) {
@@ -228,10 +226,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     fun onBackPressed(): Boolean {
         chromeClient.customViewCallback?.let { callback ->
             callback.onCustomViewHidden()
-            if (currentInfo?.isCachedWebGameOffline == true)
-                currentInfo = null
-            else
-                return@onBackPressed true
+            return@onBackPressed true
         }
 
         if (webView.canGoBack()) {
@@ -264,8 +259,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     override fun onDestroy() {
         super.onDestroy()
 
-        requireContext().stopService(Intent(context, WebViewForegroundService::class.java))
-
         cancel()
     }
 
@@ -283,11 +276,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     fun loadUrl(url: String) {
         webView.loadUrl(url)
-    }
-
-    fun launchWebGame(game: Game) {
-        currentInfo = browseHandler?.onStartedOfflineWebGame(game)
-        loadUrl(game.webEntryPoint!!)
     }
 
     /**
@@ -399,7 +387,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                             GameActivity::class.java
                         )
                         intent.putExtra(GameActivity.EXTRA_GAME_ID, info.game.gameId)
-                        intent.putExtra(GameActivity.EXTRA_IS_OFFLINE, true)
+                        intent.putExtra(GameActivity.EXTRA_IS_OFFLINE, false)
                         mainActivity.startActivity(intent)
                     }
                     actions.add(Triple(buttonText, buttonLabel, onButtonClick))
@@ -751,31 +739,13 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
             Log.d(LOGGING_TAG, "current info: ${fragment.currentInfo}")
 
-            if (fragment.currentInfo?.isCachedWebGameOffline != true) {
-                fragment.launch(Dispatchers.Default) {
-                    val doc = Jsoup.parse(html)
-                    val info = fragment.browseHandler?.onPageVisited(doc, url)
-                    fragment.currentDoc = doc
-                    fragment.currentInfo = info
-                    fragment.activity?.runOnUiThread {
-                        fragment.updateUI()
-                    }
-                }
-            } else {
+            fragment.launch(Dispatchers.Default) {
+                val doc = Jsoup.parse(html)
+                val info = fragment.browseHandler?.onPageVisited(doc, url)
+                fragment.currentDoc = doc
+                fragment.currentInfo = info
                 fragment.activity?.runOnUiThread {
-//                    fragment.chromeClient.setForcedFullscreen()
-                    fragment.webView.evaluateJavascript("""
-             document.getElementById("container").addEventListener("click", (event) => {
-            console.log("fullsc");
-  if (document.getElementById("container").requestFullscreen) {
-    document.getElementById("container").requestFullscreen();
-  } else if (document.getElementById("container").webkitRequestFullscreen) { /* Safari */
-    document.getElementById("container").webkitRequestFullscreen();
-  } else if (document.getElementById("container").msRequestFullscreen) { /* IE11 */
-    document.getElementById("container").msRequestFullscreen();
-  }
-            });
-        """.trimIndent(), null)
+                    fragment.updateUI()
                 }
             }
         }
@@ -845,35 +815,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             return null
         }
 
-        private fun showWebGameLaunchDialog(context: Context) {
-            val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-
-            if (!prefs.getBoolean(PREF_WEB_CACHE_DIALOG_HIDE, false)) {
-                val dialog = AlertDialog.Builder(context).apply {
-                    setTitle(R.string.dialog_web_cache_info_title)
-                    setMessage(R.string.dialog_web_cache_info)
-                    setPositiveButton(android.R.string.ok) { _, _ ->
-                        prefs.edit().run {
-                            putBoolean(PREF_WEB_CACHE_ENABLE, true)
-                            putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
-                            apply()
-                        }
-                    }
-                    setNegativeButton(android.R.string.cancel) { _, _ ->
-                        prefs.edit().run {
-                            putBoolean(PREF_WEB_CACHE_ENABLE, false)
-                            putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
-                            apply()
-                        }
-                    }
-                    setCancelable(true)
-
-                    create()
-                }
-                dialog.show()
-            }
-        }
-
 
         override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
             view.evaluateJavascript("""
@@ -940,16 +881,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             this.setFullscreen(view, callback)
 
         private fun setFullscreen(view: View?, callback: CustomViewCallback) {
-            val foregroundServiceIntent = Intent(context, WebViewForegroundService::class.java)
-            foregroundServiceIntent.putExtra(WebViewForegroundService.EXTRA_ORIGINAL_INTENT,
-                requireActivity().intent)
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                requireContext().startForegroundService(foregroundServiceIntent)
-            } else {
-                requireContext().startService(foregroundServiceIntent)
-            }
-
             if (view != null)
                 webView.visibility = View.GONE
 
@@ -977,8 +908,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
 
         override fun onHideCustomView() {
-            requireContext().stopService(Intent(context, WebViewForegroundService::class.java))
-
             webView.visibility = View.VISIBLE
             (activity as? MainActivity)?.apply {
                 binding.bottomView.visibility = View.VISIBLE

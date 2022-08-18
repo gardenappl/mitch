@@ -89,7 +89,7 @@
         <activity
                 android:name=".ui.GameActivity"
                 android:launchMode="singleInstance"
-                android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+                android:theme="@style/AppTheme.Fullscreen"
                 android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|uiMode"/>
 
         <receiver
@@ -129,7 +129,7 @@
                     android:name="android.support.FILE_PROVIDER_PATHS"
                     android:resource="@xml/provider_paths"/>
         </provider>
-        <service android:name=".ui.WebViewForegroundService" />
+        <service android:name=".ui.GameForegroundService" />
     </application>
 
 </manifest>

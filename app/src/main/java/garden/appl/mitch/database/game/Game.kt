@@ -57,7 +57,7 @@ data class Game(
     @ColumnInfo(name = WEB_ENTRY_POINT)
     val webEntryPoint: String? = null,
 
-    @Deprecated("Currently unused field")
+    @Deprecated("Unused field")
     @ColumnInfo(name = WEB_CACHED)
     val webCached: Boolean = false
 ) {

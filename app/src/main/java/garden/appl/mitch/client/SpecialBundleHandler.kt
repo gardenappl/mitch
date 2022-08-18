@@ -70,7 +70,7 @@ object SpecialBundleHandler {
             sharedPrefs.edit().apply {
                 putLong(prefTimestamp + userName, System.currentTimeMillis())
                 putString(prefLinkPrefix + userName, link ?: LINK_EMPTY)
-                commit()
+                commit() //TODO: clean up commit/apply
             }
         }
         return link

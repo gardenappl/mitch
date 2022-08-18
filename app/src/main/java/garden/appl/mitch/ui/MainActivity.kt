@@ -37,9 +37,6 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
     lateinit var binding: ActivityMainBinding
     private set
 
-    val runningCachedWebGame: Game?
-        get() = browseFragment.runningCachedWebGame
-
     /**
      * The restart dialog is handled here.
      * Yes, this means that if the language changes outside of MainActivity,
@@ -318,11 +315,6 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
 //        val game = db.gameDao.getGameById(gameId)!!
 //        launchWebGame(db.gameDao.getGameById(gameId)!!)
 //    }
-
-    fun launchWebGame(game: Game) {
-        setActiveFragment(BROWSE_FRAGMENT_TAG)
-        browseFragment.launchWebGame(game)
-    }
 
     private fun onFragmentSet(newFragmentTag: String, resetNavBar: Boolean) {
         if (resetNavBar)

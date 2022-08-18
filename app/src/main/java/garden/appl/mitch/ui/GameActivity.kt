@@ -2,6 +2,7 @@ package garden.appl.mitch.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
@@ -10,11 +11,16 @@ import android.util.Log
 import android.view.View
 import android.webkit.*
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.edit
+import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import garden.appl.mitch.*
 import garden.appl.mitch.database.AppDatabase
+import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.databinding.ActivityGameBinding
+import garden.appl.mitch.files.WebGameCache
 import java.io.File
 
 class GameActivity : Activity() {
@@ -42,9 +48,8 @@ class GameActivity : Activity() {
     override fun onStart() {
         super.onStart()
 
-        if (intent.action == Intent.ACTION_VIEW) {
-            webView.loadUrl(intent.data.toString())
-        }
+        if (intent.action != Intent.ACTION_VIEW)
+            throw IllegalArgumentException("Only ACTION_VIEW is supported")
 
         chromeClient = GameChromeClient()
 
@@ -60,15 +65,56 @@ class GameActivity : Activity() {
         webView.webChromeClient = chromeClient
 
 
-        val foregroundServiceIntent = Intent(this, WebViewForegroundService::class.java)
-        foregroundServiceIntent.putExtra(WebViewForegroundService.EXTRA_ORIGINAL_INTENT, intent)
+        val foregroundServiceIntent = Intent(this, GameForegroundService::class.java)
+        foregroundServiceIntent.putExtra(GameForegroundService.EXTRA_ORIGINAL_INTENT, intent)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(foregroundServiceIntent)
         } else {
             startService(foregroundServiceIntent)
         }
+
+        showLaunchDialog(this, intent.data.toString())
     }
+
+    private fun showLaunchDialog(context: Context, url: String) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+
+        if (prefs.getBoolean(PREF_WEB_CACHE_DIALOG_HIDE, false)) {
+            afterDialogShown(url)
+        } else {
+            val dialog = AlertDialog.Builder(context).apply {
+                setTitle(R.string.dialog_web_cache_info_title)
+                setMessage(R.string.dialog_web_cache_info)
+                setPositiveButton(android.R.string.ok) { _, _ ->
+                    prefs.edit(commit = true) {
+                        putBoolean(PREF_WEB_CACHE_ENABLE, true)
+                        putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
+                    }
+                    afterDialogShown(url)
+                }
+                setNegativeButton(android.R.string.cancel) { _, _ ->
+                    prefs.edit(commit = true) {
+                        putBoolean(PREF_WEB_CACHE_ENABLE, false)
+                        putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
+                    }
+                    afterDialogShown(url)
+                }
+                setCancelable(true)
+                setOnCancelListener {
+                    afterDialogShown(url)
+                }
+
+                create()
+            }
+            dialog.show()
+        }
+    }
+
+    private fun afterDialogShown(url: String) {
+        webView.loadUrl(url)
+    }
+
 
     override fun onResume() {
         super.onResume()
@@ -94,7 +140,7 @@ class GameActivity : Activity() {
         super.onDestroy()
         webView.settings.javaScriptEnabled = false
         webView.destroy()
-        stopService(Intent(this, WebViewForegroundService::class.java))
+        stopService(Intent(this, GameForegroundService::class.java))
     }
 
     override fun onBackPressed() {
@@ -115,8 +161,6 @@ class GameActivity : Activity() {
     }
 
     inner class GameWebViewClient : WebViewClient() {
-        val githubLoginPathRegex = Regex("""/?(login|sessions)(/.*)?""")
-
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
             if (ItchWebsiteUtils.isItchWebPage(request.url)) {
                 return false
@@ -138,16 +182,21 @@ class GameActivity : Activity() {
         override fun shouldInterceptRequest(
             view: WebView,
             request: WebResourceRequest
-        ): WebResourceResponse? {
-            val isOffline = this@GameActivity.intent.getBooleanExtra(EXTRA_IS_OFFLINE, false)
+        ): WebResourceResponse? = runBlocking(Dispatchers.IO) {
+            val isOffline = intent.getBooleanExtra(EXTRA_IS_OFFLINE, false)
+            val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
 
-            return runBlocking(Dispatchers.IO) {
-                val db = AppDatabase.getDatabase(this@GameActivity)
-                val game =
-                    db.gameDao.getGameById(this@GameActivity.intent.getIntExtra(EXTRA_GAME_ID, 0))!!
-                Log.d(LOGGING_TAG, "got $game")
-                Mitch.webGameCache.request(applicationContext, game, request, isOffline)
+            val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this@GameActivity)
+
+            if (!sharedPrefs.getBoolean(PREF_WEB_CACHE_ENABLE, false)
+                    && !Mitch.webGameCache.isGameWebCached(this@GameActivity, gameId)) {
+                return@runBlocking null
             }
+
+            val game = Mitch.webGameCache.makeGameWebCached(this@GameActivity, gameId)
+            Log.d(LOGGING_TAG, "got $game")
+
+            Mitch.webGameCache.request(applicationContext, game, request, isOffline)
         }
 
         override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
