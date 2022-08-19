@@ -34,7 +34,8 @@ class OwnedGamesActivity : MitchActivity() {
 
         private const val LAST_SEARCH_QUERY = "last_search"
         private const val LAST_ANDROID_ONLY_FILTER = "ua.gardenapple.itchupdater.lastupdatecheck.last_android_only"
-        private const val DEFAULT_ANDROID_ONLY_FILTER = false
+//        private const val DEFAULT_ANDROID_ONLY_FILTER = false
+        private const val androidOnlyFilter = false
     }
 
     private lateinit var binding: OwnedActivityBinding
@@ -44,7 +45,7 @@ class OwnedGamesActivity : MitchActivity() {
     private var loadJob: Job? = null
     private val repository = ItchLibraryRepository()
 
-    private var androidOnlyFilter: Boolean = DEFAULT_ANDROID_ONLY_FILTER
+//    private var androidOnlyFilter: Boolean = DEFAULT_ANDROID_ONLY_FILTER
     private var searchString: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,10 +101,10 @@ class OwnedGamesActivity : MitchActivity() {
         }
         binding.ownedItemsList.layoutManager = LinearLayoutManager(this)
 
-        androidOnlyFilter =
-            savedInstanceState?.getBoolean(LAST_ANDROID_ONLY_FILTER, DEFAULT_ANDROID_ONLY_FILTER)
-                ?: PreferenceManager.getDefaultSharedPreferences(this).getBoolean(
-                    LAST_ANDROID_ONLY_FILTER, DEFAULT_ANDROID_ONLY_FILTER)
+//        androidOnlyFilter =
+//            savedInstanceState?.getBoolean(LAST_ANDROID_ONLY_FILTER, DEFAULT_ANDROID_ONLY_FILTER)
+//                ?: PreferenceManager.getDefaultSharedPreferences(this).getBoolean(
+//                    LAST_ANDROID_ONLY_FILTER, DEFAULT_ANDROID_ONLY_FILTER)
         searchString = savedInstanceState?.getString(LAST_SEARCH_QUERY) ?: ""
 
         loadItems(searchString, androidOnlyFilter)
@@ -156,38 +157,38 @@ class OwnedGamesActivity : MitchActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.owned_actions, menu)
-        menu.findItem(R.id.only_android).isChecked = androidOnlyFilter
+//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+//        menuInflater.inflate(R.menu.owned_actions, menu)
+//        menu.findItem(R.id.only_android).isChecked = androidOnlyFilter
+//
+//        val searchView: SearchView = menu.findItem(R.id.games_search).actionView as SearchView
+//        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+//            override fun onQueryTextSubmit(query: String?): Boolean = true
+//
+//            override fun onQueryTextChange(newText: String?): Boolean {
+//                newText?.let {
+//                    searchString = newText
+//                    this@OwnedGamesActivity.loadItems(it, androidOnlyFilter)
+//                }
+//                return true
+//            }
+//        })
+//        return true
+//    }
 
-        val searchView: SearchView = menu.findItem(R.id.games_search).actionView as SearchView
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = true
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                newText?.let {
-                    searchString = newText
-                    this@OwnedGamesActivity.loadItems(it, androidOnlyFilter)
-                }
-                return true
-            }
-        })
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.only_android -> {
-                androidOnlyFilter = !item.isChecked
-                loadItems(searchString, androidOnlyFilter)
-                val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
-                sharedPrefs.edit {
-                    putBoolean(LAST_ANDROID_ONLY_FILTER, androidOnlyFilter)
-                }
-                item.isChecked = androidOnlyFilter
-                return true
-            }
-        }
-        return false
-    }
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        when (item.itemId) {
+//            R.id.only_android -> {
+//                androidOnlyFilter = !item.isChecked
+//                loadItems(searchString, androidOnlyFilter)
+//                val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
+//                sharedPrefs.edit {
+//                    putBoolean(LAST_ANDROID_ONLY_FILTER, androidOnlyFilter)
+//                }
+//                item.isChecked = androidOnlyFilter
+//                return true
+//            }
+//        }
+//        return false
+//    }
 }
