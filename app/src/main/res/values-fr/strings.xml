@@ -190,4 +190,22 @@
     <string name="bundle_claim_all_desc">Réclamer tous les jeux de cette offre groupée dès maintenant.</string>
     <string name="notification_download_no_space">Pas assez d\'espace de stockage pour ce fichier</string>
     <string name="bundle">Offres spéciales</string>
+    <string name="settings_web_cache_update">Mettre à jour les jeux web sauvegardés</string>
+    <string name="settings_web_cache_enable">Sauvegarder les jeux web</string>
+    <string name="settings_web_cache_update_never">Jamais</string>
+    <string name="settings_web_cache_update_unmetered">Lorsqu\'il est lancé sur une connexion non mesurée</string>
+    <string name="settings_web_cache_update_always">Lorsqu\'il est lancé à tout moment</string>
+    <string name="dialog_web_cache_delete_title">Supprimer ce jeu \?</string>
+    <string name="game_web_play_desc">Jouer à la version web maintenant</string>
+    <string name="game_multiple_options_get">Obtenir →</string>
+    <string name="game_multiple_options_desc_web_or_download">Jouer maintenant ou télécharger</string>
+    <string name="dialog_web_cache_info">Mitch peut enregistrer automatiquement les jeux en ligne pour y jouer hors ligne ultérieurement.</string>
+    <string name="library_category_web_cached">Jeux web</string>
+    <string name="dialog_web_cache_info_title">Installation de jeux web</string>
+    <string name="dialog_web_cache_delete_fail_title">Je ne peux pas supprimer maintenant</string>
+    <string name="game_multiple_options_desc_multiple_purchases">Achats multiples</string>
+    <string name="settings_web_cache_enable_desc">Installez tous les jeux en ligne auxquels vous avez participé pour y jouer hors ligne.</string>
+    <string name="dialog_web_cache_delete_fail">%1$s ne peut pas être supprimé car il est en cours d\'exécution.</string>
+    <string name="game_web_play_default_type">Jouer</string>
+    <string name="game_multiple_options_desc_web_or_buy">Jouer maintenant ou acheter</string>
 </resources>
