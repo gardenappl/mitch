@@ -23,8 +23,8 @@
     <string name="bundle_claim_dialog_title">Bist du sicher\?</string>
     <string name="bundle_claim_error_justice">Der Herunterladen-Link aus dem Racial Justice-Bundle konnte nicht aufgerufen werden.</string>
     <string name="game_buy">Kaufen</string>
-    <string name="settings_installer_native">Natives Installationsprogramm (Standard)</string>
-    <string name="settings_installer_session">Sitzungsinstallationsprogramm</string>
+    <string name="settings_installer_native">Natives Installationsprogramm (für einige MIUI-Geräte erforderlich)</string>
+    <string name="settings_installer_session">Sitzungsinstallationsprogramm (Standard)</string>
     <string name="settings_installer">Installationsmethode</string>
     <string name="dialog_no">Nein</string>
     <string name="settings_cancel_downloads_message">Dies sollte nur zu Test- oder Fehlerbehebungszwecken erfolgen.</string>
@@ -179,4 +179,5 @@
 \nSie können dennoch zusätzliche Inhalte wie Kunst, Musik oder Handbücher anzeigen.</string>
     <string name="dialog_download_wrong_os">%s ist nicht mit Android kompatibel. Sie können es nicht als Anwendung installieren.
 \nMöchten Sie es trotzdem herunterladen\?</string>
+    <string name="library_category_web_cached">Web-Spiele</string>
 </resources>
