@@ -285,7 +285,7 @@ class Mitch : Application() {
             setExcludeMatchingSharedPreferencesKeys(".*(racial|justice|palestine|ukraine|trans_texas).*")
 
             getPluginConfigurationBuilder(MailSenderConfigurationBuilder::class.java).apply {
-                setMailTo("~gardenapple/mitch-bug-reports@lists.sr.ht, gardenapple+mitch@posteo.net")
+                setMailTo("~gardenapple/mitch-bug-reports@lists.sr.ht, mitch@appl.garden")
                 //Empty subject, user should write their own
                 setSubject("")
                 //Email body is English only, this is intentional
