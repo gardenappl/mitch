@@ -20,6 +20,7 @@ import garden.appl.mitch.client.UpdateChecker
 import garden.appl.mitch.database.updatecheck.InstallUpdateCheckResult
 import garden.appl.mitch.database.updatecheck.UpdateCheckResultViewModel
 import garden.appl.mitch.databinding.UpdatesFragmentBinding
+import kotlinx.coroutines.cancel
 import java.util.*
 
 
@@ -116,6 +117,11 @@ class UpdatesFragment : Fragment(), CoroutineScope by MainScope() {
         super.onDestroyView()
 
         _binding = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cancel()
     }
 
 

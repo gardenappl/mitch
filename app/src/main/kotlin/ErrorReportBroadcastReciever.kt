@@ -21,6 +21,6 @@ class ErrorReportBroadcastReciever : BroadcastReceiver() {
         val errorString = intent!!.getStringExtra(EXTRA_ERROR_STRING)!!
         Log.w(LOGGING_TAG, "Reporting error: $errorString")
 
-        ACRA.getErrorReporter().handleException(Utils.ErrorReport(errorString))
+        ACRA.errorReporter.handleException(Utils.ErrorReport(errorString))
     }
 }

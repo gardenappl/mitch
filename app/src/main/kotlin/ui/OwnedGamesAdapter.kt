@@ -98,7 +98,7 @@ class OwnedGamesAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val uiModel = getItem(position)) {
+        when (val uiModel = getItem(position)!!) {
             is ItchLibraryUiModel.Item -> (holder as OwnedGameHolder).bind(uiModel.item, context)
             is ItchLibraryUiModel.Separator -> (holder as SeparatorHolder).bind(uiModel)
         }

@@ -14,9 +14,6 @@ import okhttp3.Cache
 import okhttp3.OkHttpClient
 import org.acra.ACRA
 import org.acra.ReportField
-import org.acra.config.CoreConfigurationBuilder
-import org.acra.config.DialogConfigurationBuilder
-import org.acra.config.MailSenderConfigurationBuilder
 import org.acra.data.StringFormat
 import garden.appl.mitch.client.UpdateChecker
 import garden.appl.mitch.database.DatabaseCleanup
@@ -26,6 +23,8 @@ import garden.appl.mitch.files.WebGameCache
 import garden.appl.mitch.install.InstallerDatabaseHandler
 import garden.appl.mitch.ui.CrashDialog
 import garden.appl.mitch.ui.MitchContextWrapper
+import org.acra.config.*
+import org.acra.ktx.initAcra
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -272,24 +271,24 @@ class Mitch : Application() {
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
 
-        ACRA.init(this, CoreConfigurationBuilder(this).apply {
-            setBuildConfigClass(BuildConfig::class.java)
-            setReportFormat(StringFormat.KEY_VALUE_LIST)
-            setReportContent(
+        initAcra {
+            buildConfigClass = BuildConfig::class.java
+            reportFormat = StringFormat.KEY_VALUE_LIST
+            reportContent = listOf(
                 ReportField.ANDROID_VERSION,
                 ReportField.BUILD_CONFIG,
                 ReportField.STACK_TRACE,
                 ReportField.LOGCAT,
                 ReportField.SHARED_PREFERENCES
             )
-            setExcludeMatchingSharedPreferencesKeys(".*(racial|justice|palestine|ukraine|trans_texas).*")
+            excludeMatchingSharedPreferencesKeys = listOf(".*(racial|justice|palestine|ukraine|trans_texas).*")
 
-            getPluginConfigurationBuilder(MailSenderConfigurationBuilder::class.java).apply {
-                setMailTo("~gardenapple/mitch-bug-reports@lists.sr.ht, mitch@appl.garden")
+            mailSender {
+                mailTo = "~gardenapple/mitch-bug-reports@lists.sr.ht, mitch@appl.garden"
                 //Empty subject, user should write their own
-                setSubject("")
+                subject = ""
                 //Email body is English only, this is intentional
-                setBody("""
+                body = """
                     > Please describe what you were doing when you got the error.
                     
                     > Note: SourceHut does not accept email in HTML format,
@@ -300,15 +299,13 @@ class Mitch : Application() {
                     > and also sent to the developer's personal address.
                     
                     > Thank you for your help!
-                """.trimIndent())
-                setReportFileName("error-report-and-logs.txt")
-                setEnabled(true)
+                """.trimIndent()
+                reportFileName = "error-report-and-logs.txt"
             }
 
-            getPluginConfigurationBuilder(DialogConfigurationBuilder::class.java).apply {
-                setReportDialogClass(CrashDialog::class.java)
-                setEnabled(true)
+            dialog {
+                reportDialogClass = CrashDialog::class.java
             }
-        })
+        }
     }
 }

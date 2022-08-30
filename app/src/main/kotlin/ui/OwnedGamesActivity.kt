@@ -12,6 +12,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.paging.LoadState
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -67,12 +69,11 @@ class OwnedGamesActivity : MitchActivity() {
         }
 
         // get view model
-        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ItchLibraryViewModel(repository) as T
+        viewModel = ViewModelProvider(this, viewModelFactory {
+            initializer {
+                ItchLibraryViewModel(repository)
             }
-        }).get(ItchLibraryViewModel::class.java)
+        })[ItchLibraryViewModel::class.java]
 
         binding.ownedItemsList.adapter = adapter.withLoadStateFooter(
             OwnedGamesLoadStateAdapter { adapter.retry() }

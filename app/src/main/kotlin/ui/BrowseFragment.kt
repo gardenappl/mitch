@@ -93,8 +93,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         @SuppressLint("SetJavaScriptEnabled")
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
-        webView.settings.setAppCacheEnabled(true)
-        webView.settings.setAppCachePath(File(requireContext().filesDir, "html5-app-cache").path)
+//        webView.settings.setAppCacheEnabled(true)
+//        webView.settings.setAppCachePath(File(requireContext().filesDir, "html5-app-cache").path)
         webView.settings.databaseEnabled = true
 
         webView.settings.mediaPlaybackRequiresUserGesture = false

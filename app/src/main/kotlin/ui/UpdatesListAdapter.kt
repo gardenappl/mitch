@@ -166,7 +166,7 @@ class UpdatesListAdapter internal constructor(
 
         binding.root.setOnClickListener {
             if (updateCheckResult.code == UpdateCheckResult.ERROR) {
-                ACRA.getErrorReporter().handleException(Utils.ErrorReport(updateCheckResult.errorReport!!))
+                ACRA.errorReporter.handleException(Utils.ErrorReport(updateCheckResult.errorReport!!))
             } else if (activity is MainActivity) {
                 activity.browseUrl(availableUpdate.storeUrl)
             } else {
