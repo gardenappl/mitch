@@ -200,4 +200,25 @@
     <string name="game_multiple_options_desc_web_or_download">Play now or download</string>
     <string name="game_multiple_options_desc_web_or_buy">Play now or purchase</string>
     <string name="game_multiple_options_desc_multiple_purchases">Multiple purchases</string>
+    <string name="genre_genre_action">Action</string>
+    <string name="genre_genre_adventure">Adventure</string>
+    <string name="genre_tag_card_game">Card Game</string>
+    <string name="genre_tag_educational">Educational</string>
+    <string name="genre_tag_fighting">Fighting</string>
+    <string name="genre_tag_interactive_fiction">Interactive Fiction</string>
+    <string name="genre_genre_platformer">Platformer</string>
+    <string name="genre_genre_puzzle">Puzzle</string>
+    <string name="genre_tag_racing">Racing</string>
+    <string name="genre_tag_rhythm">Rhythm</string>
+    <string name="genre_genre_rpg">Role Playing</string>
+    <string name="genre_genre_shooter">Shooter</string>
+    <string name="genre_genre_simulation">Simulation</string>
+    <string name="genre_genre_sports">Sports</string>
+    <string name="genre_genre_strategy">Strategy</string>
+    <string name="genre_tag_survival">Survival</string>
+    <string name="genre_genre_visual_novel">Visual Novel</string>
+    <string name="browser_filter_exclude_genres">Exclude genres</string>
+    <string name="settings_exclude_tags">Exclude game tag from home page</string>
+    <string name="settings_exclude_tags_show_all">Show all games</string>
+    <string name="popup_web_game_cached">This game will be available in your library for offline play.</string>
 </resources>

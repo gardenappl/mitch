@@ -202,4 +202,25 @@
     <string name="game_multiple_options_desc_web_or_download">Грати зараз або завантажити</string>
     <string name="game_multiple_options_desc_web_or_buy">Грати зараз або купити</string>
     <string name="game_multiple_options_desc_multiple_purchases">Декулька покупок</string>
+    <string name="genre_genre_action">Екшн</string>
+    <string name="genre_genre_adventure">Пригодницькі ігри</string>
+    <string name="genre_tag_card_game">Картівні ігри</string>
+    <string name="genre_tag_educational">Навчальні ігри</string>
+    <string name="genre_tag_fighting">Файтинг</string>
+    <string name="genre_tag_interactive_fiction">Інтерактивна література</string>
+    <string name="genre_genre_platformer">Платформер</string>
+    <string name="genre_genre_puzzle">Головоломка</string>
+    <string name="genre_tag_racing">Перегони</string>
+    <string name="genre_tag_rhythm">Ритмічні ігри</string>
+    <string name="genre_genre_rpg">Рольові ігри</string>
+    <string name="genre_genre_shooter">Шутер</string>
+    <string name="genre_genre_simulation">Симулятор</string>
+    <string name="genre_genre_sports">Спорт</string>
+    <string name="genre_genre_strategy">Стратегічні ігри</string>
+    <string name="genre_tag_survival">Виживання</string>
+    <string name="genre_genre_visual_novel">Візуальні новели</string>
+    <string name="browser_filter_exclude_genres">Не показувати жанри</string>
+    <string name="settings_exclude_tags">Не показувати тег ігор на домашній сторінці</string>
+    <string name="settings_exclude_tags_show_all">Показувати все</string>
+    <string name="popup_web_game_cached">Ця гра буде доступна в ігротеці в режимі офлайн.</string>
 </resources>
