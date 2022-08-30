@@ -841,6 +841,17 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         let elements = document.querySelectorAll(".purchase_banner, .header_buy_row, .buy_row, .donate_btn, .embed_wrapper, .load_iframe_btn");
                         for (var element of elements)
                             element.style.display = "none";
+                            
+                        // stop highlighting download links for non-Android OSs
+                        const uploads = document.querySelectorAll(".uploads .upload")
+                        for (const upload of uploads) {
+                        	if (upload.querySelector(".icon-android") != null)
+                        		continue
+                        	if (upload.querySelector(".icon-windows8, .icon-tux, .icon-apple") == null)
+                        		continue
+                        	const button = upload.querySelector(".download_btn")
+                        	button.setAttribute("style", "background-color: inherit; border-color: #FF2449; color: #FF2449; text-shadow: none;")
+                        }
                     });
                     window.addEventListener("resize", (event) => {
                         mitchCustomJS.onResize();
