@@ -56,7 +56,6 @@ class GameActivity : Activity() {
 
     override fun onStart() {
         super.onStart()
-        Log.d(LOGGING_TAG, "started yeee")
 
         if (intent.action != Intent.ACTION_VIEW)
             throw IllegalArgumentException("Only ACTION_VIEW is supported")
@@ -90,7 +89,6 @@ class GameActivity : Activity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        Log.d(LOGGING_TAG, "new intent")
         if (intent?.data?.toString() != this.intent.data.toString())
             showLaunchDialog(this, intent?.data.toString())
     }
@@ -147,7 +145,6 @@ class GameActivity : Activity() {
 
     override fun onStop() {
         super.onStop()
-        Log.d(LOGGING_TAG, "stopped")
         unbindService(connection)
         stopService(Intent(this, GameForegroundService::class.java))
     }
@@ -156,16 +153,14 @@ class GameActivity : Activity() {
         super.onPause()
 //        webView.onPause()
         webView.pauseTimers()
-        Log.d(LOGGING_TAG, "paused")
-//        CookieManager.getInstance().flush()
-//        runBlocking(Dispatchers.IO) {
-//            Mitch.webGameCache.flush()
-//        }
+        CookieManager.getInstance().flush()
+        runBlocking(Dispatchers.IO) {
+            Mitch.webGameCache.flush()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(LOGGING_TAG, "destroyed")
         webView.settings.javaScriptEnabled = false
         webView.destroy()
     }
@@ -173,7 +168,6 @@ class GameActivity : Activity() {
     override fun onBackPressed() {
         if (webView.canGoBack()) {
             webView.goBack()
-            Log.d(LOGGING_TAG, "go back")
         } else {
             finish()
         }
@@ -221,7 +215,6 @@ class GameActivity : Activity() {
             }
 
             val game = Mitch.webGameCache.makeGameWebCached(this@GameActivity, gameId)
-            Log.d(LOGGING_TAG, "got $game")
 
             Mitch.webGameCache.request(applicationContext, game, request, isOffline)
         }
@@ -248,13 +241,11 @@ class GameActivity : Activity() {
         private var customView: View? = null
 
         override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
-            Log.d(LOGGING_TAG, "Doing fullscreen...")
             webView.visibility = View.GONE
             binding.root.addView(view)
         }
 
         override fun onHideCustomView() {
-            Log.d(LOGGING_TAG, "Doing NOT fullscreen...")
             webView.visibility = View.VISIBLE
             customView?.let { binding.root.removeView(it) }
         }
