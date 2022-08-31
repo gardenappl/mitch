@@ -26,26 +26,27 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.textfield.TextInputEditText
 import com.leinardi.android.speeddial.SpeedDialActionItem
-import kotlinx.coroutines.*
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import com.leinardi.android.speeddial.SpeedDialView
 import garden.appl.mitch.*
 import garden.appl.mitch.client.ItchBrowseHandler
 import garden.appl.mitch.client.ItchWebsiteParser
 import garden.appl.mitch.client.SpecialBundleHandler
-import garden.appl.mitch.database.game.Game
+import garden.appl.mitch.data.ItchGenre
 import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.databinding.BrowseFragmentBinding
 import garden.appl.mitch.databinding.DialogWebPromptBinding
+import kotlinx.coroutines.*
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import java.io.ByteArrayInputStream
-import java.io.File
+import java.util.*
 
 
 class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
-
     companion object {
         private const val LOGGING_TAG = "BrowseFragment"
         private const val WEB_VIEW_STATE_KEY: String = "WebView"
+        private const val GENRES_EXCLUSION_FILTER: String = "GenresFilter"
 
         private const val APP_BAR_ACTIONS_DEFAULT = 1
         private const val APP_BAR_ACTIONS_FROM_HTML = 2
@@ -67,10 +68,24 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     val url: String?
         get() = webView.url
 
+    /**
+     * Game genres to hide from a catalogue page.
+     * Set to null (and subsequently the list is forgotten) when we navigate to a non-catalogue page
+     */
+    private var genresExclusionFilter: Set<ItchGenre>? = null
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         browseHandler = ItchBrowseHandler(context)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        genresExclusionFilter = savedInstanceState?.getStringArray(GENRES_EXCLUSION_FILTER)?.map {
+            ItchGenre.valueOf(it)
+        }?.toSet()
     }
 
     override fun onCreateView(
@@ -114,27 +129,27 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         //Set up FAB buttons
         //(colors don't matter too much as they will be set by updateUI() anyway)
-        val speedDialView = (activity as MainActivity).binding.speedDial
-        speedDialView.clearActionItems()
-        speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_reload, R.drawable.ic_baseline_refresh_24)
+        val speedDial = (activity as MainActivity).binding.speedDial
+        speedDial.clearActionItems()
+        speedDial.addActionItem(SpeedDialActionItem.Builder(R.id.browser_reload, R.drawable.ic_baseline_refresh_24)
             .setLabel(R.string.browser_reload)
             .create()
         )
-        speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_search, R.drawable.ic_baseline_search_24)
+        speedDial.addActionItem(SpeedDialActionItem.Builder(R.id.browser_search, R.drawable.ic_baseline_search_24)
             .setLabel(R.string.browser_search)
             .create()
         )
-        speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_open_in_browser, R.drawable.ic_baseline_open_in_browser_24)
+        speedDial.addActionItem(SpeedDialActionItem.Builder(R.id.browser_open_in_browser, R.drawable.ic_baseline_open_in_browser_24)
             .setLabel(R.string.browser_open_in_browser)
             .create()
         )
-        speedDialView.addActionItem(SpeedDialActionItem.Builder(R.id.browser_share, R.drawable.ic_baseline_share_24)
+        speedDial.addActionItem(SpeedDialActionItem.Builder(R.id.browser_share, R.drawable.ic_baseline_share_24)
             .setLabel(R.string.browser_share)
             .create()
         )
         
-        speedDialView.setOnActionSelectedListener { actionItem ->
-            speedDialView.close()
+        speedDial.setOnActionSelectedListener { actionItem ->
+            speedDial.close()
 
             when (actionItem.id) {
                 R.id.browser_reload -> {
@@ -204,12 +219,53 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
                     return@setOnActionSelectedListener true
                 }
+                R.id.browser_filter_exclude_genres -> {
+                    data class GenreChoice(val genre: ItchGenre) {
+                        override fun toString() = requireContext().getString(genre.nameResource)
+                    }
+                    val choices = ItchGenre.values().map { GenreChoice(it) }
+
+                    val adapter = ArrayAdapter(requireContext(),
+                        android.R.layout.simple_list_item_multiple_choice, choices)
+                    val newExclusionFilter = genresExclusionFilter?.toMutableSet()
+                        ?: return@setOnActionSelectedListener false
+
+                    val listView = ListView(context).apply {
+                        choiceMode = ListView.CHOICE_MODE_MULTIPLE
+                        setOnItemClickListener { parent, view, position, id ->
+                            val choice = parent.getItemAtPosition(position) as GenreChoice
+                            if (this@apply.isItemChecked(position))
+                                newExclusionFilter.add(choice.genre)
+                            else
+                                newExclusionFilter.remove(choice.genre)
+                        }
+                        this.adapter = adapter
+                    }
+
+                    val dialog = AlertDialog.Builder(requireContext()).run {
+                        setTitle(R.string.browser_filter_exclude_genres)
+                        setView(listView)
+                        setPositiveButton(R.string.dialog_apply) { _, _ ->
+                            genresExclusionFilter = newExclusionFilter
+                            filterExcludedGenres()
+                        }
+                        setNegativeButton(R.string.dialog_reset) { _, _ ->
+                            genresExclusionFilter = emptySet()
+                            filterExcludedGenres()
+                        }
+                        create()
+                    }
+                    for (excludedGenre in newExclusionFilter) {
+                        listView.setItemChecked(adapter.getPosition(GenreChoice(excludedGenre)), true)
+                    }
+                    dialog.show()
+                    return@setOnActionSelectedListener true
+                }
                 else -> {
                     return@setOnActionSelectedListener false
                 }
             }
         }
-
 
         //Load page, this will also update the UI
         val webViewBundle = savedInstanceState?.getBundle(WEB_VIEW_STATE_KEY)
@@ -237,6 +293,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        outState.putStringArray(GENRES_EXCLUSION_FILTER, genresExclusionFilter?.map {
+            it.name
+        }?.toTypedArray())
+
         val webViewState = Bundle()
         webView.saveState(webViewState)
         outState.putBundle(WEB_VIEW_STATE_KEY, webViewState)
@@ -302,7 +362,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             return
 
         val mainActivity = activity as? MainActivity ?: return
-
         if (!isVisible && doc != null)
             return
 
@@ -310,13 +369,14 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         val navBar = mainActivity.binding.bottomNavigationView
         val bottomGameBar = mainActivity.binding.bottomGameBar
-        val fab = mainActivity.binding.speedDial
+        val speedDial = mainActivity.binding.speedDial
         val supportAppBar = mainActivity.supportActionBar!!
         val appBar = mainActivity.binding.toolbar
         val gameButton = mainActivity.binding.gameButton
         val gameButtonInfo = mainActivity.binding.gameButtonInfo
 
-        fab.show()
+        updateGenreFilterAndAction(speedDial)
+        filterExcludedGenres()
 
         if (doc?.let { ItchWebsiteUtils.isGamePage(doc) } == true) {
             //Hide app's navbar after hiding web navbar
@@ -519,18 +579,18 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val bgColor = gameThemeBgColor ?: defaultBgColor
         val fgColor = if (gameThemeBgColor == null) defaultFgColor else defaultWhiteColor
 
-        fab.mainFabClosedBackgroundColor = accentColor
-        fab.mainFabOpenedBackgroundColor = accentColor
-        fab.mainFabClosedIconColor = accentFgColor
-        fab.mainFabOpenedIconColor = accentFgColor
-        for (actionItem in fab.actionItems) {
+        speedDial.mainFabClosedBackgroundColor = accentColor
+        speedDial.mainFabOpenedBackgroundColor = accentColor
+        speedDial.mainFabClosedIconColor = accentFgColor
+        speedDial.mainFabOpenedIconColor = accentFgColor
+        for (actionItem in speedDial.actionItems) {
             val newActionItem = SpeedDialActionItem.Builder(actionItem)
                 .setFabBackgroundColor(bgColor)
                 .setFabImageTintColor(fgColor)
                 .setLabelBackgroundColor(bgColor)
                 .setLabelColor(fgColor)
                 .create()
-            fab.replaceActionItem(actionItem, newActionItem)
+            speedDial.replaceActionItem(actionItem, newActionItem)
         }
         binding.progressBar.progressDrawable.setTint(accentColor)
         appBar.setBackgroundColor(bgColor)
@@ -551,6 +611,27 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             else
                 mainActivity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
         }
+    }
+
+    private fun updateGenreFilterAndAction(speedDial: SpeedDialView) {
+        val uri = Uri.parse(webView.url)
+        if (ItchWebsiteUtils.isGameCataloguePage(uri)) {
+            val genreExcludeSet = genresExclusionFilter ?: emptySet<ItchGenre>().also {
+                genresExclusionFilter = emptySet()
+            }
+            speedDial.addActionItem(SpeedDialActionItem.Builder(R.id.browser_filter_exclude_genres, R.drawable.ic_baseline_filter_alt_24).run {
+                if (genreExcludeSet.isEmpty())
+                    setLabel(R.string.browser_filter_exclude_genres)
+                else
+                    setLabel(resources.getQuantityString(R.plurals.browser_filter_exclude_genres_active,
+                        genreExcludeSet.size, genreExcludeSet.size))
+                create()
+            })
+        } else {
+            genresExclusionFilter = null
+            speedDial.removeActionItemById(R.id.browser_filter_exclude_genres)
+        }
+        speedDial.show()
     }
 
     /**
@@ -721,6 +802,43 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             )
         }
     }
+
+    private fun filterExcludedGenres() {
+        val excludeSet = genresExclusionFilter ?: return
+
+        val englishContext = Utils.makeLocalizedContext(requireContext(), Locale.ENGLISH)
+
+        val excludeString = excludeSet.joinToString(prefix = "[", postfix = "]") { genre ->
+            val englishName = englishContext.getString(genre.nameResource)
+            if (englishName.contains('"'))
+                throw IllegalStateException("Bad English translation!")
+            return@joinToString "\"$englishName\""
+        }
+
+        Log.d(LOGGING_TAG, "Exclusion filter array: $excludeString")
+
+        webView.post {
+            webView.evaluateJavascript("""
+                {
+                	const excludeFilter = $excludeString
+                    const gameGrid = document.querySelector(".browse_game_grid")
+
+                	for (const gameCell of gameGrid.getElementsByClassName("game_cell")) {
+                		const genre = gameCell.querySelector(".game_genre")
+
+                		if (genre && excludeFilter.includes(genre.textContent)) {
+                			gameCell.setAttribute("style", "display: none")
+                			gameCell.setAttribute("data-mitch-excluded-genre", "true")
+                		} else if (gameCell.hasAttribute("data-mitch-excluded-genre")) {
+                			gameCell.removeAttribute("style")
+                			gameCell.removeAttribute("data-mitch-excluded-genre")
+                		}
+                    }
+                }
+            """.trimIndent(), null)
+        }
+        updateGenreFilterAndAction((activity as MainActivity).binding.speedDial)
+    }
     
 
     @Keep //prevent this class from being removed by compiler optimizations
@@ -757,7 +875,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             }
         }
     }
-
 
 
 

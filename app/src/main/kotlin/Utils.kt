@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.Service
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
@@ -254,6 +256,12 @@ object Utils {
 
     fun getPreferredLocale(context: Context): Locale {
         return getPreferredLocale(context.resources.configuration)
+    }
+
+    fun makeLocalizedContext(context: Context, locale: Locale): Context {
+        val config = Configuration(context.resources.configuration)
+        config.setLocale(locale)
+        return context.createConfigurationContext(config)
     }
 
     fun shouldUseLightForeground(@ColorInt bgColor: Int): Boolean {

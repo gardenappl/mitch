@@ -3,6 +3,15 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/drawable/ic_baseline_cancel_24.xml" value="0.1" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/drawable/ic_baseline_delete_24.xml" value="0.1" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/drawable/ic_baseline_emoji_events_24.xml" value="0.1" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/drawable/ic_baseline_filter_alt_24.xml" value="0.1" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/drawable/ic_baseline_folder_24.xml" value="0.1" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/drawable/ic_baseline_info_24.xml" value="0.1" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/drawable/ic_baseline_more_vert_24.xml" value="0.1" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/drawable/ic_baseline_notifications_24.xml" value="0.1" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/drawable/ic_baseline_refresh_24.xml" value="0.1" />
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/activity_game.xml" value="0.1" />
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/activity_main.xml" value="0.15833333333333333" />
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/browse_fragment.xml" value="0.1" />
@@ -12,10 +21,15 @@
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/dialog_game_get_item.xml" value="1.0" />
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/dialog_game_get_label.xml" value="0.4803921568627451" />
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/dialog_search.xml" value="0.1" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/dialog_tag_select.xml" value="0.25" />
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/dialog_web_prompt.xml" value="0.1" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/filter_tags_activity.xml" value="0.10303548525010689" />
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/library_fragment.xml" value="0.22" />
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/owned_activity.xml" value="0.25" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/owned_item_load_state_footer.xml" value="0.22" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/owned_item_separator.xml" value="0.10560068405301411" />
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/layout/session_installer_activity.xml" value="0.10625" />
+        <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/menu/main.xml" value="0.10175288584865327" />
         <entry key="../../../../../mnt/wind/Yurik/code/android/mitch/app/src/main/res/xml/preferences.xml" value="0.33" />
       </map>
     </option>

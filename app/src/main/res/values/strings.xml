@@ -217,9 +217,15 @@
     <string name="genre_strategy">Strategy</string>
     <string name="genre_survival">Survival</string>
     <string name="genre_visual_novel">Visual Novel</string>
-    <string name="browser_filter_exclude_genres">Exclude genres</string>
+    <string name="browser_filter_exclude_genres">Exclude genres…</string>
+    <plurals name="browser_filter_exclude_genres_active">
+        <item quantity="one">%d genre excluded</item>
+        <item quantity="other">%d genres excluded</item>
+    </plurals>
     <string name="settings_exclude_tags">Exclude game tag from home page</string>
     <string name="settings_exclude_tags_show_all">Show all games</string>
     <string name="settings_exclude_tags_error">Error: could not load list of tags. Are you connected to the Internet?</string>
     <string name="popup_web_game_cached">This game will be available in your library for offline play.</string>
+    <string name="dialog_apply">Apply</string>
+    <string name="dialog_reset">Reset</string>
 </resources>

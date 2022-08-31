@@ -221,9 +221,16 @@
     <string name="genre_strategy">Стратегия</string>
     <string name="genre_survival">Выживание</string>
     <string name="genre_visual_novel">Визуальная новела</string>
-    <string name="browser_filter_exclude_genres">Не показывать жанры</string>
+    <string name="browser_filter_exclude_genres">Не показывать жанры…</string>
+    <plurals name="browser_filter_exclude_genres_active">
+        <item quantity="one">%d жанр исключен</item>
+        <item quantity="few">%d жанра исключены</item>
+        <item quantity="many">%d жанров исключено</item>
+    </plurals>
     <string name="settings_exclude_tags">Не показывать тег игр на домашней странице</string>
     <string name="settings_exclude_tags_show_all">Показывать все</string>
     <string name="settings_exclude_tags_error">Ошибка: не удалось загрузить список тегов. Вы подключены к Интернету?</string>
     <string name="popup_web_game_cached">Игра будет доступа в игротеке в режиме оффлайн.</string>
+    <string name="dialog_apply">Применить</string>
+    <string name="dialog_reset">Сбросить</string>
 </resources>

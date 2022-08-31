@@ -137,9 +137,6 @@ object ItchWebsiteUtils {
             "feed" -> "https://itch.io/my-feed"
             else -> "https://itch.io"
         }
-//        prefs.edit(commit = true) {
-//            this.remove(PREF_START_PAGE_EXCLUDE)
-//        }
         val excludeTag = prefs.getStringSet(PREF_START_PAGE_EXCLUDE, emptySet())?.firstOrNull()
         if (excludeTag != null) {
             when (urlPreference) {
@@ -237,5 +234,9 @@ object ItchWebsiteUtils {
 
     fun getLoggedInUserName(doc: Document): String? {
         return doc.selectFirst(".user_name")?.html()
+    }
+
+    fun isGameCataloguePage(uri: Uri): Boolean {
+        return uri.pathSegments?.firstOrNull() == "games"
     }
 }
