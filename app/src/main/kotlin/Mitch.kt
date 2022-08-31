@@ -51,6 +51,7 @@ const val DB_CLEAN_TASK_TAG = "db_clean"
 const val FLAVOR_FDROID = "fdroid"
 const val FLAVOR_ITCHIO = "itchio"
 
+
 // Remember to exclude sensitive info from ACRA reports
 const val PREF_DB_RAN_CLEANUP_ONCE = "ua.gardenapple.itchupdater.db_cleanup_once"
 const val PREF_INSTALLER = "ua.gardenapple.itchupdater.installer"
@@ -75,6 +76,8 @@ object PreferenceWebCacheUpdate {
     const val ALWAYS ="always"
 }
 const val PREF_BROWSE_START_PAGE = "mitch.browse_start_page"
+const val PREF_START_PAGE_EXCLUDE = "mitch.start_page_exclude"
+const val PREF_START_PAGE_EXCLUDE_DISPLAY_STRING = "mitch.start_page_exclude.display_string"
 
 
 

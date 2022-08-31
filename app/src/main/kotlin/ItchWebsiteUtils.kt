@@ -3,6 +3,7 @@ package garden.appl.mitch
 import android.content.Context
 import android.net.Uri
 import android.webkit.CookieManager
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -125,7 +126,9 @@ object ItchWebsiteUtils {
      */
     fun getMainBrowsePage(context: Context): String {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-        return when (prefs.getString(PREF_BROWSE_START_PAGE, "android")) {
+
+        val urlPreference = prefs.getString(PREF_BROWSE_START_PAGE, "android")
+        val url = when (urlPreference) {
             "android" -> "https://itch.io/games/platform-android"
             "web" -> "https://itch.io/games/platform-web"
             "web_touch" -> "https://itch.io/games/top-sellers/input-touchscreen/platform-web"
@@ -134,6 +137,16 @@ object ItchWebsiteUtils {
             "feed" -> "https://itch.io/my-feed"
             else -> "https://itch.io"
         }
+//        prefs.edit(commit = true) {
+//            this.remove(PREF_START_PAGE_EXCLUDE)
+//        }
+        val excludeTag = prefs.getStringSet(PREF_START_PAGE_EXCLUDE, emptySet())?.firstOrNull()
+        if (excludeTag != null) {
+            when (urlPreference) {
+                "android", "web", "web_touch", "all_games" -> return "$url?exclude=tg.$excludeTag"
+            }
+        }
+        return url
     }
 
     /**

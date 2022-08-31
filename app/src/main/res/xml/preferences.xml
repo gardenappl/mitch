@@ -9,6 +9,10 @@
                 android:key="mitch.browse_start_page"
                 android:summary="%s"
                 android:title="@string/settings_start_page" />
+        <Preference
+                android:key="mitch.start_page_exclude"
+                android:summary="@string/settings_exclude_tags_show_all"
+                android:title="@string/settings_exclude_tags" />
         <SwitchPreference
                 android:defaultValue="true"
                 android:key="ua.gardenapple.itchupdater.web_android_filter"
