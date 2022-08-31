@@ -17,11 +17,7 @@ import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import garden.appl.mitch.*
-import garden.appl.mitch.database.AppDatabase
-import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.databinding.ActivityGameBinding
-import garden.appl.mitch.files.WebGameCache
-import java.io.File
 
 class GameActivity : Activity() {
     companion object {
@@ -112,6 +108,13 @@ class GameActivity : Activity() {
     }
 
     private fun afterDialogShown(url: String) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+
+        if (prefs.getBoolean(PREF_WEB_CACHE_ENABLE, true)
+            && !intent.getBooleanExtra(EXTRA_IS_OFFLINE, false)) {
+
+            Toast.makeText(this, R.string.popup_web_game_cached, Toast.LENGTH_LONG).show()
+        }
         webView.loadUrl(url)
     }
 
