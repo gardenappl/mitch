@@ -2,11 +2,14 @@ package garden.appl.mitch.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.view.View
 import android.webkit.*
@@ -31,18 +34,29 @@ class GameActivity : Activity() {
     private lateinit var webView: WebView
     private lateinit var chromeClient: GameChromeClient
 
-    private var originalUiVisibility: Int = View.VISIBLE
+    private val connection = object : ServiceConnection {
+        //NO-OP, we bind to a foreground service so that Android does not kill us
+        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {}
+        override fun onServiceDisconnected(p0: ComponentName?) {}
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGameBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.root.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        binding.root.keepScreenOn = true
         webView = binding.gameWebView
     }
 
     override fun onStart() {
         super.onStart()
+        Log.d(LOGGING_TAG, "started yeee")
 
         if (intent.action != Intent.ACTION_VIEW)
             throw IllegalArgumentException("Only ACTION_VIEW is supported")
@@ -69,8 +83,21 @@ class GameActivity : Activity() {
         } else {
             startService(foregroundServiceIntent)
         }
+        bindService(foregroundServiceIntent, connection, 0)
 
         showLaunchDialog(this, intent.data.toString())
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        Log.d(LOGGING_TAG, "new intent")
+        if (intent?.data?.toString() != this.intent.data.toString())
+            showLaunchDialog(this, intent?.data.toString())
+    }
+
+    override fun onResume() {
+        super.onResume()
+        webView.resumeTimers()
     }
 
     private fun showLaunchDialog(context: Context, url: String) {
@@ -118,32 +145,29 @@ class GameActivity : Activity() {
         webView.loadUrl(url)
     }
 
-
-    override fun onResume() {
-        super.onResume()
-
-        originalUiVisibility = binding.root.systemUiVisibility
-        binding.root.systemUiVisibility =
-            View.SYSTEM_UI_FLAG_FULLSCREEN or
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-        binding.root.keepScreenOn = true
+    override fun onStop() {
+        super.onStop()
+        Log.d(LOGGING_TAG, "stopped")
+        unbindService(connection)
+        stopService(Intent(this, GameForegroundService::class.java))
     }
 
     override fun onPause() {
         super.onPause()
-        binding.root.systemUiVisibility = originalUiVisibility
-        CookieManager.getInstance().flush()
-        runBlocking(Dispatchers.IO) {
-            Mitch.webGameCache.flush()
-        }
+//        webView.onPause()
+        webView.pauseTimers()
+        Log.d(LOGGING_TAG, "paused")
+//        CookieManager.getInstance().flush()
+//        runBlocking(Dispatchers.IO) {
+//            Mitch.webGameCache.flush()
+//        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d(LOGGING_TAG, "destroyed")
         webView.settings.javaScriptEnabled = false
         webView.destroy()
-        stopService(Intent(this, GameForegroundService::class.java))
     }
 
     override fun onBackPressed() {

@@ -4,10 +4,9 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
 import android.app.NotificationManager
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.net.Uri
+import android.os.IBinder
 import android.provider.Settings
 import android.util.Log
 import android.view.*
@@ -20,6 +19,7 @@ import com.bumptech.glide.Glide
 import kotlinx.coroutines.*
 import garden.appl.mitch.*
 import garden.appl.mitch.database.AppDatabase
+import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.database.game.GameRepository
 import garden.appl.mitch.database.installation.GameInstallation
 import garden.appl.mitch.database.installation.Installation
@@ -136,6 +136,7 @@ class LibraryAdapter internal constructor(
                 context,
                 GameActivity::class.java
             )
+//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.putExtra(GameActivity.EXTRA_GAME_ID, gameInstall.game.gameId)
             intent.putExtra(GameActivity.EXTRA_IS_OFFLINE, true)
             context.startActivity(intent)
@@ -313,39 +314,27 @@ class LibraryAdapter internal constructor(
                     context.startActivity(intent)
                 } else if (type == GameRepository.Type.WebCached) {
                     if (Utils.checkServiceRunning(context, GameForegroundService::class.java)) {
-                        val dialog = AlertDialog.Builder(context).apply {
-                            setTitle(R.string.dialog_web_cache_delete_fail_title)
-                            setMessage(context.getString(R.string.dialog_web_cache_delete_fail, game.name))
-                            setPositiveButton(android.R.string.ok) { _, _ -> }
-                            setCancelable(true)
+                        // need to check game ID
+                        val intent = Intent(context, GameForegroundService::class.java)
 
-                            create()
-                        }
-                        dialog.show()
-                    } else {
-                        val dialog = AlertDialog.Builder(context).apply {
-                            setTitle(R.string.dialog_web_cache_delete_title)
-                            setMessage(context.getString(R.string.dialog_app_delete, game.name))
-                            setPositiveButton(R.string.dialog_yes) { _, _ ->
-                                mainActivityScope.launch {
-                                    Mitch.webGameCache.deleteCacheForGame(context, game.gameId)
-
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(
-                                            R.string.popup_game_deleted,
-                                            game.name
-                                        ),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
+                        val deleteGameServiceConnection = object : ServiceConnection {
+                            override fun onServiceConnected(className: ComponentName?, binderInterface: IBinder?) {
+                                val binder = binderInterface as GameForegroundService.Binder
+                                if (binder.gameId == game.gameId)
+                                    onDeleteWebChachedGame(game, true)
+                                activity.unbindService(this)
                             }
-                            setNegativeButton(R.string.dialog_no) { _, _ -> }
-                            setCancelable(true)
 
-                            create()
+                            override fun onServiceDisconnected(p0: ComponentName?) {}
                         }
-                        dialog.show()
+
+                        if (!activity.bindService(intent, deleteGameServiceConnection, 0)) {
+                            Log.d(LOGGING_TAG, "could not connect")
+                            onDeleteWebChachedGame(game, false)
+                        }
+                    } else {
+                        Log.d(LOGGING_TAG, "service not running")
+                        onDeleteWebChachedGame(game, false)
                     }
                 } else {
                     val dialog = AlertDialog.Builder(context).apply {
@@ -444,6 +433,44 @@ class LibraryAdapter internal constructor(
                 return true
             }
             else -> return false
+        }
+    }
+
+    private fun onDeleteWebChachedGame(game: Game, isRunningNow: Boolean) {
+        if (isRunningNow) {
+            val dialog = AlertDialog.Builder(context).apply {
+                setTitle(R.string.dialog_web_cache_delete_fail_title)
+                setMessage(context.getString(R.string.dialog_web_cache_delete_fail, game.name))
+                setPositiveButton(android.R.string.ok) { _, _ -> }
+                setCancelable(true)
+
+                create()
+            }
+            dialog.show()
+        } else {
+            val dialog = AlertDialog.Builder(context).apply {
+                setTitle(R.string.dialog_web_cache_delete_title)
+                setMessage(context.getString(R.string.dialog_app_delete, game.name))
+                setPositiveButton(R.string.dialog_yes) { _, _ ->
+                    mainActivityScope.launch {
+                        Mitch.webGameCache.deleteCacheForGame(context, game.gameId)
+
+                        Toast.makeText(
+                            context,
+                            context.getString(
+                                R.string.popup_game_deleted,
+                                game.name
+                            ),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+                setNegativeButton(R.string.dialog_no) { _, _ -> }
+                setCancelable(true)
+
+                create()
+            }
+            dialog.show()
         }
     }
 }

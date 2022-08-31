@@ -19,7 +19,9 @@
     <application
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
+            android:appCategory="game"
             android:label="@string/app_name"
+            android:largeHeap="true"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:name=".Mitch"
             android:supportsRtl="true"
@@ -88,7 +90,8 @@
                 android:launchMode="singleInstance"/>
         <activity
                 android:name=".ui.GameActivity"
-                android:launchMode="singleInstance"
+                android:launchMode="singleTask"
+                android:taskAffinity="garden.appl.mitch.webgame"
                 android:theme="@style/AppTheme.Fullscreen"
                 android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|uiMode"/>
 
