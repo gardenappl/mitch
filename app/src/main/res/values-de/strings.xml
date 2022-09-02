@@ -180,4 +180,13 @@
     <string name="dialog_download_wrong_os">%s ist nicht mit Android kompatibel. Sie können es nicht als Anwendung installieren.
 \nMöchten Sie es trotzdem herunterladen\?</string>
     <string name="library_category_web_cached">Web-Spiele</string>
+    <string name="settings_exclude_tags_show_all">Alle Spiele anzeigen</string>
+    <string name="settings_exclude_tags">Spielmarkierung von der Startseite ausschließen</string>
+    <string name="settings_exclude_tags_error">Fehler: Liste der Markierungen konnte nicht geladen werden. Sind Sie mit dem Internet verbunden\?</string>
+    <string name="dialog_apply">Anwenden</string>
+    <string name="genre_survival">Überleben</string>
+    <string name="popup_web_game_cached">Dieses Spiel wird in Ihrer Bibliothek für das Offline-Spiel verfügbar sein.</string>
+    <string name="dialog_reset">Zurücksetzen</string>
+    <string name="genre_sports">Sport</string>
+    <string name="genre_strategy">Strategie</string>
 </resources>
