@@ -60,6 +60,7 @@
     <string name="updates_do_update">Mettre à jour</string>
     <plurals name="updates_available">
         <item quantity="one">%d mise à jour disponible !</item>
+        <item quantity="many">%d mises à jour disponibles !</item>
         <item quantity="other">%d mises à jour disponibles !</item>
     </plurals>
     <string name="updates_error">Erreur lors de la vérification des mises à jour</string>
@@ -208,4 +209,33 @@
     <string name="dialog_web_cache_delete_fail">%1$s ne peut pas être supprimé car il est en cours d\'exécution.</string>
     <string name="game_web_play_default_type">Jouer</string>
     <string name="game_multiple_options_desc_web_or_buy">Jouer maintenant ou acheter</string>
+    <string name="genre_simulation">Simulation</string>
+    <string name="dialog_apply">Appliquer</string>
+    <string name="genre_action">Action</string>
+    <string name="genre_card_game">Jeu de cartes</string>
+    <string name="genre_interactive_fiction">Fiction interactive</string>
+    <plurals name="browser_filter_exclude_genres_active">
+        <item quantity="one">%d genre exclus</item>
+        <item quantity="many">%d genres exclus</item>
+        <item quantity="other">%d genres exclus</item>
+    </plurals>
+    <string name="genre_adventure">Aventure</string>
+    <string name="genre_educational">Éducatif</string>
+    <string name="genre_fighting">Combat</string>
+    <string name="genre_platformer">Plateformeur</string>
+    <string name="genre_puzzle">Énigme</string>
+    <string name="genre_racing">Course</string>
+    <string name="genre_rhythm">Rythme</string>
+    <string name="genre_rpg">Jeu de rôle</string>
+    <string name="genre_shooter">Jeu de tir</string>
+    <string name="genre_sports">Sports</string>
+    <string name="genre_strategy">Stratégie</string>
+    <string name="genre_survival">Survie</string>
+    <string name="genre_visual_novel">Roman visuel</string>
+    <string name="browser_filter_exclude_genres">Exclure des genres…</string>
+    <string name="settings_exclude_tags">Exclure l\'étiquette de jeu de la page d\'accueil</string>
+    <string name="settings_exclude_tags_show_all">Afficher tous les jeux</string>
+    <string name="dialog_reset">Réinitialiser</string>
+    <string name="settings_exclude_tags_error">Erreur : Impossible de charger la liste des balises. Êtes-vous connecté·e à l\'Internet \?</string>
+    <string name="popup_web_game_cached">Ce jeu sera disponible dans votre bibliothèque pour jouer hors ligne.</string>
 </resources>
