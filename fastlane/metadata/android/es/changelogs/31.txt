@@ -1,0 +1,4 @@
+* Añadidas las traducciones al árabe, turco y al bokmål noruego
+* Arreglado el resultado erróneo de la comprobación de actualizaciones después de cambiar de idioma
+* La lista de actualizaciones es ahora vertical en lugar de horizontal (ups)
+* Corregido el error al informar sobre la comprobación de actualizaciones (ups)

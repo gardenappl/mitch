@@ -1,0 +1,5 @@
+* Permitir reclamar juegos del Bundle para Ucrania y TTRPGs para Derechos Trans en Texas
+* Nuevo método de instalación de juegos, debería ser más rápido y reducir el uso de espacio en disco
+* Se han añadido advertencias cuando se intenta descargar un juego que no es para Android
+* Hacer más amplio el diálogo de búsqueda
+* Numerosas correcciones de errores y mejoras en la interfaz de usuario

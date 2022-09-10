@@ -1,0 +1,6 @@
+* Interfaz de usuario nativa añadida para descargar, comprar juegos y reclamar juegos de los grandes paquetes famosos
+* Ocultados los juegos que dicen ser compatibles con Android pero que sólo están disponibles a través de los enlaces de Google Play
+* Nuevas traducciones: Holandés, vietnamita, indonesio, francés, alemán, hindi
+* Arreglo del inicio de sesión a través de GitHub
+
+Además de muchas otras correcciones, ver el registro de cambios completo aquí: https://gardenapple.itch.io/mitch/devlog
