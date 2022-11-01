@@ -78,7 +78,7 @@ object ItchLibraryParser {
 //            }
             val author = gameDiv.selectFirst(".game_author")!!.text()
 //            val isAndroid = gameDiv.selectFirst(".icon-android") != null
-            val isAndroid = true
+            val isAndroid = false
 
             items.add(
                 ItchLibraryItem(

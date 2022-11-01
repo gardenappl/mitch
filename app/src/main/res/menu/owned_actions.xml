@@ -9,10 +9,10 @@
             app:actionViewClass="androidx.appcompat.widget.SearchView"
             android:icon="@drawable/ic_baseline_search_24"
             app:showAsAction="ifRoom"/>
-    <item
-            android:id="@+id/only_android"
-            android:checkable="true"
-            android:title="@string/library_options_show_only_android"
-            app:actionViewClass="android.widget.CheckBox"
-            app:showAsAction="withText" />
+<!--    <item-->
+<!--            android:id="@+id/only_android"-->
+<!--            android:checkable="true"-->
+<!--            android:title="@string/library_options_show_only_android"-->
+<!--            app:actionViewClass="android.widget.CheckBox"-->
+<!--            app:showAsAction="withText" />-->
 </menu>

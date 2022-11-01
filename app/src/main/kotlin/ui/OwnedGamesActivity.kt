@@ -161,24 +161,24 @@ class OwnedGamesActivity : MitchActivity() {
         return Intent(applicationContext, OwnedGamesActivity::class.java)
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        menuInflater.inflate(R.menu.owned_actions, menu)
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.owned_actions, menu)
 //        menu.findItem(R.id.only_android).isChecked = androidOnlyFilter
-//
-//        val searchView: SearchView = menu.findItem(R.id.games_search).actionView as SearchView
-//        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-//            override fun onQueryTextSubmit(query: String?): Boolean = true
-//
-//            override fun onQueryTextChange(newText: String?): Boolean {
-//                newText?.let {
-//                    searchString = newText
-//                    this@OwnedGamesActivity.loadItems(it, androidOnlyFilter)
-//                }
-//                return true
-//            }
-//        })
-//        return true
-//    }
+
+        val searchView: SearchView = menu.findItem(R.id.games_search).actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean = true
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let {
+                    searchString = newText
+                    this@OwnedGamesActivity.loadItems(it, androidOnlyFilter)
+                }
+                return true
+            }
+        })
+        return true
+    }
 
 //    override fun onOptionsItemSelected(item: MenuItem): Boolean {
 //        when (item.itemId) {
