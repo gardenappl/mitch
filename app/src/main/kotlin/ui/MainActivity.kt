@@ -35,50 +35,8 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
     private lateinit var currentFragmentTag: String
 
     lateinit var binding: ActivityMainBinding
-    private set
+        private set
 
-    /**
-     * The restart dialog is handled here.
-     * Yes, this means that if the language changes outside of MainActivity,
-     * then there will be no dialog.
-     */
-    private val langChangeListener =
-        SharedPreferences.OnSharedPreferenceChangeListener langChange@{ prefs, key ->
-            if (key != PREF_LANG_LOCALE_NEXT)
-                return@langChange
-
-            val currentLocale = prefs.getString(PREF_LANG_LOCALE, "null?")
-            val nextLocale = prefs.getString(PREF_LANG_LOCALE_NEXT, "null???")
-            Log.d(LOGGING_TAG, "handling locale change to $nextLocale, currently $currentLocale")
-            if (nextLocale == currentLocale)
-                return@langChange
-
-            AlertDialog.Builder(this).run {
-                setTitle(R.string.dialog_lang_restart_title)
-                setMessage(R.string.dialog_lang_restart)
-
-                setPositiveButton(android.R.string.ok) { _, _ ->
-                    this@MainActivity.finish()
-                    //Use 'post' method to make sure that Activity lifecycle events
-                    //run before the process exits
-                    val mainHandler = Handler(Looper.getMainLooper())
-                    mainHandler.post {
-                        val intent = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse(browseFragment.url),
-                            applicationContext,
-                            MainActivity::class.java
-                        )
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        context.startActivity(intent)
-                        Runtime.getRuntime().exit(0)
-                    }
-                }
-                setNegativeButton(android.R.string.cancel) { _, _ -> /* No-op */ }
-
-                show()
-            }
-        }
 
     companion object {
         const val LOGGING_TAG = "MainActivity"
@@ -194,18 +152,6 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
             if (!db.isOpen)
                 db.installDao.getInstallationByPackageName(packageName)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        PreferenceManager.getDefaultSharedPreferences(this)
-            .registerOnSharedPreferenceChangeListener(langChangeListener)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        PreferenceManager.getDefaultSharedPreferences(this)
-            .unregisterOnSharedPreferenceChangeListener(langChangeListener)
     }
 
     override fun onBackPressed() {
@@ -390,5 +336,16 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
                 if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
                     Mitch.externalFileManager.resumeGetViewIntent(this)
         }
+    }
+
+    override fun makeIntentForRestart(): Intent {
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse(browseFragment.url),
+            applicationContext,
+            MainActivity::class.java
+        )
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        return intent
     }
 }

@@ -22,7 +22,7 @@ import kotlinx.coroutines.runBlocking
 import garden.appl.mitch.*
 import garden.appl.mitch.databinding.ActivityGameBinding
 
-class GameActivity : Activity() {
+class GameActivity : MitchActivity() {
     companion object {
         private const val LOGGING_TAG = "GameActivity"
         const val EXTRA_GAME_ID = "GAME_ID"
@@ -179,6 +179,14 @@ class GameActivity : Activity() {
         outState.putBundle(WEB_VIEW_STATE_KEY, webViewState)
 
         super.onSaveInstanceState(outState)
+    }
+
+    override fun makeIntentForRestart(): Intent {
+        val intent = Intent(Intent.ACTION_VIEW, intent.data, applicationContext,
+            GameActivity::class.java)
+        intent.putExtra(EXTRA_GAME_ID, intent.getIntExtra(EXTRA_GAME_ID, -1))
+        intent.putExtra(EXTRA_IS_OFFLINE, intent.getBooleanExtra(EXTRA_IS_OFFLINE, false))
+        return intent
     }
 
     inner class GameWebViewClient : WebViewClient() {

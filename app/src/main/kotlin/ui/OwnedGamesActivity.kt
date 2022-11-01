@@ -29,7 +29,6 @@ import garden.appl.mitch.data.ItchLibraryViewModel
 import garden.appl.mitch.databinding.OwnedActivityBinding
 
 class OwnedGamesActivity : MitchActivity() {
-
     companion object {
         const val THUMBNAIL_WIDTH = 315
         const val THUMBNAIL_HEIGHT = 250
@@ -156,6 +155,10 @@ class OwnedGamesActivity : MitchActivity() {
                 ))
             }
         }
+    }
+
+    override fun makeIntentForRestart(): Intent {
+        return Intent(applicationContext, OwnedGamesActivity::class.java)
     }
 
 //    override fun onCreateOptionsMenu(menu: Menu): Boolean {
