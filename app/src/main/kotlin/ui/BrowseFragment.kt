@@ -247,11 +247,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         setView(listView)
                         setPositiveButton(R.string.dialog_apply) { _, _ ->
                             genresExclusionFilter = newExclusionFilter
-                            filterExcludedGenres()
+                            updateUI()
                         }
                         setNegativeButton(R.string.dialog_reset) { _, _ ->
                             genresExclusionFilter = emptySet()
-                            filterExcludedGenres()
+                            updateUI()
                         }
                         create()
                     }
@@ -840,7 +840,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 }
             """.trimIndent(), null)
         }
-        updateGenreFilterAndAction((activity as MainActivity).binding.speedDial)
     }
     
 
