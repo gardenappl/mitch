@@ -970,7 +970,13 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         	if (upload.querySelector(".icon-windows8, .icon-tux, .icon-apple") == null)
                         		continue
                         	const button = upload.querySelector(".download_btn")
-                        	button.setAttribute("style", "background-color: inherit; border-color: #FF2449; color: #FF2449; text-shadow: none;")
+                            if (!button)
+                                continue
+                            let buttonColor = getComputedStyle(button).getPropertyValue("--itchio_button_color")
+                            if (!buttonColor)
+                                buttonColor = '#FF2449'
+                        	button.setAttribute("style", "background-color: inherit; border-color: " 
+                                    + buttonColor + "; color: " + buttonColor + "; text-shadow: none;")
                         }
                     });
                     window.addEventListener("resize", (event) => {
