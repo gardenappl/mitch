@@ -275,12 +275,12 @@ object ItchWebsiteParser {
         val isPaymentOptional = message.selectFirst("[itemprop=price]")?.let { price ->
             val color = Utils.asHexCode(ItchWebsiteUtils.getAccentFgUIColor(doc)!!)
             price.replaceWith(Element("b")
-                .text(price.ownText())
+                .text(' ' + price.ownText() + ' ')
                 .attr("style", "color: $color")
             )
             return@let false
         } ?: true
-        val html = message.html().lines().joinToString(separator = "")
+        val html = message.html().lines().joinToString(separator = " ")
         Log.d(LOGGING_TAG, "Modified: $html")
         return PaymentInfo(html, isPaymentOptional)
     }
