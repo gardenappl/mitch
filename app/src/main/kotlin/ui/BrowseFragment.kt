@@ -39,6 +39,7 @@ import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.ByteArrayInputStream
+import java.security.SecureRandom
 import java.util.*
 
 
@@ -58,6 +59,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     
     private lateinit var chromeClient: MitchWebChromeClient
     private lateinit var webView: MitchWebView
+    private var webViewJSNonce: Long = 0
 
     private var browseHandler: ItchBrowseHandler? = null
     private var currentDoc: Document? = null
@@ -116,7 +118,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         webView.webViewClient = MitchWebViewClient()
         webView.webChromeClient = chromeClient
 
-        webView.addJavascriptInterface(ItchJavaScriptInterface(this), "mitchCustomJS")
+        webViewJSNonce = SecureRandom().nextLong()
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) //Security recommendation
+            webView.addJavascriptInterface(ItchJavaScriptInterface(this), "mitchCustomJS")
 
         webView.setDownloadListener { url, _, contentDisposition, mimeType, contentLength ->
             Log.d(LOGGING_TAG, "Requesting download...")
@@ -845,15 +849,25 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     @Keep //prevent this class from being removed by compiler optimizations
     private class ItchJavaScriptInterface(val fragment: BrowseFragment) {
+        private fun verifyNonce(nonce: String) {
+            if (nonce != fragment.webViewJSNonce.toString()) {
+                fragment.launch(Dispatchers.Main) {
+                    throw SecurityException("Wrong nonce in JavaScript interface call. Expected ${fragment.webViewJSNonce}, got $nonce")
+                }
+            }
+        }
+
         @JavascriptInterface
-        fun onDownloadLinkClick(uploadId: String) {
+        fun onDownloadLinkClick(uploadId: String, nonce: String) {
+            verifyNonce(nonce)
             fragment.launch {
                 fragment.browseHandler?.setClickedUploadId(uploadId.toInt())
             }
         }
 
         @JavascriptInterface
-        fun onHtmlLoaded(html: String, url: String) {
+        fun onHtmlLoaded(html: String, url: String, nonce: String) {
+            verifyNonce(nonce)
             if (fragment.activity !is MainActivity)
                 return
 
@@ -940,14 +954,14 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     document.addEventListener("DOMContentLoaded", (event) => {
                         // tell Android that the document is ready
                         mitchCustomJS.onHtmlLoaded("<html>" + document.getElementsByTagName("html")[0].innerHTML + "</html>",
-                                                   window.location.href);
+                                                   window.location.href, "$webViewJSNonce");
                                                
                         // setup download buttons
                         let downloadButtons = document.getElementsByClassName("download_btn");
                         for (var downloadButton of downloadButtons) {
                             let uploadId = downloadButton.getAttribute("data-upload_id");
                             downloadButton.addEventListener("click", (event) => {
-                                mitchCustomJS.onDownloadLinkClick(uploadId);
+                                mitchCustomJS.onDownloadLinkClick(uploadId, "$webViewJSNonce");
                             });
                         }
                         
