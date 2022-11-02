@@ -79,7 +79,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        browseHandler = ItchBrowseHandler(context)
+        browseHandler = ItchBrowseHandler(context, this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

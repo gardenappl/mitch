@@ -3,6 +3,7 @@ package garden.appl.mitch.client
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
@@ -11,13 +12,16 @@ import kotlinx.coroutines.launch
 import org.jsoup.nodes.Document
 import garden.appl.mitch.ItchWebsiteUtils
 import garden.appl.mitch.PREF_LANG_SITE_LOCALE
+import garden.appl.mitch.PREF_WARN_WRONG_OS
 import garden.appl.mitch.R
 import garden.appl.mitch.data.SpecialBundle
 import garden.appl.mitch.data.containsGame
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
+import garden.appl.mitch.database.installation.Installation
+import kotlinx.coroutines.CoroutineScope
 
-class ItchBrowseHandler(private val context: Context) {
+class ItchBrowseHandler(private val context: Context, private val scope: CoroutineScope) {
     companion object {
         private const val LOGGING_TAG = "ItchBrowseHandler"
 
@@ -158,27 +162,60 @@ class ItchBrowseHandler(private val context: Context) {
         val mimeType = currentDownloadMimeType ?: return
         val contentLength = currentDownloadContentLength ?: return
 
+        val install = ItchWebsiteParser.getPendingInstallation(downloadPageDoc, uploadId)
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+
+        if (prefs.getBoolean(PREF_WARN_WRONG_OS, true) && install.platforms != 0
+            && install.platforms and Installation.PLATFORM_ANDROID == 0) {
+
+            scope.launch(Dispatchers.Main) {
+                val dialog = AlertDialog.Builder(context).run {
+                    setTitle(android.R.string.dialog_alert_title)
+                    setIconAttribute(android.R.attr.alertDialogIcon)
+                    setMessage(context.getString(R.string.dialog_download_wrong_os,
+                        install.uploadName))
+                    setPositiveButton(R.string.dialog_yes) { _, _ ->
+                        scope.launch {
+                            doDownload(install, downloadPageUrl, downloadUrl,
+                                contentDisposition, mimeType, contentLength)
+                        }
+                    }
+                    setNegativeButton(R.string.dialog_no) { _, _ ->
+                        //no-op
+                    }
+
+                    create()
+                }
+                dialog.show()
+            }
+        } else {
+            doDownload(install, downloadPageUrl, downloadUrl,
+                contentDisposition, mimeType, contentLength)
+        }
+    }
+
+    private suspend fun doDownload(
+        pendingInstall: Installation,
+        downloadPageUrl: String,
+        downloadUrl: String,
+        contentDisposition: String,
+        mimeType: String,
+        contentLength: Long
+    ) {
         clickedUploadId = null
         currentDownloadUrl = null
         currentDownloadContentDisposition = null
         currentDownloadMimeType = null
         currentDownloadContentLength = null
 
-        coroutineScope {
-            launch(Dispatchers.Main) {
-                Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_LONG)
-                    .show()
-            }
 
-            launch {
-                val pendingInstall =
-                    ItchWebsiteParser.getPendingInstallation(downloadPageDoc, uploadId)
-
-                Log.d(LOGGING_TAG, "content length: $contentLength")
-                GameDownloader.requestDownload(context, pendingInstall, downloadUrl,
-                    downloadPageUrl, contentDisposition, mimeType, contentLength)
-            }
+        scope.launch(Dispatchers.Main) {
+            Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_LONG)
+                .show()
         }
+
+        GameDownloader.requestDownload(context, pendingInstall, downloadUrl,
+            downloadPageUrl, contentDisposition, mimeType, contentLength)
     }
 
     suspend fun getGameEmbedInfoFromId(gameId: Int): Game {
