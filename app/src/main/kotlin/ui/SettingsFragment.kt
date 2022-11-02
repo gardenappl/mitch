@@ -1,6 +1,7 @@
 package garden.appl.mitch.ui
 
 import android.app.Dialog
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -11,7 +12,6 @@ import androidx.core.content.edit
 import androidx.core.widget.addTextChangedListener
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
 import androidx.preference.get
 import garden.appl.mitch.*
 import garden.appl.mitch.client.ItchTag
@@ -31,8 +31,19 @@ class SettingsFragment : PreferenceFragmentCompat(), CoroutineScope by MainScope
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
+        updatePrefExcludeTag(preferenceManager.sharedPreferences!!.getString(PREF_BROWSE_START_PAGE, "main")!!)
 
-        updatePreferenceSummaries()
+        findPreference<Preference>(PREF_BROWSE_START_PAGE)?.setOnPreferenceChangeListener { _, newValue ->
+            updatePrefExcludeTag(newValue as String)
+            true
+        }
+
+        findPreference<Preference>(PREF_WEB_CACHE_ENABLE)?.setOnPreferenceChangeListener { _, _ ->
+            preferenceManager.sharedPreferences!!.edit {
+                putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
+            }
+            true
+        }
     }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
@@ -68,13 +79,6 @@ class SettingsFragment : PreferenceFragmentCompat(), CoroutineScope by MainScope
 
             dialog.show()
             return true
-
-        } else if (preference.key == PREF_WEB_CACHE_ENABLE) {
-            val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            sharedPrefs.edit {
-                putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
-            }
-            Log.d(LOGGING_TAG, "will now hide web cache dialog")
 
         } else if (preference.key == PREF_START_PAGE_EXCLUDE) {
             val binding = DialogTagSelectBinding.inflate(layoutInflater)
@@ -119,12 +123,11 @@ class SettingsFragment : PreferenceFragmentCompat(), CoroutineScope by MainScope
                             option.tag.name
                         }
 
-                        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                        sharedPrefs.edit(commit = true) {
+                        preferenceManager.sharedPreferences!!.edit(commit = true) {
                             putStringSet(PREF_START_PAGE_EXCLUDE, option?.tag?.let { setOf(it.tag) })
                             putString(PREF_START_PAGE_EXCLUDE_DISPLAY_STRING, selectedTagDisplayString)
                         }
-                        this@SettingsFragment.updatePreferenceSummaries()
+                        this@SettingsFragment.updatePrefExcludeTag()
                         dialog.dismiss()
                     }
                 }
@@ -155,13 +158,20 @@ class SettingsFragment : PreferenceFragmentCompat(), CoroutineScope by MainScope
         }
     }
 
-    private fun updatePreferenceSummaries() {
-        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+    private fun updatePrefExcludeTag(prefBrowseStartPage: String? = null) {
+        val sharedPrefs = preferenceManager.sharedPreferences!!
 
         val startPageExcludePreference = preferenceScreen.get<Preference>(PREF_START_PAGE_EXCLUDE)!!
-        startPageExcludePreference.setSummary(sharedPrefs.getString(
+        startPageExcludePreference.summary = sharedPrefs.getString(
             PREF_START_PAGE_EXCLUDE_DISPLAY_STRING,
             getString(R.string.settings_exclude_tags_show_all)
-        ))
+        )
+
+        if (prefBrowseStartPage != null) {
+            startPageExcludePreference.isSelectable = when (prefBrowseStartPage) {
+                "android", "web", "web_touch", "all_games" -> true
+                else -> false
+            }
+        }
     }
 }
