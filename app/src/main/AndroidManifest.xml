@@ -23,6 +23,7 @@
             android:label="@string/app_name"
             android:largeHeap="true"
             android:roundIcon="@mipmap/ic_launcher_round"
+            android:manageSpaceActivity="garden.appl.mitch.ui.MainActivity$LibraryActivity"
             android:name=".Mitch"
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
@@ -94,6 +95,10 @@
                 android:taskAffinity="garden.appl.mitch.webgame"
                 android:theme="@style/AppTheme.Fullscreen"
                 android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|uiMode"/>
+        <activity
+                android:exported="true"
+                android:name=".ui.MainActivity$LibraryActivity"
+                android:theme="@style/SplashScreenTheme" />
 
         <receiver
                 android:name=".install.InstallRequestBroadcastReceiver"

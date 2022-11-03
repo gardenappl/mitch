@@ -1,28 +1,23 @@
 package garden.appl.mitch.ui
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
-import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.*
 import garden.appl.mitch.*
 import garden.appl.mitch.database.AppDatabase
-import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.databinding.ActivityMainBinding
 
 /**
@@ -114,8 +109,10 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
                 UPDATES_FRAGMENT_TAG
             else if (supportFragmentManager.findFragmentByTag(SETTINGS_FRAGMENT_TAG)?.isVisible == true)
                 SETTINGS_FRAGMENT_TAG
-            else
-                throw IllegalStateException("No active fragments?")
+            else {
+                Log.w(LOGGING_TAG, "no visible fragment?")
+                return@addOnBackStackChangedListener
+            }
             onFragmentSet(newFragmentTag, true)
         }
 
@@ -128,8 +125,6 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
 
             return@setOnNavigationItemSelectedListener fragmentChanged
         }
-
-        setActiveFragment(currentFragmentTag, true)
     }
 
     override fun onStart() {
@@ -141,9 +136,7 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
         } else if (intent.getBooleanExtra(EXTRA_SHOULD_OPEN_LIBRARY, false)) {
             setActiveFragment(LIBRARY_FRAGMENT_TAG)
         } else {
-//            val launchOfflineWebGameId = intent.getIntExtra(EXTRA_LAUNCH_OFFLINE_WEB_GAME_ID, -1)
-//            if (launchOfflineWebGameId != -1)
-//                launchWebGame(launchOfflineWebGameId)
+            setActiveFragment(currentFragmentTag)
         }
 
         launch {
@@ -225,6 +218,7 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
      * @return true if the current fragment has changed
      */
     fun setActiveFragment(newFragmentTag: String, resetNavBar: Boolean = true): Boolean {
+        Log.d(LOGGING_TAG, "current: $currentFragmentTag, new: $newFragmentTag")
         if (newFragmentTag == currentFragmentTag)
             return false
 
@@ -347,5 +341,18 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
         )
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         return intent
+    }
+
+    /**
+     * Redirect for <application> "manageSpaceActivity" attribute
+     */
+    class LibraryActivity : AppCompatActivity() {
+        override fun onStart() {
+            super.onStart()
+            val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra(MainActivity.EXTRA_SHOULD_OPEN_LIBRARY, true)
+            startActivity(intent)
+            finish()
+        }
     }
 }
