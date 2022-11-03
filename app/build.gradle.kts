@@ -39,8 +39,8 @@ android {
         targetSdk = 29
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        versionCode = 101
-        versionName = "2.1.0"
+        versionCode = 102
+        versionName = "2.1.1"
     }
     buildTypes {
         named("release").configure {
