@@ -10,6 +10,7 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.webkit.*
@@ -107,14 +108,14 @@ class GameActivity : MitchActivity() {
             val dialog = AlertDialog.Builder(context).apply {
                 setTitle(R.string.dialog_web_cache_info_title)
                 setMessage(R.string.dialog_web_cache_info)
-                setPositiveButton(android.R.string.ok) { _, _ ->
+                setPositiveButton(R.string.dialog_yes) { _, _ ->
                     prefs.edit(commit = true) {
                         putBoolean(PREF_WEB_CACHE_ENABLE, true)
                         putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
                     }
                     afterDialogShown(url)
                 }
-                setNegativeButton(android.R.string.cancel) { _, _ ->
+                setNegativeButton(R.string.dialog_no) { _, _ ->
                     prefs.edit(commit = true) {
                         putBoolean(PREF_WEB_CACHE_ENABLE, false)
                         putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
@@ -141,6 +142,17 @@ class GameActivity : MitchActivity() {
             Toast.makeText(this, R.string.popup_web_game_cached, Toast.LENGTH_LONG).show()
         }
         webView.loadUrl(url)
+//        val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
+//        val unencodedHtml = """
+//            <html>
+//                <body>
+//                    <h1>Hello</h1>
+//                    <p>Umm uhh <a href="$url">Click here</a> <a href="#">or here</a></p>
+//                </body>
+//            </html>
+//        """.trimIndent()
+//        val encodedHtml = Base64.encodeToString(unencodedHtml.toByteArray(), Base64.NO_PADDING)
+//        webView.loadData(encodedHtml, "text/html", "base64")
     }
 
     override fun onStop() {
@@ -225,23 +237,6 @@ class GameActivity : MitchActivity() {
             val game = Mitch.webGameCache.makeGameWebCached(this@GameActivity, gameId)
 
             Mitch.webGameCache.request(applicationContext, game, request, isOffline)
-        }
-
-        override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-            view.evaluateJavascript(
-                """
-                    document.addEventListener("DOMContentLoaded", (event) => {
-                        console.log("content loaded!");
-                        let body = document.body;
-                        body.addEventListener("click", (event) => {
-                            console.log("fullscreen!");
-                            body.requestFullscreen().catch(err => {
-                                console.log("Error attempting to enable fullscreen mode:" + err.message + ' ' + err.name);
-                            });
-                        });
-                    });
-                """, null
-            )
         }
     }
 
