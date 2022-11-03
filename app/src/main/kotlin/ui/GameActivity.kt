@@ -12,6 +12,7 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.os.PersistableBundle
 import android.util.Base64
 import android.util.Log
 import android.view.View
@@ -29,6 +30,8 @@ import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.databinding.ActivityGameBinding
 import kotlinx.coroutines.*
+import java.io.IOException
+import java.net.SocketTimeoutException
 
 class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
     companion object {
@@ -62,13 +65,6 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
                     View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         binding.root.keepScreenOn = true
         webView = binding.gameWebView
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        if (intent.action != Intent.ACTION_VIEW)
-            throw IllegalArgumentException("Only ACTION_VIEW is supported")
 
         chromeClient = GameChromeClient()
 
@@ -94,7 +90,12 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         }
         bindService(foregroundServiceIntent, connection, 0)
 
-        showLaunchDialog(this, intent.data.toString())
+
+        val bundle = savedInstanceState?.getBundle(WEB_VIEW_STATE_KEY)
+        if (bundle != null)
+            webView.restoreState(bundle)
+        else
+            showLaunchDialog(this, intent.data.toString())
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -105,7 +106,8 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
 
     override fun onResume() {
         super.onResume()
-        webView.resumeTimers()
+//        webView.resumeTimers()
+        webView.onResume()
     }
 
     private fun showLaunchDialog(context: Context, url: String) {
@@ -155,17 +157,21 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
         Log.d(LOGGING_TAG, "Running $gameId")
         if (gameId != -1) {
-            launch createShortcut@{
+            launch(Dispatchers.IO) {
                 val game = AppDatabase.getDatabase(this@GameActivity).gameDao.getGameById(gameId)
-                    ?: return@createShortcut
+                    ?: return@launch
 
-                val faviconBitmap = withContext(Dispatchers.IO) {
-                    val downloadedBitmap = Glide.with(this@GameActivity).asBitmap().run {
+                val downloadedBitmap = try {
+                    Glide.with(this@GameActivity).asBitmap().run {
                         load(game.thumbnailUrl)
                         submit()
                     }.get()
-                    Bitmap.createScaledBitmap(downloadedBitmap, 108, 108, false)
+                } catch (e: IOException) {
+                    return@launch
                 }
+                val faviconBitmap =
+                    Bitmap.createScaledBitmap(downloadedBitmap, 108, 108, false)
+
                 val shortcut =
                     ShortcutInfoCompat.Builder(this@GameActivity, getShortcutId(gameId)).run {
                         setShortLabel(game.name)
@@ -179,26 +185,21 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        unbindService(connection)
-        stopService(Intent(this, GameForegroundService::class.java))
-    }
-
     override fun onPause() {
         super.onPause()
-//        webView.onPause()
-        webView.pauseTimers()
+
+        webView.onPause()
         CookieManager.getInstance().flush()
-        runBlocking(Dispatchers.IO) {
+        runBlocking {
             Mitch.webGameCache.flush()
         }
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-        webView.settings.javaScriptEnabled = false
+        unbindService(connection)
+        stopService(Intent(this, GameForegroundService::class.java))
         webView.destroy()
+        super.onDestroy()
     }
 
     override fun onBackPressed() {

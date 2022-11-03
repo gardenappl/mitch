@@ -58,7 +58,6 @@ const val PREF_INSTALLER = "ua.gardenapple.itchupdater.installer"
 const val PREF_WEB_ANDROID_FILTER = "ua.gardenapple.itchupdater.web_android_filter"
 // Bundles: mitch.{racial, palestine, ukraine, trans_texas}
 const val PREF_LANG = "mitch.lang"
-
 /**
  * Locale is not controlled directly by the user; instead, Mitch.kt applies
  * [PREF_LANG_LOCALE_NEXT], and then [PREF_LANG_LOCALE] gets applied on app restart
@@ -78,6 +77,8 @@ object PreferenceWebCacheUpdate {
 const val PREF_BROWSE_START_PAGE = "mitch.browse_start_page"
 const val PREF_START_PAGE_EXCLUDE = "mitch.start_page_exclude"
 const val PREF_START_PAGE_EXCLUDE_DISPLAY_STRING = "mitch.start_page_exclude.display_string"
+
+const val PREF_DEBUG_DISABLE_GAME_ACTIVITY = "mitch.debug.disable_game_activity"
 
 
 

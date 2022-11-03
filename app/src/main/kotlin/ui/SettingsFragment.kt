@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -46,6 +47,8 @@ class SettingsFragment : PreferenceFragmentCompat(), CoroutineScope by MainScope
             }
             true
         }
+        if (BuildConfig.DEBUG)
+            findPreference<Preference>(PREF_DEBUG_DISABLE_GAME_ACTIVITY)?.isVisible = true
     }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {

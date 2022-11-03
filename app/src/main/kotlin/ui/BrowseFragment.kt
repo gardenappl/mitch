@@ -311,14 +311,16 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     override fun onPause() {
         super.onPause()
 
-        webView.pauseTimers()
+        webView.onPause()
+//        webView.pauseTimers()
         CookieManager.getInstance().flush()
     }
 
     override fun onResume() {
         super.onResume()
 
-        webView.resumeTimers()
+        webView.onResume()
+//        webView.resumeTimers()
         chromeClient.onResume()
     }
 
@@ -326,6 +328,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         super.onDestroy()
 
         cancel()
+        webView.destroy()
     }
 
     override fun onDetach() {
@@ -951,6 +954,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
 
         override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+            val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            val hiddenElements = if (prefs.getBoolean(PREF_DEBUG_DISABLE_GAME_ACTIVITY, false) && BuildConfig.DEBUG)
+                ".purchase_banner, .header_buy_row, .buy_row, .donate_btn"
+            else
+                ".purchase_banner, .header_buy_row, .buy_row, .donate_btn, .embed_wrapper, .load_iframe_btn"
             view.evaluateJavascript("""
                     document.addEventListener("DOMContentLoaded", (event) => {
                         // tell Android that the document is ready
@@ -972,7 +980,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                             ytBanner.style.visibility = "hidden";
                             
                         // remove game purchase banners, we implement our own
-                        let elements = document.querySelectorAll(".purchase_banner, .header_buy_row, .buy_row, .donate_btn, .embed_wrapper, .load_iframe_btn");
+                        let elements = document.querySelectorAll("$hiddenElements");
                         for (var element of elements)
                             element.style.display = "none";
                             
