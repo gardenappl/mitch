@@ -116,12 +116,6 @@ class WebGameCache(context: Context) {
                 }
             })
         }
-        Log.d(LOGGING_TAG, "response code for ${request.url}: ${response?.statusCode}")
-        if (response != null) {
-            for (header in response.responseHeaders) {
-                Log.d(LOGGING_TAG, "${header.key}: ${header.value}")
-            }
-        }
         return if (response == null && !forceCache)
             request(httpClient, request, forceCache = true)
         else
@@ -130,7 +124,6 @@ class WebGameCache(context: Context) {
 
     private fun getOkHttpClientForGame(game: Game): OkHttpClient {
         return cacheHttpClients.getOrPut(game.gameId) { ->
-            Log.d(LOGGING_TAG, "making new client for $game")
             Mitch.httpClient.newBuilder().let {
                 it.cache(Cache(getCacheDir(game.gameId), Long.MAX_VALUE))
                 it.build()
@@ -145,7 +138,6 @@ class WebGameCache(context: Context) {
     suspend fun makeGameWebCached(context: Context, gameId: Int): Game {
         val db = AppDatabase.getDatabase(context)
         val install = db.installDao.getWebInstallationForGame(gameId)
-        Log.d(LOGGING_TAG, "Current web install is $install")
 
         val newInstall = Installation(
             internalId = install?.internalId ?: 0,
@@ -170,7 +162,6 @@ class WebGameCache(context: Context) {
             cacheHttpClients.remove(gameId)?.run {
                 cache?.delete()
             } ?: getCacheDir(gameId).deleteRecursively()
-            Log.d(LOGGING_TAG, "deleted ${getCacheDir(gameId)}")
         }
 
         val db = AppDatabase.getDatabase(context)
@@ -180,7 +171,6 @@ class WebGameCache(context: Context) {
     suspend fun flush() = withContext(Dispatchers.IO) {
         for (httpClient in cacheHttpClients) {
             httpClient.value.cache?.flush()
-            Log.d(LOGGING_TAG, "flushed for ID ${httpClient.key}")
         }
     }
 

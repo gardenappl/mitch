@@ -37,7 +37,6 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
         const val LOGGING_TAG = "MainActivity"
 
         const val EXTRA_SHOULD_OPEN_LIBRARY = "SHOULD_OPEN_LIBRARY"
-//        const val EXTRA_LAUNCH_OFFLINE_WEB_GAME_ID = "LAUNCH_OFFLINE_WEB_GAME_ID"
         
         private const val ACTIVE_FRAGMENT_KEY: String = "fragment"
 

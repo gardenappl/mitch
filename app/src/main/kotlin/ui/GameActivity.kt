@@ -6,6 +6,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.ShortcutInfo
+import android.content.pm.ShortcutManager
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
@@ -17,18 +19,25 @@ import android.webkit.*
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.graphics.drawable.IconCompat
 import androidx.preference.PreferenceManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import com.bumptech.glide.Glide
 import garden.appl.mitch.*
+import garden.appl.mitch.database.AppDatabase
+import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.databinding.ActivityGameBinding
+import kotlinx.coroutines.*
 
-class GameActivity : MitchActivity() {
+class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
     companion object {
         private const val LOGGING_TAG = "GameActivity"
         const val EXTRA_GAME_ID = "GAME_ID"
         const val EXTRA_IS_OFFLINE = "IS_OFFLINE"
         private const val WEB_VIEW_STATE_KEY: String = "WebView"
+
+        fun getShortcutId(gameId: Int) = "web_game/${gameId}"
     }
 
     private lateinit var binding: ActivityGameBinding
@@ -142,17 +151,32 @@ class GameActivity : MitchActivity() {
             Toast.makeText(this, R.string.popup_web_game_cached, Toast.LENGTH_LONG).show()
         }
         webView.loadUrl(url)
-//        val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
-//        val unencodedHtml = """
-//            <html>
-//                <body>
-//                    <h1>Hello</h1>
-//                    <p>Umm uhh <a href="$url">Click here</a> <a href="#">or here</a></p>
-//                </body>
-//            </html>
-//        """.trimIndent()
-//        val encodedHtml = Base64.encodeToString(unencodedHtml.toByteArray(), Base64.NO_PADDING)
-//        webView.loadData(encodedHtml, "text/html", "base64")
+
+        val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
+        Log.d(LOGGING_TAG, "Running $gameId")
+        if (gameId != -1) {
+            launch createShortcut@{
+                val game = AppDatabase.getDatabase(this@GameActivity).gameDao.getGameById(gameId)
+                    ?: return@createShortcut
+
+                val faviconBitmap = withContext(Dispatchers.IO) {
+                    val downloadedBitmap = Glide.with(this@GameActivity).asBitmap().run {
+                        load(game.thumbnailUrl)
+                        submit()
+                    }.get()
+                    Bitmap.createScaledBitmap(downloadedBitmap, 108, 108, false)
+                }
+                val shortcut =
+                    ShortcutInfoCompat.Builder(this@GameActivity, getShortcutId(gameId)).run {
+                        setShortLabel(game.name)
+                        setIcon(IconCompat.createWithAdaptiveBitmap(faviconBitmap))
+                        setIntent(makeIntentForRestart())
+                        build()
+                    }
+
+                ShortcutManagerCompat.pushDynamicShortcut(this@GameActivity, shortcut)
+            }
+        }
     }
 
     override fun onStop() {
@@ -194,11 +218,11 @@ class GameActivity : MitchActivity() {
     }
 
     override fun makeIntentForRestart(): Intent {
-        val intent = Intent(Intent.ACTION_VIEW, intent.data, applicationContext,
+        val newIntent = Intent(Intent.ACTION_VIEW, intent.data, applicationContext,
             GameActivity::class.java)
-        intent.putExtra(EXTRA_GAME_ID, intent.getIntExtra(EXTRA_GAME_ID, -1))
-        intent.putExtra(EXTRA_IS_OFFLINE, intent.getBooleanExtra(EXTRA_IS_OFFLINE, false))
-        return intent
+        newIntent.putExtra(EXTRA_GAME_ID, intent.getIntExtra(EXTRA_GAME_ID, -1))
+        newIntent.putExtra(EXTRA_IS_OFFLINE, intent.getBooleanExtra(EXTRA_IS_OFFLINE, false))
+        return newIntent
     }
 
     inner class GameWebViewClient : WebViewClient() {

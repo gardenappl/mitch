@@ -59,16 +59,10 @@ object ItchWebsiteParser {
         Log.d(LOGGING_TAG, "Getting info for $gamePageUrl")
         val name: String = getGameName(storePageDoc)
 
-        val thumbnail = storePageDoc.head().selectFirst("[property=\"og:image\"]")
-        val thumbnailUrl = if (thumbnail != null) {
-            thumbnail.attr("content")
-        } else {
-            Log.d(LOGGING_TAG, "No thumbnail!")
-            null
-        }
+        val thumbnailUrl = storePageDoc.head().selectFirst("[property=\"og:image\"]")?.attr("content")
+        val faviconUrl = storePageDoc.head().selectFirst("link[rel=\"icon\"]")?.attr("href")
 
         val infoTable = getInfoTable(storePageDoc)
-
         val authorName = getAuthorName(Uri.parse(gamePageUrl), infoTable)
         val lastDownloadTimestamp: String? = getTimestamp(infoTable)
 
@@ -79,7 +73,8 @@ object ItchWebsiteParser {
             storeUrl = gamePageUrl,
             thumbnailUrl = thumbnailUrl,
             lastUpdatedTimestamp = lastDownloadTimestamp,
-            locale = getLocale(storePageDoc)
+            locale = getLocale(storePageDoc),
+            faviconUrl = faviconUrl
         )
     }
 

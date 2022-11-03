@@ -57,6 +57,9 @@ data class Game(
     @ColumnInfo(name = WEB_ENTRY_POINT)
     val webEntryPoint: String? = null,
 
+    @ColumnInfo(name = FAVICON_URL)
+    val faviconUrl: String? = null,
+
     @Deprecated("Unused field")
     @ColumnInfo(name = WEB_CACHED)
     val webCached: Boolean = false
@@ -77,6 +80,7 @@ data class Game(
         const val THUMBNAIL_URL = "thumbnail_url"
         const val LAST_UPDATED_TIMESTAMP = "last_timestamp"
         const val WEB_ENTRY_POINT = "web_entry_point"
+        const val FAVICON_URL = "favicon_url"
         const val WEB_CACHED = "web_cached"
     }
 
