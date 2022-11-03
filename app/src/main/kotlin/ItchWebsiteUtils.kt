@@ -32,8 +32,11 @@ object ItchWebsiteUtils {
     fun isItchWebPage(uri: Uri): Boolean {
         return uri.host != null && (uri.host == "itch.io" ||
                 uri.host!!.endsWith(".itch.io") ||
-                uri.host!!.endsWith(".itch.zone") ||
-                uri.host!!.endsWith(".hwcdn.net"))
+                uri.host!!.endsWith(".itch.zone"))
+    }
+
+    fun isItchWebPageOrCDN(uri: Uri): Boolean {
+        return isItchWebPage(uri) || uri.host!!.endsWith(".hwcdn.net")
     }
 
     fun isStorePage(htmlDoc: Document): Boolean {

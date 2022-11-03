@@ -898,7 +898,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val githubLoginPathRegex = Regex("""/?(login|sessions)(/.*)?""")
 
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-            if (ItchWebsiteUtils.isItchWebPage(request.url)) {
+            if (ItchWebsiteUtils.isItchWebPageOrCDN(request.url)) {
                 return false
             } else if (request.url.host == "github.com"
                     && request.url.path?.matches(githubLoginPathRegex) == true) {

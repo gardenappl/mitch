@@ -203,7 +203,7 @@ class GameActivity : MitchActivity() {
 
     inner class GameWebViewClient : WebViewClient() {
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-            if (ItchWebsiteUtils.isItchWebPage(request.url)) {
+            if (ItchWebsiteUtils.isItchWebPageOrCDN(request.url)) {
                 return false
             }
             val intent = Intent(Intent.ACTION_VIEW, request.url)
@@ -224,6 +224,8 @@ class GameActivity : MitchActivity() {
             view: WebView,
             request: WebResourceRequest
         ): WebResourceResponse? = runBlocking(Dispatchers.IO) {
+            if (request.url.scheme?.startsWith("http") != true)
+                return@runBlocking null
             val isOffline = intent.getBooleanExtra(EXTRA_IS_OFFLINE, false)
             val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
 
