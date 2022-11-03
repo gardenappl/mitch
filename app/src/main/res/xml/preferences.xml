@@ -74,5 +74,8 @@
         <Preference
                 android:key="cancel_all_downloads"
                 android:title="@string/settings_cancel_downloads" />
+        <Preference
+                android:key="mitch.clear_all_data"
+                android:title="@string/settings_clear_all" />
     </PreferenceCategory>
 </PreferenceScreen>

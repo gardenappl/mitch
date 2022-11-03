@@ -228,4 +228,7 @@
     <string name="popup_web_game_cached">This game will be available in your library for offline play.</string>
     <string name="dialog_apply">Apply</string>
     <string name="dialog_reset">Reset</string>
+    <string name="settings_clear_all">Clear all Mitch data</string>
+    <string name="settings_clear_all_title">Delete all data?</string>
+    <string name="settings_clear_all_message">This will delete all saved web games, all downloaded files (which have not been exported to the Downloads folder), and will log you out of your itch.io account, among other things.\nThis will not delete installed applications, however Mitch will no longer keep track of updates for them.\nAre you sure you want to clear all Mitch application data?</string>
 </resources>

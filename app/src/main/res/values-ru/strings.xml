@@ -233,4 +233,7 @@
     <string name="popup_web_game_cached">Игра будет доступа в игротеке в режиме оффлайн.</string>
     <string name="dialog_apply">Применить</string>
     <string name="dialog_reset">Сбросить</string>
+    <string name="settings_clear_all">Удалить все данные Mitch</string>
+    <string name="settings_clear_all_title">Очистить все данные?</string>
+    <string name="settings_clear_all_message">Это удалит все сохранённые веб-игры, все загруженные файлы (кроме экспортированых в папку Загрузки), и другое.\nЭто не удалит установленные приложения, но Mitch больше не будет проверять для них обновления.\nВы уверены, что хотите удалить все данные Mitch?</string>
 </resources>

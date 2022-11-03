@@ -1,6 +1,8 @@
 package garden.appl.mitch.ui
 
+import android.app.ActivityManager
 import android.app.Dialog
+import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
@@ -134,6 +136,23 @@ class SettingsFragment : PreferenceFragmentCompat(), CoroutineScope by MainScope
             }
 
             dialog.setOnDismissListener { loadTagsJob.cancel() }
+            dialog.show()
+            return true
+
+        } else if (preference.key == "mitch.clear_all_data") {
+            val dialog = AlertDialog.Builder(requireContext()).run {
+                setTitle(R.string.settings_clear_all_title)
+                setMessage(R.string.settings_clear_all_message)
+                setIcon(R.drawable.ic_baseline_warning_24)
+
+                setPositiveButton(R.string.dialog_yes) { _, _ ->
+                    val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                    manager.clearApplicationUserData()
+                }
+                setNegativeButton(R.string.dialog_no) { _, _ -> /* no-op */ }
+                setOnDismissListener { /* no-op */ }
+                create()
+            }
             dialog.show()
             return true
         }
