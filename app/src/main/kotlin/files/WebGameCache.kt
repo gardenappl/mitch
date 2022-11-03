@@ -15,8 +15,11 @@ import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.database.installation.Installation
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.UnknownHostException
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.HashMap
@@ -28,7 +31,8 @@ class WebGameCache(context: Context) {
         private const val LOGGING_TAG = "WebGameCache"
     }
 
-    private val cacheDir = File(context.cacheDir, "webgames")
+    private val cacheDirLegacy = File(context.cacheDir, "webgames")
+    private val cacheDir by lazy { context.getDir("webgames", Context.MODE_PRIVATE) }
     private val cacheHttpClients = HashMap<Int, OkHttpClient>()
 
     suspend fun request(
@@ -38,9 +42,7 @@ class WebGameCache(context: Context) {
         isOfflineWebGame: Boolean
     ): WebResourceResponse? = withContext(Dispatchers.IO) {
         val updateWebCache = if (isOfflineWebGame) {
-            Log.d(LOGGING_TAG, "Currently in offline mode")
             val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
-            Log.d(LOGGING_TAG, sharedPrefs.getString(PREF_WEB_CACHE_UPDATE, PreferenceWebCacheUpdate.NEVER)!!)
             when (sharedPrefs.getString(PREF_WEB_CACHE_UPDATE, PreferenceWebCacheUpdate.NEVER)) {
                 PreferenceWebCacheUpdate.NEVER ->
                     false
@@ -52,7 +54,6 @@ class WebGameCache(context: Context) {
         } else {
             true
         }
-        Log.d(LOGGING_TAG, "Update web cache: $updateWebCache")
 
         val url = request.url.toString()
         val httpRequest = Request.Builder().run {
@@ -64,7 +65,6 @@ class WebGameCache(context: Context) {
             build()
         }
         val httpClient = getOkHttpClientForGame(game)
-        Log.d(LOGGING_TAG, "current cache in ${httpClient.cache?.directory}")
 
         request(httpClient, httpRequest, forceCache = !updateWebCache)
     }
@@ -81,7 +81,7 @@ class WebGameCache(context: Context) {
             build()
         }
 
-        val response = suspendCancellableCoroutine<WebResourceResponse?> { continuation ->
+        val response = suspendCancellableCoroutine { continuation ->
             httpClient.newCall(httpRequest).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     if (e is UnknownHostException)
@@ -132,15 +132,15 @@ class WebGameCache(context: Context) {
         return cacheHttpClients.getOrPut(game.gameId) { ->
             Log.d(LOGGING_TAG, "making new client for $game")
             Mitch.httpClient.newBuilder().let {
-                val gameCacheDir = getCacheDir(game.gameId)
-                gameCacheDir.mkdirs()
-                it.cache(Cache(gameCacheDir, Long.MAX_VALUE))
+                it.cache(Cache(getCacheDir(game.gameId), Long.MAX_VALUE))
                 it.build()
             }
         }
     }
 
-    private fun getCacheDir(gameId: Int): File = File(cacheDir, gameId.toString())
+    private fun getCacheDir(gameId: Int): File {
+        return migrateCacheDir(gameId, mkdir = true)
+    }
 
     suspend fun makeGameWebCached(context: Context, gameId: Int): Game {
         val db = AppDatabase.getDatabase(context)
@@ -186,6 +186,13 @@ class WebGameCache(context: Context) {
 
     suspend fun cleanCaches(db: AppDatabase) {
         val installs = db.installDao.getWebInstallationsSync()
+
+        val dirsLegacy = cacheDirLegacy.listFiles()
+        dirsLegacy?.forEach { dir ->
+            migrateCacheDir(dir.name.toInt(), false)
+        }
+        cacheDirLegacy.deleteRecursively()
+
         val dirs = cacheDir.listFiles() ?: return
 
         Log.d(LOGGING_TAG, "Cleaning up...")
@@ -202,5 +209,30 @@ class WebGameCache(context: Context) {
             }
         }
         Log.d(LOGGING_TAG, "Cleaning up done.")
+    }
+
+    private fun migrateCacheDir(gameId: Int, mkdir: Boolean): File {
+        val dir = File(cacheDir, gameId.toString())
+        val legacyDir = File(cacheDirLegacy, gameId.toString())
+
+        try {
+            if (legacyDir.renameTo(dir)) {
+                Log.d(LOGGING_TAG, "Renamed from $legacyDir to $dir")
+            } else {
+                legacyDir.copyRecursively(dir)
+                legacyDir.deleteRecursively()
+                Log.d(LOGGING_TAG, "Moved from $legacyDir to $dir")
+            }
+            return dir
+        } catch (e: NoSuchFileException) {
+            //no-op
+        } catch (e: Exception) {
+            File(cacheDirLegacy, gameId.toString()).deleteRecursively()
+            Log.d(LOGGING_TAG, "Failed to move $legacyDir, deleting and returning $dir")
+        }
+
+        if (mkdir)
+            dir.mkdirs()
+        return dir
     }
 }
