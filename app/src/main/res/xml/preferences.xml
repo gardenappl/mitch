@@ -81,6 +81,6 @@
                 android:visible="false"
                 android:defaultValue="false"
                 android:key="mitch.debug.disable_game_activity"
-                android:title="Disable GameActivity" />
+                android:title="Enable web games in Browse tab" />
     </PreferenceCategory>
 </PreferenceScreen>
