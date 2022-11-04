@@ -126,8 +126,10 @@ class WebGameCache(context: Context) {
 
     private fun getOkHttpClientForGame(game: Game): OkHttpClient {
         return cacheHttpClients.getOrPut(game.gameId) { ->
+            val cacheDir = getCacheDir(game.gameId)
+            Utils.logDebug(LOGGING_TAG, "new client; cache dir: $cacheDir")
             Mitch.httpClient.newBuilder().let {
-                it.cache(Cache(getCacheDir(game.gameId), Long.MAX_VALUE))
+                it.cache(Cache(cacheDir, Long.MAX_VALUE))
                 it.build()
             }
         }
@@ -163,7 +165,11 @@ class WebGameCache(context: Context) {
         withContext(Dispatchers.IO) {
             cacheHttpClients.remove(gameId)?.run {
                 cache?.delete()
-            } ?: getCacheDir(gameId).deleteRecursively()
+            }
+            val cacheDir = getCacheDir(gameId)
+            Utils.logDebug(LOGGING_TAG, "Deleting $cacheDir")
+            cacheDir.deleteRecursively()
+            Utils.logDebug(LOGGING_TAG, "exists? ${cacheDir.exists()}")
         }
 
         val db = AppDatabase.getDatabase(context)

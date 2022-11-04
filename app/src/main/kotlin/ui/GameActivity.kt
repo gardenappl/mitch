@@ -9,6 +9,7 @@ import android.content.ServiceConnection
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -34,7 +35,12 @@ import kotlinx.coroutines.*
 import okhttp3.internal.cacheGet
 import java.io.IOException
 import java.net.SocketTimeoutException
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.TimeUnit
 
+/**
+ * Data URI is unused, but currently the hwcdn URL is supplied.
+ */
 class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
     companion object {
         private const val LOGGING_TAG = "GameActivity"
@@ -43,6 +49,65 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         private const val WEB_VIEW_STATE_KEY: String = "WebView"
 
         fun getShortcutId(gameId: Int) = "web_game/${gameId}"
+
+        /**
+         * @return for backwards compat reasons, returns false if failed to get thumbnail
+         */
+        suspend fun makeShortcut(game: Game, context: Context): ShortcutInfoCompat {
+            val game = tryFixBackwardsCompatGame(game, context)
+            val faviconBitmap = game.faviconUrl?.let { url ->
+                withContext(Dispatchers.IO) {
+                    val bitmap = try {
+                        Glide.with(context).asBitmap().run {
+                            load(url)
+                            submit()
+                        }.get()
+                    } catch (e: ExecutionException) {
+                        Log.e(LOGGING_TAG, "no thumbnail: ${e.cause}")
+                        return@withContext null
+                    }
+                    Bitmap.createScaledBitmap(bitmap, 128, 128, false)
+                }
+            }
+            Log.d(LOGGING_TAG, "Game: $game")
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(game.webEntryPoint),
+                context, GameActivity::class.java).apply {
+
+                putExtra(EXTRA_GAME_ID, game.gameId)
+                putExtra(EXTRA_IS_OFFLINE, true)
+            }
+            val shortcutId = getShortcutId(game.gameId)
+            return ShortcutInfoCompat.Builder(context, shortcutId).run {
+                setShortLabel(game.name)
+                if (faviconBitmap != null)
+                    setIcon(IconCompat.createWithBitmap(faviconBitmap))
+                setIntent(intent)
+                build()
+            }
+        }
+
+        /**
+         * @return possibly an updated instance of [Game]
+         */
+        private suspend fun tryFixBackwardsCompatGame(game: Game, context: Context): Game {
+            if (game.webIframe != null)
+                return game
+
+            Log.d(LOGGING_TAG, "getting iframe and favicon as backwards compat")
+            try {
+                val doc = ItchWebsiteUtils.fetchAndParse(game.storeUrl)
+                val parsedGame = ItchWebsiteParser.getGameInfoForStorePage(doc, game.storeUrl)!!
+                val newGame = game.copy(
+                    webIframe = parsedGame.webIframe,
+                    faviconUrl = parsedGame.faviconUrl
+                )
+                val db = AppDatabase.getDatabase(context)
+                db.gameDao.upsert(newGame)
+                return newGame
+            } catch (e: Exception) {
+                return game
+            }
+        }
     }
 
     private lateinit var binding: ActivityGameBinding
@@ -81,9 +146,11 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         webView.webViewClient = GameWebViewClient()
         webView.webChromeClient = chromeClient
 
+        val gameId = intent?.getIntExtra(EXTRA_GAME_ID, -1) ?: -1
 
         val foregroundServiceIntent = Intent(this, GameForegroundService::class.java)
         foregroundServiceIntent.putExtra(GameForegroundService.EXTRA_ORIGINAL_INTENT, intent)
+        foregroundServiceIntent.putExtra(GameForegroundService.EXTRA_GAME_ID, gameId)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(foregroundServiceIntent)
@@ -102,8 +169,11 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        if (intent?.data?.toString() != this.intent.data.toString())
+        if (intent?.getIntExtra(EXTRA_GAME_ID, -1)
+            != this.intent?.getIntExtra(EXTRA_GAME_ID, -2)) {
+
             showLaunchDialog(this)
+        }
     }
 
     override fun onResume() {
@@ -150,63 +220,48 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
         val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
-        Log.d(LOGGING_TAG, "Running $gameId")
+        val isOffline = intent.getBooleanExtra(EXTRA_IS_OFFLINE, false)
+
+        Log.d(LOGGING_TAG, "Running $gameId, offline: $isOffline")
         if (gameId != -1) {
             launch {
                 val db = AppDatabase.getDatabase(this@GameActivity)
 
                 val webInstall = db.installDao.getWebInstallationForGame(gameId)
-                if (webInstall == null && prefs.getBoolean(PREF_WEB_CACHE_ENABLE, true)) {
-                    Toast.makeText(this@GameActivity, R.string.popup_web_game_cached, Toast.LENGTH_LONG).show()
-                }
-                val game = db.gameDao.getGameById(gameId)!!
-                if (loadGame(game) == null)
-                    return@launch //won't be able to load favicon
-
-                val faviconBitmap = game.faviconUrl?.let { url ->
-                    withContext(Dispatchers.IO) {
-                        return@withContext try {
-                            Glide.with(this@GameActivity).asBitmap().run {
-                                load(url)
-                                submit()
-                            }.get()
-                        } catch (e: IOException) {
-                            null
-                        }
+                if (webInstall == null) {
+                    if (isOffline) {
+                        Toast.makeText(
+                            this@GameActivity,
+                            R.string.popup_web_game_deleted_cannot_launch,
+                            Toast.LENGTH_LONG
+                        ).show()
+                        finish()
+                        return@launch
+                    } else if (prefs.getBoolean(PREF_WEB_CACHE_ENABLE, true)) {
+                        Toast.makeText(
+                            this@GameActivity,
+                            R.string.popup_web_game_cached,
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
-                val shortcutId = getShortcutId(gameId)
-                val shortcut = ShortcutInfoCompat.Builder(this@GameActivity, shortcutId).run {
-                    setShortLabel(game.name)
-                    if (faviconBitmap != null)
-                        setIcon(IconCompat.createWithBitmap(faviconBitmap))
-                    setIntent(makeIntentForRestart())
-                    build()
-                }
+                val gameBackwardsCompat = db.gameDao.getGameById(gameId)!!
+                val game = tryFixBackwardsCompatGame(gameBackwardsCompat, this@GameActivity)
+
+                loadGame(game)
+                val shortcut = makeShortcut(game, this@GameActivity)
                 ShortcutManagerCompat.pushDynamicShortcut(this@GameActivity, shortcut)
             }
         }
     }
 
-    /**
-     * @return possibly an updated instance of [Game], for backwards compat reasons; or null on failure to do backwards compat migration
-     */
-    private suspend fun loadGame(game: Game): Game? {
-        var game = game
-
-        val db = AppDatabase.getDatabase(this@GameActivity)
-        // backwards compat
+    private fun loadGame(game: Game) {
         if (game.webIframe == null) {
-            Log.d(LOGGING_TAG, "getting iframe and favicon as backwards compat")
-            try {
-                val doc = ItchWebsiteUtils.fetchAndParse(game.storeUrl)
-                game = ItchWebsiteParser.getGameInfoForStorePage(doc, game.storeUrl)!!
-                db.gameDao.upsert(game)
-            } catch (e: Exception) {
-                webView.loadUrl(game.webEntryPoint!!)
-                return null
-            }
+            // backwards compat
+            webView.loadUrl(game.webEntryPoint!!)
+            return
         }
+
         val html = """<html>
             <head>
                 <style type="text/css">
@@ -232,7 +287,6 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
             <body>${game.webIframe}</body>
         </html>""".trimIndent()
         Utils.loadHtml(webView, html)
-        return game
     }
 
     override fun onPause() {

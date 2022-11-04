@@ -6,7 +6,10 @@ import android.app.DownloadManager
 import android.app.NotificationManager
 import android.content.*
 import android.net.Uri
+import android.os.Binder
+import android.os.Build
 import android.os.IBinder
+import android.os.Parcel
 import android.provider.Settings
 import android.util.Log
 import android.view.*
@@ -14,8 +17,10 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
+import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import garden.appl.mitch.*
 import garden.appl.mitch.database.AppDatabase
@@ -214,6 +219,8 @@ class LibraryAdapter internal constructor(
                 removeItem(R.id.app_info)
             if (!(type == GameRepository.Type.Downloads && gameInstall.externalFileName == null))
                 removeItem(R.id.move_to_downloads)
+            if (type != GameRepository.Type.WebCached)
+                removeItem(R.id.web_install_launcher_shortcut)
             if (!((type == GameRepository.Type.Downloads && gameInstall.externalFileName == null) ||
                         type == GameRepository.Type.Installed ||
                         type == GameRepository.Type.WebCached))
@@ -307,6 +314,15 @@ class LibraryAdapter internal constructor(
                 }
                 return true
             }
+            R.id.web_install_launcher_shortcut -> {
+                mainActivityScope.launch {
+                    val shortcut = GameActivity.makeShortcut(game, context)
+                    if (!ShortcutManagerCompat.requestPinShortcut(context, shortcut, null)) {
+                        Toast.makeText(context, R.string.popup_web_install_launcher_shortcut_error, Toast.LENGTH_LONG)
+                    }
+                }
+                return true
+            }
             R.id.delete -> {
                 if (type == GameRepository.Type.Installed) {
                     val intent = Intent(Intent.ACTION_DELETE,
@@ -314,18 +330,34 @@ class LibraryAdapter internal constructor(
                     context.startActivity(intent)
                 } else if (type == GameRepository.Type.WebCached) {
                     if (Utils.checkServiceRunning(context, GameForegroundService::class.java)) {
+                        Utils.logDebug(LOGGING_TAG, "Running.")
                         // need to check game ID
                         val intent = Intent(context, GameForegroundService::class.java)
 
                         val deleteGameServiceConnection = object : ServiceConnection {
-                            override fun onServiceConnected(className: ComponentName?, binderInterface: IBinder?) {
-                                val binder = binderInterface as GameForegroundService.Binder
-                                if (binder.gameId == game.gameId)
-                                    onDeleteWebChachedGame(game, true)
+                            override fun onServiceConnected(className: ComponentName, binderInterface: IBinder) {
+                                Utils.logDebug(LOGGING_TAG, "connected")
+                                val data = if (Build.VERSION.SDK_INT >= 33)
+                                    Parcel.obtain(binderInterface)
+                                else
+                                    Parcel.obtain()
+                                data.writeInt(GameForegroundService.TRANSACT_TYPE_GAME_ID)
+                                val reply = if (Build.VERSION.SDK_INT >= 33)
+                                    Parcel.obtain(binderInterface)
+                                else
+                                    Parcel.obtain()
+                                binderInterface.transact(Binder.FIRST_CALL_TRANSACTION, data, reply, 0)
+                                val gameId = reply.readInt()
+                                data.recycle()
+                                reply.recycle()
+                                Utils.logDebug(LOGGING_TAG, "binder: $gameId, here: ${game.gameId}")
+                                onDeleteWebChachedGame(game, gameId == game.gameId)
                                 activity.unbindService(this)
                             }
 
-                            override fun onServiceDisconnected(p0: ComponentName?) {}
+                            override fun onServiceDisconnected(p0: ComponentName?) {
+                                Utils.logDebug(LOGGING_TAG, "disconnected")
+                            }
                         }
 
                         if (!activity.bindService(intent, deleteGameServiceConnection, 0)) {
@@ -453,6 +485,8 @@ class LibraryAdapter internal constructor(
                 setMessage(context.getString(R.string.dialog_app_delete, game.name))
                 setPositiveButton(R.string.dialog_yes) { _, _ ->
                     mainActivityScope.launch {
+                        ShortcutManagerCompat.removeDynamicShortcuts(context,
+                            listOf(GameActivity.getShortcutId(game.gameId)))
                         Mitch.webGameCache.deleteCacheForGame(context, game.gameId)
 
                         Toast.makeText(

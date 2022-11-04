@@ -321,10 +321,13 @@ object Utils {
     }
 
     fun loadHtml(webView: WebView, html: String) {
-        if (BuildConfig.DEBUG)
-            Log.d(LOGGING_TAG, html)
+        logDebug(LOGGING_TAG, html)
         val encodedHtml: String = Base64.encodeToString(html.toByteArray(), Base64.NO_PADDING)
         webView.loadData(encodedHtml, "text/html", "base64")
+    }
 
+    fun logDebug(tag: String, string: String) {
+        if (BuildConfig.DEBUG)
+            Log.d(tag, string)
     }
 }

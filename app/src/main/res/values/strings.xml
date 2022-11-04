@@ -231,4 +231,7 @@
     <string name="settings_clear_all">Clear all Mitch data</string>
     <string name="settings_clear_all_title">Delete all data?</string>
     <string name="settings_clear_all_message">This will delete all saved web games, all downloaded files (which have not been exported to the Downloads folder), and will log you out of your itch.io account, among other things.\nThis will not delete installed applications, however Mitch will no longer keep track of updates for them.\nAre you sure you want to clear all Mitch application data?</string>
+    <string name="game_web_install_launcher_shortcut">Install on home screen</string>
+    <string name="popup_web_install_launcher_shortcut_error">Your launcher does not support custom shortcuts.</string>
+    <string name="popup_web_game_deleted_cannot_launch">This game has been deleted.</string>
 </resources>

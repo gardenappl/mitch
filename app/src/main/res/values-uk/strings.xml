@@ -234,4 +234,7 @@
     <string name="settings_clear_all">Видалити всі дані Mitch</string>
     <string name="settings_clear_all_title">Очистити всі дані?</string>
     <string name="settings_clear_all_message">Це видалить усі збережені веб-ігри, усі завантажені файли (окрім тих, які були експортовані у теку Завантаження), та інше.\nЦе не видалить встановлені додатки, але Mitch більше не буде перевіряти наявність оновлень для них.\nВи впевнені, що хочете видалити всі дані додатку Mitch?</string>
+    <string name="game_web_install_launcher_shortcut">Встановити на домашній екран</string>
+    <string name="popup_web_install_launcher_shortcut_error">Ваш лаунчер не підтримує ярликів.</string>
+    <string name="popup_web_game_deleted_cannot_launch">Ця гра була видалена.</string>
 </resources>

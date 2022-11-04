@@ -24,17 +24,23 @@ class GameForegroundService : Service() {
 
         const val EXTRA_ORIGINAL_INTENT = "original_intent"
         const val EXTRA_GAME_ID = "game_id"
+
+        const val TRANSACT_TYPE_GAME_ID = 69
     }
 
     private var gameId: Int = -1
 
     inner class Binder : android.os.Binder() {
-        var gameId: Int
-            get() = this@GameForegroundService.gameId
-            set(value) { this@GameForegroundService.gameId = value }
+        override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
+            if (data.readInt() == TRANSACT_TYPE_GAME_ID) {
+                reply?.writeInt(gameId)
+                return true
+            }
+            return false
+        }
     }
 
-    override fun onBind(p0: Intent?): IBinder? = Binder()
+    override fun onBind(p0: Intent?): IBinder? = this.Binder()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(LOGGING_TAG, "Foreground service started")
