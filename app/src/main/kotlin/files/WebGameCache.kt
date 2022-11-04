@@ -1,10 +1,12 @@
 package garden.appl.mitch.files
 
 import android.content.Context
+import android.os.Looper
 import android.util.Log
 import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import android.widget.Toast
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine

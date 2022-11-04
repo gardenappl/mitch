@@ -4,12 +4,10 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.Service
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
@@ -21,7 +19,9 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Html
 import android.text.Spanned
+import android.util.Base64
 import android.util.Log
+import android.webkit.WebView
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.core.content.FileProvider
@@ -318,5 +318,13 @@ object Utils {
             }
         }
         return false
+    }
+
+    fun loadHtml(webView: WebView, html: String) {
+        if (BuildConfig.DEBUG)
+            Log.d(LOGGING_TAG, html)
+        val encodedHtml: String = Base64.encodeToString(html.toByteArray(), Base64.NO_PADDING)
+        webView.loadData(encodedHtml, "text/html", "base64")
+
     }
 }

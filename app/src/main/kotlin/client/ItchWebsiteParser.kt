@@ -66,6 +66,8 @@ object ItchWebsiteParser {
         val authorName = getAuthorName(Uri.parse(gamePageUrl), infoTable)
         val lastDownloadTimestamp: String? = getTimestamp(infoTable)
 
+        val iframeHtml = getIframe(storePageDoc)?.outerHtml()
+
         return Game(
             gameId = gameId,
             name = name,
@@ -74,7 +76,8 @@ object ItchWebsiteParser {
             thumbnailUrl = thumbnailUrl,
             lastUpdatedTimestamp = lastDownloadTimestamp,
             locale = getLocale(storePageDoc),
-            faviconUrl = faviconUrl
+            faviconUrl = faviconUrl,
+            webIframe = iframeHtml
         )
     }
 
@@ -436,16 +439,18 @@ object ItchWebsiteParser {
             ?: throw IllegalArgumentException("Could not find game jam or forum name")
     }
 
+    private fun getIframe(doc: Document, placeholder: Element? = null): Element? {
+        val placeholder = placeholder ?: doc.selectFirst(".iframe_placeholder")
+        if (placeholder != null)
+            return Jsoup.parse(placeholder.attr("data-iframe")).selectFirst("iframe")
+        else
+            return doc.getElementById("game_drop")
+    }
+
     fun getWebGameUrlAndLabel(context: Context, doc: Document): Pair<String?, String?> {
         val placeholder = doc.selectFirst(".iframe_placeholder")
-        if (placeholder != null) {
-            val sourceUrl = placeholder.attr("data-iframe").let { value ->
-                Jsoup.parse(value).selectFirst("iframe")
-            }?.attr("src")
-            return Pair(sourceUrl, placeholder.selectFirst(".load_iframe_btn")?.text())
-        } else {
-            val sourceUrl = doc.getElementById("game_drop")?.attr("src")
-            return Pair(sourceUrl, context.getString(R.string.game_web_play_default_type))
-        }
+        val label = placeholder?.selectFirst(".load_iframe_btn")?.text()
+            ?: context.getString(R.string.game_web_play_default_type)
+        return Pair(getIframe(doc, placeholder)?.attr("src"), label)
     }
 }

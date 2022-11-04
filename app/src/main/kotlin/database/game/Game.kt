@@ -50,19 +50,25 @@ data class Game(
     @ColumnInfo(name = LAST_UPDATED_TIMESTAMP)
     val lastUpdatedTimestamp: String? = null,
 
-    /*
+    /**
      * URL of the initial HTML page for a (cached) web game
      * Set to null for games which are not cached web games
      */
     @ColumnInfo(name = WEB_ENTRY_POINT)
     val webEntryPoint: String? = null,
 
-    @ColumnInfo(name = FAVICON_URL)
-    val faviconUrl: String? = null,
+    /**
+     * <iframe> which will display the [webEntryPoint]
+     * Set to null for games which are not cached web games
+     */
+    @ColumnInfo(name = WEB_IFRAME_HTML)
+    val webIframe: String? = null,
 
-    @Deprecated("Unused field")
     @ColumnInfo(name = WEB_CACHED)
-    val webCached: Boolean = false
+    val webCached: Boolean = false,
+
+    @ColumnInfo(name = FAVICON_URL)
+    val faviconUrl: String? = null
 ) {
     companion object {
         const val MITCH_GAME_ID = 544475
@@ -80,8 +86,9 @@ data class Game(
         const val THUMBNAIL_URL = "thumbnail_url"
         const val LAST_UPDATED_TIMESTAMP = "last_timestamp"
         const val WEB_ENTRY_POINT = "web_entry_point"
-        const val FAVICON_URL = "favicon_url"
+        const val WEB_IFRAME_HTML = "web_iframe"
         const val WEB_CACHED = "web_cached"
+        const val FAVICON_URL = "favicon_url"
     }
 
     @Ignore

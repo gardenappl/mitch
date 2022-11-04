@@ -133,5 +133,10 @@ val Migrations = arrayOf(
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("ALTER TABLE games ADD COLUMN favicon_url TEXT DEFAULT NULL")
         }
+    },
+    object : Migration(12, 13) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE games ADD COLUMN web_iframe TEXT DEFAULT NULL")
+        }
     }
 )

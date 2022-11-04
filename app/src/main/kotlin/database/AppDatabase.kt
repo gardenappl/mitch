@@ -24,7 +24,7 @@ import garden.appl.mitch.database.updatecheck.UpdateCheckResultModel
 
 @Database(
     entities = [Game::class, Installation::class, UpdateCheckResultModel::class],
-    version = 12,
+    version = 13,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

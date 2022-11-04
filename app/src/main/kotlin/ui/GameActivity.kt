@@ -26,10 +26,12 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.preference.PreferenceManager
 import com.bumptech.glide.Glide
 import garden.appl.mitch.*
+import garden.appl.mitch.client.ItchWebsiteParser
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.databinding.ActivityGameBinding
 import kotlinx.coroutines.*
+import okhttp3.internal.cacheGet
 import java.io.IOException
 import java.net.SocketTimeoutException
 
@@ -95,13 +97,13 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         if (bundle != null)
             webView.restoreState(bundle)
         else
-            showLaunchDialog(this, intent.data.toString())
+            showLaunchDialog(this)
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         if (intent?.data?.toString() != this.intent.data.toString())
-            showLaunchDialog(this, intent?.data.toString())
+            showLaunchDialog(this)
     }
 
     override fun onResume() {
@@ -110,11 +112,11 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         webView.onResume()
     }
 
-    private fun showLaunchDialog(context: Context, url: String) {
+    private fun showLaunchDialog(context: Context) {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
 
         if (prefs.getBoolean(PREF_WEB_CACHE_DIALOG_HIDE, false)) {
-            afterDialogShown(url)
+            afterDialogShown()
         } else {
             val dialog = AlertDialog.Builder(context).apply {
                 setTitle(R.string.dialog_web_cache_info_title)
@@ -124,18 +126,18 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
                         putBoolean(PREF_WEB_CACHE_ENABLE, true)
                         putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
                     }
-                    afterDialogShown(url)
+                    afterDialogShown()
                 }
                 setNegativeButton(R.string.dialog_no) { _, _ ->
                     prefs.edit(commit = true) {
                         putBoolean(PREF_WEB_CACHE_ENABLE, false)
                         putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
                     }
-                    afterDialogShown(url)
+                    afterDialogShown()
                 }
                 setCancelable(true)
                 setOnCancelListener {
-                    afterDialogShown(url)
+                    afterDialogShown()
                 }
 
                 create()
@@ -144,45 +146,93 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         }
     }
 
-    private fun afterDialogShown(url: String) {
+    private fun afterDialogShown() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-
-        if (prefs.getBoolean(PREF_WEB_CACHE_ENABLE, true)
-            && !intent.getBooleanExtra(EXTRA_IS_OFFLINE, false)) {
-
-            Toast.makeText(this, R.string.popup_web_game_cached, Toast.LENGTH_LONG).show()
-        }
-        webView.loadUrl(url)
 
         val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
         Log.d(LOGGING_TAG, "Running $gameId")
         if (gameId != -1) {
-            launch(Dispatchers.IO) {
-                val game = AppDatabase.getDatabase(this@GameActivity).gameDao.getGameById(gameId)
-                    ?: return@launch
+            launch {
+                val db = AppDatabase.getDatabase(this@GameActivity)
 
-                val downloadedBitmap = try {
-                    Glide.with(this@GameActivity).asBitmap().run {
-                        load(game.thumbnailUrl)
-                        submit()
-                    }.get()
-                } catch (e: IOException) {
-                    return@launch
+                val webInstall = db.installDao.getWebInstallationForGame(gameId)
+                if (webInstall == null && prefs.getBoolean(PREF_WEB_CACHE_ENABLE, true)) {
+                    Toast.makeText(this@GameActivity, R.string.popup_web_game_cached, Toast.LENGTH_LONG).show()
                 }
-                val faviconBitmap =
-                    Bitmap.createScaledBitmap(downloadedBitmap, 108, 108, false)
+                val game = db.gameDao.getGameById(gameId)!!
+                if (loadGame(game) == null)
+                    return@launch //won't be able to load favicon
 
-                val shortcut =
-                    ShortcutInfoCompat.Builder(this@GameActivity, getShortcutId(gameId)).run {
-                        setShortLabel(game.name)
-                        setIcon(IconCompat.createWithAdaptiveBitmap(faviconBitmap))
-                        setIntent(makeIntentForRestart())
-                        build()
+                val faviconBitmap = game.faviconUrl?.let { url ->
+                    withContext(Dispatchers.IO) {
+                        return@withContext try {
+                            Glide.with(this@GameActivity).asBitmap().run {
+                                load(url)
+                                submit()
+                            }.get()
+                        } catch (e: IOException) {
+                            null
+                        }
                     }
-
+                }
+                val shortcutId = getShortcutId(gameId)
+                val shortcut = ShortcutInfoCompat.Builder(this@GameActivity, shortcutId).run {
+                    setShortLabel(game.name)
+                    if (faviconBitmap != null)
+                        setIcon(IconCompat.createWithBitmap(faviconBitmap))
+                    setIntent(makeIntentForRestart())
+                    build()
+                }
                 ShortcutManagerCompat.pushDynamicShortcut(this@GameActivity, shortcut)
             }
         }
+    }
+
+    /**
+     * @return possibly an updated instance of [Game], for backwards compat reasons; or null on failure to do backwards compat migration
+     */
+    private suspend fun loadGame(game: Game): Game? {
+        var game = game
+
+        val db = AppDatabase.getDatabase(this@GameActivity)
+        // backwards compat
+        if (game.webIframe == null) {
+            Log.d(LOGGING_TAG, "getting iframe and favicon as backwards compat")
+            try {
+                val doc = ItchWebsiteUtils.fetchAndParse(game.storeUrl)
+                game = ItchWebsiteParser.getGameInfoForStorePage(doc, game.storeUrl)!!
+                db.gameDao.upsert(game)
+            } catch (e: Exception) {
+                webView.loadUrl(game.webEntryPoint!!)
+                return null
+            }
+        }
+        val html = """<html>
+            <head>
+                <style type="text/css">
+                    html {
+                        overflow: auto;
+                    }
+                    
+                    html, body, div, iframe {
+                        margin: 0px; 
+                        padding: 0px; 
+                        height: 100%; 
+                        border: none;
+                    }
+                    iframe {
+                        display: block; 
+                        width: 100%; 
+                        border: none; 
+                        overflow-y: auto; 
+                        overflow-x: hidden;
+                    }
+                </style>
+            </head>
+            <body>${game.webIframe}</body>
+        </html>""".trimIndent()
+        Utils.loadHtml(webView, html)
+        return game
     }
 
     override fun onPause() {
