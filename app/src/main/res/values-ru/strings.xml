@@ -239,4 +239,5 @@
     <string name="game_web_install_launcher_shortcut">Установить на домашний экран</string>
     <string name="popup_web_install_launcher_shortcut_error">Ваш лаунчер не поддерживает ярлыки.</string>
     <string name="popup_web_game_deleted_cannot_launch">Эта игра была удалена.</string>
+    <string name="popup_link_copied">Ссылка скопирована в буфер обмена.</string>
 </resources>

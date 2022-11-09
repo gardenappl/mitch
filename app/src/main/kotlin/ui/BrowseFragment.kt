@@ -1,6 +1,8 @@
 package garden.appl.mitch.ui
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -127,6 +129,23 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             launch(Dispatchers.IO) {
                 browseHandler?.onDownloadStarted(url, contentDisposition, mimeType,
                     if (contentLength > 0) contentLength else null)
+            }
+        }
+
+        webView.setOnLongClickListener { _ ->
+            val result = webView.hitTestResult
+            val url = result.extra ?: return@setOnLongClickListener false
+            when (result.type) {
+                WebView.HitTestResult.SRC_ANCHOR_TYPE,
+                WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
+                    val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE)
+                    val data = ClipData.newPlainText("Copied URL", url)
+                    (clipboard as ClipboardManager).setPrimaryClip(data)
+                    Toast.makeText(requireContext(), R.string.popup_link_copied, Toast.LENGTH_LONG)
+                        .show()
+                    return@setOnLongClickListener true
+                }
+                else -> return@setOnLongClickListener false
             }
         }
 

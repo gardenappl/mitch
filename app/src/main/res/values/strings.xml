@@ -234,4 +234,5 @@
     <string name="game_web_install_launcher_shortcut">Install on home screen</string>
     <string name="popup_web_install_launcher_shortcut_error">Your launcher does not support custom shortcuts.</string>
     <string name="popup_web_game_deleted_cannot_launch">This game has been deleted.</string>
+    <string name="popup_link_copied">Link copied to clipboard.</string>
 </resources>
