@@ -148,7 +148,7 @@ object Downloader : DownloadFileListener() {
                     build()
                 }
 
-                val response = suspendCancellableCoroutine<Response> { cont ->
+                val response = suspendCancellableCoroutine { cont ->
                     Mitch.httpClient.newCall(request).enqueue(object : Callback {
                         override fun onFailure(call: Call, e: IOException) {
                             cont.resumeWithException(e)

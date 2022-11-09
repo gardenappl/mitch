@@ -327,7 +327,10 @@ object Utils {
     }
 
     fun logDebug(tag: String, string: String) {
-        if (BuildConfig.DEBUG)
-            Log.d(tag, string)
+        if (BuildConfig.DEBUG) {
+            for (s in string.chunked(1000)) {
+                Log.d(tag, s)
+            }
+        }
     }
 }

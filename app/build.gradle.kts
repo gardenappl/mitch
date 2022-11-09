@@ -40,7 +40,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         versionCode = 102
-        versionName = "2.1.1"
+        versionName = "2.2.0"
     }
     buildTypes {
         named("release").configure {
