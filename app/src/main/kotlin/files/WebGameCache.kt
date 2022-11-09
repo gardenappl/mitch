@@ -16,6 +16,7 @@ import garden.appl.mitch.*
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.database.installation.Installation
+import okhttp3.Headers.Companion.toHeaders
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -58,8 +59,10 @@ class WebGameCache(context: Context) {
         }
 
         val url = request.url.toString()
+        Utils.logDebug(LOGGING_TAG, "$url, update?: $updateWebCache")
         val httpRequest = Request.Builder().run {
             url(url)
+            headers(request.requestHeaders.toHeaders())
             CookieManager.getInstance()?.getCookie(url)?.let { cookie ->
                 addHeader("Cookie", cookie)
             }
@@ -80,8 +83,21 @@ class WebGameCache(context: Context) {
                     minFresh(10, TimeUnit.MINUTES)
                     build()
                 })
+
+            // A bad workaround for https://todo.sr.ht/~gardenapple/mitch/31
+            if (!request.url.host.endsWith(".hwcdn.net")
+                && (request.url.encodedPath.endsWith(".ttf")
+                    || request.url.encodedPath.endsWith(".woff")
+                    || request.url.encodedPath.endsWith(".woff2"))) {
+
+                header("Host", request.url.host)
+                header("Sec-Fetch-Dest", "font")
+                header("Sec-Fetch-Mode", "cors")
+                header("Sec-Fetch-Site", "cross-site")
+            }
             build()
         }
+        Utils.logDebug(LOGGING_TAG, "request: $httpRequest")
 
         val response = suspendCancellableCoroutine { continuation ->
             httpClient.newCall(httpRequest).enqueue(object : Callback {
@@ -118,6 +134,7 @@ class WebGameCache(context: Context) {
                 }
             })
         }
+        Utils.logDebug(LOGGING_TAG, "response from ${httpRequest.url}: ${response?.responseHeaders}")
         return if (response == null && !forceCache)
             request(httpClient, request, forceCache = true)
         else

@@ -120,6 +120,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         webView.webViewClient = MitchWebViewClient()
         webView.webChromeClient = chromeClient
 
+        webView.settings.allowFileAccess = false
+        webView.settings.allowContentAccess = false
         webViewJSNonce = SecureRandom().nextLong()
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) //Security recommendation
             webView.addJavascriptInterface(ItchJavaScriptInterface(this), "mitchCustomJS")
@@ -969,7 +971,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     }
                 }
             }
-//            Log.d(LOGGING_TAG, request.url.host)
+            Utils.logDebug(LOGGING_TAG, "Method: ${request.method}, Url: ${request.url}, ${request.requestHeaders.entries.joinToString()}")
             return null
         }
 

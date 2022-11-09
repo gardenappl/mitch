@@ -146,6 +146,10 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         webView.webViewClient = GameWebViewClient()
         webView.webChromeClient = chromeClient
 
+        webView.settings.allowFileAccess = false
+        webView.settings.allowContentAccess = false
+
+
         val gameId = intent?.getIntExtra(EXTRA_GAME_ID, -1) ?: -1
 
         val foregroundServiceIntent = Intent(this, GameForegroundService::class.java)
@@ -286,7 +290,8 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
             </head>
             <body>${game.webIframe}</body>
         </html>""".trimIndent()
-        Utils.loadHtml(webView, html)
+        webView.loadDataWithBaseURL(game.storeUrl, html, "text/html", "UTF-8", null)
+//        webView.loadDataWithBaseURL(game.webEntryPoint!!, html, "text/html", "UTF-8", null)
     }
 
     override fun onPause() {
@@ -355,6 +360,8 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         ): WebResourceResponse? = runBlocking(Dispatchers.IO) {
             if (request.url.scheme?.startsWith("http") != true)
                 return@runBlocking null
+            if (!request.method.equals("GET", ignoreCase = true))
+                return@runBlocking null
             val isOffline = intent.getBooleanExtra(EXTRA_IS_OFFLINE, false)
             val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
 
@@ -364,7 +371,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
                     && !Mitch.webGameCache.isGameWebCached(this@GameActivity, gameId)) {
                 return@runBlocking null
             }
-
+            Utils.logDebug(LOGGING_TAG, "GET ${request.url}, ${request.requestHeaders.entries.joinToString()}")
             val game = Mitch.webGameCache.makeGameWebCached(this@GameActivity, gameId)
 
             Mitch.webGameCache.request(applicationContext, game, request, isOffline)

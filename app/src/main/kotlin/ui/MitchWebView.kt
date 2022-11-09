@@ -16,8 +16,4 @@ class MitchWebView @JvmOverloads constructor(
 
     val contentWidth: Float
         get() = (computeHorizontalScrollRange().toFloat() / resources.displayMetrics.density)
-
-    override fun onSaveInstanceState(): Parcelable? {
-        return super.onSaveInstanceState()
-    }
 }

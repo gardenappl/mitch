@@ -320,12 +320,6 @@ object Utils {
         return false
     }
 
-    fun loadHtml(webView: WebView, html: String) {
-        logDebug(LOGGING_TAG, html)
-        val encodedHtml: String = Base64.encodeToString(html.toByteArray(), Base64.NO_PADDING)
-        webView.loadData(encodedHtml, "text/html", "base64")
-    }
-
     fun logDebug(tag: String, string: String) {
         if (BuildConfig.DEBUG) {
             for (s in string.chunked(1000)) {
