@@ -1,6 +1,6 @@
 # Mitch
 
-**Hosted on [itch.io](https://gardenapple.itch.io/mitch) and [SourceHut](https://sr.ht/~gardenapple/mitch/).**
+**Hosted on [itch.io](https://gardenapple.itch.io/mitch) and [SourceHut](https://sr.ht/~gardenapple/mitch/).** <sup>[why SourceHut?](#why-sourcehut)</sup>
 
 (mirrored on [GitHub](https://github.com/gardenappl/mitch) and [GitLab](https://gitlab.com/gardenappl/mitch))
 
@@ -57,3 +57,9 @@ gradlew.bat build
 ```
 
 Instead of using the `build` task (which builds every variant of the app and can take a while), consider building only one flavor: replace `build` with `assembleFdroidRelease` or `assembleItchioRelease`.
+
+## Why SourceHut?
+
+I still have doubts about the minimalist/brutalist workflows on SourceHut. The main reason why I chose it for Mitch was because I wanted an easy way to collect bug reports outside of Google Analytics. I didn't want to self-host an ACRA backend, so I set up a [mailing list](https://lists.sr.ht/~gardenapple/mitch-bug-reports) as a quick and dirty solution for gathering bug reports. This has the added benefit of making user consent very explicit: you must agree to send the crash report as an email attachment from your mail app.
+
+In practice, this does not work well, because 99% of emails that are sent by phone users are sent as HTML, which is [A Bad Thing](https://useplaintext.email/) and therefore rejected by SourceHut. So the mailing list is mostly empty and I only fill my personal inbox. Mitch tells people to use plain text if they can, but perhaps I can encourage this further by making a mailing app that does this in a nice way by default.

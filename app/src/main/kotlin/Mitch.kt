@@ -289,8 +289,7 @@ class Mitch : Application() {
 
             mailSender {
                 mailTo = "~gardenapple/mitch-bug-reports@lists.sr.ht, mitch@appl.garden"
-                //Empty subject, user should write their own
-                subject = ""
+                subject = "[insert Mitch bug here]"
                 //Email body is English only, this is intentional
                 body = """
                     > Please describe what you were doing when you got the error.
