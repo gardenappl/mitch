@@ -238,4 +238,13 @@
     <string name="dialog_reset">Réinitialiser</string>
     <string name="settings_exclude_tags_error">Erreur : Impossible de charger la liste des balises. Êtes-vous connecté·e à l\'Internet \?</string>
     <string name="popup_web_game_cached">Ce jeu sera disponible dans votre bibliothèque pour jouer hors ligne.</string>
+    <string name="game_web_install_launcher_shortcut">Installer sur l\'écran d\'accueil</string>
+    <string name="popup_web_game_deleted_cannot_launch">Ce jeu a été supprimé.</string>
+    <string name="settings_clear_all">Effacer toutes les données de Mitch</string>
+    <string name="popup_web_install_launcher_shortcut_error">Votre lanceur ne prend pas en charge les raccourcis personnalisés.</string>
+    <string name="settings_clear_all_title">Supprimer toutes les données \?</string>
+    <string name="popup_link_copied">Lien copié dans le presse-papiers.</string>
+    <string name="settings_clear_all_message">Ceci supprimera tous les jeux Web enregistrés, tous les fichiers téléchargés (qui n\'ont pas été exportés vers le dossier Téléchargements) et vous déconnectera de votre compte itch.io, entre autres choses.
+\nCette opération ne supprimera pas les applications installées, mais Mitch ne suivra plus leurs mises à jour.
+\nÊtes-vous sûr·e de vouloir effacer toutes les données des applications Mitch \?</string>
 </resources>
