@@ -14,6 +14,11 @@ class MitchWebView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0) : WebView(context, attrs, defStyleAttr) {
 
+    init {
+        isFocusable = true
+        isFocusableInTouchMode = true
+    }
+
     val contentWidth: Float
         get() = (computeHorizontalScrollRange().toFloat() / resources.displayMetrics.density)
 }
