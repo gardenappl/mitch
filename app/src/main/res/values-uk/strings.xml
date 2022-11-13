@@ -238,4 +238,5 @@
     <string name="popup_web_install_launcher_shortcut_error">Ваш лаунчер не підтримує ярликів.</string>
     <string name="popup_web_game_deleted_cannot_launch">Ця гра була видалена.</string>
     <string name="popup_link_copied">Посилання скопійовано.</string>
+    <string name="popup_no_file_manager">Не вдалося обрати файл. У вас встановлений менедженр файлів?</string>
 </resources>

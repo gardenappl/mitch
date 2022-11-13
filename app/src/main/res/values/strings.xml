@@ -235,4 +235,5 @@
     <string name="popup_web_install_launcher_shortcut_error">Your launcher does not support custom shortcuts.</string>
     <string name="popup_web_game_deleted_cannot_launch">This game has been deleted.</string>
     <string name="popup_link_copied">Link copied to clipboard.</string>
+    <string name="popup_no_file_manager">Failed to pick file. Do you have a file manager installed?</string>
 </resources>

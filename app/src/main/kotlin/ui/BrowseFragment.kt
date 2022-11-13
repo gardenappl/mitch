@@ -1,10 +1,7 @@
 package garden.appl.mitch.ui
 
 import android.annotation.SuppressLint
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
@@ -18,6 +15,11 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.*
 import android.widget.*
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.OpenDocument
+import androidx.activity.result.contract.ActivityResultContracts.OpenMultipleDocuments
+import androidx.activity.result.registerForActivityResult
 import androidx.annotation.Keep
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
@@ -78,6 +80,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
      */
     private var genresExclusionFilter: Set<ItchGenre>? = null
 
+    private lateinit var openDocumentLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var openMultipleDocumentsLauncher: ActivityResultLauncher<Array<String>>
+    private var filePathCallback: ValueCallback<Array<Uri>>? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -90,6 +95,15 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         genresExclusionFilter = savedInstanceState?.getStringArray(GENRES_EXCLUSION_FILTER)?.map {
             ItchGenre.valueOf(it)
         }?.toSet()
+
+        openDocumentLauncher = registerForActivityResult(OpenDocument()) { uri ->
+            uri?.let { filePathCallback?.onReceiveValue(arrayOf(it)) }
+            filePathCallback = null
+        }
+        openMultipleDocumentsLauncher = registerForActivityResult(OpenMultipleDocuments()) { uris ->
+            filePathCallback?.onReceiveValue(uris.toTypedArray())
+            filePathCallback = null
+        }
     }
 
     override fun onCreateView(
@@ -1202,6 +1216,28 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 create()
             }
             dialog.show()
+            return true
+        }
+
+        override fun onShowFileChooser(
+            webView: WebView,
+            filePathCallback: ValueCallback<Array<Uri>>,
+            fileChooserParams: FileChooserParams
+        ): Boolean {
+            val launcher = when (fileChooserParams.mode) {
+                FileChooserParams.MODE_OPEN -> openDocumentLauncher
+                FileChooserParams.MODE_OPEN_MULTIPLE -> openMultipleDocumentsLauncher
+                else -> return false
+            }
+            this@BrowseFragment.filePathCallback = filePathCallback
+
+            try {
+                launcher.launch(fileChooserParams.acceptTypes)
+            } catch (e: ActivityNotFoundException) {
+                Toast.makeText(context, getString(R.string.popup_no_file_manager), Toast.LENGTH_LONG)
+                    .show()
+                return false
+            }
             return true
         }
     }
