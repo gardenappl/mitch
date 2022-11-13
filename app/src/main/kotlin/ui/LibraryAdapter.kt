@@ -91,6 +91,10 @@ class LibraryAdapter internal constructor(
         }
 
         holder.overflowMenuButton.setOnClickListener { view -> onCardOverflowClick(view, position) }
+        holder.itemView.setOnLongClickListener { view ->
+            onCardOverflowClick(holder.overflowMenuButton, position)
+            return@setOnLongClickListener true
+        }
 
         if (game.thumbnailUrl != null) {
             Glide.with(context)
