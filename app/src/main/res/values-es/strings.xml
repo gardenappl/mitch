@@ -126,6 +126,7 @@
     <string name="updates_error">Error al comprobar las actualizaciones</string>
     <plurals name="updates_available">
         <item quantity="one">¡%d actualización disponible!</item>
+        <item quantity="many">¡%d actualizaciones disponibles!</item>
         <item quantity="other">¡%d actualizaciones disponibles!</item>
     </plurals>
     <string name="updates_do_update">Actualizar</string>
@@ -179,7 +180,7 @@
     <string name="settings_warn_os">Advertir al descargar aplicaciones que no son de Android</string>
     <string name="bundle">Paquetes especiales</string>
     <string name="game_bundle_ukraine">Paquete para Ucrania</string>
-    <string name="game_bundle_trans_texas">Paquete ¡Derechos de los transexuales en Texas!</string>
+    <string name="game_bundle_trans_texas"></string>
     <string name="bundle_claim_all">Reclamar todo</string>
     <string name="bundle_claim_all_desc">Reclamar todos los juegos de este paquete ahora.</string>
     <string name="bundle_claim_error">No se ha podido acceder al enlace de descarga del paquete.</string>
@@ -231,4 +232,13 @@
     <string name="settings_exclude_tags_show_all">Mostrar todos los juegos</string>
     <string name="settings_exclude_tags_error">Error: no se ha podido cargar la lista de etiquetas. ¿Estás conectado a Internet\?</string>
     <string name="dialog_reset">Restablecer</string>
+    <string name="settings_clear_all">Borrar todos los datos de Mitch</string>
+    <string name="settings_clear_all_title">¿Borrar todos los datos\?</string>
+    <string name="game_web_install_launcher_shortcut">Instalar en la pantalla de inicio</string>
+    <string name="popup_web_install_launcher_shortcut_error">Tu lanzador no admite accesos directos personalizados.</string>
+    <string name="popup_web_game_deleted_cannot_launch">Este juego ha sido eliminado.</string>
+    <string name="popup_link_copied">Enlace copiado al portapapeles.</string>
+    <string name="settings_clear_all_message">Esto borrará todos los juegos web guardados, todos los archivos descargados (que no hayan sido exportados a la carpeta de descargas), y cerrará la sesión de tu cuenta de itch.io, entre otras cosas.
+\nEsto no borrará las aplicaciones instaladas, sin embargo Mitch ya no hará un seguimiento de las actualizaciones de las mismas.
+\n¿Estás seguro de que quieres borrar todos los datos de las aplicaciones de Mitch\?</string>
 </resources>
