@@ -180,7 +180,7 @@
     <string name="settings_warn_os">Advertir al descargar aplicaciones que no son de Android</string>
     <string name="bundle">Paquetes especiales</string>
     <string name="game_bundle_ukraine">Paquete para Ucrania</string>
-    <string name="game_bundle_trans_texas"></string>
+    <string name="game_bundle_trans_texas">¡Derechos trans en Texas! Paquete</string>
     <string name="bundle_claim_all">Reclamar todo</string>
     <string name="bundle_claim_all_desc">Reclamar todos los juegos de este paquete ahora.</string>
     <string name="bundle_claim_error">No se ha podido acceder al enlace de descarga del paquete.</string>
