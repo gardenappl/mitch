@@ -183,4 +183,8 @@
     <string name="notification_download_io_error">Nettverk eller lagringsfeil</string>
     <string name="dialog_lang_restart">Programmet må startes på ny for å bruke det nye språket</string>
     <string name="dialog_lang_restart_title">Språk endret</string>
+    <string name="settings_web_cache_update_never">Aldri</string>
+    <string name="game_web_play_default_type">Spill</string>
+    <string name="dialog_web_cache_delete_title">Slett dette spillet\?</string>
+    <string name="dialog_web_cache_delete_fail_title">Kan ikke slette nå</string>
 </resources>
