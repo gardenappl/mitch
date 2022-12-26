@@ -187,4 +187,21 @@
     <string name="game_web_play_default_type">Spill</string>
     <string name="dialog_web_cache_delete_title">Slett dette spillet\?</string>
     <string name="dialog_web_cache_delete_fail_title">Kan ikke slette nå</string>
+    <string name="genre_action">Handling</string>
+    <string name="genre_adventure">Eventyr</string>
+    <string name="genre_card_game">Kortspill</string>
+    <string name="genre_puzzle">Puslespill</string>
+    <string name="genre_strategy">Strategi</string>
+    <string name="browser_filter_exclude_genres">Utelat sjangere …</string>
+    <string name="settings_exclude_tags_show_all">Vis alle spill</string>
+    <string name="game_multiple_options_desc_web_or_download">Spill nå eller last ned</string>
+    <string name="game_multiple_options_desc_web_or_buy">Spill nå eller kjøp</string>
+    <string name="settings_clear_all">Tøm all Mitch-data</string>
+    <string name="settings_clear_all_title">Slett all data\?</string>
+    <string name="popup_link_copied">Lenke kopiert til utklippstavle.</string>
+    <string name="popup_web_game_deleted_cannot_launch">Dette spillet har blitt slettet.</string>
+    <string name="dialog_apply">Bruk</string>
+    <string name="game_multiple_options_get">Hent →</string>
+    <string name="genre_survival">Overlevelse</string>
+    <string name="dialog_reset">Tilbakestill</string>
 </resources>
