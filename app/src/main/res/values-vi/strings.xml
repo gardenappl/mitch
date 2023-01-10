@@ -189,4 +189,9 @@
     <string name="bundle_claim_all_desc">Nhận tất cả trò chơi từ gói này ngay.</string>
     <string name="bundle_claim_error">Không thể truy cập liên kết tải xuống cho gói này.</string>
     <string name="notification_download_no_space">Không đủ dung lượng bộ nhớ cho tệp này</string>
+    <string name="dialog_web_cache_info_title">Đang cài đặt trò chơi trên mạng</string>
+    <string name="dialog_web_cache_info">Mitch có thể tự động lưu trò chơi trên mạng để bạn có thể chơi ngoại tuyến.</string>
+    <string name="settings_web_cache_enable">Lưu trò chơi trên mạng</string>
+    <string name="settings_web_cache_enable_desc">Cài đặt tất cả trò chơi trên mạng để chơi ngoại tuyến.</string>
+    <string name="library_category_web_cached">Trò chơi trên mạng</string>
 </resources>
