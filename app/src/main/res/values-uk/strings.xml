@@ -2,7 +2,7 @@
 <resources>
     <string name="nav_settings">Налаштування</string>
     <string name="nav_website_view">Сайт</string>
-    <string name="notification_channel_install">Встановлення додатків</string>
+    <string name="notification_channel_install">Встановлення застосунків</string>
     <string name="notification_channel_install_desc">Сповіщати коли додаток з itch.io потребує встановлення.</string>
     <string name="notification_channel_updates">Оновлення ігор</string>
     <string name="notification_channel_updates_desc">Сповіщати коли для гри з itch.io доступне оновлення.</string>
@@ -15,19 +15,19 @@
     <string name="settings_update_check_mode">Режим перевірки оновлень</string>
     <string name="notification_channel_installing">Процес завантаження чи встановлення</string>
     <string name="notification_channel_installing_desc">Показувати інформацію про процес завантаження чи встановлення ігор.</string>
-    <string name="notification_installing">Додаток встановлюється</string>
+    <string name="notification_installing">Застосунок встановлюється</string>
     <string name="notification_install_complete_title">Додаток встановлено</string>
     <string name="notification_install_cancelled_title">Зупинили встановлення</string>
     <string name="notification_install_unknown_title">Невідома помилка</string>
     <string name="notification_install_blocked_title">Встановлення заблоковано</string>
     <string name="notification_install_conflict_title">Конфлікт з іншим пакунком</string>
-    <string name="notification_install_incompatible_title">Додаток несумісний з вашим пристроєм</string>
+    <string name="notification_install_incompatible_title">Застосунок несумісний з вашим пристроєм</string>
     <string name="notification_install_invalid_title">Недопустимий файл</string>
     <string name="notification_install_storage_title">Не вдалося встановити: недостатньо місця</string>
     <string name="library_category_downloads">Завантаження</string>
-    <string name="library_category_installed">Встановлені додатки</string>
+    <string name="library_category_installed">Встановлені застосунки</string>
     <string name="game_go_to_store">Показати сторінку гри</string>
-    <string name="game_package_info">Інформація про додаток</string>
+    <string name="game_package_info">Інформація про застосунок</string>
     <string name="game_download_remove">Прибрати з Mitch</string>
     <string name="game_package_info_fail">Ваша система не дає можливість переглядати таку інформацію.</string>
     <string name="dialog_cancel">Скасувати</string>
@@ -89,7 +89,7 @@
     <string name="dialog_cancel_download_done">Завантаження скасовано.</string>
     <string name="dialog_game_delete_title">Видалити файл?</string>
     <string name="notification_download_time_remaining">Залишилося %1$d хв. %2$d с.</string>
-    <string name="dialog_app_delete_title">Видалити додаток?</string>
+    <string name="dialog_app_delete_title">Видалити застосунок\?</string>
     <string name="dialog_app_delete">Ви впевнені, що хочете видалити %1$s?</string>
     <string name="game_move_to_downloads">Перемістити в теку Завантаження</string>
     <string name="dialog_game_remove_title">Перестати отримувати оновлення?</string>
@@ -114,7 +114,7 @@
     <string name="updates_size_and_name">%1$s · %2$s</string>
     <string name="updates_version_change">%1$s → %2$s</string>
     <string name="updates_multiple">Доступні декілька версій</string>
-    <string name="library_no_apps">Встановлених додатків немає.</string>
+    <string name="library_no_apps">Встановлених застосунків немає.</string>
     <string name="library_no_downloads">Завантажень немає.</string>
     <string name="dialog_dont_show_again">Не показувати це знову</string>
     <string name="dialog_web_prompt">Веб-сторінка за адресою %s запитує:</string>
@@ -134,13 +134,13 @@
     <string name="bug_report_dialog">Вибачте, сталася деяка помилка в Mitch. Натисніть ОК, щоб повідомити про це розробнику.</string>
     <string name="bug_report_dialog_title">Щось пішло не так</string>
     <string name="library_games_search">Пошук</string>
-    <string name="library_open_app_failed">Не вдалося відкрити додаток.</string>
+    <string name="library_open_app_failed">Не вдалося відкрити застосунок.</string>
     <string name="settings_category_advanced">Додатково</string>
     <string name="settings_cancel_downloads">Скинути всі завантаження</string>
     <string name="settings_cancel_downloads_title">Скинути всі поточні завантаження?</string>
     <string name="dialog_no">Ні</string>
     <string name="settings_cancel_downloads_message">Взагалі, це варто робити лише в цілях тестування або вирішення проблем з Mitch.</string>
-    <string name="settings_installer_desc">Змініть це у випадку, коли у вас виникають проблеми зі встановленням додатків.</string>
+    <string name="settings_installer_desc">Змініть це у випадку, коли у вас виникають проблеми зі встановленням застосунків.</string>
     <string name="settings_installer">Метод встановлення</string>
     <string name="settings_installer_native">Системний встановлювач (необхідно для деяких пристроїв MIUI)</string>
     <string name="settings_installer_session">Встановлення сесією (за замовчуванням)</string>
@@ -169,13 +169,15 @@
     <string name="settings_lang_system">Як у системі</string>
     <string name="settings_lang">Мова</string>
     <string name="dialog_lang_restart_title">Зміна мови</string>
-    <string name="dialog_lang_restart">Додаток перезапуститься з новою мовою</string>
+    <string name="dialog_lang_restart">Застосунок перезапуститься з новою мовою</string>
     <string name="notification_download_io_error">Помилка мережі або диску</string>
     <string name="notification_download_unknown_error">Невідома помилка</string>
-    <string name="dialog_installer_please_wait">Зачекайте, зараз почнемо встановлювати додаток…</string>
+    <string name="dialog_installer_please_wait">Зачекайте, зараз почнемо встановлювати застосунок…</string>
     <string name="dialog_installer_no_space">Не вистачає місця на диску.</string>
-    <string name="dialog_download_wrong_os">%s не сумісно з Android. Ви не зможете встановити це як додаток.\nВи все одно бажаєте це завантажити?</string>
-    <string name="dialog_download_wrong_os_has_extras">%s не сумісно з Android. Ви не зможете встановити це як додаток.\nМожна переглянути додатковий контент, наприклад, ілюстрації, музику, та інструкції.</string>
+    <string name="dialog_download_wrong_os">%s не сумісно з Android. Ви не зможете встановити це як застосунок.
+\nВи все одно бажаєте це завантажити\?</string>
+    <string name="dialog_download_wrong_os_has_extras">%s не сумісно з Android. Ви не зможете встановити це як застосунок.
+\nМожна переглянути додатковий контент, наприклад, ілюстрації, музику, та інструкції.</string>
     <string name="settings_warn_os">Попереджати, коли гра не сумісна з Android</string>
     <string name="notification_download_no_space">В сховищі недостатньо місця для цього файлу</string>
     <string name="game_bundle_ukraine">Благодійний набір Україні</string>
@@ -233,7 +235,9 @@
     <string name="dialog_reset">Скинути</string>
     <string name="settings_clear_all">Видалити всі дані Mitch</string>
     <string name="settings_clear_all_title">Очистити всі дані?</string>
-    <string name="settings_clear_all_message">Це видалить усі збережені веб-ігри, усі завантажені файли (окрім тих, які були експортовані у теку Завантаження), та інше.\nЦе не видалить встановлені додатки, але Mitch більше не буде перевіряти наявність оновлень для них.\nВи впевнені, що хочете видалити всі дані додатку Mitch?</string>
+    <string name="settings_clear_all_message">Це видалить усі збережені вебігри, усі завантажені файли (окрім тих, які були експортовані у теку Завантаження), та інше.
+\nЦе не видалить встановлені застосунки, але Mitch більше не буде перевіряти наявність оновлень для них.
+\nВи впевнені, що хочете видалити всі дані застосунку Mitch\?</string>
     <string name="game_web_install_launcher_shortcut">Встановити на домашній екран</string>
     <string name="popup_web_install_launcher_shortcut_error">Ваш лаунчер не підтримує ярликів.</string>
     <string name="popup_web_game_deleted_cannot_launch">Ця гра була видалена.</string>
