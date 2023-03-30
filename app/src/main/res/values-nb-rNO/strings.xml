@@ -204,4 +204,44 @@
     <string name="game_multiple_options_get">Hent →</string>
     <string name="genre_survival">Overlevelse</string>
     <string name="dialog_reset">Tilbakestill</string>
+    <string name="bundle">Spesialpakker</string>
+    <string name="genre_educational">Utdanningsmessig</string>
+    <string name="genre_fighting">Slossing</string>
+    <string name="genre_interactive_fiction">Interaktiv fiksjon</string>
+    <string name="genre_platformer">Plattform</string>
+    <string name="genre_racing">Kjørekappløp</string>
+    <string name="genre_rhythm">Rytme</string>
+    <string name="genre_rpg">Rollespill</string>
+    <string name="genre_shooter">Skyting</string>
+    <string name="genre_simulation">Simulator</string>
+    <string name="genre_sports">Sport</string>
+    <string name="genre_visual_novel">Visuell novelle</string>
+    <string name="settings_exclude_tags">Ekskluder spillskilt fra startsiden</string>
+    <string name="popup_web_game_cached">Spillet vil være tilgjengelig i biblioteket ditt for frakoblet spilling.</string>
+    <string name="settings_exclude_tags_error">Feil: Kunne ikke laste inn liste over etiketter. Er du tilkoblet Internett\?</string>
+    <string name="library_category_web_cached">Nett-spill</string>
+    <string name="bundle_claim_all">Gjør krav på alle</string>
+    <string name="bundle_claim_all_desc">Hent alle spillene i denne samlingen nå.</string>
+    <string name="bundle_claim_error">Fikk ikke tilgang til nedlastningslenke for samlingen.</string>
+    <string name="notification_download_no_space">Ikke nok lagringsplass for denne filen.</string>
+    <string name="dialog_web_cache_info_title">Installasjon av nett-spill</string>
+    <string name="settings_web_cache_enable">Lagring av nett-spill</string>
+    <string name="settings_web_cache_update">Oppdater lagrede nett-spill</string>
+    <string name="game_bundle_trans_texas">Trans-rettigheter i Texas. Pakke</string>
+    <string name="dialog_web_cache_info">Mitch kan automatisk lagre nett-spill for senere frakoblet spilling.</string>
+    <string name="settings_web_cache_enable_desc">Installer alle spilte nett-spill for senere frakoblet spilling.</string>
+    <string name="settings_web_cache_update_unmetered">Når startet på kvoteløs tilkobling</string>
+    <string name="settings_web_cache_update_always">Når startet, alltid</string>
+    <string name="game_web_play_desc">Spill nett-versjonen nå</string>
+    <string name="game_multiple_options_desc_multiple_purchases">Flerfoldige kjøp</string>
+    <string name="popup_web_install_launcher_shortcut_error">Oppstarteren din støtter ikke egendefinerte snarveier.</string>
+    <string name="game_bundle_ukraine">Pakke for Ukraina</string>
+    <plurals name="browser_filter_exclude_genres_active">
+        <item quantity="one">%d sjanger ekskludert</item>
+        <item quantity="other">%d sjangere ekskludert</item>
+    </plurals>
+    <string name="game_web_install_launcher_shortcut">Installer på hjemmeskjermen</string>
+    <string name="dialog_web_cache_delete_fail">%1$s kan ikke slettes fordi det kjører.</string>
+    <string name="settings_clear_all_message">Slett alle nett-spill, alle nedlastede filer (som ikke har blitt eksportert til nedlastingsmappen, og logg deg ut av din itch.io-konto, (blandt annet)\?
+\nDette sletter ikke installerte programmer, dog vil Mitch slutte å holde øye med installasjon av nye versjoner derav.</string>
 </resources>
