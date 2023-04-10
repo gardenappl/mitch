@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_category_browse">Durchsuche</string>
+    <string name="settings_category_browse">Durchsuchen</string>
     <string name="settings_block_trackers_desc">Verhindert den Zugriff auf Google Analytics.
 \nBeachte, dass sich manche Spieleentwickler tatsächlich auf diese Statistiken verlassen könnten.</string>
     <string name="settings_block_trackers">Tracker blockieren</string>
@@ -42,7 +42,7 @@
     <string name="library_download">Herunterladen</string>
     <string name="library_install">Installieren</string>
     <string name="platform_android">Android</string>
-    <string name="library_category_owned_see">Anzegein →</string>
+    <string name="library_category_owned_see">Anzeigen →</string>
     <string name="library_category_owned">Eigene Elemente</string>
     <string name="dialog_web_alert">Webseite unter %s sagt:</string>
     <string name="dialog_web_prompt">Webseite unter %s fragt:</string>
