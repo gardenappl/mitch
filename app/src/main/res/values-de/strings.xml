@@ -189,4 +189,6 @@
     <string name="dialog_reset">Zurücksetzen</string>
     <string name="genre_sports">Sport</string>
     <string name="genre_strategy">Strategie</string>
+    <string name="bundle_claim_all">Alle beanspruchen</string>
+    <string name="bundle_claim_all_desc">Beanspruchen Sie jetzt jedes Spiel aus diesem Bundle.</string>
 </resources>
