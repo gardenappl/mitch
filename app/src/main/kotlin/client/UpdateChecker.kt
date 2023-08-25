@@ -8,7 +8,6 @@ import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker.Result
 import androidx.work.WorkerParameters
@@ -185,8 +184,8 @@ class UpdateChecker(private val context: Context) {
                         pendingIntent = PendingIntent.getActivity(context, 0, activityIntent, 0)
                     }
                 } else if (result.code == UpdateCheckResult.ERROR) {
-                    val intent = Intent(context, ErrorReportBroadcastReciever::class.java).apply {
-                        putExtra(ErrorReportBroadcastReciever.EXTRA_ERROR_STRING, result.errorReport)
+                    val intent = Intent(context, ErrorReportBroadcastReceiver::class.java).apply {
+                        putExtra(ErrorReportBroadcastReceiver.EXTRA_ERROR_STRING, result.errorReport)
                     }
                     pendingIntent = PendingIntent.getBroadcast(context, result.installationId,
                         intent, PendingIntent.FLAG_UPDATE_CURRENT)

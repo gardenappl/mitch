@@ -36,8 +36,8 @@ object GameDownloader {
             }
         } catch (e: IOException) {
             NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
-                val intent = Intent(context, ErrorReportBroadcastReciever::class.java).apply {
-                    putExtra(ErrorReportBroadcastReciever.EXTRA_ERROR_STRING, Utils.toString(e))
+                val intent = Intent(context, ErrorReportBroadcastReceiver::class.java).apply {
+                    putExtra(ErrorReportBroadcastReceiver.EXTRA_ERROR_STRING, Utils.toString(e))
                 }
                 setContentIntent(PendingIntent.getBroadcast(context, 0,
                     intent, PendingIntent.FLAG_ONE_SHOT))

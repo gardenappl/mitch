@@ -110,7 +110,7 @@
                 android:name=".client.UpdateNotificationBroadcastReceiver"
                 android:exported="false" />
         <receiver
-                android:name=".ErrorReportBroadcastReciever"
+                android:name=".ErrorReportBroadcastReceiver"
                 android:exported="false" />
         <receiver
                 android:name=".install.UninstallBroadcastReceiver"

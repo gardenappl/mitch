@@ -62,7 +62,7 @@ class UpdatesFragment : Fragment(), CoroutineScope by MainScope() {
         binding.updateResults.addOnScrollListener(preloader)
 
         availableResultsViewModel = ViewModelProvider(this).get(UpdateCheckResultViewModel::class.java)
-        availableResultsViewModel.availableUpdates.observe(viewLifecycleOwner, { availableUpdates ->
+        availableResultsViewModel.availableUpdates.observe(viewLifecycleOwner) { availableUpdates ->
             availableUpdates?.let {
                 adapter.availableUpdates = availableUpdates
             }
@@ -79,7 +79,7 @@ class UpdatesFragment : Fragment(), CoroutineScope by MainScope() {
                     }
                 }
             }
-        })
+        }
 
         binding.root.setOnRefreshListener {
             (activity as MainActivity).launch {

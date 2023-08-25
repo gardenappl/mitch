@@ -32,8 +32,8 @@ abstract class DownloadFileListener {
     ) {
         val pendingIntent: PendingIntent
         if (errorName != null) {
-            val intent = Intent(context, ErrorReportBroadcastReciever::class.java).apply {
-                putExtra(ErrorReportBroadcastReciever.EXTRA_ERROR_STRING, errorReport)
+            val intent = Intent(context, ErrorReportBroadcastReceiver::class.java).apply {
+                putExtra(ErrorReportBroadcastReceiver.EXTRA_ERROR_STRING, errorReport)
             }
             pendingIntent = PendingIntent.getBroadcast(context, 0,
                 intent, PendingIntent.FLAG_ONE_SHOT)

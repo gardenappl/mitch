@@ -9,7 +9,7 @@ import org.acra.ACRA
 /**
  * Receives broadcast when user taps an update check notification which says "Error"
  */
-class ErrorReportBroadcastReciever : BroadcastReceiver() {
+class ErrorReportBroadcastReceiver : BroadcastReceiver() {
     companion object {
         private const val LOGGING_TAG = "ErrorBroadcastReceive"
 
@@ -17,10 +17,8 @@ class ErrorReportBroadcastReciever : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        Log.w(LOGGING_TAG, "Received")
         val errorString = intent!!.getStringExtra(EXTRA_ERROR_STRING)!!
         Log.w(LOGGING_TAG, "Reporting error: $errorString")
-
         ACRA.errorReporter.handleException(Utils.ErrorReport(errorString))
     }
 }
