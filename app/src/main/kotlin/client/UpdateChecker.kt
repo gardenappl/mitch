@@ -50,6 +50,8 @@ class UpdateChecker(private val context: Context) {
                 if (!updateChecker.shouldCheck(install))
                     continue
 
+                delay(1000)
+
                 launch(Dispatchers.IO) {
                     var result: UpdateCheckResult
                     val game: Game = if (gameCache.containsKey(install.gameId)) {
