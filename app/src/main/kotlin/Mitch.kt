@@ -78,7 +78,7 @@ const val PREF_BROWSE_START_PAGE = "mitch.browse_start_page"
 const val PREF_START_PAGE_EXCLUDE = "mitch.start_page_exclude"
 const val PREF_START_PAGE_EXCLUDE_DISPLAY_STRING = "mitch.start_page_exclude.display_string"
 
-const val PREF_DEBUG_DISABLE_GAME_ACTIVITY = "mitch.debug.disable_game_activity"
+const val PREF_DEBUG_WEB_GAMES_IN_BROWSE_TAB = "mitch.debug.web_games_in_browse"
 
 
 

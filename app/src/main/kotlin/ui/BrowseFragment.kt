@@ -16,10 +16,8 @@ import android.view.inputmethod.InputMethodManager
 import android.webkit.*
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocument
 import androidx.activity.result.contract.ActivityResultContracts.OpenMultipleDocuments
-import androidx.activity.result.registerForActivityResult
 import androidx.annotation.Keep
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
@@ -992,7 +990,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
         override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
             val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            val hiddenElements = if (prefs.getBoolean(PREF_DEBUG_DISABLE_GAME_ACTIVITY, false) && BuildConfig.DEBUG)
+            val hiddenElements = if (prefs.getBoolean(PREF_DEBUG_WEB_GAMES_IN_BROWSE_TAB, false) && BuildConfig.DEBUG)
                 ".purchase_banner, .header_buy_row, .buy_row, .donate_btn"
             else
                 ".purchase_banner, .header_buy_row, .buy_row, .donate_btn, .embed_wrapper, .load_iframe_btn"
