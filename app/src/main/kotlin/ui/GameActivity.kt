@@ -16,21 +16,30 @@ import android.os.IBinder
 import android.os.PersistableBundle
 import android.util.Base64
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.*
+import android.widget.CheckBox
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
+import androidx.core.view.setMargins
+import androidx.core.view.setPadding
 import androidx.preference.PreferenceManager
 import com.bumptech.glide.Glide
 import garden.appl.mitch.*
 import garden.appl.mitch.client.ItchWebsiteParser
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
+import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.databinding.ActivityGameBinding
+import garden.appl.mitch.databinding.DialogWithCheckboxBinding
 import kotlinx.coroutines.*
 import okhttp3.internal.cacheGet
 import java.io.IOException
@@ -50,9 +59,6 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
 
         fun getShortcutId(gameId: Int) = "web_game/${gameId}"
 
-        /**
-         * @return for backwards compat reasons, returns false if failed to get thumbnail
-         */
         suspend fun makeShortcut(game: Game, context: Context): ShortcutInfoCompat {
             val game = tryFixBackwardsCompatGame(game, context)
             val faviconBitmap = game.faviconUrl?.let { url ->
@@ -149,6 +155,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         webView.settings.allowFileAccess = false
         webView.settings.allowContentAccess = false
 
+        webView.setBackgroundColor(Utils.getColor(this, R.color.colorAccent))
 
         val gameId = intent?.getIntExtra(EXTRA_GAME_ID, -1) ?: -1
 
@@ -165,10 +172,13 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
 
 
         val bundle = savedInstanceState?.getBundle(WEB_VIEW_STATE_KEY)
-        if (bundle != null)
+        if (bundle != null) {
             webView.restoreState(bundle)
-        else
-            showLaunchDialog(this)
+        } else {
+            launch {
+                showLaunchDialog()
+            }
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -176,7 +186,9 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         if (intent?.getIntExtra(EXTRA_GAME_ID, -1)
             != this.intent?.getIntExtra(EXTRA_GAME_ID, -2)) {
 
-            showLaunchDialog(this)
+            launch {
+                showLaunchDialog()
+            }
         }
     }
 
@@ -186,32 +198,56 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         webView.onResume()
     }
 
-    private fun showLaunchDialog(context: Context) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+    private suspend fun showLaunchDialog() {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
-        if (prefs.getBoolean(PREF_WEB_CACHE_DIALOG_HIDE, false)) {
-            afterDialogShown()
+        val db = AppDatabase.getDatabase(this)
+        val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
+        val install = db.installDao.getWebInstallationForGame(gameId)
+
+        if (install != null || prefs.getBoolean(PREF_WEB_CACHE_DIALOG_HIDE, false)) {
+            afterDialogShown(install)
         } else {
-            val dialog = AlertDialog.Builder(context).apply {
+            val dialog = AlertDialog.Builder(this).apply {
                 setTitle(R.string.dialog_web_cache_info_title)
                 setMessage(R.string.dialog_web_cache_info)
+
+                val checkbox = CheckBox(context).apply {
+                    setText(R.string.dialog_dont_ask_again)
+                }
+
+                setView(FrameLayout(context).apply {
+                    addView(checkbox, FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        setMargins(50, 25, 50, 0)
+                    })
+                })
+
                 setPositiveButton(R.string.dialog_yes) { _, _ ->
                     prefs.edit(commit = true) {
                         putBoolean(PREF_WEB_CACHE_ENABLE, true)
-                        putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
+                        if (checkbox.isChecked) {
+//                            putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
+                            Log.d(LOGGING_TAG, "enabled!!")
+                        }
                     }
-                    afterDialogShown()
+                    launch { afterDialogShown(install) }
                 }
                 setNegativeButton(R.string.dialog_no) { _, _ ->
                     prefs.edit(commit = true) {
                         putBoolean(PREF_WEB_CACHE_ENABLE, false)
-                        putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
+                        if (checkbox.isChecked) {
+//                            putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
+                            Log.d(LOGGING_TAG, "enabled!!")
+                        }
                     }
-                    afterDialogShown()
+                    launch { afterDialogShown(install) }
                 }
                 setCancelable(true)
                 setOnCancelListener {
-                    afterDialogShown()
+                    launch { afterDialogShown(install) }
                 }
 
                 create()
@@ -220,43 +256,36 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         }
     }
 
-    private fun afterDialogShown() {
+    private suspend fun afterDialogShown(webInstall: Installation?) {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
         val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
         val isOffline = intent.getBooleanExtra(EXTRA_IS_OFFLINE, false)
 
         Log.d(LOGGING_TAG, "Running $gameId, offline: $isOffline")
-        if (gameId != -1) {
-            launch {
-                val db = AppDatabase.getDatabase(this@GameActivity)
-
-                val webInstall = db.installDao.getWebInstallationForGame(gameId)
-                if (webInstall == null) {
-                    if (isOffline) {
-                        Toast.makeText(
-                            this@GameActivity,
-                            R.string.popup_web_game_deleted_cannot_launch,
-                            Toast.LENGTH_LONG
-                        ).show()
-                        finish()
-                        return@launch
-                    } else if (prefs.getBoolean(PREF_WEB_CACHE_ENABLE, true)) {
-                        Toast.makeText(
-                            this@GameActivity,
-                            R.string.popup_web_game_cached,
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-                val gameBackwardsCompat = db.gameDao.getGameById(gameId)!!
-                val game = tryFixBackwardsCompatGame(gameBackwardsCompat, this@GameActivity)
-
-                loadGame(game)
-                val shortcut = makeShortcut(game, this@GameActivity)
-                ShortcutManagerCompat.pushDynamicShortcut(this@GameActivity, shortcut)
+        if (webInstall == null) {
+            if (isOffline) {
+                Toast.makeText(
+                    this@GameActivity,
+                    R.string.popup_web_game_deleted_cannot_launch,
+                    Toast.LENGTH_LONG
+                ).show()
+                finish()
+                return
+            } else if (prefs.getBoolean(PREF_WEB_CACHE_ENABLE, true)) {
+                Toast.makeText(
+                    this@GameActivity,
+                    R.string.popup_web_game_cached,
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
+        val db = AppDatabase.getDatabase(this)
+        val game = tryFixBackwardsCompatGame(db.gameDao.getGameById(gameId)!!, this)
+
+        loadGame(game)
+        val shortcut = makeShortcut(game, this@GameActivity)
+        ShortcutManagerCompat.pushDynamicShortcut(this@GameActivity, shortcut)
     }
 
     private fun loadGame(game: Game) {
@@ -278,6 +307,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
                         padding: 0px; 
                         height: 100%; 
                         border: none;
+                        /* background-color: #FA5C5C; */
                     }
                     iframe {
                         display: block; 
