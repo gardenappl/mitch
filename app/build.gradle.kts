@@ -19,6 +19,10 @@ if (shouldSign) {
 
 
 android {
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
     if (shouldSign) {
         signingConfigs {
             create("release") {
