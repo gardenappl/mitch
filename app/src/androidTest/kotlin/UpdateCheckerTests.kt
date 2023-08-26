@@ -3,6 +3,10 @@ package garden.appl.mitch
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import garden.appl.mitch.client.SingleUpdateChecker
+import garden.appl.mitch.client.UpdateCheckResult
+import garden.appl.mitch.database.AppDatabase
+import garden.appl.mitch.database.game.Game
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
@@ -10,10 +14,6 @@ import org.junit.Assume
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
-import garden.appl.mitch.client.UpdateCheckResult
-import garden.appl.mitch.client.SingleUpdateChecker
-import garden.appl.mitch.database.AppDatabase
-import garden.appl.mitch.database.game.Game
 
 @RunWith(AndroidJUnit4::class)
 class UpdateCheckerTests {

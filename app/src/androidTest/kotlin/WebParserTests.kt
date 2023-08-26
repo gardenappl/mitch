@@ -2,6 +2,9 @@ package garden.appl.mitch
 
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import garden.appl.mitch.client.ItchWebsiteParser
+import garden.appl.mitch.database.game.Game
+import garden.appl.mitch.database.installation.Installation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.jsoup.Jsoup
@@ -9,9 +12,6 @@ import org.jsoup.nodes.Document
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
-import garden.appl.mitch.client.ItchWebsiteParser
-import garden.appl.mitch.database.game.Game
-import garden.appl.mitch.database.installation.Installation
 
 /**
  * Instrumented test, which will execute on an Android device.

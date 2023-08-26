@@ -1,36 +1,26 @@
 package garden.appl.mitch.ui
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.pm.ShortcutInfo
-import android.content.pm.ShortcutManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.os.PersistableBundle
-import android.util.Base64
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.webkit.*
 import android.widget.CheckBox
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
-import androidx.core.view.setMargins
-import androidx.core.view.setPadding
 import androidx.preference.PreferenceManager
 import com.bumptech.glide.Glide
 import garden.appl.mitch.*
@@ -39,13 +29,8 @@ import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.databinding.ActivityGameBinding
-import garden.appl.mitch.databinding.DialogWithCheckboxBinding
 import kotlinx.coroutines.*
-import okhttp3.internal.cacheGet
-import java.io.IOException
-import java.net.SocketTimeoutException
 import java.util.concurrent.ExecutionException
-import java.util.concurrent.TimeUnit
 
 /**
  * Data URI is unused, but currently the hwcdn URL is supplied.
