@@ -21,6 +21,9 @@ class UtilsTest : TestCase() {
         assertFalse(Utils.isVersionNewer("1.0.9", "2.0.0"))
         assertFalse(Utils.isVersionNewer("2.0.0", "2.0.010"))
         assertFalse(Utils.isVersionNewer("1.0.15", "2.0"))
-        assertNull(Utils.isVersionNewer("Nonsense", "Other nonsense"))
+
+        assertNull(Utils.isVersionNewer("Nonsense version", "1.0"))
+        assertNull(Utils.isVersionNewer("1.0", "Nonsense version"))
+        assertNull(Utils.isVersionNewer("Nonsense version", "Other nonsense version"))
     }
 }
