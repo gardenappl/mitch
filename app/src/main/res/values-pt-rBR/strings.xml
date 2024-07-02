@@ -55,6 +55,7 @@
     <string name="nav_updates">Atualizações</string>
     <plurals name="updates_available">
         <item quantity="one">%d atualização disponível!</item>
+        <item quantity="many">%d atualizações disponíveis!</item>
         <item quantity="other">%d atualizações disponíveis!</item>
     </plurals>
     <string name="updates_do_update">Atualizar</string>
@@ -106,7 +107,8 @@
     <string name="dialog_app_delete_title">’Excluir este aplicativo\?</string>
     <string name="game_move_to_downloads">Mover para a pasta Downloads</string>
     <string name="dialog_missing_file">O arquivo %1$s foi movido ou excluído da pasta Downloads.
-\nDeseja removê-lo do aplicativo Mitch\? Você não receberá mais atualizações para %2$s.</string>
+\n
+\nDeseja removê-lo do aplicativo Mitch? Você não receberá mais atualizações para %2$s.</string>
     <string name="notification_channel_web_running">O jogo da Web está em execução</string>
     <string name="notification_download_error">Erro ao baixar: %1$s</string>
     <string name="popup_game_deleted">%1$s foi excluído.</string>
@@ -153,8 +155,10 @@
     <string name="game_bundle_racial">Pacote para Justiça Racial e Igualdade</string>
     <string name="bundle_custom_link">Definir URL de download personalizado</string>
     <string name="game_bundle_palestine">Pacote indie para a ajuda palestina</string>
-    <string name="bundle_claim_dialog">Aviso: você está prestes a encher sua biblioteca com mais de 1.000 jogos. Você tem certeza de que quer fazer isso\?
+    <string name="bundle_claim_dialog">Aviso: você está prestes a encher sua biblioteca com mais de 1.000 jogos. Você tem certeza de que quer fazer isso?
+\n
 \nIsso vai levar muito, muito tempo.
+\n
 \nEste processo é irreversível.</string>
     <string name="popup_no_network_connection">A verificação de atualizações requer uma conexão de rede</string>
     <string name="settings_android_only_filter">Android: filtro apenas para download</string>
@@ -181,4 +185,60 @@
     <string name="bundle_claim_error">Não foi possível acessar o link de download do pacote.</string>
     <string name="notification_download_no_space">Não há espaço de armazenamento suficiente para este arquivo</string>
     <string name="bundle">Pacotes especiais</string>
+    <string name="genre_educational">Educacional</string>
+    <string name="library_category_web_cached">Web jogos</string>
+    <string name="settings_web_cache_update_never">Nunca</string>
+    <string name="dialog_web_cache_info_title">Instalando web jogos</string>
+    <string name="dialog_web_cache_info">Mitch pode automaticamente salver jogos web para posteriormente serem jogados offline.</string>
+    <string name="settings_web_cache_enable">Salvar jogos web</string>
+    <string name="settings_web_cache_update">Atualizar jogos web salvos</string>
+    <string name="dialog_web_cache_delete_fail_title">Impossível remover no momento</string>
+    <string name="dialog_web_cache_delete_fail">%1$s não pode ser removido pois está sendo executado.</string>
+    <string name="game_web_play_desc">Jogar a versão web agora</string>
+    <string name="genre_simulation">Simulação</string>
+    <string name="settings_web_cache_enable_desc">Instala todos os jogos web jogados para posteriormente jogar offline.</string>
+    <string name="dialog_web_cache_delete_title">Remover este jogo?</string>
+    <string name="game_multiple_options_get">Obter →</string>
+    <string name="settings_web_cache_update_unmetered">Quando aberto em uma conexão não limitada</string>
+    <string name="settings_web_cache_update_always">Quando aberto</string>
+    <string name="game_web_play_default_type">Jogar</string>
+    <string name="game_multiple_options_desc_web_or_download">Jogar agora ou baixar</string>
+    <string name="game_multiple_options_desc_multiple_purchases">Compras múltiplas</string>
+    <string name="genre_adventure">Aventura</string>
+    <string name="game_multiple_options_desc_web_or_buy">Jogar agora ou comprar</string>
+    <string name="genre_action">Ação</string>
+    <string name="genre_fighting">Luta</string>
+    <string name="genre_interactive_fiction">Ficção Interativa</string>
+    <string name="genre_racing">Corrida</string>
+    <string name="genre_rhythm">Rítmo</string>
+    <string name="genre_rpg">Role Playing</string>
+    <string name="genre_strategy">Estratégia</string>
+    <string name="genre_card_game">Cartas</string>
+    <string name="genre_platformer">Plataforma</string>
+    <string name="genre_puzzle">Quebra-Cabeças</string>
+    <string name="genre_shooter">Tiro</string>
+    <string name="genre_sports">Esportes</string>
+    <string name="genre_survival">Sobrevivência</string>
+    <string name="genre_visual_novel">Romance</string>
+    <string name="browser_filter_exclude_genres">Excluir gêneros…</string>
+    <string name="settings_exclude_tags">Excluir game tag da página inicial</string>
+    <string name="dialog_apply">Aplicar</string>
+    <string name="dialog_reset">Reset</string>
+    <string name="settings_exclude_tags_show_all">Mostrar todos os jogos</string>
+    <string name="settings_exclude_tags_error">Erro: não foi possível carregar lista de tags. Você está conectado à Internet?</string>
+    <string name="popup_web_game_cached">Este jogo estará disponível em sua biblioteca para jogar offline.</string>
+    <string name="settings_clear_all_title">Remover todos os dados?</string>
+    <string name="popup_web_install_launcher_shortcut_error">Seu launcher não suporta atalhos customizados.</string>
+    <string name="popup_web_game_deleted_cannot_launch">Este jogo foi removido.</string>
+    <string name="popup_link_copied">Link copiado para área de transferência.</string>
+    <plurals name="browser_filter_exclude_genres_active">
+        <item quantity="one">%d gênero excluído</item>
+        <item quantity="many">%d gêneros excluídos</item>
+        <item quantity="other">%d gêneros excluídos</item>
+    </plurals>
+    <string name="settings_clear_all">Limpar todos os dados do Mitch</string>
+    <string name="settings_clear_all_message">Isso irá remover todos os jogos web armazenados, todos os arquivos armazenados (que não foram exportados para o diretório Downloads), e irá deslogar de sua conta itch.io, entre outras coisas.
+\nIsso não irá remover apps instalados, no entanto o Mitch não irá mais acompanhar updates para eles.
+\nVocê tem certeza que deseja excluir todos os dados do Mitch?</string>
+    <string name="game_web_install_launcher_shortcut">Instalar na tela inicial</string>
 </resources>
