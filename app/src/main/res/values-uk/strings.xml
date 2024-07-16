@@ -74,11 +74,11 @@
     <string name="library_category_pending">В очікуванні</string>
     <string name="library_item_downloading">Завантажується…</string>
     <string name="library_item_installing">Встановлюється…</string>
-    <string name="library_item_ready_to_install">Натисніть, щоб встановити</string>
+    <string name="library_item_ready_to_install">Натисніть для встановлення</string>
     <string name="game_cancel_download_or_install">Скасувати</string>
     <string name="popup_download_or_install_cancelled">Скасовано</string>
     <string name="notification_game_running">Запущена веб-гра на itch.io</string>
-    <string name="notification_channel_web_running">Запущена веб-гра на itch.io</string>
+    <string name="notification_channel_web_running">Веб-гра запущена</string>
     <string name="notification_channel_web_running_desc">Сповіщати коли у вбудованому веб-браузері запущена гра.</string>
     <string name="notification_download_error">Помилка під час завантаження: %1$s</string>
     <string name="select_app_for_file">Відкрити файл за допомогою</string>
