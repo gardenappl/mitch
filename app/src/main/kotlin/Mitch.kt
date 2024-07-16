@@ -72,7 +72,7 @@ const val PREF_WEB_CACHE_DIALOG_HIDE = "mitch.web_cache_dialog_hide"
 object PreferenceWebCacheUpdate {
     const val NEVER = "never"
     const val UNMETERED = "unmetered"
-    const val ALWAYS ="always"
+    const val ALWAYS = "always"
 }
 const val PREF_BROWSE_START_PAGE = "mitch.browse_start_page"
 const val PREF_START_PAGE_EXCLUDE = "mitch.start_page_exclude"

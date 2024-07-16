@@ -1,6 +1,7 @@
 keystore.properties
 *.iml
-.gradle
+.gradle/
+.kotlin/
 /local.properties
 /.idea/caches
 /.idea/libraries
@@ -10,6 +11,6 @@ keystore.properties
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 .DS_Store
-**/build
-/captures
+**/build/
+/captures/
 .externalNativeBuild
