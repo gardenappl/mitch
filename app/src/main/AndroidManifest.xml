@@ -140,5 +140,13 @@
         </provider>
         <service android:name=".ui.GameForegroundService" />
     </application>
-
+    <!-- Required for 'Open in default web browser' function -->
+    <!-- https://stackoverflow.com/questions/2201917/how-can-i-open-a-url-in-androids-web-browser-from-my-application#61488105 -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
 </manifest>

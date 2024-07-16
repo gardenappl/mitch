@@ -2,6 +2,7 @@ package garden.appl.mitch.ui
 
 import android.annotation.SuppressLint
 import android.content.*
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
@@ -135,7 +136,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         webView.settings.allowFileAccess = false
         webView.settings.allowContentAccess = false
         webViewJSNonce = SecureRandom().nextLong()
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) //Security recommendation
+        // JavaScript interface has catastrophic security vulnerabilities in old Android versions.
+        // Explicitly disable it even though minSdk is greater than JellyBean.
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN)
             webView.addJavascriptInterface(ItchJavaScriptInterface(this), "mitchCustomJS")
 
         webView.setDownloadListener { url, _, contentDisposition, mimeType, contentLength ->
@@ -197,22 +200,34 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     ShareCompat.IntentBuilder.from(requireActivity())
                         .setType("text/plain")
                         .setChooserTitle(R.string.browser_share)
-                        .setText(webView.url)
+                        .setText(url)
                         .startChooser()
                     return@setOnActionSelectedListener true
                 }
+                // https://stackoverflow.com/questions/2201917/how-can-i-open-a-url-in-androids-web-browser-from-my-application#61488105
                 R.id.browser_open_in_browser -> {
+                    val resolveIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://"))
+                    val resolveInfo = requireContext().packageManager
+                        .resolveActivity(resolveIntent, PackageManager.MATCH_DEFAULT_ONLY)
+                    val defaultBrowserPackageName = resolveInfo?.activityInfo?.packageName
+
                     val intent = Intent(Intent.ACTION_VIEW)
-                    intent.data = Uri.parse(webView.url)
+                    intent.data = Uri.parse(url)
 
-                    val title = resources.getString(R.string.browser_open_in_browser)
-                    val chooser = Intent.createChooser(intent, title)
-
-                    startActivity(chooser)
+                    Log.d(LOGGING_TAG, "Default browser: $defaultBrowserPackageName")
+                    if (defaultBrowserPackageName == null ||
+                        defaultBrowserPackageName == "android") {
+                        // "android" means no default browser is set
+                        val title = resources.getString(R.string.browser_open_in_browser)
+                        startActivity(Intent.createChooser(intent, title))
+                    } else {
+                        intent.setPackage(defaultBrowserPackageName)
+                        startActivity(intent)
+                    }
                     return@setOnActionSelectedListener true
                 }
                 R.id.browser_search -> {
-                    //Search dialog
+                    // Search dialog
 
                     val viewInflated: View = LayoutInflater.from(context)
                         .inflate(R.layout.dialog_search, getView() as ViewGroup?, false)
@@ -231,7 +246,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         }
                         .show()
 
-                    //Show keyboard automatically
+                    // Show keyboard automatically
                     input.post {
                         input.isFocusableInTouchMode = true
                         input.requestFocus()
@@ -304,7 +319,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             }
         }
 
-        //Load page, this will also update the UI
+        // Load page, this will also update the UI
         val webViewBundle = savedInstanceState?.getBundle(WEB_VIEW_STATE_KEY)
         Utils.logDebug(LOGGING_TAG, "Restoring $webViewBundle")
         if (webViewBundle != null) {
@@ -393,7 +408,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         updateUI(null, null)
     }
 
-    //TODO: hide stuff on scroll?
+    // TODO: hide stuff on scroll?
     /**
      * Adapts the app's UI to the theme of a web page. Should only affect the UI while the browse
      * fragment is selected.
@@ -409,8 +424,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         if (!isVisible && doc != null)
             return
 
-        //Log.d(LOGGING_TAG, "Processing UI...")
-
         val navBar = mainActivity.binding.bottomNavigationView
         val bottomGameBar = mainActivity.binding.bottomGameBar
         val speedDial = mainActivity.binding.speedDial
@@ -423,7 +436,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         filterExcludedGenres()
 
         if (doc?.let { ItchWebsiteUtils.isGamePage(doc) } == true) {
-            //Hide app's navbar after hiding web navbar
+            // Hide app's navbar after hiding web navbar
             val navBarHideCallback: (String) -> Unit = navBarHide@{
                 if (!isVisible)
                     return@navBarHide
@@ -602,7 +615,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             supportAppBar.hide()
         }
 
-        //Colors adapt to game theme
+        // Colors adapt to game theme
 
         val defaultAccentColor = Utils.getColor(requireContext(), R.color.colorAccent)
         val defaultWhiteColor = Utils.getColor(requireContext(), R.color.colorPrimary)
@@ -660,7 +673,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     }
 
     private fun updateGenreFilterAndAction(speedDial: SpeedDialView) {
-        val uri = Uri.parse(webView.url)
+        if (url == null)
+            return
+        val uri = Uri.parse(url)
         if (ItchWebsiteUtils.isGameCataloguePage(uri)) {
             val genreExcludeSet = genresExclusionFilter ?: emptySet<ItchGenre>().also {
                 genresExclusionFilter = emptySet()
@@ -717,7 +732,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     }
                 }
                 setNegativeButton(R.string.dialog_no) { _, _ ->
-                    //no-op
+                    // no-op
                 }
 
                 create()
@@ -777,7 +792,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     }
 
             } else if (item.hasClass("jam_entry")) {
-                //TODO: handle multiple jam entries nicely
+                // TODO: handle multiple jam entries nicely
                 val menuItemName = item.child(0).text()
 
                 appBar.menu.add(APP_BAR_ACTIONS_GAME_JAM, 1, 1, menuItemName)
@@ -789,9 +804,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM)
 
             } else if (item.getElementsByClass("view_more").isNotEmpty()) {
-                //Cannot rely on ItchWebsiteParser, because its method requires the current URL,
-                //and while loading another page, webView.url changes prematurely
-                //(leading to crashes...)
+                // Cannot rely on ItchWebsiteParser, because its method requires the current URL,
+                // and while loading another page, url changes prematurely
+                // (leading to crashes...)
                 val authorName = item.getElementsByClass("mobile_label")[0].text()
 
                 val menuItemName =
@@ -886,7 +901,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     }
     
 
-    @Keep //prevent this class from being removed by compiler optimizations
+    @Keep // prevent this class from being removed by compiler optimizations
     private class ItchJavaScriptInterface(val fragment: BrowseFragment) {
         private fun verifyNonce(nonce: String) {
             if (nonce != fragment.webViewJSNonce.toString()) {
