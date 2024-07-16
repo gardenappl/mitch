@@ -232,7 +232,7 @@ object ItchWebsiteUtils {
     }
 
     fun isDarkTheme(doc: Document): Boolean {
-        return doc.selectFirst(".main_layout")?.hasClass("dark_theme") ?: false
+        return doc.body().hasClass("dark_theme")
     }
 
     fun getLoggedInUserName(doc: Document): String? {
