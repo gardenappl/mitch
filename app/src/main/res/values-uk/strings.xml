@@ -243,4 +243,5 @@
     <string name="popup_web_game_deleted_cannot_launch">Ця гра була видалена.</string>
     <string name="popup_link_copied">Посилання скопійовано.</string>
     <string name="popup_no_file_manager">Не вдалося обрати файл. У вас встановлений менедженр файлів?</string>
+    <string name="dialog_dont_ask_again">Не запитувати це знову</string>
 </resources>
