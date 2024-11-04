@@ -178,8 +178,6 @@
     <string name="dialog_lang_restart_title">Đã đổi ngôn ngữ</string>
     <string name="dialog_installer_no_space">Không đủ dung lượng ổ đĩa cho ứng dụng này.</string>
     <string name="settings_warn_os">Cảnh báo khi tải các ứng dụng không dành cho Android xuống</string>
-    <string name="dialog_download_wrong_os_has_extras">%s không tương thích với Android. Bạn sẽ không thể cài đặt dưới dạng ứng dụng.
-\nBạn vẫn có thể xem nội dung bổ sung, như là tranh vẽ, nhạc, hoặc hướng dẫn.</string>
     <string name="dialog_download_wrong_os">%s không tương thích với Android. Bạn sẽ không thể cài đặt dưới dạng ứng dụng.
 \nBạn có vẫn muốn tải xuống không\?</string>
     <string name="bundle">Gói đặc biệt</string>

@@ -175,8 +175,6 @@
     <string name="dialog_download_wrong_os">%s não é compatível com Android. Você não poderá instalá-lo como um aplicativo.
 \nVocê quer baixá-lo mesmo assim\?</string>
     <string name="dialog_installer_no_space">Não há espaço em disco suficiente para este aplicativo.</string>
-    <string name="dialog_download_wrong_os_has_extras">%s não é compatível com Android. Você não poderá instalá-lo como um aplicativo.
-\nVocê ainda pode visualizar conteúdo adicional, como arte, música ou manuais.</string>
     <string name="settings_warn_os">Avisar ao baixar aplicativos não Android</string>
     <string name="game_bundle_ukraine">Pacote para a Ucrânia</string>
     <string name="game_bundle_trans_texas">Direitos Trans no Texas! Pacote</string>

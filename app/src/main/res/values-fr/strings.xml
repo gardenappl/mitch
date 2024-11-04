@@ -180,8 +180,6 @@
     <string name="dialog_lang_restart">L\'application va redémarrer pour appliquer le changement de langue</string>
     <string name="dialog_lang_restart_title">La langue a été changée</string>
     <string name="settings_warn_os">Avertir lors du téléchargement d\'applications non Android</string>
-    <string name="dialog_download_wrong_os_has_extras">%s n\'est pas compatible avec Android. Vous ne pourrez pas l\'installer en tant qu\'application.
-\nVous pouvez néanmoins afficher du contenu supplémentaire, comme des illustrations, de la musique ou des manuels.</string>
     <string name="dialog_download_wrong_os">%s n\'est pas compatible avec Android. Vous ne pourrez pas l\'installer en tant qu\'application.
 \nVoulez-vous quand même le télécharger \?</string>
     <string name="game_bundle_trans_texas">Offre groupée Les droits des trans au Texas !</string>

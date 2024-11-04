@@ -175,8 +175,6 @@
     <string name="notification_download_io_error">Error de red o de disco</string>
     <string name="dialog_download_wrong_os">%s no es compatible con Android. No podrás instalarlo como una aplicación.
 \n¿Quieres descargarlo de todos modos\?</string>
-    <string name="dialog_download_wrong_os_has_extras">%s no es compatible con Android. No podrás instalarlo como una aplicación.
-\nAun así, podrás ver los contenidos adicionales, como arte, música o manuales.</string>
     <string name="settings_warn_os">Advertir al descargar aplicaciones que no son de Android</string>
     <string name="bundle">Paquetes especiales</string>
     <string name="game_bundle_ukraine">Paquete para Ucrania</string>

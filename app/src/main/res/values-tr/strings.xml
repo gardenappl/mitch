@@ -179,8 +179,6 @@
     <string name="dialog_lang_restart_title">Dil değişti</string>
     <string name="dialog_installer_no_space">Bu uygulama için yeterli disk alanı yok.</string>
     <string name="settings_warn_os">Android olmayan uygulamaları indirirken uyar</string>
-    <string name="dialog_download_wrong_os_has_extras">%s, Android ile uyumlu değil. Onu uygulama olarak kuramayacaksınız.
-\nResim, müzik veya kılavuz gibi ek içerikleri görüntülemeye devam edebilirsiniz.</string>
     <string name="dialog_download_wrong_os">%s, Android ile uyumlu değil. Onu uygulama olarak kuramayacaksınız.
 \nYine de indirmek istiyor musunuz\?</string>
     <string name="game_bundle_ukraine">Ukrayna paketi</string>

@@ -173,8 +173,6 @@
     <string name="settings_lang_site">Avhengig av side</string>
     <string name="settings_lang_default">Forvalg</string>
     <string name="settings_warn_os">Advar om nedlasting av programmer som ikke er for Android</string>
-    <string name="dialog_download_wrong_os_has_extras">%s er ikke kompatibelt med Android. Du kan ikke installere det som et program.
-\nDu kan fremdeles åpne tilleggsinnhold, som kunst, musikk, eller manualer.</string>
     <string name="dialog_download_wrong_os">%s er ikke kompatibelt med Android. Du vil ikke kunne installere det som et program.
 \nØnsker du å laste det ned uansett\?</string>
     <string name="dialog_installer_no_space">Ikke nok lagringsplass for dette programmet.</string>

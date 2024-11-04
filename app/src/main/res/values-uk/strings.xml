@@ -176,8 +176,10 @@
     <string name="dialog_installer_no_space">Не вистачає місця на диску.</string>
     <string name="dialog_download_wrong_os">%s не сумісно з Android. Ви не зможете встановити це як застосунок.
 \nВи все одно бажаєте це завантажити\?</string>
-    <string name="dialog_download_wrong_os_has_extras">%s не сумісно з Android. Ви не зможете встановити це як застосунок.
-\nМожна переглянути додатковий контент, наприклад, ілюстрації, музику, та інструкції.</string>
+    <string name="dialog_purchase_wrong_os">%s не сумісно з Android. Ви не зможете встановити це як застосунок.
+\nВи все одно бажаєте це придбати\?</string>
+    <string name="dialog_purchase_wrong_os_has_extras">%s не сумісно з Android. Ви не зможете встановити це як застосунок.
+\nМожна встановити це на інший пристрій, або переглянути додатковий контент, наприклад, ілюстрації та музику.</string>
     <string name="settings_warn_os">Попереджати, коли гра не сумісна з Android</string>
     <string name="notification_download_no_space">В сховищі недостатньо місця для цього файлу</string>
     <string name="game_bundle_ukraine">Благодійний набір Україні</string>

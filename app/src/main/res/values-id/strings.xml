@@ -174,7 +174,5 @@
 \nApakah kamu tetap ingin mengunduhnya\?</string>
     <string name="dialog_installer_no_space">Tidak ada ruang disk yang cukup untuk aplikasi ini.</string>
     <string name="settings_android_only_filter">Android: saring hanya yang dapat diunduh</string>
-    <string name="dialog_download_wrong_os_has_extras">%s tidak kompatibel dengan Android. Kamu tidak akan bisa memasangnya sebagai aplikasi.
-\nKamu mungkin masih bisa melihat konten tambahan, seperti seni, musik, atau panduan.</string>
     <string name="notification_download_io_error">Kesalahan jaringan atau disk</string>
 </resources>

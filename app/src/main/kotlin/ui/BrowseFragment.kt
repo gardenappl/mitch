@@ -452,7 +452,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                             getString(R.string.game_download)
                         val buttonLabel = Utils.spannedFromHtml(purchasedInfo.ownershipReasonHtml)
                         val onButtonClick = View.OnClickListener {
-                            goToDownloadOrPurchase(doc, info, purchasedInfo.downloadPage)
+                            mainActivity.browseUrl(purchasedInfo.downloadPage)
                         }
                         actions.add(Triple(buttonText, buttonLabel, onButtonClick))
                     }
@@ -489,7 +489,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         val purchaseUri = Uri.parse(info.game!!.storeUrl)
                             .buildUpon()
                             .appendPath("purchase")
-                        goToDownloadOrPurchase(doc, info, purchaseUri.toString())
+                        goToPurchasePage(doc, info, purchaseUri.toString())
                     }
                     actions.add(Triple(buttonText, buttonLabel, onButtonClick))
                 }
@@ -696,10 +696,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     }
 
     /**
-     * Go to a game's download or purchase page, and possibly show a warning dialog
+     * Go to a game's purchase page, and possibly show a warning dialog
      * if the game is not an Android game
      */
-    private fun goToDownloadOrPurchase(doc: Document, info: ItchBrowseHandler.Info, url: String) {
+    private fun goToPurchasePage(doc: Document, info: ItchBrowseHandler.Info, url: String) {
         val mainActivity = activity as? MainActivity ?: return
         val prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity)
 
@@ -720,18 +720,18 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 setTitle(android.R.string.dialog_alert_title)
                 setIconAttribute(android.R.attr.alertDialogIcon)
 
-                if (foundExtras) {
-                    setMessage(getString(R.string.dialog_download_wrong_os_has_extras, info.game!!.name))
-                    setPositiveButton(android.R.string.ok) { _, _ ->
-                        mainActivity.browseUrl(url)
-                    }
-                } else {
-                    setMessage(getString(R.string.dialog_download_wrong_os, info.game!!.name))
-                    setPositiveButton(R.string.dialog_yes) { _, _ ->
-                        mainActivity.browseUrl(url)
-                    }
+                val message = if (foundExtras)
+                    R.string.dialog_purchase_wrong_os_has_extras
+                else
+                    R.string.dialog_purchase_wrong_os
+                setMessage(getString(message, info.game!!.name))
+
+                val positiveButton = if (foundExtras) android.R.string.ok else R.string.dialog_yes
+                val negativeButton = if (foundExtras) android.R.string.cancel else R.string.dialog_no
+                setPositiveButton(positiveButton) { _, _ ->
+                    mainActivity.browseUrl(url)
                 }
-                setNegativeButton(R.string.dialog_no) { _, _ ->
+                setNegativeButton(negativeButton) { _, _ ->
                     // no-op
                 }
 

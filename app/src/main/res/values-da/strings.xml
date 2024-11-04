@@ -10,7 +10,6 @@
     <string name="bug_report_dialog_title">Noget gik galt</string>
     <string name="settings_installer_desc">Prøv at ændre dette, hvis du har problemer med at installere apps.</string>
     <string name="bundle_claim_dialog">Advarsel: Du er ved at fylde dit bibliotek med 1000+ spil. Er du sikker på, at du vil gøre det?\n\nDette vil tage meget, meget lang tid.\n\nDenne proces er irreversibel.</string>
-    <string name="dialog_download_wrong_os_has_extras">%s er ikke kompatibel med Android. Du vil ikke kunne installere den som en app.\nDu kan stadig se ekstra indhold f.eks. kunst, musik eller manualer.</string>
     <string name="notification_channel_updates">Spilopdateringer</string>
     <string name="notification_channel_install_desc">Underret, når en itch.io-app kræver installation.</string>
     <string name="notification_channel_updates_desc">Underret, når et itch.io-spil får en opdatering.</string>
