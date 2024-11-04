@@ -3,6 +3,7 @@ package garden.appl.mitch.ui
 import android.app.ActivityManager
 import android.app.Dialog
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -31,18 +32,14 @@ class SettingsFragment : PreferenceFragmentCompat(), CoroutineScope by MainScope
 
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        val prefs = preferenceManager.sharedPreferences!!
+        migrateOldPreferences(prefs)
+
         setPreferencesFromResource(R.xml.preferences, rootKey)
-        updatePrefExcludeTag(preferenceManager.sharedPreferences!!.getString(PREF_BROWSE_START_PAGE, "main")!!)
+        updatePrefExcludeTag(prefs.getString(PREF_BROWSE_START_PAGE, "main"))
 
         findPreference<Preference>(PREF_BROWSE_START_PAGE)?.setOnPreferenceChangeListener { _, newValue ->
             updatePrefExcludeTag(newValue as String)
-            true
-        }
-
-        findPreference<Preference>(PREF_WEB_CACHE_ENABLE)?.setOnPreferenceChangeListener { _, _ ->
-            preferenceManager.sharedPreferences!!.edit {
-                putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
-            }
             true
         }
         findPreference<Preference>(PREF_DEBUG_WEB_GAMES_IN_BROWSE_TAB)?.isVisible = BuildConfig.DEBUG
@@ -190,6 +187,23 @@ class SettingsFragment : PreferenceFragmentCompat(), CoroutineScope by MainScope
             startPageExcludePreference.isSelectable = when (prefBrowseStartPage) {
                 "android", "web", "web_touch", "all_games" -> true
                 else -> false
+            }
+        }
+    }
+
+    private fun migrateOldPreferences(prefs: SharedPreferences) {
+        try {
+            prefs.getString(PREF_WEB_CACHE_ENABLE, PreferenceWebCacheEnable.DEFAULT)
+        } catch (_: ClassCastException) {
+            val booleanValue = prefs.getBoolean(PREF_WEB_CACHE_ENABLE, false)
+            val oldDialogHideKey = "mitch.web_cache_dialog_hide"
+            prefs.edit(commit = true) {
+                this.remove(PREF_WEB_CACHE_ENABLE)
+                if (prefs.getBoolean(oldDialogHideKey, false))
+                    this.putString(PREF_WEB_CACHE_ENABLE, PreferenceWebCacheEnable.ASK)
+                else
+                    this.putString(PREF_WEB_CACHE_ENABLE, booleanValue.toString())
+                this.remove(oldDialogHideKey)
             }
         }
     }

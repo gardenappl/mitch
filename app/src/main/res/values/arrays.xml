@@ -52,6 +52,17 @@
         <item>system</item>
     </string-array>
 
+    <string-array name="pref_web_cache_enable_entries">
+        <item>@string/settings_web_cache_enable_always</item>
+        <item>@string/settings_web_cache_enable_ask</item>
+        <item>@string/settings_web_cache_enable_never</item>
+    </string-array>
+    <string-array name="pref_web_cache_enable_values">
+        <item>true</item>
+        <item>ask</item>
+        <item>false</item>
+    </string-array>
+
     <string-array name="pref_web_cache_update_entries">
         <item>@string/settings_web_cache_update_always</item>
         <item>@string/settings_web_cache_update_unmetered</item>

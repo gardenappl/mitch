@@ -237,7 +237,6 @@
     <string name="settings_exclude_tags_error">Erreur : Impossible de charger la liste des balises. Êtes-vous connecté·e à l\'Internet \?</string>
     <string name="popup_web_game_cached">Ce jeu sera disponible dans votre bibliothèque pour jouer hors ligne.</string>
     <string name="game_web_install_launcher_shortcut">Installer sur l\'écran d\'accueil</string>
-    <string name="popup_web_game_deleted_cannot_launch">Ce jeu a été supprimé.</string>
     <string name="settings_clear_all">Effacer toutes les données de Mitch</string>
     <string name="popup_web_install_launcher_shortcut_error">Votre lanceur ne prend pas en charge les raccourcis personnalisés.</string>
     <string name="settings_clear_all_title">Supprimer toutes les données \?</string>

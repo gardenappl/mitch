@@ -503,9 +503,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                             mainActivity,
                             GameActivity::class.java
                         )
-//                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         intent.putExtra(GameActivity.EXTRA_GAME_ID, info.game.gameId)
-                        intent.putExtra(GameActivity.EXTRA_IS_OFFLINE, false)
+                        intent.putExtra(GameActivity.EXTRA_LAUNCHED_FROM_INSTALL, false)
                         Log.d(LOGGING_TAG, "Starting $intent")
                         mainActivity.startActivity(intent)
                     }

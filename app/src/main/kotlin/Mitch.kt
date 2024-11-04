@@ -67,8 +67,14 @@ const val PREF_LANG_LOCALE_NEXT = "mitch.lang_locale_next"
 const val PREF_LANG_SITE_LOCALE = "mitch.lang_site_locale"
 const val PREF_WARN_WRONG_OS = "mitch.warn_wrong_os"
 const val PREF_WEB_CACHE_ENABLE = "mitch.web_cache_enable"
+object PreferenceWebCacheEnable {
+    const val NEVER = "false"
+    const val ASK = "ask"
+    const val ALWAYS = "true"
+    const val DEFAULT = ASK
+}
+//const val PREF_WEB_CACHE_DIALOG_HIDE = "mitch.web_cache_dialog_hide"
 const val PREF_WEB_CACHE_UPDATE = "mitch.web_cache_update"
-const val PREF_WEB_CACHE_DIALOG_HIDE = "mitch.web_cache_dialog_hide"
 object PreferenceWebCacheUpdate {
     const val NEVER = "never"
     const val UNMETERED = "unmetered"

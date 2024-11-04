@@ -40,26 +40,12 @@ class WebGameCache(context: Context) {
 
     suspend fun request(
         context: Context,
-        game: Game,
+        gameId: Int,
         request: WebResourceRequest,
-        isOfflineWebGame: Boolean
+        isOfflineMode: Boolean
     ): WebResourceResponse? = withContext(Dispatchers.IO) {
-        val updateWebCache = if (isOfflineWebGame) {
-            val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
-            when (sharedPrefs.getString(PREF_WEB_CACHE_UPDATE, PreferenceWebCacheUpdate.NEVER)) {
-                PreferenceWebCacheUpdate.NEVER ->
-                    false
-                PreferenceWebCacheUpdate.UNMETERED ->
-                    Utils.isNetworkConnected(context, requireUnmetered = true)
-                else ->
-                    Utils.isNetworkConnected(context)
-            }
-        } else {
-            true
-        }
-
         val url = request.url.toString()
-        Utils.logDebug(LOGGING_TAG, "$url, update?: $updateWebCache")
+//        Utils.logDebug(LOGGING_TAG, "$url, force cache?: $isOfflineMode")
         val httpRequest = Request.Builder().run {
             url(url)
             headers(request.requestHeaders.toHeaders())
@@ -69,9 +55,9 @@ class WebGameCache(context: Context) {
             get()
             build()
         }
-        val httpClient = getOkHttpClientForGame(game)
+        val httpClient = getOkHttpClientForGame(gameId)
 
-        request(httpClient, httpRequest, forceCache = !updateWebCache)
+        request(httpClient, httpRequest, forceCache = isOfflineMode)
     }
 
     private suspend fun request(httpClient: OkHttpClient, request: Request, forceCache: Boolean): WebResourceResponse? {
@@ -97,7 +83,7 @@ class WebGameCache(context: Context) {
             }
             build()
         }
-        Utils.logDebug(LOGGING_TAG, "request: $httpRequest")
+//        Utils.logDebug(LOGGING_TAG, "request: $httpRequest")
 
         val response = suspendCancellableCoroutine { continuation ->
             httpClient.newCall(httpRequest).enqueue(object : Callback {
@@ -134,16 +120,16 @@ class WebGameCache(context: Context) {
                 }
             })
         }
-        Utils.logDebug(LOGGING_TAG, "response from ${httpRequest.url}: ${response?.responseHeaders}")
+//        Utils.logDebug(LOGGING_TAG, "response from ${httpRequest.url}: ${response?.responseHeaders}")
         return if (response == null && !forceCache)
             request(httpClient, request, forceCache = true)
         else
             response
     }
 
-    private fun getOkHttpClientForGame(game: Game): OkHttpClient {
-        return cacheHttpClients.getOrPut(game.gameId) { ->
-            val cacheDir = getCacheDir(game.gameId)
+    private fun getOkHttpClientForGame(gameId: Int): OkHttpClient {
+        return cacheHttpClients.getOrPut(gameId) { ->
+            val cacheDir = getCacheDir(gameId)
             Utils.logDebug(LOGGING_TAG, "new client; cache dir: $cacheDir")
             Mitch.httpClient.newBuilder().let {
                 it.cache(Cache(cacheDir, Long.MAX_VALUE))
@@ -156,7 +142,7 @@ class WebGameCache(context: Context) {
         return migrateCacheDir(gameId, mkdir = true)
     }
 
-    suspend fun makeGameWebCached(context: Context, gameId: Int): Game {
+    suspend fun makeGameWebCached(context: Context, gameId: Int) {
         val db = AppDatabase.getDatabase(context)
         val install = db.installDao.getWebInstallationForGame(gameId)
 
@@ -170,7 +156,6 @@ class WebGameCache(context: Context) {
             fileSize = Installation.WEB_FILE_SIZE
         )
         db.installDao.upsert(newInstall)
-        return db.gameDao.getGameById(gameId)!!
     }
 
     suspend fun isGameWebCached(context: Context, gameId: Int): Boolean {

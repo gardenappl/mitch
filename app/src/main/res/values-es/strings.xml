@@ -234,7 +234,6 @@
     <string name="settings_clear_all_title">¿Borrar todos los datos\?</string>
     <string name="game_web_install_launcher_shortcut">Instalar en la pantalla de inicio</string>
     <string name="popup_web_install_launcher_shortcut_error">Tu lanzador no admite accesos directos personalizados.</string>
-    <string name="popup_web_game_deleted_cannot_launch">Este juego ha sido eliminado.</string>
     <string name="popup_link_copied">Enlace copiado al portapapeles.</string>
     <string name="settings_clear_all_message">Esto borrará todos los juegos web guardados, todos los archivos descargados (que no hayan sido exportados a la carpeta de descargas), y cerrará la sesión de tu cuenta de itch.io, entre otras cosas.
 \nEsto no borrará las aplicaciones instaladas, sin embargo Mitch ya no hará un seguimiento de las actualizaciones de las mismas.

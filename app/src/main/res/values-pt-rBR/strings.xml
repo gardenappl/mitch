@@ -227,7 +227,6 @@
     <string name="popup_web_game_cached">Este jogo estará disponível em sua biblioteca para jogar offline.</string>
     <string name="settings_clear_all_title">Remover todos os dados?</string>
     <string name="popup_web_install_launcher_shortcut_error">Seu launcher não suporta atalhos customizados.</string>
-    <string name="popup_web_game_deleted_cannot_launch">Este jogo foi removido.</string>
     <string name="popup_link_copied">Link copiado para área de transferência.</string>
     <plurals name="browser_filter_exclude_genres_active">
         <item quantity="one">%d gênero excluído</item>

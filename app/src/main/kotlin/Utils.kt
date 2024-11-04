@@ -210,23 +210,16 @@ object Utils {
             val activeNetwork = connectivityManager.activeNetwork ?: return false
             val networkCapabilities =
                 connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
-            val isInternet = when {
-                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-                else -> false
-            }
-            return isInternet && (!requireUnmetered
-                    || networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED))
+            return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                    && (!requireUnmetered
+                        || networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED))
         } else {
             @Suppress("DEPRECATION")
             val networkInfo = connectivityManager.activeNetworkInfo ?: return false
             @Suppress("DEPRECATION")
             return when (networkInfo.type) {
-                ConnectivityManager.TYPE_WIFI -> true
-                ConnectivityManager.TYPE_MOBILE -> !requireUnmetered
-                ConnectivityManager.TYPE_ETHERNET -> true
-                else -> false
+                ConnectivityManager.TYPE_MOBILE -> !requireUnmetered && networkInfo.isConnected
+                else -> networkInfo.isConnected
             }
         }
     }

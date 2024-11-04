@@ -109,9 +109,7 @@
         <item name="android:textColor">@color/colorForeground</item>
     </style>
 
-    <style name="AppTheme.Fullscreen" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActionBar">false</item>
+    <style name="AppTheme.Fullscreen" parent="AppTheme.NoActionBar">
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="colorAccent">@color/colorAccent</item>

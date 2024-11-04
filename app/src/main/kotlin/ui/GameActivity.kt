@@ -27,7 +27,6 @@ import garden.appl.mitch.*
 import garden.appl.mitch.client.ItchWebsiteParser
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
-import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.databinding.ActivityGameBinding
 import kotlinx.coroutines.*
 import java.util.concurrent.ExecutionException
@@ -39,7 +38,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
     companion object {
         private const val LOGGING_TAG = "GameActivity"
         const val EXTRA_GAME_ID = "GAME_ID"
-        const val EXTRA_IS_OFFLINE = "IS_OFFLINE"
+        const val EXTRA_LAUNCHED_FROM_INSTALL = "IS_OFFLINE"
         private const val WEB_VIEW_STATE_KEY: String = "WebView"
 
         fun getShortcutId(gameId: Int) = "web_game/${gameId}"
@@ -65,7 +64,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
                 context, GameActivity::class.java).apply {
 
                 putExtra(EXTRA_GAME_ID, game.gameId)
-                putExtra(EXTRA_IS_OFFLINE, true)
+                putExtra(EXTRA_LAUNCHED_FROM_INSTALL, true)
             }
             val shortcutId = getShortcutId(game.gameId)
             return ShortcutInfoCompat.Builder(context, shortcutId).run {
@@ -104,6 +103,9 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
     private lateinit var binding: ActivityGameBinding
     private lateinit var webView: WebView
     private lateinit var chromeClient: GameChromeClient
+
+    private var isOfflineMode: Boolean = false
+    private var isCaching: Boolean = false
 
     private val connection = object : ServiceConnection {
         //NO-OP, we bind to a foreground service so that Android does not kill us
@@ -186,85 +188,100 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
     private suspend fun showLaunchDialog() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
-        val db = AppDatabase.getDatabase(this)
         val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
-        val install = db.installDao.getWebInstallationForGame(gameId)
+        val installedOffline = Mitch.webGameCache.isGameWebCached(this, gameId)
 
-        if (install != null || prefs.getBoolean(PREF_WEB_CACHE_DIALOG_HIDE, false)) {
-            afterDialogShown(install)
-        } else {
-            val dialog = AlertDialog.Builder(this).apply {
-                setTitle(R.string.dialog_web_cache_info_title)
-                setMessage(R.string.dialog_web_cache_info)
-
-                val checkbox = CheckBox(context).apply {
-                    setText(R.string.dialog_dont_ask_again)
-                }
-
-                setView(FrameLayout(context).apply {
-                    addView(checkbox, FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.WRAP_CONTENT
-                    ).apply {
-                        setMargins(50, 25, 50, 0)
-                    })
-                })
-
-                setPositiveButton(R.string.dialog_yes) { _, _ ->
-                    prefs.edit(commit = true) {
-                        putBoolean(PREF_WEB_CACHE_ENABLE, true)
-                        if (checkbox.isChecked) {
-//                            putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
-                            Log.d(LOGGING_TAG, "enabled!!")
-                        }
-                    }
-                    launch { afterDialogShown(install) }
-                }
-                setNegativeButton(R.string.dialog_no) { _, _ ->
-                    prefs.edit(commit = true) {
-                        putBoolean(PREF_WEB_CACHE_ENABLE, false)
-                        if (checkbox.isChecked) {
-//                            putBoolean(PREF_WEB_CACHE_DIALOG_HIDE, true)
-                            Log.d(LOGGING_TAG, "enabled!!")
-                        }
-                    }
-                    launch { afterDialogShown(install) }
-                }
-                setCancelable(true)
-                setOnCancelListener {
-                    launch { afterDialogShown(install) }
-                }
-
-                create()
-            }
-            dialog.show()
+        val webCacheEnabled = try {
+            prefs.getString(PREF_WEB_CACHE_ENABLE, PreferenceWebCacheEnable.DEFAULT)
+                ?.toBooleanStrictOrNull()
+        } catch (_: ClassCastException) {
+            Log.d(LOGGING_TAG, "web cache enabled? old settings")
+            if (prefs.getBoolean("mitch.web_cache_dialog_hide", false))
+                false
+            else
+                null
         }
+        Log.d(LOGGING_TAG, "web cache enabled?: $webCacheEnabled")
+
+        if (installedOffline || intent.getBooleanExtra(EXTRA_LAUNCHED_FROM_INSTALL, false)) {
+            afterDialogShown(installedOffline, true)
+            return
+        } else if (webCacheEnabled != null) {
+            afterDialogShown(installedOffline, webCacheEnabled)
+            return
+        }
+        val dialog = AlertDialog.Builder(this).apply {
+            setTitle(R.string.dialog_web_cache_info_title)
+            setMessage(R.string.dialog_web_cache_info)
+
+            val hideCheckBox = CheckBox(context).apply {
+                setText(R.string.dialog_dont_ask_again)
+            }
+
+            setView(FrameLayout(context).apply {
+                addView(hideCheckBox, FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(50, 25, 50, 0)
+                })
+            })
+
+            setPositiveButton(R.string.dialog_yes) { _, _ ->
+                prefs.edit(commit = true) {
+                    if (hideCheckBox.isChecked) {
+                        putString(PREF_WEB_CACHE_ENABLE, PreferenceWebCacheEnable.ALWAYS)
+                    }
+                }
+                launch { afterDialogShown(installedOffline, true) }
+            }
+            setNegativeButton(R.string.dialog_no) { _, _ ->
+                prefs.edit(commit = true) {
+                    if (hideCheckBox.isChecked) {
+                        putString(PREF_WEB_CACHE_ENABLE, PreferenceWebCacheEnable.NEVER)
+                    }
+                }
+                launch { afterDialogShown(installedOffline, false) }
+            }
+            setCancelable(true)
+            setOnCancelListener {
+                launch { afterDialogShown(installedOffline, false) }
+            }
+
+            create()
+        }
+        dialog.show()
     }
 
-    private suspend fun afterDialogShown(webInstall: Installation?) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-
+    private suspend fun afterDialogShown(installedOffline: Boolean, shouldCache: Boolean) {
         val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
-        val isOffline = intent.getBooleanExtra(EXTRA_IS_OFFLINE, false)
 
-        Log.d(LOGGING_TAG, "Running $gameId, offline: $isOffline")
-        if (webInstall == null) {
-            if (isOffline) {
-                Toast.makeText(
-                    this@GameActivity,
-                    R.string.popup_web_game_deleted_cannot_launch,
-                    Toast.LENGTH_LONG
-                ).show()
-                finish()
-                return
-            } else if (prefs.getBoolean(PREF_WEB_CACHE_ENABLE, true)) {
-                Toast.makeText(
-                    this@GameActivity,
-                    R.string.popup_web_game_cached,
-                    Toast.LENGTH_LONG
-                ).show()
+        Log.d(LOGGING_TAG, "Running $gameId, installed offline: $installedOffline, should cache: $shouldCache")
+
+        if (shouldCache && !installedOffline) {
+            Toast.makeText(this, R.string.popup_web_game_cached, Toast.LENGTH_LONG)
+                .show()
+            Mitch.webGameCache.makeGameWebCached(this, gameId)
+            this.isOfflineMode = false
+        } else if (installedOffline) {
+            val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
+            when (sharedPrefs.getString(PREF_WEB_CACHE_UPDATE, PreferenceWebCacheUpdate.NEVER)) {
+                PreferenceWebCacheUpdate.NEVER ->
+                    this.isOfflineMode = true
+                PreferenceWebCacheUpdate.UNMETERED ->
+                    this.isOfflineMode = !Utils.isNetworkConnected(this, requireUnmetered = true)
+                else ->
+                    this.isOfflineMode = !Utils.isNetworkConnected(this)
             }
+        } else {
+            this.isOfflineMode = false
         }
+
+        if (this.isOfflineMode)
+            Toast.makeText(this, R.string.popup_web_game_offline_mode, Toast.LENGTH_LONG)
+                .show()
+        this.isCaching = shouldCache
+
         val db = AppDatabase.getDatabase(this)
         val game = tryFixBackwardsCompatGame(db.gameDao.getGameById(gameId)!!, this)
 
@@ -330,7 +347,15 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         if (webView.canGoBack()) {
             webView.goBack()
         } else {
-            finish()
+            val dialog = AlertDialog.Builder(this).apply {
+                setMessage(R.string.popup_web_game_exit)
+                setPositiveButton(R.string.dialog_yes) { _, _ ->
+                    super.onBackPressed()
+                }
+                setNegativeButton(R.string.dialog_no) { _, _ -> /* NO-OP */ }
+                setCancelable(true)
+            }
+            dialog.show()
         }
     }
 
@@ -346,7 +371,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         val newIntent = Intent(Intent.ACTION_VIEW, intent.data, applicationContext,
             GameActivity::class.java)
         newIntent.putExtra(EXTRA_GAME_ID, intent.getIntExtra(EXTRA_GAME_ID, -1))
-        newIntent.putExtra(EXTRA_IS_OFFLINE, intent.getBooleanExtra(EXTRA_IS_OFFLINE, false))
+        newIntent.putExtra(EXTRA_LAUNCHED_FROM_INSTALL, intent.getBooleanExtra(EXTRA_LAUNCHED_FROM_INSTALL, false))
         return newIntent
     }
 
@@ -377,19 +402,16 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
                 return@runBlocking null
             if (!request.method.equals("GET", ignoreCase = true))
                 return@runBlocking null
-            val isOffline = intent.getBooleanExtra(EXTRA_IS_OFFLINE, false)
             val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
 
-            val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this@GameActivity)
-
-            if (!sharedPrefs.getBoolean(PREF_WEB_CACHE_ENABLE, false)
-                    && !Mitch.webGameCache.isGameWebCached(this@GameActivity, gameId)) {
+            if (!this@GameActivity.isCaching) {
+//                Utils.logDebug(LOGGING_TAG, "GET ${request.url}, not intercepting...")
                 return@runBlocking null
             }
-            Utils.logDebug(LOGGING_TAG, "GET ${request.url}, ${request.requestHeaders.entries.joinToString()}")
-            val game = Mitch.webGameCache.makeGameWebCached(this@GameActivity, gameId)
+//            Utils.logDebug(LOGGING_TAG, "GET ${request.url}, ${request.requestHeaders.entries.joinToString()}")
 
-            Mitch.webGameCache.request(applicationContext, game, request, isOffline)
+            Mitch.webGameCache.request(applicationContext, gameId, request,
+                this@GameActivity.isOfflineMode)
         }
     }
 

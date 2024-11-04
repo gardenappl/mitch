@@ -187,12 +187,14 @@
     <string name="bundle">Special bundles</string>
     <string name="dialog_web_cache_info_title">Installing web games</string>
     <string name="dialog_web_cache_info">Save this game to your device for offline play? Note that this will take up some storage space and might not work for some games.</string>
-    <string name="settings_web_cache_enable">Save web games</string>
-    <string name="settings_web_cache_enable_desc">Install all played web-games for later offline playing.</string>
-    <string name="settings_web_cache_update">Update saved web games</string>
-    <string name="settings_web_cache_update_never">Never</string>
-    <string name="settings_web_cache_update_unmetered">When launched on an unmetered connection</string>
-    <string name="settings_web_cache_update_always">When launched anytime</string>
+    <string name="settings_web_cache_enable">Install web-games locally for offline playing</string>
+    <string name="settings_web_cache_enable_always">Always</string>
+    <string name="settings_web_cache_enable_ask">Ask for each game</string>
+    <string name="settings_web_cache_enable_never">Never</string>
+    <string name="settings_web_cache_update">Use offline mode for installed web games</string>
+    <string name="settings_web_cache_update_never">Always</string>
+    <string name="settings_web_cache_update_unmetered">When launched on a metered connection</string>
+    <string name="settings_web_cache_update_always">Only when Internet access is unavailable</string>
     <string name="dialog_web_cache_delete_title">Delete this game?</string>
     <string name="dialog_web_cache_delete_fail_title">Can\'t delete now</string>
     <string name="dialog_web_cache_delete_fail">%1$s cannot be deleted because it is currently running.</string>
@@ -235,7 +237,8 @@
     <string name="settings_clear_all_message">This will delete all saved web games, all downloaded files (which have not been exported to the Downloads folder), and will log you out of your itch.io account, among other things.\nThis will not delete installed applications, however Mitch will no longer keep track of updates for them.\nAre you sure you want to clear all Mitch application data?</string>
     <string name="game_web_install_launcher_shortcut">Install on home screen</string>
     <string name="popup_web_install_launcher_shortcut_error">Your launcher does not support custom shortcuts.</string>
-    <string name="popup_web_game_deleted_cannot_launch">This game has been deleted.</string>
     <string name="popup_link_copied">Link copied to clipboard.</string>
     <string name="popup_no_file_manager">Failed to pick file. Do you have a file manager installed?</string>
+    <string name="popup_web_game_offline_mode">Launching in offline mode</string>
+    <string name="popup_web_game_exit">Exit game?</string>
 </resources>

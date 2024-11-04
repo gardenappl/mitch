@@ -20,7 +20,6 @@ import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import garden.appl.mitch.*
 import garden.appl.mitch.database.AppDatabase
@@ -147,7 +146,7 @@ class LibraryAdapter internal constructor(
             )
 //            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.putExtra(GameActivity.EXTRA_GAME_ID, gameInstall.game.gameId)
-            intent.putExtra(GameActivity.EXTRA_IS_OFFLINE, true)
+            intent.putExtra(GameActivity.EXTRA_LAUNCHED_FROM_INSTALL, true)
             context.startActivity(intent)
         } else if (gameInstall.packageName != null) {
             val launchIntent = context.packageManager.getLaunchIntentForPackage(gameInstall.packageName)

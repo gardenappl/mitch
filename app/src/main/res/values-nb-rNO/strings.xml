@@ -197,7 +197,6 @@
     <string name="settings_clear_all">Tøm all Mitch-data</string>
     <string name="settings_clear_all_title">Slett all data\?</string>
     <string name="popup_link_copied">Lenke kopiert til utklippstavle.</string>
-    <string name="popup_web_game_deleted_cannot_launch">Dette spillet har blitt slettet.</string>
     <string name="dialog_apply">Bruk</string>
     <string name="game_multiple_options_get">Hent →</string>
     <string name="genre_survival">Overlevelse</string>

@@ -174,7 +174,6 @@
     <string name="settings_clear_all">Ryd alle Mitch-data</string>
     <string name="game_web_install_launcher_shortcut">Installer på startskærm</string>
     <string name="popup_web_install_launcher_shortcut_error">Din launcher understøtter ikke brugerdefinerede genveje.</string>
-    <string name="popup_web_game_deleted_cannot_launch">Dette spil er blevet slettet.</string>
     <string name="popup_link_copied">Link kopieret til udklipsholder.</string>
     <string name="popup_no_file_manager">Kunne ikke vælge fil. Har du en filhåndtering installeret?</string>
     <string name="settings_block_trackers_desc">Forhindrer adgang til Google Analytics.\nBemærk, at nogle spiludviklere muligvis har brug for disse statistikker.</string>

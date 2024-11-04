@@ -29,10 +29,12 @@
                 android:key="preference_update_check_if_metered"
                 android:summary="@string/settings_update_check_metered_desc"
                 android:title="@string/settings_update_check_metered" />
-        <SwitchPreference
-                android:defaultValue="false"
+        <ListPreference
+                android:defaultValue="ask"
+                android:entries="@array/pref_web_cache_enable_entries"
+                android:entryValues="@array/pref_web_cache_enable_values"
                 android:key="mitch.web_cache_enable"
-                android:summary="@string/settings_web_cache_enable_desc"
+                android:summary="%s"
                 android:title="@string/settings_web_cache_enable" />
         <ListPreference
                 android:defaultValue="always"

@@ -190,12 +190,14 @@
     <string name="library_category_web_cached">Веб-игры</string>
     <string name="dialog_web_cache_info_title">Установка веб-игр</string>
     <string name="dialog_web_cache_info">Сохранить эту игру для запуска в режиме оффлайн? Это займёт место на устройстве и, возможно, не сработает с некоторыми играми.</string>
-    <string name="settings_web_cache_enable">Сохранять веб-игры</string>
-    <string name="settings_web_cache_enable_desc">Устанавливать все запущенные веб-игры для их дальнейшего запуска в режиме оффлайн.</string>
-    <string name="settings_web_cache_update">Обновлять сохранённые веб-игры</string>
-    <string name="settings_web_cache_update_never">Никогда</string>
-    <string name="settings_web_cache_update_unmetered">При запуске с безлимитным подключением</string>
-    <string name="settings_web_cache_update_always">При любом запуске</string>
+    <string name="settings_web_cache_enable">Устанавливать веб-игры для запуска в режиме оффлайн</string>
+    <string name="settings_web_cache_enable_always">Всегда</string>
+    <string name="settings_web_cache_enable_ask">Спрашивать для каждой игры</string>
+    <string name="settings_web_cache_enable_never">Никогда</string>
+    <string name="settings_web_cache_update">Запускать установленные веб-игры в режиме оффлайн</string>
+    <string name="settings_web_cache_update_never">Всегда</string>
+    <string name="settings_web_cache_update_unmetered">При запуске с лимитным подключением</string>
+    <string name="settings_web_cache_update_always">Только если отсутствует связь с Интернетом</string>
     <string name="dialog_web_cache_delete_title">Удалить игру?</string>
     <string name="dialog_web_cache_delete_fail_title">Нельзя сейчас удалить</string>
     <string name="dialog_web_cache_delete_fail">%1$s нельзя удалить так как эта игра сейчас запущена.</string>
@@ -239,7 +241,8 @@
     <string name="settings_clear_all_message">Это удалит все сохранённые веб-игры, все загруженные файлы (кроме экспортированых в папку Загрузки), и другое.\nЭто не удалит установленные приложения, но Mitch больше не будет проверять для них обновления.\nВы уверены, что хотите удалить все данные Mitch?</string>
     <string name="game_web_install_launcher_shortcut">Установить на домашний экран</string>
     <string name="popup_web_install_launcher_shortcut_error">Ваш лаунчер не поддерживает ярлыки.</string>
-    <string name="popup_web_game_deleted_cannot_launch">Эта игра была удалена.</string>
     <string name="popup_link_copied">Ссылка скопирована в буфер обмена.</string>
     <string name="popup_no_file_manager">Не удалось выбрать файл. У вас установлен менеджер файлов?</string>
+    <string name="popup_web_game_offline_mode">Запускаем в оффлайн-режиме</string>
+    <string name="popup_web_game_exit">Выйти из игры?</string>
 </resources>

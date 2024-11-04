@@ -191,12 +191,14 @@
     <string name="library_category_web_cached">Веб-ігри</string>
     <string name="dialog_web_cache_info_title">Встановлення веб-ігор</string>
     <string name="dialog_web_cache_info">Встановити цю гру для запуску в офлайн-режимі? Це займе трохи місця на пристрої, і можливо не буде працювати з деякими іграми.</string>
-    <string name="settings_web_cache_enable">Завантажувати веб-ігри</string>
-    <string name="settings_web_cache_enable_desc">Встановлювати всі запущені веб-ігри для їх подальшого запуску в офлайн-режимі.</string>
-    <string name="settings_web_cache_update">Оновлювати збережені веб-ігри</string>
-    <string name="settings_web_cache_update_never">Ніколи</string>
-    <string name="settings_web_cache_update_unmetered">При запуску з безлімітним підключенням</string>
-    <string name="settings_web_cache_update_always">При будь-якому запуску</string>
+    <string name="settings_web_cache_enable">Встановлювати веб-ігри для запуску в режимі офлайн</string>
+    <string name="settings_web_cache_enable_always">Завжди</string>
+    <string name="settings_web_cache_enable_ask">Запитувати для кожної гри</string>
+    <string name="settings_web_cache_enable_never">Ніколи</string>
+    <string name="settings_web_cache_update">Запуск веб-ігор в офлайн-режимі</string>
+    <string name="settings_web_cache_update_never">Завжди</string>
+    <string name="settings_web_cache_update_unmetered">При запуску з лімітним підключенням</string>
+    <string name="settings_web_cache_update_always">Тільки коли немає зв\'язку з Інтернетом</string>
     <string name="dialog_web_cache_delete_title">Видалити гру?</string>
     <string name="dialog_web_cache_delete_fail_title">Неможливо зараз видалити</string>
     <string name="dialog_web_cache_delete_fail">%1$s не можна видалити оскільки ця гра зараз запущена.</string>
@@ -242,8 +244,9 @@
 \nВи впевнені, що хочете видалити всі дані застосунку Mitch\?</string>
     <string name="game_web_install_launcher_shortcut">Встановити на домашній екран</string>
     <string name="popup_web_install_launcher_shortcut_error">Ваш лаунчер не підтримує ярликів.</string>
-    <string name="popup_web_game_deleted_cannot_launch">Ця гра була видалена.</string>
     <string name="popup_link_copied">Посилання скопійовано.</string>
     <string name="popup_no_file_manager">Не вдалося обрати файл. У вас встановлений менедженр файлів?</string>
     <string name="dialog_dont_ask_again">Не запитувати це знову</string>
+    <string name="popup_web_game_offline_mode">Запускаємо в офлайн-режимі</string>
+    <string name="popup_web_game_exit">Вийти з гри?</string>
 </resources>
