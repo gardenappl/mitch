@@ -9,6 +9,7 @@ import android.webkit.CookieManager
 import android.webkit.URLUtil
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.PendingIntentCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
@@ -39,8 +40,8 @@ object GameDownloader {
                 val intent = Intent(context, ErrorReportBroadcastReceiver::class.java).apply {
                     putExtra(ErrorReportBroadcastReceiver.EXTRA_ERROR_STRING, Utils.toString(e))
                 }
-                setContentIntent(PendingIntent.getBroadcast(context, 0,
-                    intent, PendingIntent.FLAG_ONE_SHOT))
+                setContentIntent(PendingIntentCompat.getBroadcast(context, 0,
+                    intent, PendingIntent.FLAG_ONE_SHOT, false))
                 setAutoCancel(true)
 
                 setSmallIcon(R.drawable.ic_mitch_notification)

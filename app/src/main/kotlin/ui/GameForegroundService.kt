@@ -8,6 +8,7 @@ import android.os.IBinder
 import android.os.Parcel
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.PendingIntentCompat
 import garden.appl.mitch.NOTIFICATION_CHANNEL_ID_WEB_RUNNING
 import garden.appl.mitch.R
 
@@ -47,7 +48,7 @@ class GameForegroundService : Service() {
 
         val pendingIntent =
             intent?.getParcelableExtra<Intent?>(EXTRA_ORIGINAL_INTENT)?.let { originalIntent ->
-                PendingIntent.getActivity(this, 0, originalIntent, 0)
+                PendingIntentCompat.getActivity(this, 0, originalIntent, 0, false)
             }
         gameId = intent?.getIntExtra(EXTRA_GAME_ID, -1) ?: -1
 

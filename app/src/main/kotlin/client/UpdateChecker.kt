@@ -8,6 +8,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.PendingIntentCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker.Result
 import androidx.work.WorkerParameters
@@ -160,8 +161,8 @@ class UpdateChecker(private val context: Context) {
                         val intent = Intent(context, UpdateNotificationBroadcastReceiver::class.java).apply {
                             putExtra(UpdateNotificationBroadcastReceiver.EXTRA_INSTALL_ID, result.installationId)
                         }
-                        pendingIntent = PendingIntent.getBroadcast(context, 0,
-                            intent, PendingIntent.FLAG_UPDATE_CURRENT)
+                        pendingIntent = PendingIntentCompat.getBroadcast(context, 0,
+                            intent, PendingIntent.FLAG_UPDATE_CURRENT, false)!!
                     } else if (game.downloadPageUrl == null) {
                         val activityIntent = Intent(
                             Intent.ACTION_VIEW,
@@ -173,7 +174,8 @@ class UpdateChecker(private val context: Context) {
                             context,
                             MainActivity::class.java
                         )
-                        pendingIntent = PendingIntent.getActivity(context, 0, activityIntent, 0)
+                        pendingIntent = PendingIntentCompat.getActivity(context, 0, activityIntent,
+                            0, false)!!
                     } else {
                         val activityIntent = Intent(
                             Intent.ACTION_VIEW,
@@ -181,14 +183,15 @@ class UpdateChecker(private val context: Context) {
                             context,
                             MainActivity::class.java
                         )
-                        pendingIntent = PendingIntent.getActivity(context, 0, activityIntent, 0)
+                        pendingIntent = PendingIntentCompat.getActivity(context, 0, activityIntent,
+                            0, false)!!
                     }
                 } else if (result.code == UpdateCheckResult.ERROR) {
                     val intent = Intent(context, ErrorReportBroadcastReceiver::class.java).apply {
                         putExtra(ErrorReportBroadcastReceiver.EXTRA_ERROR_STRING, result.errorReport)
                     }
-                    pendingIntent = PendingIntent.getBroadcast(context, result.installationId,
-                        intent, PendingIntent.FLAG_UPDATE_CURRENT)
+                    pendingIntent = PendingIntentCompat.getBroadcast(context, result.installationId,
+                        intent, PendingIntent.FLAG_UPDATE_CURRENT, false)!!
                 } else {
                     val activityIntent = Intent(
                         Intent.ACTION_VIEW,
@@ -196,7 +199,8 @@ class UpdateChecker(private val context: Context) {
                         context,
                         MainActivity::class.java
                     )
-                    pendingIntent = PendingIntent.getActivity(context, 0, activityIntent, 0)
+                    pendingIntent = PendingIntentCompat.getActivity(context, 0, activityIntent,
+                        0, false)!!
                 }
                 setContentIntent(pendingIntent)
             }

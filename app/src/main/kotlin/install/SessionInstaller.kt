@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.util.Log
+import androidx.core.app.PendingIntentCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import garden.appl.mitch.Mitch
@@ -65,9 +66,9 @@ class SessionInstaller : AbstractInstaller() {
 
         val callbackIntent = Intent(context, SessionInstallerService::class.java)
         callbackIntent.putExtra(SessionInstallerService.EXTRA_APP_NAME, appName)
-        val pendingIntent = PendingIntent.getService(
-            context, sessionId, callbackIntent, PendingIntent.FLAG_UPDATE_CURRENT
-        )
+        val pendingIntent = PendingIntentCompat.getService(
+            context, sessionId, callbackIntent, PendingIntent.FLAG_UPDATE_CURRENT, false
+        )!!
 
         Mitch.databaseHandler.onInstallStart(sessionId)
         Log.d(LOGGING_TAG, "Notified")

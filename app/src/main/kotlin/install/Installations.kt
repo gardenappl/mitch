@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.PendingIntentCompat
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -182,7 +183,7 @@ object Installations {
                     packageName?.let {
                         context.packageManager.getLaunchIntentForPackage(it)?.also { intent ->
                             val pendingIntent =
-                                PendingIntent.getActivity(context, 0, intent, 0)
+                                PendingIntentCompat.getActivity(context, 0, intent, 0, false)
                             setContentIntent(pendingIntent)
                             setAutoCancel(true)
                         }

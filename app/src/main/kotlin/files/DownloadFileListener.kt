@@ -8,6 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.PendingIntentCompat
 import androidx.room.withTransaction
 import garden.appl.mitch.*
 import garden.appl.mitch.database.AppDatabase
@@ -35,22 +36,24 @@ abstract class DownloadFileListener {
             val intent = Intent(context, ErrorReportBroadcastReceiver::class.java).apply {
                 putExtra(ErrorReportBroadcastReceiver.EXTRA_ERROR_STRING, errorReport)
             }
-            pendingIntent = PendingIntent.getBroadcast(context, 0,
-                intent, PendingIntent.FLAG_ONE_SHOT)
+            pendingIntent = PendingIntentCompat.getBroadcast(context, 0, intent,
+                PendingIntent.FLAG_ONE_SHOT, false)!!
 
         } else if (downloadType == DownloadType.SESSION_INSTALL) {
             val intent = Intent(context, InstallRequestBroadcastReceiver::class.java).apply {
                 putExtra(InstallRequestBroadcastReceiver.EXTRA_STREAM_SESSION_ID, downloadOrInstallId)
                 putExtra(InstallRequestBroadcastReceiver.EXTRA_APP_NAME, fileName)
             }
-            pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            pendingIntent = PendingIntentCompat.getBroadcast(context, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT, false)!!
 
         } else if (downloadType == DownloadType.FILE_APK) {
             val intent = Intent(context, InstallRequestBroadcastReceiver::class.java).apply {
                 data = Uri.fromFile(downloadFile)
                 putExtra(InstallRequestBroadcastReceiver.EXTRA_DOWNLOAD_ID, downloadOrInstallId)
             }
-            pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            pendingIntent = PendingIntentCompat.getBroadcast(context, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT, false)!!
 
         } else {
             val fileIntent = Utils.getIntentForFile(context, downloadFile!!, FILE_PROVIDER)
@@ -61,7 +64,8 @@ abstract class DownloadFileListener {
             } else {
                 Intent.createChooser(fileIntent, context.resources.getString(R.string.select_app_for_file))
             }
-            pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            pendingIntent = PendingIntentCompat.getActivity(context, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT, false)!!
         }
 
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED).apply {
@@ -113,7 +117,8 @@ abstract class DownloadFileListener {
                 putExtra(DownloadCancelBroadcastReceiver.EXTRA_DOWNLOAD_ID, downloadId)
                 putExtra(DownloadCancelBroadcastReceiver.EXTRA_UPLOAD_ID, uploadId)
             }
-            val cancelPendingIntent = PendingIntent.getBroadcast(context, 0, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val cancelPendingIntent = PendingIntentCompat.getBroadcast(context, 0, cancelIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT, false)
             addAction(R.drawable.ic_baseline_cancel_24, context.getString(R.string.dialog_cancel),
                     cancelPendingIntent)
         }
