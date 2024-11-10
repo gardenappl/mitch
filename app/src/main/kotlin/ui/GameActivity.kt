@@ -16,6 +16,8 @@ import android.webkit.*
 import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.core.content.pm.ShortcutInfoCompat
@@ -103,6 +105,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
     private lateinit var binding: ActivityGameBinding
     private lateinit var webView: WebView
     private lateinit var chromeClient: GameChromeClient
+    private var fileChooserCallback: ValueCallback<Array<Uri>>? = null
 
     private var isOfflineMode: Boolean = false
     private var isCaching: Boolean = false
@@ -126,7 +129,15 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         binding.root.keepScreenOn = true
         webView = binding.gameWebView
 
-        chromeClient = GameChromeClient()
+        val openDocumentLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            uri?.let { fileChooserCallback?.onReceiveValue(arrayOf(it)) }
+            fileChooserCallback = null
+        }
+        val openMultipleDocumentsLauncher = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+            fileChooserCallback?.onReceiveValue(uris.toTypedArray())
+            fileChooserCallback = null
+        }
+        chromeClient = GameChromeClient(openDocumentLauncher, openMultipleDocumentsLauncher)
 
         @SuppressLint("SetJavaScriptEnabled")
         webView.settings.javaScriptEnabled = true
@@ -143,6 +154,13 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         webView.settings.allowContentAccess = false
 
         webView.setBackgroundColor(Utils.getColor(this, R.color.colorAccent))
+
+        webView.setDownloadListener { url, _, contentDisposition, mimeType, contentLength ->
+            Log.d(LOGGING_TAG, "Requesting download: $url")
+            Log.d(LOGGING_TAG, "Requesting download: $contentDisposition")
+            Log.d(LOGGING_TAG, "Requesting download: $mimeType")
+            Log.d(LOGGING_TAG, "Requesting download: $contentLength")
+        }
 
         val gameId = intent?.getIntExtra(EXTRA_GAME_ID, -1) ?: -1
 
@@ -195,13 +213,11 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
             prefs.getString(PREF_WEB_CACHE_ENABLE, PreferenceWebCacheEnable.DEFAULT)
                 ?.toBooleanStrictOrNull()
         } catch (_: ClassCastException) {
-            Log.d(LOGGING_TAG, "web cache enabled? old settings")
             if (prefs.getBoolean("mitch.web_cache_dialog_hide", false))
                 false
             else
                 null
         }
-        Log.d(LOGGING_TAG, "web cache enabled?: $webCacheEnabled")
 
         if (installedOffline || intent.getBooleanExtra(EXTRA_LAUNCHED_FROM_INSTALL, false)) {
             afterDialogShown(installedOffline, true)
@@ -415,7 +431,10 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         }
     }
 
-    inner class GameChromeClient : WebChromeClient() {
+    inner class GameChromeClient(
+        openDocumentLauncher: ActivityResultLauncher<Array<String>>,
+        openMultipleDocumentsLauncher: ActivityResultLauncher<Array<String>>
+    ) : MitchWebChromeClient(openDocumentLauncher, openMultipleDocumentsLauncher) {
         private var customView: View? = null
 
         override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
@@ -426,6 +445,10 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         override fun onHideCustomView() {
             webView.visibility = View.VISIBLE
             customView?.let { binding.root.removeView(it) }
+        }
+
+        override fun setFileChooserCallback(callback: ValueCallback<Array<Uri>>) {
+            this@GameActivity.fileChooserCallback = callback
         }
     }
 }

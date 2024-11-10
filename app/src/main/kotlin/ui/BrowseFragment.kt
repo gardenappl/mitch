@@ -16,7 +16,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.*
 import android.widget.*
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocument
 import androidx.activity.result.contract.ActivityResultContracts.OpenMultipleDocuments
 import androidx.annotation.Keep
@@ -37,7 +36,6 @@ import garden.appl.mitch.client.SpecialBundleHandler
 import garden.appl.mitch.data.ItchGenre
 import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.databinding.BrowseFragmentBinding
-import garden.appl.mitch.databinding.DialogWebPromptBinding
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -60,7 +58,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     private var _binding: BrowseFragmentBinding? = null
     private val binding get() = _binding!!
     
-    private lateinit var chromeClient: MitchWebChromeClient
+    private lateinit var chromeClient: MitchBrowserWebChromeClient
     private lateinit var webView: MitchWebView
     private var webViewJSNonce: Long = 0
 
@@ -79,8 +77,14 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
      */
     private var genresExclusionFilter: Set<ItchGenre>? = null
 
-    private lateinit var openDocumentLauncher: ActivityResultLauncher<Array<String>>
-    private lateinit var openMultipleDocumentsLauncher: ActivityResultLauncher<Array<String>>
+    private val openDocumentLauncher = registerForActivityResult(OpenDocument()) { uri ->
+        uri?.let { filePathCallback?.onReceiveValue(arrayOf(it)) }
+        filePathCallback = null
+    }
+    private val openMultipleDocumentsLauncher = registerForActivityResult(OpenMultipleDocuments()) { uris ->
+        filePathCallback?.onReceiveValue(uris.toTypedArray())
+        filePathCallback = null
+    }
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
 
     override fun onAttach(context: Context) {
@@ -94,15 +98,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         genresExclusionFilter = savedInstanceState?.getStringArray(GENRES_EXCLUSION_FILTER)?.map {
             ItchGenre.valueOf(it)
         }?.toSet()
-
-        openDocumentLauncher = registerForActivityResult(OpenDocument()) { uri ->
-            uri?.let { filePathCallback?.onReceiveValue(arrayOf(it)) }
-            filePathCallback = null
-        }
-        openMultipleDocumentsLauncher = registerForActivityResult(OpenMultipleDocuments()) { uris ->
-            filePathCallback?.onReceiveValue(uris.toTypedArray())
-            filePathCallback = null
-        }
     }
 
     override fun onCreateView(
@@ -120,7 +115,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        chromeClient = MitchWebChromeClient()
+        chromeClient = MitchBrowserWebChromeClient()
 
         @SuppressLint("SetJavaScriptEnabled")
         webView.settings.javaScriptEnabled = true
@@ -1077,7 +1072,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
     }
 
-    inner class MitchWebChromeClient : WebChromeClient() {
+    inner class MitchBrowserWebChromeClient : MitchWebChromeClient(
+        openDocumentLauncher,
+        openMultipleDocumentsLauncher
+    ) {
         private var customView: View? = null
         private var originalUiVisibility: Int = View.SYSTEM_UI_FLAG_VISIBLE
         var customViewCallback: CustomViewCallback? = null
@@ -1155,102 +1153,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             }
         }
 
-        override fun onJsAlert(
-            view: WebView?,
-            url: String?,
-            message: String?,
-            result: JsResult?
-        ): Boolean {
-            val dialog = AlertDialog.Builder(requireContext()).apply {
-                setTitle(resources.getString(R.string.dialog_web_alert, url))
-                setMessage(message)
-                setPositiveButton(android.R.string.ok) { _, _ ->
-                    result!!.confirm()
-                }
-                setCancelable(false)
-
-                create()
-            }
-            dialog.show()
-            return true
-        }
-
-        override fun onJsConfirm(
-            view: WebView?,
-            url: String?,
-            message: String?,
-            result: JsResult?
-        ): Boolean {
-            val dialog = AlertDialog.Builder(requireContext()).apply {
-                setTitle(resources.getString(R.string.dialog_web_prompt, url))
-                setMessage(message)
-                setPositiveButton(android.R.string.ok) { _, _ ->
-                    result!!.confirm()
-                }
-                setNegativeButton(android.R.string.cancel) { _, _ ->
-                    result!!.cancel()
-                }
-                setOnCancelListener { 
-                    result!!.cancel()
-                }
-
-                create()
-            }
-            dialog.show()
-            return true
-        }
-
-        override fun onJsPrompt(
-            view: WebView?,
-            url: String?,
-            message: String?,
-            defaultValue: String?,
-            result: JsPromptResult?
-        ): Boolean {
-            val binding = DialogWebPromptBinding.inflate(layoutInflater)
-
-            val dialog = AlertDialog.Builder(requireContext()).apply {
-                setTitle(resources.getString(R.string.dialog_web_prompt, url))
-                binding.message.text = message
-                binding.input.setText(defaultValue)
-                setView(binding.root)
-
-                setPositiveButton(android.R.string.ok) { _, _ ->
-                    result!!.confirm(binding.message.text.toString())
-                }
-                setNegativeButton(android.R.string.cancel) { _, _ ->
-                    result!!.cancel()
-                }
-                setOnCancelListener {
-                    result!!.cancel()
-                }
-
-                create()
-            }
-            dialog.show()
-            return true
-        }
-
-        override fun onShowFileChooser(
-            webView: WebView,
-            filePathCallback: ValueCallback<Array<Uri>>,
-            fileChooserParams: FileChooserParams
-        ): Boolean {
-            val launcher = when (fileChooserParams.mode) {
-                FileChooserParams.MODE_OPEN -> openDocumentLauncher
-                FileChooserParams.MODE_OPEN_MULTIPLE -> openMultipleDocumentsLauncher
-                else -> return false
-            }
-            this@BrowseFragment.filePathCallback = filePathCallback
-
-            try {
-                launcher.launch(fileChooserParams.acceptTypes)
-            } catch (e: ActivityNotFoundException) {
-                Toast.makeText(context, getString(R.string.popup_no_file_manager), Toast.LENGTH_LONG)
-                    .show()
-                return false
-            }
-            return true
+        override fun setFileChooserCallback(callback: ValueCallback<Array<Uri>>) {
+            this@BrowseFragment.filePathCallback = callback
         }
     }
 }
