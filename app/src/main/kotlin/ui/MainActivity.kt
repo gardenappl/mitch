@@ -23,8 +23,7 @@ import garden.appl.mitch.databinding.ActivityMainBinding
 /**
  * The [MainActivity] handles a lot of things, including day/night themes and languages
  */
-class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
-    ActivityCompat.OnRequestPermissionsResultCallback {
+class MainActivity : MitchActivity(), CoroutineScope by MainScope() {
 
     private lateinit var browseFragment: BrowseFragment
     private lateinit var currentFragmentTag: String
@@ -249,12 +248,6 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
         browseFragment.loadUrl(url)
     }
 
-//    private fun launchWebGame(gameId: Int) = launch {
-//        val db = AppDatabase.getDatabase(this@MainActivity)
-//        val game = db.gameDao.getGameById(gameId)!!
-//        launchWebGame(db.gameDao.getGameById(gameId)!!)
-//    }
-
     private fun onFragmentSet(newFragmentTag: String, resetNavBar: Boolean) {
         if (resetNavBar)
             navBarSelectItem(getItemId(newFragmentTag))
@@ -318,19 +311,6 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
     }
 
 
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            PERMISSION_REQUEST_MOVE_TO_DOWNLOADS ->
-                if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
-                    Mitch.externalFileManager.resumeMoveToDownloads()
-            PERMISSION_REQUEST_DOWNLOADS_VIEW_INTENT ->
-                if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
-                    Mitch.externalFileManager.resumeGetViewIntent(this)
-        }
-    }
-
     override fun makeIntentForRestart(): Intent {
         val intent = Intent(
             Intent.ACTION_VIEW,
@@ -349,7 +329,7 @@ class MainActivity : MitchActivity(), CoroutineScope by MainScope(),
         override fun onStart() {
             super.onStart()
             val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra(MainActivity.EXTRA_SHOULD_OPEN_LIBRARY, true)
+            intent.putExtra(EXTRA_SHOULD_OPEN_LIBRARY, true)
             startActivity(intent)
             finish()
         }

@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit
 
 const val PERMISSION_REQUEST_DOWNLOADS_VIEW_INTENT = 1
 const val PERMISSION_REQUEST_MOVE_TO_DOWNLOADS = 2
+const val PERMISSION_REQUEST_NOTIFICATION = 3
 
 const val FILE_PROVIDER = "ua.gardenapple.itchupdater.fileprovider"
 
@@ -83,6 +84,7 @@ object PreferenceWebCacheUpdate {
 const val PREF_BROWSE_START_PAGE = "mitch.browse_start_page"
 const val PREF_START_PAGE_EXCLUDE = "mitch.start_page_exclude"
 const val PREF_START_PAGE_EXCLUDE_DISPLAY_STRING = "mitch.start_page_exclude.display_string"
+const val PREF_NO_NOTIFICATIONS = "mitch.no_notifications"
 
 const val PREF_DEBUG_WEB_GAMES_IN_BROWSE_TAB = "mitch.debug.web_games_in_browse"
 

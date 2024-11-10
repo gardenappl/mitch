@@ -1,5 +1,6 @@
 package garden.appl.mitch.client
 
+import android.Manifest
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -9,6 +10,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.PendingIntentCompat
+import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker.Result
 import androidx.work.WorkerParameters
@@ -133,83 +135,82 @@ class UpdateChecker(private val context: Context) {
 //            UpdateCheckResult.UNKNOWN -> context.resources.getString(R.string.notification_update_unknown)
             else -> context.resources.getString(R.string.notification_update_fail)
         }
-        val builder =
-            NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_UPDATES).apply {
-                setSmallIcon(R.drawable.ic_mitch_notification)
-                setContentText(message)
-                setAutoCancel(true)
+        val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_UPDATES).apply {
+            setSmallIcon(R.drawable.ic_mitch_notification)
+            setContentText(message)
+            setAutoCancel(true)
 
-                if (install.packageName != null) {
-                    try {
-                        val info = context.packageManager.getApplicationInfo(install.packageName, 0)
-                        val icon = context.packageManager.getApplicationIcon(info)
-                        setContentTitle(context.packageManager.getApplicationLabel(info))
-                        setLargeIcon(Utils.drawableToBitmap(icon))
-                    } catch (e: PackageManager.NameNotFoundException) {
-                        Log.w(LOGGING_TAG, "Error: application ${install.packageName} not found!", e)
-                        setContentTitle(install.uploadName)
-                    }
-                } else {
+            if (install.packageName != null) {
+                try {
+                    val info = context.packageManager.getApplicationInfo(install.packageName, 0)
+                    val icon = context.packageManager.getApplicationIcon(info)
+                    setContentTitle(context.packageManager.getApplicationLabel(info))
+                    setLargeIcon(Utils.drawableToBitmap(icon))
+                } catch (e: PackageManager.NameNotFoundException) {
+                    Log.w(LOGGING_TAG, "Error: application ${install.packageName} not found!", e)
                     setContentTitle(install.uploadName)
                 }
+            } else {
+                setContentTitle(install.uploadName)
+            }
 
-                priority = NotificationCompat.PRIORITY_LOW
+            priority = NotificationCompat.PRIORITY_LOW
 
-                val pendingIntent: PendingIntent
-                if (result.code == UpdateCheckResult.UPDATE_AVAILABLE) {
-                    if (result.uploadID != null) {
-                        val intent = Intent(context, UpdateNotificationBroadcastReceiver::class.java).apply {
-                            putExtra(UpdateNotificationBroadcastReceiver.EXTRA_INSTALL_ID, result.installationId)
-                        }
-                        pendingIntent = PendingIntentCompat.getBroadcast(context, 0,
-                            intent, PendingIntent.FLAG_UPDATE_CURRENT, false)!!
-                    } else if (game.downloadPageUrl == null) {
-                        val activityIntent = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse(game.storeUrl).run {
-                                val builder = this.buildUpon()
-                                builder.appendPath("purchase")
-                                builder.build()
-                            },
-                            context,
-                            MainActivity::class.java
-                        )
-                        pendingIntent = PendingIntentCompat.getActivity(context, 0, activityIntent,
-                            0, false)!!
-                    } else {
-                        val activityIntent = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse(game.downloadPageUrl),
-                            context,
-                            MainActivity::class.java
-                        )
-                        pendingIntent = PendingIntentCompat.getActivity(context, 0, activityIntent,
-                            0, false)!!
+            val pendingIntent: PendingIntent
+            if (result.code == UpdateCheckResult.UPDATE_AVAILABLE) {
+                if (result.uploadID != null) {
+                    val intent = Intent(context, UpdateNotificationBroadcastReceiver::class.java).apply {
+                        putExtra(UpdateNotificationBroadcastReceiver.EXTRA_INSTALL_ID, result.installationId)
                     }
-                } else if (result.code == UpdateCheckResult.ERROR) {
-                    val intent = Intent(context, ErrorReportBroadcastReceiver::class.java).apply {
-                        putExtra(ErrorReportBroadcastReceiver.EXTRA_ERROR_STRING, result.errorReport)
-                    }
-                    pendingIntent = PendingIntentCompat.getBroadcast(context, result.installationId,
+                    pendingIntent = PendingIntentCompat.getBroadcast(context, 0,
                         intent, PendingIntent.FLAG_UPDATE_CURRENT, false)!!
-                } else {
+                } else if (game.downloadPageUrl == null) {
                     val activityIntent = Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse(game.storeUrl),
+                        Uri.parse(game.storeUrl).run {
+                            val builder = this.buildUpon()
+                            builder.appendPath("purchase")
+                            builder.build() },
                         context,
                         MainActivity::class.java
                     )
                     pendingIntent = PendingIntentCompat.getActivity(context, 0, activityIntent,
-                        0, false)!!
+                            0, false)!!
+                } else {
+                    val activityIntent = Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(game.downloadPageUrl),
+                        context,
+                        MainActivity::class.java
+                    )
+                    pendingIntent = PendingIntentCompat.getActivity(context, 0, activityIntent,
+                            0, false)!!
                 }
-                setContentIntent(pendingIntent)
+            } else if (result.code == UpdateCheckResult.ERROR) {
+                val intent = Intent(context, ErrorReportBroadcastReceiver::class.java).apply {
+                    putExtra(ErrorReportBroadcastReceiver.EXTRA_ERROR_STRING, result.errorReport)
+                }
+                pendingIntent = PendingIntentCompat.getBroadcast(context, result.installationId,
+                        intent, PendingIntent.FLAG_UPDATE_CURRENT, false)!!
+            } else {
+                val activityIntent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(game.storeUrl),
+                    context,
+                    MainActivity::class.java
+                )
+                pendingIntent = PendingIntentCompat.getActivity(context, 0, activityIntent,
+                        0, false)!!
             }
-
-        with(NotificationManagerCompat.from(context)) {
-            notify(NOTIFICATION_TAG_UPDATE_CHECK, install.internalId, builder.build())
+            setContentIntent(pendingIntent)
+        }
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED) {
+            with(NotificationManagerCompat.from(context)) {
+                notify(NOTIFICATION_TAG_UPDATE_CHECK, install.internalId, builder.build())
+            }
         }
     }
-
 
     class Worker(appContext: Context, params: WorkerParameters)
         : CoroutineWorker(appContext, params) {

@@ -1,5 +1,6 @@
 package garden.appl.mitch.install
 
+import android.Manifest
 import android.app.Activity
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -10,12 +11,14 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.PendingIntentCompat
+import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import garden.appl.mitch.*
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.installation.Installation
+import garden.appl.mitch.ui.MitchActivity
 import java.io.File
 
 object Installations {
@@ -152,10 +155,8 @@ object Installations {
      * This method should *NOT* depend on the AppDatabase because this could be used for
      * the GitLab build update check, or other things
      */
-    private fun notifyInstallResult(
-        context: Context, installSessionId: Long,
-        packageName: String?, appName: String, status: Int
-    ) {
+    private fun notifyInstallResult(context: Context, installSessionId: Long, packageName: String?,
+                                    appName: String, status: Int) {
         val message = when (status) {
             PackageInstaller.STATUS_FAILURE_ABORTED -> context.resources.getString(R.string.notification_install_cancelled_title)
             PackageInstaller.STATUS_FAILURE_BLOCKED -> context.resources.getString(R.string.notification_install_blocked_title)
@@ -201,13 +202,15 @@ object Installations {
 //                priority = NotificationCompat.PRIORITY_HIGH
             }
 
-        with(NotificationManagerCompat.from(context)) {
-            if (Utils.fitsInInt(installSessionId))
-                notify(NOTIFICATION_TAG_INSTALL_RESULT, installSessionId.toInt(), builder.build())
-            else
-                notify(NOTIFICATION_TAG_INSTALL_RESULT_LONG, installSessionId.toInt(),
-                    builder.build())
-        }
+        val tag = if (Utils.fitsInInt(installSessionId))
+            NOTIFICATION_TAG_INSTALL_RESULT
+        else
+            NOTIFICATION_TAG_INSTALL_RESULT_LONG
+        MitchActivity.tryNotifyWithPermission(
+            null, context,
+            tag, installSessionId.toInt(), builder.build(),
+            R.string.dialog_notification_explain_download
+        )
     }
 
     suspend fun tryUpdatePendingInstallData(context: Context, installId: Long, apk: File) {

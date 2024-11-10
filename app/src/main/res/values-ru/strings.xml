@@ -245,4 +245,6 @@
     <string name="popup_no_file_manager">Не удалось выбрать файл. У вас установлен менеджер файлов?</string>
     <string name="popup_web_game_offline_mode">Запускаем в оффлайн-режиме</string>
     <string name="popup_web_game_exit">Выйти из игры?</string>
+    <string name="dialog_notification_explain_title">Уведомления</string>
+    <string name="dialog_notification_explain_download">Mitch пришлет уведолмение, когда загрузка заввершится, а также может уведомлять о будущих обновлениях.</string>
 </resources>

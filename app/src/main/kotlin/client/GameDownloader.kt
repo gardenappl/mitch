@@ -8,7 +8,6 @@ import android.util.Log
 import android.webkit.CookieManager
 import android.webkit.URLUtil
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.PendingIntentCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -18,6 +17,7 @@ import org.json.JSONObject
 import garden.appl.mitch.*
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.installation.Installation
+import garden.appl.mitch.ui.MitchActivity
 import java.io.IOException
 
 
@@ -36,7 +36,7 @@ object GameDownloader {
                     UpdateChecker(context).checkUpdates()
             }
         } catch (e: IOException) {
-            NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
+            NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).run {
                 val intent = Intent(context, ErrorReportBroadcastReceiver::class.java).apply {
                     putExtra(ErrorReportBroadcastReceiver.EXTRA_ERROR_STRING, Utils.toString(e))
                 }
@@ -49,10 +49,13 @@ object GameDownloader {
                 setContentText(context.resources.getString(R.string.notification_download_error, "failed to start"))
 
                 priority = NotificationCompat.PRIORITY_HIGH
-            }.let { builder ->
-                with(NotificationManagerCompat.from(context)) {
-                    notify(NOTIFICATION_TAG_UPDATE_CHECK, update.installationId, builder.build())
-                }
+                build()
+            }.let { notification ->
+                MitchActivity.tryNotifyWithPermission(
+                    null, context,
+                    NOTIFICATION_TAG_UPDATE_CHECK, update.installationId, notification,
+                    R.string.dialog_notification_explain_download
+                )
             }
         }
     }

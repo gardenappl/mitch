@@ -1,6 +1,7 @@
 package garden.appl.mitch.ui
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -89,7 +90,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        browseHandler = ItchBrowseHandler(context, this)
+        browseHandler = ItchBrowseHandler(context as MainActivity, this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

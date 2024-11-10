@@ -1,20 +1,39 @@
 package garden.appl.mitch.ui
 
+import android.Manifest
+import android.app.Dialog
+import android.app.Notification
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.net.ipsec.ike.ChildSessionConfiguration.Builder
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.NotificationManagerCompat.NotificationWithIdAndTag
+import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
+import garden.appl.mitch.Mitch
+import garden.appl.mitch.PERMISSION_REQUEST_DOWNLOADS_VIEW_INTENT
+import garden.appl.mitch.PERMISSION_REQUEST_MOVE_TO_DOWNLOADS
+import garden.appl.mitch.PERMISSION_REQUEST_NOTIFICATION
 import garden.appl.mitch.PREF_LANG_LOCALE
 import garden.appl.mitch.PREF_LANG_LOCALE_NEXT
+import garden.appl.mitch.PREF_NO_NOTIFICATIONS
 import garden.appl.mitch.R
 
-abstract class MitchActivity : AppCompatActivity() {
+abstract class MitchActivity : AppCompatActivity(),
+    ActivityCompat.OnRequestPermissionsResultCallback {
+
     private val langChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener langChange@{ prefs, key ->
             if (key != PREF_LANG_LOCALE_NEXT)
@@ -70,5 +89,83 @@ abstract class MitchActivity : AppCompatActivity() {
 
         super.attachBaseContext(MitchContextWrapper.wrap(newBase,
             prefs.getString(PREF_LANG_LOCALE, "")!!))
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            PERMISSION_REQUEST_MOVE_TO_DOWNLOADS ->
+                if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
+                    Mitch.externalFileManager.resumeMoveToDownloads()
+            PERMISSION_REQUEST_DOWNLOADS_VIEW_INTENT ->
+                if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
+                    Mitch.externalFileManager.resumeGetViewIntent(this)
+            PERMISSION_REQUEST_NOTIFICATION -> {
+                try {
+                    NotificationManagerCompat.from(this)
+                        .notify(MitchActivity.pendingNotifications.map { entry ->
+                            NotificationWithIdAndTag(entry.key.first, entry.key.second, entry.value)
+                        })
+                    MitchActivity.pendingNotifications.clear()
+                } catch (e: SecurityException) {
+                    throw e
+                }
+            }
+        }
+    }
+
+    fun requestNotificationPermission() {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)
+            && !prefs.getBoolean(PREF_NO_NOTIFICATIONS, false)
+            && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+
+            AlertDialog.Builder(this).run {
+                setTitle(R.string.dialog_notification_explain_title)
+                setMessage(R.string.dialog_notification_explain_download)
+                setPositiveButton(android.R.string.ok) { _, _ ->
+                    ActivityCompat.requestPermissions(
+                        this@MitchActivity,
+                        arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                        PERMISSION_REQUEST_NOTIFICATION
+                    )
+                }
+                setNegativeButton(android.R.string.cancel) { _, _ ->
+                    prefs.edit {
+                        putBoolean(PREF_NO_NOTIFICATIONS, true)
+                    }
+                }
+                show()
+            }
+        }
+    }
+
+    companion object {
+        private val pendingNotifications = HashMap<Pair<String, Int>, Notification>()
+
+        fun tryNotifyWithPermission(
+            mitchActivity: MitchActivity?, context: Context,
+            tag: String, id: Int, notification: Notification,
+            @StringRes explanationDialog: Int
+        ) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    with(NotificationManagerCompat.from(context)) {
+                        notify(tag, id, notification)
+                    }
+                } else if (mitchActivity != null) {
+                    mitchActivity.requestNotificationPermission()
+                    pendingNotifications[Pair(tag, id)] = notification
+                } else {
+                    Log.w(Mitch.LOGGING_TAG, "Did not deliver notification! ${context.getString(explanationDialog)}")
+                    pendingNotifications[Pair(tag, id)] = notification
+                }
+            } else {
+                with(NotificationManagerCompat.from(context)) {
+                    notify(tag, id, notification)
+                }
+            }
+        }
     }
 }

@@ -1,20 +1,25 @@
 package garden.appl.mitch.files
 
+import android.Manifest
 import android.app.Activity
+import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.PendingIntentCompat
+import androidx.core.content.ContextCompat
 import androidx.room.withTransaction
 import garden.appl.mitch.*
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.install.InstallRequestBroadcastReceiver
 import garden.appl.mitch.install.Installations
 import garden.appl.mitch.ui.MainActivity
+import garden.appl.mitch.ui.MitchActivity
 import java.io.File
 
 abstract class DownloadFileListener {
@@ -68,7 +73,7 @@ abstract class DownloadFileListener {
                 PendingIntent.FLAG_UPDATE_CURRENT, false)!!
         }
 
-        val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED).apply {
+        NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED).apply {
             setSmallIcon(R.drawable.ic_mitch_notification)
             if (errorName != null) {
                 setContentTitle(context.resources.getString(R.string.notification_download_error, fileName))
@@ -84,13 +89,8 @@ abstract class DownloadFileListener {
             priority = NotificationCompat.PRIORITY_HIGH
             setContentIntent(pendingIntent)
             setAutoCancel(true)
-        }
 
-        with(NotificationManagerCompat.from(context)) {
-            if (Utils.fitsInInt(downloadOrInstallId))
-                notify(NOTIFICATION_TAG_DOWNLOAD, downloadOrInstallId.toInt(), builder.build())
-            else
-                notify(NOTIFICATION_TAG_DOWNLOAD_LONG, downloadOrInstallId.toInt(), builder.build())
+            notify(context, downloadOrInstallId, this.build())
         }
     }
 
@@ -101,7 +101,7 @@ abstract class DownloadFileListener {
         uploadId: Int,
         progressPercent: Int?
     ) {
-        val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
+        NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
             setOngoing(true)
             setOnlyAlertOnce(true)
             priority = NotificationCompat.PRIORITY_LOW
@@ -121,13 +121,20 @@ abstract class DownloadFileListener {
                 PendingIntent.FLAG_UPDATE_CURRENT, false)
             addAction(R.drawable.ic_baseline_cancel_24, context.getString(R.string.dialog_cancel),
                     cancelPendingIntent)
+            notify(context, downloadId, this.build())
         }
-        with(NotificationManagerCompat.from(context)) {
-            if (Utils.fitsInInt(downloadId))
-                notify(NOTIFICATION_TAG_DOWNLOAD, downloadId.toInt(), builder.build())
-            else
-                notify(NOTIFICATION_TAG_DOWNLOAD_LONG, downloadId.toInt(), builder.build())
-        }
+    }
+
+    private fun notify(context: Context, downloadId: Long, notification: Notification) {
+        val tag = if (Utils.fitsInInt(downloadId))
+            NOTIFICATION_TAG_DOWNLOAD
+        else
+            NOTIFICATION_TAG_DOWNLOAD_LONG
+        MitchActivity.tryNotifyWithPermission(
+            null, context,
+            tag, downloadId.toInt(), notification,
+            R.string.dialog_notification_explain_download
+        )
     }
 
     protected suspend fun onCompleted(

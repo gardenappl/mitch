@@ -249,4 +249,6 @@
     <string name="dialog_dont_ask_again">Не запитувати це знову</string>
     <string name="popup_web_game_offline_mode">Запускаємо в офлайн-режимі</string>
     <string name="popup_web_game_exit">Вийти з гри?</string>
+    <string name="dialog_notification_explain_title">Сповіщення</string>
+    <string name="dialog_notification_explain_download">Mitch надійшле сповіщення, коли завантаження буде завершене, а також може сповіщати про подальші оновлення.</string>
 </resources>

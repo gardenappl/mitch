@@ -1,13 +1,11 @@
 package garden.appl.mitch.client
 
-import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.jsoup.nodes.Document
 import garden.appl.mitch.ItchWebsiteUtils
@@ -19,9 +17,10 @@ import garden.appl.mitch.data.containsGame
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.database.installation.Installation
+import garden.appl.mitch.ui.MitchActivity
 import kotlinx.coroutines.CoroutineScope
 
-class ItchBrowseHandler(private val context: Context, private val scope: CoroutineScope) {
+class ItchBrowseHandler(private val context: MitchActivity, private val scope: CoroutineScope) {
     companion object {
         private const val LOGGING_TAG = "ItchBrowseHandler"
 
@@ -214,6 +213,7 @@ class ItchBrowseHandler(private val context: Context, private val scope: Corouti
                 .show()
         }
 
+        (context as MitchActivity).requestNotificationPermission()
         GameDownloader.requestDownload(context, pendingInstall, downloadUrl,
             downloadPageUrl, contentDisposition, mimeType, contentLength)
     }
