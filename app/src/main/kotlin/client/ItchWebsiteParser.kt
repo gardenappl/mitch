@@ -212,11 +212,9 @@ object ItchWebsiteParser {
         val purchaseBanner = doc.selectFirst(".purchase_banner_inner") ?: return emptyList()
 
         Log.d(LOGGING_TAG, "Purchased game")
-        return purchaseBanner.getElementsByClass("key_row").sortedBy {
-            val price = it.selectFirst(".purchase_price") ?: return@sortedBy 0
-
-            Log.d(LOGGING_TAG, "Paid: ${price.html().removePrefix("$").replace(".", "")}")
-            return@sortedBy price.html().removePrefix("$").replace(".", "").toInt()
+        return purchaseBanner.getElementsByClass("key_row").sortedByDescending {
+            val price = it.selectFirst(".purchase_price") ?: return@sortedByDescending 0
+            return@sortedByDescending price.html().removePrefix("$").replace(".", "").toInt()
         }.map { downloadButtonRow ->
             //Reformat cloned element
 
