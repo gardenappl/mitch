@@ -240,4 +240,6 @@
 \n¿Estás seguro de que quieres borrar todos los datos de las aplicaciones de Mitch\?</string>
     <string name="dialog_dont_ask_again">No volver a preguntar</string>
     <string name="popup_no_file_manager">No se pudo seleccionar el archivo. ¿Tiene instalado un administrador de archivos?</string>
+    <string name="dialog_purchase_wrong_os">%s no es compatible con Android. No podrás instalarlo como aplicación. Es posible que puedas instalarlo en otros dispositivos.\n¿Continuar de todos modos?</string>
+    <string name="dialog_purchase_wrong_os_has_extras">%s no es compatible con Android. No podrás instalarlo como aplicación.\nEs posible que aún puedas instalarlo en otros dispositivos o ver contenido adicional, como arte o música.</string>
 </resources>
