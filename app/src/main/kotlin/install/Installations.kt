@@ -1,24 +1,29 @@
 package garden.appl.mitch.install
 
-import android.Manifest
 import android.app.Activity
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.pm.PackageInstaller
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.PendingIntentCompat
-import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import garden.appl.mitch.*
+import garden.appl.mitch.Mitch
+import garden.appl.mitch.MiuiUtils
+import garden.appl.mitch.NOTIFICATION_CHANNEL_ID_INSTALLING
+import garden.appl.mitch.NOTIFICATION_TAG_DOWNLOAD
+import garden.appl.mitch.NOTIFICATION_TAG_DOWNLOAD_LONG
+import garden.appl.mitch.NOTIFICATION_TAG_INSTALL_RESULT
+import garden.appl.mitch.NOTIFICATION_TAG_INSTALL_RESULT_LONG
+import garden.appl.mitch.PREF_INSTALLER
+import garden.appl.mitch.R
+import garden.appl.mitch.Utils
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.ui.MitchActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 object Installations {

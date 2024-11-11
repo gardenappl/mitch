@@ -12,8 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import kotlinx.coroutines.launch
-import org.acra.ACRA
 import garden.appl.mitch.NOTIFICATION_TAG_UPDATE_CHECK
 import garden.appl.mitch.R
 import garden.appl.mitch.Utils
@@ -21,6 +19,8 @@ import garden.appl.mitch.client.GameDownloader
 import garden.appl.mitch.client.UpdateCheckResult
 import garden.appl.mitch.database.updatecheck.InstallUpdateCheckResult
 import garden.appl.mitch.databinding.UpdatesItemBinding
+import kotlinx.coroutines.launch
+import org.acra.ACRA
 
 class UpdatesListAdapter internal constructor(
     private val activity: Activity,

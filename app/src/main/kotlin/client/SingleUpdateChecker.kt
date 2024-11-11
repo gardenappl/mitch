@@ -1,8 +1,6 @@
 package garden.appl.mitch.client
 
 import android.util.Log
-import kotlinx.coroutines.delay
-import org.jsoup.nodes.Document
 import garden.appl.mitch.BuildConfig
 import garden.appl.mitch.FLAVOR_ITCHIO
 import garden.appl.mitch.ItchWebsiteUtils
@@ -10,6 +8,8 @@ import garden.appl.mitch.Utils
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.database.installation.Installation
+import kotlinx.coroutines.delay
+import org.jsoup.nodes.Document
 import java.io.IOException
 import kotlin.random.Random
 

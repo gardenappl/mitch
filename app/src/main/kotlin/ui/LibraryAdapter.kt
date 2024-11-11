@@ -4,7 +4,11 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
 import android.app.NotificationManager
-import android.content.*
+import android.content.ActivityNotFoundException
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Binder
 import android.os.Build
@@ -12,16 +16,28 @@ import android.os.IBinder
 import android.os.Parcel
 import android.provider.Settings
 import android.util.Log
-import android.view.*
-import android.widget.*
+import android.view.LayoutInflater
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import kotlinx.coroutines.*
-import garden.appl.mitch.*
+import garden.appl.mitch.FILE_PROVIDER
+import garden.appl.mitch.Mitch
+import garden.appl.mitch.NOTIFICATION_TAG_DOWNLOAD
+import garden.appl.mitch.NOTIFICATION_TAG_DOWNLOAD_LONG
+import garden.appl.mitch.R
+import garden.appl.mitch.Utils
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.database.game.GameRepository
@@ -29,6 +45,11 @@ import garden.appl.mitch.database.installation.GameInstallation
 import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.install.AbstractInstaller
 import garden.appl.mitch.install.Installations
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 
 class LibraryAdapter internal constructor(

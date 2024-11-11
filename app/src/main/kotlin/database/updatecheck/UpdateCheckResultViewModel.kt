@@ -2,9 +2,9 @@ package garden.appl.mitch.database.updatecheck
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import garden.appl.mitch.database.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import garden.appl.mitch.database.AppDatabase
 
 class UpdateCheckResultViewModel(app: Application) : AndroidViewModel(app) {
     private val repository: UpdateCheckResultRepository = runBlocking(Dispatchers.IO) {

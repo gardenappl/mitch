@@ -1,14 +1,11 @@
 package garden.appl.mitch.ui
 
 import android.Manifest
-import android.app.Dialog
 import android.app.Notification
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.net.Uri
-import android.net.ipsec.ike.ChildSessionConfiguration.Builder
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -103,10 +100,10 @@ abstract class MitchActivity : AppCompatActivity(),
             PERMISSION_REQUEST_NOTIFICATION -> {
                 try {
                     NotificationManagerCompat.from(this)
-                        .notify(MitchActivity.pendingNotifications.map { entry ->
+                        .notify(pendingNotifications.map { entry ->
                             NotificationWithIdAndTag(entry.key.first, entry.key.second, entry.value)
                         })
-                    MitchActivity.pendingNotifications.clear()
+                    pendingNotifications.clear()
                 } catch (e: SecurityException) {
                     throw e
                 }

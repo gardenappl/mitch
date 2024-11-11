@@ -4,9 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import garden.appl.mitch.database.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import garden.appl.mitch.database.AppDatabase
 
 class UninstallBroadcastReceiver : BroadcastReceiver() {
     companion object {

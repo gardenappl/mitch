@@ -19,9 +19,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Html
 import android.text.Spanned
-import android.util.Base64
 import android.util.Log
-import android.webkit.WebView
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.core.content.FileProvider
@@ -31,8 +29,12 @@ import com.github.ajalt.colormath.fromCss
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
-import java.io.*
-import java.util.*
+import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
+import java.io.PrintWriter
+import java.io.StringWriter
+import java.util.Locale
 
 
 object Utils {

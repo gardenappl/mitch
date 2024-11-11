@@ -7,10 +7,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import garden.appl.mitch.BuildConfig
 import garden.appl.mitch.FLAVOR_FDROID
 import garden.appl.mitch.PREF_DB_RAN_CLEANUP_ONCE
@@ -21,6 +17,10 @@ import garden.appl.mitch.database.installation.InstallationDao
 import garden.appl.mitch.database.updatecheck.Converters
 import garden.appl.mitch.database.updatecheck.UpdateCheckResultDao
 import garden.appl.mitch.database.updatecheck.UpdateCheckResultModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 @Database(
     entities = [Game::class, Installation::class, UpdateCheckResultModel::class],

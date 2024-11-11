@@ -4,11 +4,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import garden.appl.mitch.Utils
 import garden.appl.mitch.install.InstallRequestBroadcastReceiver.Companion.EXTRA_DOWNLOAD_ID
 import garden.appl.mitch.install.InstallRequestBroadcastReceiver.Companion.EXTRA_STREAM_SESSION_ID
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import java.io.File
 
 /**

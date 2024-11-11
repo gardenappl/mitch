@@ -1,6 +1,11 @@
 package garden.appl.mitch.database.installation
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Ignore
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import garden.appl.mitch.client.ItchWebsiteParser
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.database.installation.Installation.Companion.STATUS_DOWNLOADING

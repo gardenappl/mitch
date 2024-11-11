@@ -15,11 +15,11 @@ import com.bumptech.glide.ListPreloader
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
 import com.bumptech.glide.util.FixedPreloadSizeProvider
-import garden.appl.mitch.database.game.*
+import garden.appl.mitch.database.game.GameRepository
 import garden.appl.mitch.database.game.GameViewModel
 import garden.appl.mitch.database.installation.GameInstallation
 import garden.appl.mitch.databinding.LibraryFragmentBinding
-import java.util.*
+import java.util.Collections
 
 class LibraryFragment : Fragment() {
     private var _binding: LibraryFragmentBinding? = null

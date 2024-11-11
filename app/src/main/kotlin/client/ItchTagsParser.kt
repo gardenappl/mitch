@@ -1,6 +1,5 @@
 package garden.appl.mitch.client
 
-import android.util.Log
 import android.webkit.CookieManager
 import garden.appl.mitch.Mitch
 import kotlinx.coroutines.Dispatchers

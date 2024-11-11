@@ -1,7 +1,6 @@
 package garden.appl.mitch.database.game
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import garden.appl.mitch.database.installation.GameInstallation
 
 class GameRepository(gameDao: GameDao, val type: Type) {

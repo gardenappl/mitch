@@ -15,7 +15,15 @@ import androidx.core.widget.addTextChangedListener
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.get
-import garden.appl.mitch.*
+import garden.appl.mitch.BuildConfig
+import garden.appl.mitch.Mitch
+import garden.appl.mitch.PREF_BROWSE_START_PAGE
+import garden.appl.mitch.PREF_DEBUG_WEB_GAMES_IN_BROWSE_TAB
+import garden.appl.mitch.PREF_START_PAGE_EXCLUDE
+import garden.appl.mitch.PREF_START_PAGE_EXCLUDE_DISPLAY_STRING
+import garden.appl.mitch.PREF_WEB_CACHE_ENABLE
+import garden.appl.mitch.PreferenceWebCacheEnable
+import garden.appl.mitch.R
 import garden.appl.mitch.client.ItchTag
 import garden.appl.mitch.client.ItchTagsParser
 import garden.appl.mitch.database.AppDatabase
@@ -23,7 +31,11 @@ import garden.appl.mitch.database.DatabaseCleanup
 import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.databinding.DialogTagSelectBinding
 import garden.appl.mitch.install.Installations
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class SettingsFragment : PreferenceFragmentCompat(), CoroutineScope by MainScope() {
     companion object {

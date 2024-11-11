@@ -9,7 +9,11 @@ import android.os.Environment
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import garden.appl.mitch.*
+import garden.appl.mitch.FILE_PROVIDER
+import garden.appl.mitch.Mitch
+import garden.appl.mitch.PERMISSION_REQUEST_DOWNLOADS_VIEW_INTENT
+import garden.appl.mitch.PERMISSION_REQUEST_MOVE_TO_DOWNLOADS
+import garden.appl.mitch.Utils
 import java.io.File
 
 class ExternalFileManager {

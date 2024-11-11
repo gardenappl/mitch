@@ -9,12 +9,11 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
-import androidx.work.*
-import okhttp3.Cache
-import okhttp3.OkHttpClient
-import org.acra.ACRA
-import org.acra.ReportField
-import org.acra.data.StringFormat
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import garden.appl.mitch.client.UpdateChecker
 import garden.appl.mitch.database.DatabaseCleanup
 import garden.appl.mitch.files.DownloadFileManager
@@ -23,7 +22,13 @@ import garden.appl.mitch.files.WebGameCache
 import garden.appl.mitch.install.InstallerDatabaseHandler
 import garden.appl.mitch.ui.CrashDialog
 import garden.appl.mitch.ui.MitchContextWrapper
-import org.acra.config.*
+import okhttp3.Cache
+import okhttp3.OkHttpClient
+import org.acra.ACRA
+import org.acra.ReportField
+import org.acra.config.dialog
+import org.acra.config.mailSender
+import org.acra.data.StringFormat
 import org.acra.ktx.initAcra
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -103,7 +108,7 @@ class Mitch : Application() {
 
         val httpClient: OkHttpClient by lazy {
             OkHttpClient.Builder().let {
-                val okHttpCacheDir = File(Mitch.cacheDir, "OkHttp")
+                val okHttpCacheDir = File(cacheDir, "OkHttp")
                 okHttpCacheDir.mkdirs()
                 it.cache(Cache(
                     directory = okHttpCacheDir,
@@ -131,7 +136,7 @@ class Mitch : Application() {
             when (key) {
                 "preference_update_check_if_metered" -> {
                     registerUpdateCheckTask(prefs.getBoolean(key, false),
-                        ExistingPeriodicWorkPolicy.REPLACE)
+                            ExistingPeriodicWorkPolicy.UPDATE)
                 }
                 "preference_theme",
                 "current_site_theme" -> setThemeFromPreferences(prefs)

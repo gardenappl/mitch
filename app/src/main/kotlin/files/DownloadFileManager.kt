@@ -2,12 +2,12 @@ package garden.appl.mitch.files
 
 import android.content.Context
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.install.AbstractInstaller
 import garden.appl.mitch.install.Installations
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class DownloadFileManager(context: Context) {

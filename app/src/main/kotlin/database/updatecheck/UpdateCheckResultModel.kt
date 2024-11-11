@@ -1,6 +1,11 @@
 package garden.appl.mitch.database.updatecheck
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 import garden.appl.mitch.client.ItchWebsiteParser
 import garden.appl.mitch.client.UpdateCheckResult
 import garden.appl.mitch.database.installation.Installation

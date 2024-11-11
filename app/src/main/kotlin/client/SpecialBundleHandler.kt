@@ -6,15 +6,15 @@ import android.util.Log
 import android.webkit.CookieManager
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
+import garden.appl.mitch.ItchWebsiteUtils
+import garden.appl.mitch.Mitch
+import garden.appl.mitch.data.SpecialBundle
+import garden.appl.mitch.database.game.Game
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
 import okhttp3.Request
 import org.jsoup.nodes.Document
-import garden.appl.mitch.ItchWebsiteUtils
-import garden.appl.mitch.Mitch
-import garden.appl.mitch.data.SpecialBundle
-import garden.appl.mitch.database.game.Game
 import java.net.URL
 import java.util.regex.Pattern
 

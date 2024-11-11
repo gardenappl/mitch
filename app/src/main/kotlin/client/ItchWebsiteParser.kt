@@ -6,6 +6,12 @@ import android.net.Uri
 import android.util.Log
 import android.webkit.CookieManager
 import androidx.core.graphics.ColorUtils
+import garden.appl.mitch.ItchWebsiteUtils
+import garden.appl.mitch.Mitch
+import garden.appl.mitch.R
+import garden.appl.mitch.Utils
+import garden.appl.mitch.database.game.Game
+import garden.appl.mitch.database.installation.Installation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
@@ -14,14 +20,8 @@ import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import garden.appl.mitch.ItchWebsiteUtils
-import garden.appl.mitch.Mitch
-import garden.appl.mitch.R
-import garden.appl.mitch.Utils
-import garden.appl.mitch.database.game.Game
-import garden.appl.mitch.database.installation.Installation
 import java.io.IOException
-import java.util.*
+import java.util.Collections
 
 object ItchWebsiteParser {
     class UploadNotFoundException(uploadId: Int) : RuntimeException(uploadId.toString())

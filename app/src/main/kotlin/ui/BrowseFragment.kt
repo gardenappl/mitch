@@ -1,8 +1,10 @@
 package garden.appl.mitch.ui
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.*
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
@@ -12,11 +14,27 @@ import android.text.Html
 import android.text.Spanned
 import android.text.SpannedString
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.webkit.*
-import android.widget.*
+import android.webkit.CookieManager
+import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.ListView
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocument
 import androidx.activity.result.contract.ActivityResultContracts.OpenMultipleDocuments
 import androidx.annotation.Keep
@@ -30,19 +48,29 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.textfield.TextInputEditText
 import com.leinardi.android.speeddial.SpeedDialActionItem
 import com.leinardi.android.speeddial.SpeedDialView
-import garden.appl.mitch.*
+import garden.appl.mitch.BuildConfig
+import garden.appl.mitch.ItchWebsiteUtils
+import garden.appl.mitch.PREF_DEBUG_WEB_GAMES_IN_BROWSE_TAB
+import garden.appl.mitch.PREF_WARN_WRONG_OS
+import garden.appl.mitch.PREF_WEB_ANDROID_FILTER
+import garden.appl.mitch.R
+import garden.appl.mitch.Utils
 import garden.appl.mitch.client.ItchBrowseHandler
 import garden.appl.mitch.client.ItchWebsiteParser
 import garden.appl.mitch.client.SpecialBundleHandler
 import garden.appl.mitch.data.ItchGenre
 import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.databinding.BrowseFragmentBinding
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.ByteArrayInputStream
 import java.security.SecureRandom
-import java.util.*
+import java.util.Locale
 
 
 class BrowseFragment : Fragment(), CoroutineScope by MainScope() {

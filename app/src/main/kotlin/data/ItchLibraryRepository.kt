@@ -3,9 +3,9 @@ package garden.appl.mitch.data
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import kotlinx.coroutines.flow.Flow
 import garden.appl.mitch.client.ItchLibraryItem
 import garden.appl.mitch.client.ItchLibraryParser
+import kotlinx.coroutines.flow.Flow
 
 class ItchLibraryRepository {
     private val itchLibraryPagingSource = ItchLibraryPagingSource()

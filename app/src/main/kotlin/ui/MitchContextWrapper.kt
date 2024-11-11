@@ -5,7 +5,7 @@ import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.os.Build
 import garden.appl.mitch.Utils
-import java.util.*
+import java.util.Locale
 
 
 /**

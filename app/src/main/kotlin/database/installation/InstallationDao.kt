@@ -1,7 +1,13 @@
 package garden.appl.mitch.database.installation
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
 import garden.appl.mitch.database.installation.Installation.Companion.DOWNLOAD_OR_INSTALL_ID
 import garden.appl.mitch.database.installation.Installation.Companion.GAME_ID
 import garden.appl.mitch.database.installation.Installation.Companion.INTERNAL_ID

@@ -2,10 +2,14 @@ package garden.appl.mitch.data
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.*
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.filter
+import androidx.paging.insertSeparators
+import androidx.paging.map
+import garden.appl.mitch.client.ItchLibraryItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import garden.appl.mitch.client.ItchLibraryItem
 
 class ItchLibraryViewModel(private val repository: ItchLibraryRepository) : ViewModel() {
     

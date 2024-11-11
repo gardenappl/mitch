@@ -6,9 +6,9 @@ import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.util.Log
 import androidx.core.app.PendingIntentCompat
+import garden.appl.mitch.Mitch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import garden.appl.mitch.Mitch
 import java.io.File
 import java.io.IOException
 import java.io.OutputStream
@@ -90,7 +90,7 @@ class SessionInstaller : AbstractInstaller() {
         }
     }
 
-    override suspend fun isInstalling(context: Context, installId: Long): Boolean? {
+    override suspend fun isInstalling(context: Context, installId: Long): Boolean {
         return context.packageManager.packageInstaller.getSessionInfo(installId.toInt())?.isActive ?: false
     }
 }

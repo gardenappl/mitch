@@ -9,15 +9,21 @@ import android.webkit.CookieManager
 import android.webkit.URLUtil
 import androidx.core.app.NotificationCompat
 import androidx.core.app.PendingIntentCompat
+import garden.appl.mitch.ErrorReportBroadcastReceiver
+import garden.appl.mitch.ItchWebsiteUtils
+import garden.appl.mitch.Mitch
+import garden.appl.mitch.NOTIFICATION_CHANNEL_ID_INSTALLING
+import garden.appl.mitch.NOTIFICATION_TAG_UPDATE_CHECK
+import garden.appl.mitch.R
+import garden.appl.mitch.Utils
+import garden.appl.mitch.database.AppDatabase
+import garden.appl.mitch.database.installation.Installation
+import garden.appl.mitch.ui.MitchActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
 import okhttp3.Request
 import org.json.JSONObject
-import garden.appl.mitch.*
-import garden.appl.mitch.database.AppDatabase
-import garden.appl.mitch.database.installation.Installation
-import garden.appl.mitch.ui.MitchActivity
 import java.io.IOException
 
 

@@ -6,13 +6,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import garden.appl.mitch.NOTIFICATION_TAG_DOWNLOAD
 import garden.appl.mitch.NOTIFICATION_TAG_DOWNLOAD_LONG
 import garden.appl.mitch.Utils
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.install.Installations
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 
 /**
  * This is an internal receiver which only receives broadcasts when clicking "Cancel"

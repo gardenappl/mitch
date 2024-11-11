@@ -3,10 +3,10 @@ package garden.appl.mitch.database.game
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.installation.GameInstallation
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 
 internal open class GameViewModel(app: Application, type: GameRepository.Type) : AndroidViewModel(app) {
     private val repository: GameRepository

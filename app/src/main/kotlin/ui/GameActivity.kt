@@ -12,7 +12,12 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.view.View
-import android.webkit.*
+import android.webkit.CookieManager
+import android.webkit.ValueCallback
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.Toast
@@ -25,12 +30,24 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.preference.PreferenceManager
 import com.bumptech.glide.Glide
-import garden.appl.mitch.*
+import garden.appl.mitch.ItchWebsiteUtils
+import garden.appl.mitch.Mitch
+import garden.appl.mitch.PREF_WEB_CACHE_ENABLE
+import garden.appl.mitch.PREF_WEB_CACHE_UPDATE
+import garden.appl.mitch.PreferenceWebCacheEnable
+import garden.appl.mitch.PreferenceWebCacheUpdate
+import garden.appl.mitch.R
+import garden.appl.mitch.Utils
 import garden.appl.mitch.client.ItchWebsiteParser
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.databinding.ActivityGameBinding
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.concurrent.ExecutionException
 
 /**

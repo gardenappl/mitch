@@ -1,9 +1,7 @@
 package garden.appl.mitch.ui
 
-import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.os.Binder
 import android.os.IBinder
 import android.os.Parcel
 import android.util.Log
@@ -41,7 +39,7 @@ class GameForegroundService : Service() {
         }
     }
 
-    override fun onBind(p0: Intent?): IBinder? = this.Binder()
+    override fun onBind(p0: Intent?): IBinder = this.Binder()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(LOGGING_TAG, "Foreground service started")

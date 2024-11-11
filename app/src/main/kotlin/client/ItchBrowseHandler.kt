@@ -5,9 +5,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.jsoup.nodes.Document
 import garden.appl.mitch.ItchWebsiteUtils
 import garden.appl.mitch.PREF_LANG_SITE_LOCALE
 import garden.appl.mitch.PREF_WARN_WRONG_OS
@@ -19,6 +16,9 @@ import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.ui.MitchActivity
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.jsoup.nodes.Document
 
 class ItchBrowseHandler(private val context: MitchActivity, private val scope: CoroutineScope) {
     companion object {
@@ -213,7 +213,7 @@ class ItchBrowseHandler(private val context: MitchActivity, private val scope: C
                 .show()
         }
 
-        (context as MitchActivity).requestNotificationPermission()
+        context.requestNotificationPermission()
         GameDownloader.requestDownload(context, pendingInstall, downloadUrl,
             downloadPageUrl, contentDisposition, mimeType, contentLength)
     }

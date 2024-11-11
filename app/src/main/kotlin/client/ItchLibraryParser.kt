@@ -1,13 +1,13 @@
 package garden.appl.mitch.client
 
 import android.webkit.CookieManager
+import garden.appl.mitch.Mitch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Request
 import org.json.JSONException
 import org.json.JSONObject
 import org.jsoup.Jsoup
-import garden.appl.mitch.Mitch
 import java.io.IOException
 
 object ItchLibraryParser {

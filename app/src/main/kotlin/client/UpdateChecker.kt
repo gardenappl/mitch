@@ -14,13 +14,22 @@ import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker.Result
 import androidx.work.WorkerParameters
-import kotlinx.coroutines.*
-import org.jsoup.nodes.Document
-import garden.appl.mitch.*
+import garden.appl.mitch.ErrorReportBroadcastReceiver
+import garden.appl.mitch.NOTIFICATION_CHANNEL_ID_UPDATES
+import garden.appl.mitch.NOTIFICATION_TAG_UPDATE_CHECK
+import garden.appl.mitch.R
+import garden.appl.mitch.Utils
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.ui.MainActivity
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import org.jsoup.nodes.Document
 import java.net.SocketTimeoutException
 
 class UpdateChecker(private val context: Context) {

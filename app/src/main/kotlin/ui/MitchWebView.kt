@@ -1,7 +1,6 @@
 package garden.appl.mitch.ui
 
 import android.content.Context
-import android.os.Parcelable
 import android.util.AttributeSet
 import android.webkit.WebView
 

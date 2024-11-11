@@ -13,15 +13,15 @@ import com.bumptech.glide.ListPreloader
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
 import com.bumptech.glide.util.FixedPreloadSizeProvider
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import garden.appl.mitch.client.UpdateChecker
 import garden.appl.mitch.database.updatecheck.InstallUpdateCheckResult
 import garden.appl.mitch.database.updatecheck.UpdateCheckResultViewModel
 import garden.appl.mitch.databinding.UpdatesFragmentBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import java.util.*
+import kotlinx.coroutines.launch
+import java.util.Collections
 
 
 class UpdatesFragment : Fragment(), CoroutineScope by MainScope() {

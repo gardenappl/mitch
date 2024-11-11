@@ -3,14 +3,13 @@ package garden.appl.mitch
 import android.content.Context
 import android.net.Uri
 import android.webkit.CookieManager
-import androidx.core.content.edit
 import androidx.preference.PreferenceManager
+import garden.appl.mitch.ui.MitchWebView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Request
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import garden.appl.mitch.ui.MitchWebView
 import java.io.IOException
 import java.net.URLEncoder
 

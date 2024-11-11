@@ -5,9 +5,9 @@ import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.os.IBinder
 import android.util.Log
+import garden.appl.mitch.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import garden.appl.mitch.Utils
 
 /**
  * This service gets started after an APK gets installed by an Installer.

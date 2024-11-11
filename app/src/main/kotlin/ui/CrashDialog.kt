@@ -3,8 +3,8 @@ package garden.appl.mitch.ui
 import android.app.Activity
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
-import org.acra.dialog.CrashReportDialogHelper
 import garden.appl.mitch.R
+import org.acra.dialog.CrashReportDialogHelper
 
 class CrashDialog : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {

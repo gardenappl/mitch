@@ -1,7 +1,6 @@
 package garden.appl.mitch.ui
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -11,14 +10,18 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.*
-import garden.appl.mitch.*
+import garden.appl.mitch.ItchWebsiteUtils
+import garden.appl.mitch.R
+import garden.appl.mitch.Utils
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.databinding.ActivityMainBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 /**
  * The [MainActivity] handles a lot of things, including day/night themes and languages
