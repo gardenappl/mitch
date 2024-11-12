@@ -250,4 +250,5 @@
     <string name="popup_web_game_exit">Вийти з гри?</string>
     <string name="dialog_notification_explain_title">Сповіщення</string>
     <string name="dialog_notification_explain_download">Mitch надійшле сповіщення, коли завантаження буде завершене, а також може сповіщати про подальші оновлення.</string>
+    <string name="dialog_save_file_title">Завантажити файл?</string>
 </resources>
