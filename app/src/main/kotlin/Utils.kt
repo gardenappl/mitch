@@ -24,6 +24,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.core.content.FileProvider
 import androidx.core.graphics.ColorUtils
+import androidx.work.Data
 import com.github.ajalt.colormath.ConvertibleColor
 import com.github.ajalt.colormath.fromCss
 import kotlinx.coroutines.Dispatchers
@@ -178,6 +179,10 @@ object Utils {
             bundle.getInt(key)
         else
             null
+    }
+
+    fun getInt(data: Data, key: String): Int? {
+        return data.keyValueMap[key] as? Int
     }
 
     fun getLong(bundle: Bundle, key: String): Long? {

@@ -212,6 +212,6 @@ object GameDownloader {
         }
 
         Log.d(LOGGING_TAG, "content length: $contentLength")
-        Mitch.fileManager.requestDownload(context, url, fileName, contentLength, pendingInstall)
+        Mitch.installDownloadManager.requestDownload(context, url, fileName, contentLength, pendingInstall)
     }
 }

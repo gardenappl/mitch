@@ -151,7 +151,7 @@ class LibraryAdapter internal constructor(
                 val installer = Installations.getInstaller(gameInstall.downloadOrInstallId)
                 when (installer.type) {
                     AbstractInstaller.Type.File -> {
-                        val file = Mitch.fileManager.getPendingFile(gameInstall.uploadId)!!
+                        val file = Mitch.installDownloadManager.getPendingFile(gameInstall.uploadId)!!
                         installer.requestInstall(context, gameInstall.downloadOrInstallId, file)
                     }
                     AbstractInstaller.Type.Stream ->
@@ -218,7 +218,7 @@ class LibraryAdapter internal constructor(
             }
 
         } else if (gameInstall.status == Installation.STATUS_INSTALLED) {
-            val downloadedFile = Mitch.fileManager.getDownloadedFile(gameInstall.uploadId)
+            val downloadedFile = Mitch.installDownloadManager.getDownloadedFile(gameInstall.uploadId)
             if (downloadedFile?.exists() == true) {
                 val intent = Utils.getIntentForFile(context, downloadedFile, FILE_PROVIDER)
                 context.startActivity(Intent.createChooser(intent, context.resources.getString(R.string.select_app_for_file)))
@@ -395,7 +395,7 @@ class LibraryAdapter internal constructor(
                 } else {
                     val dialog = AlertDialog.Builder(context).apply {
                         runBlocking(Dispatchers.IO) {
-                            if (Mitch.fileManager.getDownloadedFile(
+                            if (Mitch.installDownloadManager.getDownloadedFile(
                                     gameInstall.uploadId
                                 )?.exists() == true
                             ) {

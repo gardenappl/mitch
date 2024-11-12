@@ -78,7 +78,7 @@ class SettingsFragment : PreferenceFragmentCompat(), CoroutineScope by MainScope
                         }
                         db.installDao.delete(readyToInstall)
 
-                        Mitch.fileManager.deleteAllDownloads(context)
+                        Mitch.installDownloadManager.deleteAllDownloads(context)
 
                         DatabaseCleanup(requireContext()).cleanAppDatabase(db)
                     }

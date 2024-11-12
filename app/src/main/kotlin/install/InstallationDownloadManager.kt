@@ -1,16 +1,15 @@
-package garden.appl.mitch.files
+package garden.appl.mitch.install
 
 import android.content.Context
 import android.util.Log
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.installation.Installation
-import garden.appl.mitch.install.AbstractInstaller
-import garden.appl.mitch.install.Installations
+import garden.appl.mitch.files.Downloader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class DownloadFileManager(context: Context) {
+class InstallationDownloadManager(context: Context) {
     companion object {
 //        const val APK_MIME = "application/vnd.android.package-archive"
         const val LOGGING_TAG = "DownloadFileManager"
@@ -53,9 +52,25 @@ class DownloadFileManager(context: Context) {
 
             Log.d(LOGGING_TAG, "content length: $contentLength")
             if (installer.type == AbstractInstaller.Type.Stream)
-                Downloader.requestDownload(context, url, install, fileName, contentLength, null, installer)
+                Downloader.requestDownload(
+                    context,
+                    url,
+                    install,
+                    fileName,
+                    contentLength,
+                    null,
+                    installer
+                )
             else
-                Downloader.requestDownload(context, url, install, fileName, contentLength,  file, null)
+                Downloader.requestDownload(
+                    context,
+                    url,
+                    install,
+                    fileName,
+                    contentLength,
+                    file,
+                    null
+                )
         } else {
             Downloader.requestDownload(context, url, install, fileName, contentLength, file, null)
         }

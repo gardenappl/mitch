@@ -51,7 +51,7 @@ class ExternalFileManager {
     }
     
     private fun doMoveToDownloads(uploadId: Int, callback: (String?) -> Unit) {
-        val file = Mitch.fileManager.getDownloadedFile(uploadId)
+        val file = Mitch.installDownloadManager.getDownloadedFile(uploadId)
         if (file?.exists() != true) {
             callback(null)
             return

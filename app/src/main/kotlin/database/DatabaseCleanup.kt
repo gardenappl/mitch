@@ -46,7 +46,7 @@ class DatabaseCleanup(private val context: Context) {
                     }
                 }
                 Installation.STATUS_DOWNLOADING -> {
-                    if (!Mitch.fileManager.checkIsDownloading(context, install))
+                    if (!Mitch.installDownloadManager.checkIsDownloading(context, install))
                         installsToDelete.add(install)
                 }
             }

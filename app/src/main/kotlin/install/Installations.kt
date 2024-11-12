@@ -37,7 +37,7 @@ object Installations {
         db.installDao.deleteFinishedInstallation(uploadId)
 
         withContext(Dispatchers.IO) {
-            Mitch.fileManager.deleteDownloadedFile(uploadId)
+            Mitch.installDownloadManager.deleteDownloadedFile(uploadId)
         }
     }
 
@@ -98,10 +98,10 @@ object Installations {
 
         if (status == Installation.STATUS_DOWNLOADING) {
             Log.d(LOGGING_TAG, "Cancelling $downloadOrInstallId")
-            Mitch.fileManager.cancel(context, downloadOrInstallId, uploadId)
+            Mitch.installDownloadManager.cancel(context, downloadOrInstallId, uploadId)
         } else {
             withContext(Dispatchers.IO) {
-                Mitch.fileManager.deletePendingFile(uploadId)
+                Mitch.installDownloadManager.deletePendingFile(uploadId)
             }
         }
         db.installDao.delete(installId)
@@ -152,7 +152,7 @@ object Installations {
         }
 
         notifyInstallResult(context, installId, packageName, appName, status)
-        Mitch.fileManager.deletePendingFile(install.uploadId)
+        Mitch.installDownloadManager.deletePendingFile(install.uploadId)
         Mitch.databaseHandler.onInstallResult(install, packageName, status)
     }
 

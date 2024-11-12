@@ -8,7 +8,7 @@ import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.files.DownloadType
 
 
-class InstallerDatabaseHandler(val context: Context)  {
+class InstallationDatabaseManager(val context: Context)  {
     companion object {
         private const val LOGGING_TAG = "InstallDatabaseHandler"
     }
@@ -51,7 +51,7 @@ class InstallerDatabaseHandler(val context: Context)  {
     suspend fun onDownloadComplete(pendingInstall: Installation, downloadType: DownloadType) {
         val db = AppDatabase.getDatabase(context)
 
-        if (downloadType == DownloadType.FILE) {
+        if (downloadType == DownloadType.INSTALL_MISC) {
             pendingInstall.status = Installation.STATUS_INSTALLED
             pendingInstall.downloadOrInstallId = null
             db.installDao.update(pendingInstall)

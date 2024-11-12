@@ -25,7 +25,7 @@ abstract class AbstractInstaller {
     abstract suspend fun openWriteStream(context: Context, sessionId: Int, lengthBytes: Long): OutputStream
 
     /**
-     * Implementations should call [InstallerDatabaseHandler.onInstallStart] at the beginning,
+     * Implementations should call [InstallationDatabaseManager.onInstallStart] at the beginning,
      * and [Installations.onInstallResult] on completion.
      *
      * @throws NotImplementedError if [type] is [Type.File].

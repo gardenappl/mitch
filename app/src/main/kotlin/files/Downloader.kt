@@ -6,22 +6,35 @@ import android.util.Log
 import android.webkit.CookieManager
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
-import garden.appl.mitch.*
+import garden.appl.mitch.Mitch
+import garden.appl.mitch.NOTIFICATION_TAG_DOWNLOAD
+import garden.appl.mitch.NOTIFICATION_TAG_DOWNLOAD_LONG
+import garden.appl.mitch.R
+import garden.appl.mitch.Utils
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.install.AbstractInstaller
+import garden.appl.mitch.install.InstallationDownloadFileListener
 import garden.appl.mitch.install.Installations
 import garden.appl.mitch.install.SessionInstaller
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request
 import okhttp3.Response
-import java.io.*
+import java.io.BufferedInputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.OutputStream
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-object Downloader : DownloadFileListener() {
+object Downloader {
     private const val WORKER_URL = "url"
     private const val WORKER_DOWNLOAD_DIR = "path"
     private const val WORKER_FILE_NAME = "file_name"
@@ -31,6 +44,15 @@ object Downloader : DownloadFileListener() {
     private const val TAG_WORKER = "MITCH_DOWN"
 
     private const val LOGGING_TAG = "WorkerDownloader"
+    private val installationListener = InstallationDownloadFileListener()
+    private val normalListener = DownloadFileListener()
+
+    private fun getListener(type: DownloadType): DownloadFileListener {
+        return when (type) {
+            DownloadType.NORMAL_FILE -> normalListener
+            else -> installationListener
+        }
+    }
 
     @Synchronized
     private fun getUnusedDownloadId(context: Context): Long {
@@ -54,7 +76,7 @@ object Downloader : DownloadFileListener() {
     suspend fun requestDownload(
         context: Context,
         url: String,
-        install: Installation,
+        install: Installation?,
         fileName: String,
         contentLength: Long?,
         file: File?,
@@ -65,12 +87,14 @@ object Downloader : DownloadFileListener() {
         else
             getUnusedDownloadId(context)
 
-        Log.d(LOGGING_TAG, "Download or stream install ID: $id")
-        install.downloadOrInstallId = id
-        install.status = Installation.STATUS_DOWNLOADING
+        if (install != null) {
+            Log.d(LOGGING_TAG, "Download or stream install ID: $id")
+            install.downloadOrInstallId = id
+            install.status = Installation.STATUS_DOWNLOADING
 
-        val db = AppDatabase.getDatabase(context)
-        db.installDao.upsert(install)
+            val db = AppDatabase.getDatabase(context)
+            db.installDao.upsert(install)
+        }
 
         val downloadRequest =
             OneTimeWorkRequestBuilder<Worker>().run {
@@ -81,7 +105,7 @@ object Downloader : DownloadFileListener() {
                         Pair(WORKER_DOWNLOAD_DIR, file?.parent),
                         Pair(WORKER_FILE_NAME, fileName),
                         Pair(WORKER_DOWNLOAD_OR_INSTALL_ID, id),
-                        Pair(WORKER_UPLOAD_ID, install.uploadId)
+                        Pair(WORKER_UPLOAD_ID, install?.uploadId)
                     )
                 )
                 addTag(TAG_WORKER)
@@ -120,19 +144,23 @@ object Downloader : DownloadFileListener() {
             val fileName = inputData.getString(WORKER_FILE_NAME)!!
             val contentLength = inputData.getLong(WORKER_CONTENT_LENGTH, -1)
             val downloadOrInstallId = inputData.getLong(WORKER_DOWNLOAD_OR_INSTALL_ID, -1)
-            val uploadId = inputData.getInt(WORKER_UPLOAD_ID, -1)
+            val uploadId = Utils.getInt(inputData, WORKER_UPLOAD_ID)
 
             val downloadType = if (downloadDir == null)
-                DownloadType.SESSION_INSTALL
+                DownloadType.INSTALL_SESSION
+            else if (uploadId == null)
+                DownloadType.NORMAL_FILE
             else if (fileName.endsWith(".apk"))
-                DownloadType.FILE_APK
+                DownloadType.INSTALL_APK
             else
-                DownloadType.FILE
+                DownloadType.INSTALL_MISC
+            Log.d(LOGGING_TAG, "Download type: $downloadType")
+            val listener = getListener(downloadType)
 
             try {
                 Log.d(LOGGING_TAG, "content length: $contentLength")
                 if (downloadDir != null && contentLength > 0) {
-                    File(downloadDir + '/').mkdirs()
+                    File("${downloadDir}/").mkdirs()
 
                     if (StatFs(downloadDir).availableBytes <= contentLength)
                         throw SessionInstaller.NotEnoughSpaceException()
@@ -164,10 +192,7 @@ object Downloader : DownloadFileListener() {
                 }
 
                 response.use {
-                    Downloader.onProgress(
-                        applicationContext, fileName, downloadOrInstallId,
-                        uploadId, null
-                    )
+                    listener.onProgress(applicationContext, fileName, downloadOrInstallId, null)
 
                     val outputStream = if (downloadDir != null) {
                         val file = File(downloadDir, fileName)
@@ -183,7 +208,7 @@ object Downloader : DownloadFileListener() {
                         )
                     }
                     outputStream.use {
-                        download(response, it, fileName, downloadOrInstallId, uploadId)
+                        download(response, it, fileName, downloadOrInstallId, listener)
                     }
 
                     with(NotificationManagerCompat.from(applicationContext)) {
@@ -197,16 +222,11 @@ object Downloader : DownloadFileListener() {
                     //right after a progress notification, sometimes it doesn't show up
                     delay(500)
 
-                    Downloader.onCompleted(
-                        applicationContext,
-                        fileName,
-                        uploadId,
-                        downloadOrInstallId,
-                        downloadType
-                    )
+                    listener.onCompleted(applicationContext,
+                            fileName, uploadId, downloadOrInstallId, downloadType)
                 }
             } catch (e: CancellationException) {
-                Downloader.onCancel(applicationContext, downloadOrInstallId)
+                listener.onCancel(applicationContext, downloadOrInstallId)
                 Result.failure()
             } catch (e: Exception) {
                 Log.e(LOGGING_TAG, "Caught while downloading", e)
@@ -219,8 +239,8 @@ object Downloader : DownloadFileListener() {
                     is IOException -> R.string.notification_download_io_error
                     else -> R.string.notification_download_unknown_error
                 }
-                Downloader.onError(
-                    applicationContext, fileName, downloadOrInstallId, uploadId, downloadType,
+                listener.onError(
+                    applicationContext, fileName, uploadId, downloadOrInstallId, downloadType,
                     e.localizedMessage ?: applicationContext.getString(errorName), e
                 )
                 Result.failure()
@@ -231,7 +251,7 @@ object Downloader : DownloadFileListener() {
 
         private suspend fun download(
             response: Response, outputStream: OutputStream, fileName: String,
-            downloadId: Long, uploadId: Int
+            downloadId: Long, listener: DownloadFileListener
         ) = withContext(Dispatchers.IO) {
             val totalBytes = response.body.contentLength()
             var progressPercent: Long = 0
@@ -242,10 +262,8 @@ object Downloader : DownloadFileListener() {
                 Utils.cancellableCopy(inputStream, outputStream) { bytesRead ->
                     val currentProgress: Long = 100 * bytesRead / totalBytes
                     if (currentProgress != progressPercent) {
-                        Downloader.onProgress(
-                            applicationContext, fileName, downloadId,
-                            uploadId, currentProgress.toInt()
-                        )
+                        listener.onProgress(applicationContext,
+                                fileName, downloadId, currentProgress.toInt())
                         progressPercent = currentProgress
                     }
                 }

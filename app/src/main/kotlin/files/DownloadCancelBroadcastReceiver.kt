@@ -23,14 +23,11 @@ class DownloadCancelBroadcastReceiver : BroadcastReceiver() {
         private const val LOGGING_TAG = "DownloadCancelReceiver"
 
         const val EXTRA_DOWNLOAD_ID = "DOWNLOAD_ID"
-        const val EXTRA_UPLOAD_ID = "UPLOAD_ID"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         val downloadId = Utils.getLong(intent.extras!!, EXTRA_DOWNLOAD_ID)!!
         Log.d(LOGGING_TAG, "downloadId: $downloadId")
-        val uploadId = Utils.getInt(intent.extras!!, EXTRA_UPLOAD_ID)!!
-        Log.d(LOGGING_TAG, "uploadId: $uploadId")
 
         val notificationManager =
             context.getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager

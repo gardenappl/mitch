@@ -16,10 +16,10 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import garden.appl.mitch.client.UpdateChecker
 import garden.appl.mitch.database.DatabaseCleanup
-import garden.appl.mitch.files.DownloadFileManager
 import garden.appl.mitch.files.ExternalFileManager
 import garden.appl.mitch.files.WebGameCache
-import garden.appl.mitch.install.InstallerDatabaseHandler
+import garden.appl.mitch.install.InstallationDatabaseManager
+import garden.appl.mitch.install.InstallationDownloadManager
 import garden.appl.mitch.ui.CrashDialog
 import garden.appl.mitch.ui.MitchContextWrapper
 import okhttp3.Cache
@@ -117,14 +117,14 @@ class Mitch : Application() {
                 it.build()
             }
         }
-        val fileManager: DownloadFileManager by lazy {
-            DownloadFileManager(mitchContext).apply {
+        val installDownloadManager: InstallationDownloadManager by lazy {
+            InstallationDownloadManager(mitchContext).apply {
                 setup()
             }
         }
         val externalFileManager = ExternalFileManager()
-        val databaseHandler: InstallerDatabaseHandler by lazy {
-            InstallerDatabaseHandler(mitchContext)
+        val databaseHandler: InstallationDatabaseManager by lazy {
+            InstallationDatabaseManager(mitchContext)
         }
         val webGameCache: WebGameCache by lazy {
             WebGameCache(mitchContext)
