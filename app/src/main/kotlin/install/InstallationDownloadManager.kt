@@ -85,10 +85,6 @@ class InstallationDownloadManager(context: Context) {
             Downloader.checkIsDownloading(context, downloadId)
         } ?: false
     }
-
-    fun deleteAllDownloads(context: Context) {
-        Downloader.cancelAll(context)
-    }
     
     fun deletePendingFile(uploadId: Int) {
         val dir = File(pendingPath, uploadId.toString())
