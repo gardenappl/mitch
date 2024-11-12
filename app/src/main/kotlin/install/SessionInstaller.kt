@@ -67,7 +67,7 @@ class SessionInstaller : AbstractInstaller() {
         val callbackIntent = Intent(context, SessionInstallerService::class.java)
         callbackIntent.putExtra(SessionInstallerService.EXTRA_APP_NAME, appName)
         val pendingIntent = PendingIntentCompat.getService(
-            context, sessionId, callbackIntent, PendingIntent.FLAG_UPDATE_CURRENT, false
+            context, sessionId, callbackIntent, PendingIntent.FLAG_UPDATE_CURRENT, true
         )!!
 
         Mitch.databaseHandler.onInstallStart(sessionId)
