@@ -202,12 +202,12 @@
     <string name="library_category_web_cached">Juegos web</string>
     <string name="dialog_web_cache_info_title">Instalación de juegos web</string>
     <string name="dialog_web_cache_info">¿Quieres guardar este juego en tu dispositivo para jugar sin conexión? Ten en cuenta que esto ocupará algo de espacio de almacenamiento y es posible que no funcione con algunos juegos.</string>
-    <string name="settings_web_cache_enable">Guardar juegos web</string>
+    <string name="settings_web_cache_enable">Instalar juegos web localmente para jugar sin conexión</string>
     <string name="settings_web_cache_enable_desc">Instala todos los juegos web que hayas jugado para poder jugar más tarde sin conexión.</string>
-    <string name="settings_web_cache_update">Actualizar los juegos web guardados</string>
-    <string name="settings_web_cache_update_never">Nunca</string>
-    <string name="settings_web_cache_update_unmetered">Cuando se lanza en una conexión sin medidor</string>
-    <string name="settings_web_cache_update_always">Cuando se lanza en cualquier momento</string>
+    <string name="settings_web_cache_update">Utilice el modo sin conexión para los juegos web instalados</string>
+    <string name="settings_web_cache_update_never">Siempre</string>
+    <string name="settings_web_cache_update_unmetered">Cuando se ejecuta en una conexión medida</string>
+    <string name="settings_web_cache_update_always">Solo cuando no hay acceso a Internet</string>
     <string name="dialog_web_cache_delete_title">¿Eliminar este juego\?</string>
     <string name="dialog_web_cache_delete_fail_title">No se puede borrar ahora</string>
     <string name="dialog_web_cache_delete_fail">%1$s no puede ser eliminado porque se está ejecutando actualmente.</string>
@@ -242,4 +242,11 @@
     <string name="popup_no_file_manager">No se pudo seleccionar el archivo. ¿Tiene instalado un administrador de archivos?</string>
     <string name="dialog_purchase_wrong_os">%s no es compatible con Android. No podrás instalarlo como aplicación. Es posible que puedas instalarlo en otros dispositivos.\n¿Continuar de todos modos?</string>
     <string name="dialog_purchase_wrong_os_has_extras">%s no es compatible con Android. No podrás instalarlo como aplicación.\nEs posible que aún puedas instalarlo en otros dispositivos o ver contenido adicional, como arte o música.</string>
+    <string name="settings_web_cache_enable_ask">Pregunta por cada juego</string>
+    <string name="settings_web_cache_enable_never">Nunca</string>
+    <string name="popup_web_game_offline_mode">Iniciar sin conexión</string>
+    <string name="dialog_notification_explain_title">Notificaciones</string>
+    <string name="settings_web_cache_enable_always">Siempre</string>
+    <string name="popup_web_game_exit">¿Salir del juego?</string>
+    <string name="dialog_notification_explain_download">Mitch enviará una notificación una vez que se complete la descarga y también puede notificarle sobre futuras actualizaciones.</string>
 </resources>
