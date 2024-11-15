@@ -20,6 +20,10 @@ import garden.appl.mitch.files.DownloadType
 import garden.appl.mitch.ui.MainActivity
 import java.io.File
 
+/**
+ * Could be split into three DownloadFileListeners for the three different download types
+ * that are handled, this is legacy code.
+ */
 class InstallationDownloadFileListener : DownloadFileListener() {
     companion object {
         const val LOGGING_TAG = "InstallDownListener"
@@ -136,9 +140,5 @@ class InstallationDownloadFileListener : DownloadFileListener() {
             Mitch.installDownloadManager.deletePendingFile(uploadId!!)
             Mitch.databaseHandler.onDownloadFailed(downloadOrInstallId)
         }
-    }
-
-    override fun onProgress(context: Context, fileName: String, downloadId: Long, progressPercent: Int?) {
-        createProgressNotification(context, fileName, downloadId, progressPercent)
     }
 }

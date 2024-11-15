@@ -8,6 +8,7 @@ import garden.appl.mitch.files.Downloader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.net.URL
 
 class InstallationDownloadManager(context: Context) {
     companion object {
@@ -46,33 +47,24 @@ class InstallationDownloadManager(context: Context) {
             deletePendingFile(uploadId)
         }
 
-        val file = File(File(pendingPath, uploadId.toString()), fileName)
-        if (fileName.endsWith(".apk")) {
-            val installer = Installations.getInstaller(context)
-
+        val downloadDir = File(pendingPath, uploadId.toString())
+        val installer = Installations.getInstaller(context)
+        if (fileName.endsWith(".apk") && installer.type == AbstractInstaller.Type.Stream) {
             Log.d(LOGGING_TAG, "content length: $contentLength")
-            if (installer.type == AbstractInstaller.Type.Stream)
-                Downloader.requestDownload(
-                    context,
-                    url,
-                    install,
-                    fileName,
-                    contentLength,
-                    null,
-                    installer
-                )
-            else
-                Downloader.requestDownload(
-                    context,
-                    url,
-                    install,
-                    fileName,
-                    contentLength,
-                    file,
-                    null
-                )
+            URL("data:").openConnection()
+            Downloader.requestDownload(context, url, install, fileName, contentLength,
+                downloadDir = null,
+                tempDownloadDir = false,
+                installer
+            )
         } else {
-            Downloader.requestDownload(context, url, install, fileName, contentLength, file, null)
+            Downloader.requestDownload(context, url, install,
+                fileName,
+                contentLength,
+                downloadDir,
+                tempDownloadDir = false,
+                installer = null
+            )
         }
     }
 

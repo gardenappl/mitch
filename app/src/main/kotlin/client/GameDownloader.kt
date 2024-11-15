@@ -205,12 +205,7 @@ object GameDownloader {
             db.gameDao.upsert(game)
         }
 
-        val fileName = if (mimeType == "application/octet-stream") {
-            URLUtil.guessFileName(url, contentDisposition, null)
-        } else {
-            URLUtil.guessFileName(url, contentDisposition, mimeType)
-        }
-
+        val fileName = Utils.guessFileName(url, contentDisposition, mimeType)
         Log.d(LOGGING_TAG, "content length: $contentLength")
         Mitch.installDownloadManager.requestDownload(context, url, fileName, contentLength, pendingInstall)
     }

@@ -54,6 +54,9 @@ object Downloader {
         }
     }
 
+    fun getNormalDownloadPath(context: Context, downloadId: Long) =
+        File(File(context.filesDir, "misc_download"), downloadId.toString())
+
     @Synchronized
     private fun getUnusedDownloadId(context: Context): Long {
         for (i in Int.MAX_VALUE.toLong() + 1..Int.MAX_VALUE.toLong() * 2) {
@@ -71,7 +74,7 @@ object Downloader {
     /**
      * @param contentLength file size, null if unknown
      * @param installer null if we are downloading into a file
-     * @param file null if [installer] has type [AbstractInstaller.Type.Stream]
+     * @param downloadDir null if [installer] has type [AbstractInstaller.Type.Stream] or if [tempDownloadDir]
      */
     suspend fun requestDownload(
         context: Context,
@@ -79,13 +82,18 @@ object Downloader {
         install: Installation?,
         fileName: String,
         contentLength: Long?,
-        file: File?,
+        downloadDir: File?,
+        tempDownloadDir: Boolean,
         installer: AbstractInstaller?
     ) {
         val id = if (installer != null)
             installer.createSessionForStreamInstall(context).toLong()
         else
             getUnusedDownloadId(context)
+        val downloadDir = if (tempDownloadDir)
+            getNormalDownloadPath(context, id)
+        else
+            downloadDir
 
         if (install != null) {
             Log.d(LOGGING_TAG, "Download or stream install ID: $id")
@@ -102,7 +110,7 @@ object Downloader {
                     workDataOf(
                         Pair(WORKER_URL, url),
                         Pair(WORKER_CONTENT_LENGTH, contentLength),
-                        Pair(WORKER_DOWNLOAD_DIR, file?.parent),
+                        Pair(WORKER_DOWNLOAD_DIR, downloadDir?.path),
                         Pair(WORKER_FILE_NAME, fileName),
                         Pair(WORKER_DOWNLOAD_OR_INSTALL_ID, id),
                         Pair(WORKER_UPLOAD_ID, install?.uploadId)
@@ -159,11 +167,33 @@ object Downloader {
 
             try {
                 Log.d(LOGGING_TAG, "content length: $contentLength")
-                if (downloadDir != null && contentLength > 0) {
+                if (downloadDir != null) {
                     File("${downloadDir}/").mkdirs()
 
                     if (StatFs(downloadDir).availableBytes <= contentLength)
                         throw SessionInstaller.NotEnoughSpaceException()
+                }
+
+                val outputStream = if (downloadDir != null) {
+                    val file = File(downloadDir, fileName)
+
+                    FileOutputStream(file, false)
+                } else {
+                    val installer = Installations.getInstaller(downloadOrInstallId)
+
+                    installer.openWriteStream(
+                        applicationContext,
+                        downloadOrInstallId.toInt(),
+                        contentLength
+                    )
+                }
+
+                if (DataURL.isValid(url)) {
+                    listener.onProgress(applicationContext, fileName, downloadOrInstallId, null)
+                    Utils.cancellableCopy(DataURL(url).toInputStream(), outputStream)
+                    listener.onCompleted(applicationContext, fileName, uploadId, downloadOrInstallId, downloadType)
+
+                    return@withContext Result.success()
                 }
 
                 val request = Request.Builder().run {
@@ -194,19 +224,6 @@ object Downloader {
                 response.use {
                     listener.onProgress(applicationContext, fileName, downloadOrInstallId, null)
 
-                    val outputStream = if (downloadDir != null) {
-                        val file = File(downloadDir, fileName)
-
-                        FileOutputStream(file, false)
-                    } else {
-                        val installer = Installations.getInstaller(downloadOrInstallId)
-
-                        installer.openWriteStream(
-                            applicationContext,
-                            downloadOrInstallId.toInt(),
-                            contentLength
-                        )
-                    }
                     outputStream.use {
                         download(response, it, fileName, downloadOrInstallId, listener)
                     }

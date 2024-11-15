@@ -42,6 +42,7 @@ import garden.appl.mitch.client.ItchWebsiteParser
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.databinding.ActivityGameBinding
+import garden.appl.mitch.files.Downloader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -177,6 +178,18 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
             Log.d(LOGGING_TAG, "Requesting download: $contentDisposition")
             Log.d(LOGGING_TAG, "Requesting download: $mimeType")
             Log.d(LOGGING_TAG, "Requesting download: $contentLength")
+            val fileName = Utils.guessFileName(url, contentDisposition, mimeType)
+            Log.d(LOGGING_TAG, "Guessed file name: $fileName")
+            this.launch {
+                Downloader.requestDownload(this@GameActivity, url,
+                    install = null,
+                    fileName = fileName,
+                    contentLength = contentLength,
+                    downloadDir = null,
+                    tempDownloadDir = true,
+                    installer = null
+                )
+            }
         }
 
         val gameId = intent?.getIntExtra(EXTRA_GAME_ID, -1) ?: -1

@@ -132,4 +132,6 @@ dependencies {
     // AboutLibraries
     implementation("com.mikepenz:aboutlibraries-core:11.2.3")
     implementation("com.mikepenz:aboutlibraries:11.2.3")
+    // Jodd Util (for mimetypes)
+    implementation("org.jodd:jodd-util:6.3.0")
 }

@@ -2,6 +2,7 @@ package garden.appl.mitch.ui
 
 import android.content.ActivityNotFoundException
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.webkit.JsPromptResult
 import android.webkit.JsResult
@@ -18,6 +19,10 @@ abstract class MitchWebChromeClient(
     private val openDocumentLauncher: ActivityResultLauncher<Array<String>>,
     private val openMultipleDocumentsLauncher: ActivityResultLauncher<Array<String>>
 ) : WebChromeClient() {
+    companion object {
+        const val LOGGING_TAG = "MitchChrome"
+    }
+
     override fun onJsAlert(
         view: WebView,
         url: String,
@@ -109,8 +114,15 @@ abstract class MitchWebChromeClient(
         }
         setFileChooserCallback(filePathCallback)
 
+        Log.d(LOGGING_TAG, "File chooser accept types: ${fileChooserParams.acceptTypes.joinToString(prefix = "[", postfix = "]")}")
+        Log.d(LOGGING_TAG, "length: ${fileChooserParams.acceptTypes.size}")
+        val acceptTypes = if (fileChooserParams.acceptTypes.isEmpty()
+                || fileChooserParams.acceptTypes.contentEquals(arrayOf("")))
+            arrayOf("*/*")
+        else
+            fileChooserParams.acceptTypes
         try {
-            launcher.launch(fileChooserParams.acceptTypes)
+            launcher.launch(acceptTypes)
         } catch (e: ActivityNotFoundException) {
             val context = webView.context
             Toast.makeText(context, context.getString(R.string.popup_no_file_manager), Toast.LENGTH_LONG)

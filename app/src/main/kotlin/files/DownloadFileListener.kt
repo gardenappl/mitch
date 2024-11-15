@@ -6,30 +6,65 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.PendingIntentCompat
+import garden.appl.mitch.ErrorReportBroadcastReceiver
+import garden.appl.mitch.FILE_PROVIDER
+import garden.appl.mitch.Mitch
 import garden.appl.mitch.NOTIFICATION_CHANNEL_ID_INSTALLING
+import garden.appl.mitch.NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED
 import garden.appl.mitch.NOTIFICATION_TAG_DOWNLOAD
 import garden.appl.mitch.NOTIFICATION_TAG_DOWNLOAD_LONG
 import garden.appl.mitch.R
 import garden.appl.mitch.Utils
 import garden.appl.mitch.ui.MitchActivity
+import java.io.File
 
 open class DownloadFileListener {
     open suspend fun onCompleted(context: Context, fileName: String, uploadId: Int?,
                             downloadOrInstallId: Long, type: DownloadType) {
-        Log.d("haaaa", "stub!")
+        val path = Downloader.getNormalDownloadPath(context, downloadOrInstallId)
+        val file = File(path, fileName)
+        Mitch.externalFileManager.moveToDownloads(context, file) { newFileName ->
+            path.deleteRecursively()
+            val fileIntent = Utils.getIntentForFile(context, File(newFileName), FILE_PROVIDER)
+            val intent = Intent.createChooser(fileIntent, context.resources.getString(R.string.select_app_for_file))
+            val pendingIntent = PendingIntentCompat.getActivity(context, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT, false)!!
+
+            NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED).apply {
+                setSmallIcon(R.drawable.ic_mitch_notification)
+                setContentTitle(context.resources.getString(R.string.notification_download_complete_title))
+                setContentText(fileName)
+
+                priority = NotificationCompat.PRIORITY_HIGH
+                setContentIntent(pendingIntent)
+                setAutoCancel(true)
+
+                notify(context, downloadOrInstallId, this.build())
+            }
+        }
     }
 
     open suspend fun onError(context: Context, fileName: String, uploadId: Int?,
                              downloadOrInstallId: Long, type: DownloadType, errorName: String,
                              throwable: Throwable?) {
+        val intent = Intent(context, ErrorReportBroadcastReceiver::class.java).apply {
+            putExtra(ErrorReportBroadcastReceiver.EXTRA_ERROR_STRING, Utils.toString(throwable))
+        }
+        val pendingIntent = PendingIntentCompat.getBroadcast(context, 0, intent,
+            PendingIntent.FLAG_ONE_SHOT, false)!!
+        NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED).apply {
+            setSmallIcon(R.drawable.ic_mitch_notification)
+            setContentTitle(context.resources.getString(R.string.notification_download_error, fileName))
+            setContentText(errorName)
 
-    }
+            priority = NotificationCompat.PRIORITY_HIGH
+            setContentIntent(pendingIntent)
+            setAutoCancel(true)
 
-    open fun onProgress(context: Context, fileName: String, downloadId: Long, progressPercent: Int?) {
-
+            notify(context, downloadOrInstallId, this.build())
+        }
     }
 
     /**
@@ -44,12 +79,8 @@ open class DownloadFileListener {
         }
     }
 
-    protected fun createProgressNotification(
-        context: Context,
-        fileName: String,
-        downloadId: Long,
-        progressPercent: Int?
-    ) {
+
+    fun onProgress(context: Context, fileName: String, downloadId: Long, progressPercent: Int?) {
         NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALLING).apply {
             setOngoing(true)
             setOnlyAlertOnce(true)

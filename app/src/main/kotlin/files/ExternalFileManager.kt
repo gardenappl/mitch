@@ -29,6 +29,7 @@ class ExternalFileManager {
 
     /**
      * Move a completed download to downloads folder.
+     * Will request permission if necessary.
      * @param activity activity which might request permission (must implement [Activity.onRequestPermissionsResult]
      * @param uploadId downloaded file to move
      * @param callback function which receives the new file name: it should be usable with [getViewIntent]
@@ -37,21 +38,45 @@ class ExternalFileManager {
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                 PackageManager.PERMISSION_GRANTED) {
             doMoveToDownloads(uploadId, callback)
-            return
+        } else {
+            lastUploadId = uploadId
+            moveToDownloadsCallback = callback
+            ActivityCompat.requestPermissions(
+                activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                PERMISSION_REQUEST_MOVE_TO_DOWNLOADS
+            )
         }
+    }
 
-        lastUploadId = uploadId
-        moveToDownloadsCallback = callback
-        ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-            PERMISSION_REQUEST_MOVE_TO_DOWNLOADS)
+    /**
+     * Move a completed download to downloads folder.
+     * Will NOT request permission
+     * @param callback function which receives the new file name: it should be usable with [getViewIntent]
+     */
+    fun moveToDownloads(context: Context, file: File, callback: (String?) -> Unit) {
+//        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+//                PackageManager.PERMISSION_GRANTED) {
+//            doMoveToDownloads(file, callback)
+//        } else {
+//            throw SecurityException("no write storage permission")
+//        }
+        doMoveToDownloads(file, callback)
     }
     
     fun resumeMoveToDownloads() {
         doMoveToDownloads(lastUploadId, moveToDownloadsCallback)
     }
-    
+
     private fun doMoveToDownloads(uploadId: Int, callback: (String?) -> Unit) {
         val file = Mitch.installDownloadManager.getDownloadedFile(uploadId)
+        if (file == null) {
+            callback(null)
+            return
+        }
+        doMoveToDownloads(file, callback)
+    }
+    
+    private fun doMoveToDownloads(file: File, callback: (String?) -> Unit) {
         if (file?.exists() != true) {
             callback(null)
             return

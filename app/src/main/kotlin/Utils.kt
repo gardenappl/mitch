@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.text.Html
 import android.text.Spanned
 import android.util.Log
+import android.webkit.URLUtil
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.core.content.FileProvider
@@ -27,6 +28,8 @@ import androidx.core.graphics.ColorUtils
 import androidx.work.Data
 import com.github.ajalt.colormath.ConvertibleColor
 import com.github.ajalt.colormath.fromCss
+import garden.appl.mitch.files.DataURL
+import jodd.net.MimeTypes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
@@ -325,6 +328,28 @@ object Utils {
             for (s in string.chunked(1000)) {
                 Log.d(tag, s)
             }
+        }
+    }
+
+    fun guessFileName(url: String, contentDisposition: String?, mimeType: String?): String {
+        return if (DataURL.isValid(url)) {
+            val extension = mimeType?.let {
+                val fixedMimeType = if (mimeType == "text/json")
+                    "application/json"
+                else
+                    mimeType
+                MimeTypes.findExtensionsByMimeTypes(fixedMimeType, false)
+                    .firstOrNull()
+            }
+            if (extension == null) {
+                "download"
+            } else {
+                "download.$extension"
+            }
+        } else if (mimeType == "application/octet-stream") {
+            URLUtil.guessFileName(url, contentDisposition, null)
+        } else {
+            URLUtil.guessFileName(url, contentDisposition, mimeType)
         }
     }
 }
