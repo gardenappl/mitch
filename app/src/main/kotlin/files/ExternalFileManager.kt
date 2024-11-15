@@ -13,7 +13,9 @@ import garden.appl.mitch.FILE_PROVIDER
 import garden.appl.mitch.Mitch
 import garden.appl.mitch.PERMISSION_REQUEST_DOWNLOADS_VIEW_INTENT
 import garden.appl.mitch.PERMISSION_REQUEST_MOVE_TO_DOWNLOADS
+import garden.appl.mitch.PERMISSION_REQUEST_START_DOWNLOAD
 import garden.appl.mitch.Utils
+import garden.appl.mitch.ui.MitchActivity
 import java.io.File
 
 class ExternalFileManager {
@@ -23,6 +25,7 @@ class ExternalFileManager {
 
     private var lastUploadId: Int = 0
     private lateinit var moveToDownloadsCallback: (String?) -> Unit
+    private lateinit var requestPermissionCallback: () -> Unit
     
     private lateinit var lastExternalFileName: String
     private lateinit var getViewIntentCallback: (Intent?) -> Unit
@@ -34,7 +37,7 @@ class ExternalFileManager {
      * @param uploadId downloaded file to move
      * @param callback function which receives the new file name: it should be usable with [getViewIntent]
      */
-    fun moveToDownloads(activity: Activity, uploadId: Int, callback: (String?) -> Unit) {
+    fun moveToDownloads(activity: MitchActivity, uploadId: Int, callback: (String?) -> Unit) {
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                 PackageManager.PERMISSION_GRANTED) {
             doMoveToDownloads(uploadId, callback)
@@ -46,6 +49,23 @@ class ExternalFileManager {
                 PERMISSION_REQUEST_MOVE_TO_DOWNLOADS
             )
         }
+    }
+
+    fun requestPermissionIfNeeded(activity: MitchActivity, callback: () -> Unit) {
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED) {
+            callback()
+        } else {
+            requestPermissionCallback = callback
+            ActivityCompat.requestPermissions(
+                activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                PERMISSION_REQUEST_START_DOWNLOAD
+            )
+        }
+    }
+
+    fun resumeRequestPermission() {
+        requestPermissionCallback()
     }
 
     /**
@@ -77,7 +97,7 @@ class ExternalFileManager {
     }
     
     private fun doMoveToDownloads(file: File, callback: (String?) -> Unit) {
-        if (file?.exists() != true) {
+        if (!file.exists()) {
             callback(null)
             return
         }
@@ -111,7 +131,7 @@ class ExternalFileManager {
     fun getViewIntent(activity: Activity, externalFileName: String, callback: (Intent?) -> Unit) {
         Log.d(LOGGING_TAG, "Opening $externalFileName")
 
-        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) ==
                 PackageManager.PERMISSION_GRANTED) {
             doGetViewIntent(activity, externalFileName, callback)
             return
@@ -126,8 +146,11 @@ class ExternalFileManager {
     fun resumeGetViewIntent(context: Context) {
         doGetViewIntent(context, lastExternalFileName, getViewIntentCallback)
     }
-    
-    private fun doGetViewIntent(context: Context, externalFileName: String, callback: (Intent?) -> Unit) {
+
+    /**
+     * Must check permission first
+     */
+    fun doGetViewIntent(context: Context, externalFileName: String, callback: (Intent?) -> Unit) {
         val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val file = File(downloadsDir, externalFileName)
         if (file.exists())

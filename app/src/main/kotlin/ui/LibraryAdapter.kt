@@ -53,7 +53,7 @@ import kotlinx.coroutines.withContext
 
 
 class LibraryAdapter internal constructor(
-    private val activity: Activity,
+    private val activity: MitchActivity,
     val list: RecyclerView,
     val type: GameRepository.Type
 ) : RecyclerView.Adapter<LibraryAdapter.GameViewHolder>() {

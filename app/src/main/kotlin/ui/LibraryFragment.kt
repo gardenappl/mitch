@@ -134,7 +134,7 @@ class LibraryFragment : Fragment() {
         viewModelClass: Class<T>,
         onObserve: (List<GameInstallation>) -> Unit
     ) {
-        val adapter = LibraryAdapter(requireActivity(), list, type)
+        val adapter = LibraryAdapter(requireActivity() as MitchActivity, list, type)
         list.adapter = adapter
         list.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)

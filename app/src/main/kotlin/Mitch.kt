@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit
 const val PERMISSION_REQUEST_DOWNLOADS_VIEW_INTENT = 1
 const val PERMISSION_REQUEST_MOVE_TO_DOWNLOADS = 2
 const val PERMISSION_REQUEST_NOTIFICATION = 3
+const val PERMISSION_REQUEST_START_DOWNLOAD = 4
 
 const val FILE_PROVIDER = "ua.gardenapple.itchupdater.fileprovider"
 

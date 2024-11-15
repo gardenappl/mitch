@@ -23,6 +23,7 @@ import garden.appl.mitch.Mitch
 import garden.appl.mitch.PERMISSION_REQUEST_DOWNLOADS_VIEW_INTENT
 import garden.appl.mitch.PERMISSION_REQUEST_MOVE_TO_DOWNLOADS
 import garden.appl.mitch.PERMISSION_REQUEST_NOTIFICATION
+import garden.appl.mitch.PERMISSION_REQUEST_START_DOWNLOAD
 import garden.appl.mitch.PREF_LANG_LOCALE
 import garden.appl.mitch.PREF_LANG_LOCALE_NEXT
 import garden.appl.mitch.PREF_NO_NOTIFICATIONS
@@ -94,6 +95,9 @@ abstract class MitchActivity : AppCompatActivity(),
             PERMISSION_REQUEST_MOVE_TO_DOWNLOADS ->
                 if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
                     Mitch.externalFileManager.resumeMoveToDownloads()
+            PERMISSION_REQUEST_START_DOWNLOAD ->
+                if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
+                    Mitch.externalFileManager.resumeRequestPermission()
             PERMISSION_REQUEST_DOWNLOADS_VIEW_INTENT ->
                 if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
                     Mitch.externalFileManager.resumeGetViewIntent(this)

@@ -6,10 +6,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.PendingIntentCompat
 import garden.appl.mitch.ErrorReportBroadcastReceiver
-import garden.appl.mitch.FILE_PROVIDER
 import garden.appl.mitch.Mitch
 import garden.appl.mitch.NOTIFICATION_CHANNEL_ID_INSTALLING
 import garden.appl.mitch.NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED
@@ -27,21 +27,34 @@ open class DownloadFileListener {
         val file = File(path, fileName)
         Mitch.externalFileManager.moveToDownloads(context, file) { newFileName ->
             path.deleteRecursively()
-            val fileIntent = Utils.getIntentForFile(context, File(newFileName), FILE_PROVIDER)
-            val intent = Intent.createChooser(fileIntent, context.resources.getString(R.string.select_app_for_file))
-            val pendingIntent = PendingIntentCompat.getActivity(context, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT, false)!!
+            if (newFileName == null) {
+                Toast.makeText(context, R.string.dialog_missing_file_title, Toast.LENGTH_LONG)
+                    .show()
+                return@moveToDownloads
+            }
+            Mitch.externalFileManager.doGetViewIntent(context, newFileName) { viewIntent ->
+                if (viewIntent == null) {
+                    Toast.makeText(context, R.string.dialog_missing_file_title, Toast.LENGTH_LONG)
+                        .show()
+                    return@doGetViewIntent
+                }
+                val intent = Intent.createChooser(viewIntent, context.resources.getString(R.string.select_app_for_file))
+                val pendingIntent = PendingIntentCompat.getActivity(
+                    context, 0, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT, false
+                )!!
 
-            NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED).apply {
-                setSmallIcon(R.drawable.ic_mitch_notification)
-                setContentTitle(context.resources.getString(R.string.notification_download_complete_title))
-                setContentText(fileName)
+                NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED).apply {
+                    setSmallIcon(R.drawable.ic_mitch_notification)
+                    setContentTitle(context.resources.getString(R.string.notification_download_complete_title))
+                    setContentText(newFileName)
 
-                priority = NotificationCompat.PRIORITY_HIGH
-                setContentIntent(pendingIntent)
-                setAutoCancel(true)
+                    priority = NotificationCompat.PRIORITY_HIGH
+                    setContentIntent(pendingIntent)
+                    setAutoCancel(true)
 
-                notify(context, downloadOrInstallId, this.build())
+                    this@DownloadFileListener.notify(context, downloadOrInstallId, this.build())
+                }
             }
         }
     }
