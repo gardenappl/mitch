@@ -203,7 +203,6 @@
     <string name="dialog_web_cache_info_title">Installation de jeux web</string>
     <string name="dialog_web_cache_delete_fail_title">Je ne peux pas supprimer maintenant</string>
     <string name="game_multiple_options_desc_multiple_purchases">Achats multiples</string>
-    <string name="settings_web_cache_enable_desc">Installez tous les jeux en ligne auxquels vous avez participé pour y jouer hors ligne.</string>
     <string name="dialog_web_cache_delete_fail">%1$s ne peut pas être supprimé car il est en cours d\'exécution.</string>
     <string name="game_web_play_default_type">Jouer</string>
     <string name="game_multiple_options_desc_web_or_buy">Jouer maintenant ou acheter</string>

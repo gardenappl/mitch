@@ -226,7 +226,6 @@
     <string name="settings_web_cache_update">Oppdater lagrede nett-spill</string>
     <string name="game_bundle_trans_texas">Trans-rettigheter i Texas. Pakke</string>
     <string name="dialog_web_cache_info">Mitch kan automatisk lagre nett-spill for senere frakoblet spilling.</string>
-    <string name="settings_web_cache_enable_desc">Installer alle spilte nett-spill for senere frakoblet spilling.</string>
     <string name="settings_web_cache_update_unmetered">Når startet på kvoteløs tilkobling</string>
     <string name="settings_web_cache_update_always">Når startet, alltid</string>
     <string name="game_web_play_desc">Spill nett-versjonen nå</string>

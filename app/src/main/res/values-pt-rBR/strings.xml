@@ -194,7 +194,6 @@
     <string name="dialog_web_cache_delete_fail">%1$s não pode ser removido pois está sendo executado.</string>
     <string name="game_web_play_desc">Jogar a versão web agora</string>
     <string name="genre_simulation">Simulação</string>
-    <string name="settings_web_cache_enable_desc">Instala todos os jogos web jogados para posteriormente jogar offline.</string>
     <string name="dialog_web_cache_delete_title">Remover este jogo?</string>
     <string name="game_multiple_options_get">Obter →</string>
     <string name="settings_web_cache_update_unmetered">Quando aberto em uma conexão não limitada</string>

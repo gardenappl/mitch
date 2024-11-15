@@ -190,6 +190,5 @@
     <string name="dialog_web_cache_info_title">Đang cài đặt trò chơi trên mạng</string>
     <string name="dialog_web_cache_info">Mitch có thể tự động lưu trò chơi trên mạng để bạn có thể chơi ngoại tuyến.</string>
     <string name="settings_web_cache_enable">Lưu trò chơi trên mạng</string>
-    <string name="settings_web_cache_enable_desc">Cài đặt tất cả trò chơi trên mạng để chơi ngoại tuyến.</string>
     <string name="library_category_web_cached">Trò chơi trên mạng</string>
 </resources>

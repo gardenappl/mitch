@@ -219,7 +219,6 @@
     <string name="settings_clear_all_title">Alle Daten löschen\?</string>
     <string name="bundle">Besondere Bundles</string>
     <string name="dialog_web_cache_info">Mitch kann automatisch Web-Spiele für die spätere Offline-Verwendung speichern.</string>
-    <string name="settings_web_cache_enable_desc">Alle gespielten Web-Spiele für spätere Offline-Verwendung installieren.</string>
     <string name="settings_web_cache_update_never">Niemals</string>
     <string name="dialog_web_cache_delete_title">Dieses Spiel löschen\?</string>
     <string name="game_multiple_options_desc_web_or_buy">Jetzt spielen oder kaufen</string>

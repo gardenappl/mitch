@@ -203,7 +203,6 @@
     <string name="dialog_web_cache_info_title">Instalación de juegos web</string>
     <string name="dialog_web_cache_info">¿Quieres guardar este juego en tu dispositivo para jugar sin conexión? Ten en cuenta que esto ocupará algo de espacio de almacenamiento y es posible que no funcione con algunos juegos.</string>
     <string name="settings_web_cache_enable">Instalar juegos web localmente para jugar sin conexión</string>
-    <string name="settings_web_cache_enable_desc">Instala todos los juegos web que hayas jugado para poder jugar más tarde sin conexión.</string>
     <string name="settings_web_cache_update">Utilice el modo sin conexión para los juegos web instalados</string>
     <string name="settings_web_cache_update_never">Siempre</string>
     <string name="settings_web_cache_update_unmetered">Cuando se ejecuta en una conexión medida</string>
