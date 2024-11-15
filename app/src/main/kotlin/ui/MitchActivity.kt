@@ -94,13 +94,13 @@ abstract class MitchActivity : AppCompatActivity(),
         when (requestCode) {
             PERMISSION_REQUEST_MOVE_TO_DOWNLOADS ->
                 if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
-                    Mitch.externalFileManager.resumeMoveToDownloads()
+                    Mitch.externalFileManager.resumeMoveToDownloads(this)
             PERMISSION_REQUEST_START_DOWNLOAD ->
                 if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
                     Mitch.externalFileManager.resumeRequestPermission()
             PERMISSION_REQUEST_DOWNLOADS_VIEW_INTENT ->
                 if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
-                    Mitch.externalFileManager.resumeGetViewIntent(this)
+                    Mitch.externalFileManager.resumeGetViewIntent()
             PERMISSION_REQUEST_NOTIFICATION -> {
                 try {
                     NotificationManagerCompat.from(this)

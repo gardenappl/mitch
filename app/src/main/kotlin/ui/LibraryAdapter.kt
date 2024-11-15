@@ -177,8 +177,17 @@ class LibraryAdapter internal constructor(
                 Toast.makeText(context, R.string.library_open_app_failed, Toast.LENGTH_LONG)
                     .show()
             }
-        } else if (gameInstall.externalFileName != null) {
-            Mitch.externalFileManager.getViewIntent(activity, gameInstall.externalFileName) { intent ->
+        } else if (gameInstall.externalFileUri != null) {
+            Log.d(LOGGING_TAG, "External URI: ${gameInstall.externalFileUri}")
+            if (!gameInstall.externalFileUri.contains("://")) {
+                Log.d(LOGGING_TAG, "Legacy code: not a URI")
+                val fileName = gameInstall.externalFileUri
+                Toast.makeText(context, context.getString(R.string.popup_moved_to_downloads, fileName),
+                    Toast.LENGTH_LONG).show()
+                return
+            }
+            val uri = Uri.parse(gameInstall.externalFileUri)
+            Mitch.externalFileManager.getViewIntent(activity, uri) { intent ->
                 if (intent != null) {
                     context.startActivity(Intent.createChooser(intent,
                         context.resources.getString(R.string.select_app_for_file)))
@@ -188,7 +197,7 @@ class LibraryAdapter internal constructor(
                 val dialog = AlertDialog.Builder(context).apply {
                     setTitle(R.string.dialog_missing_file_title)
                     setMessage(context.getString(R.string.dialog_missing_file,
-                    gameInstall.externalFileName, gameInstall.uploadName))
+                    gameInstall.externalFileUri, gameInstall.uploadName))
 
                     setPositiveButton(R.string.dialog_remove) { _, _ ->
                         runBlocking(Dispatchers.IO) {
@@ -241,15 +250,15 @@ class LibraryAdapter internal constructor(
 
             if (type != GameRepository.Type.Installed)
                 removeItem(R.id.app_info)
-            if (!(type == GameRepository.Type.Downloads && gameInstall.externalFileName == null))
+            if (!(type == GameRepository.Type.Downloads && gameInstall.externalFileUri == null))
                 removeItem(R.id.move_to_downloads)
             if (type != GameRepository.Type.WebCached)
                 removeItem(R.id.web_install_launcher_shortcut)
-            if (!((type == GameRepository.Type.Downloads && gameInstall.externalFileName == null) ||
+            if (!((type == GameRepository.Type.Downloads && gameInstall.externalFileUri == null) ||
                         type == GameRepository.Type.Installed ||
                         type == GameRepository.Type.WebCached))
                 removeItem(R.id.delete)
-            if (!(type == GameRepository.Type.Downloads && gameInstall.externalFileName != null))
+            if (!(type == GameRepository.Type.Downloads && gameInstall.externalFileUri != null))
                 removeItem(R.id.remove)
             if (type != GameRepository.Type.Pending)
                 removeItem(R.id.cancel)
@@ -297,8 +306,8 @@ class LibraryAdapter internal constructor(
                     .show()
                 mainActivityScope.launch(Dispatchers.IO) {
                     try {
-                        Mitch.externalFileManager.moveToDownloads(activity, gameInstall.uploadId) { externalName ->
-                            if (externalName == null) {
+                        Mitch.externalFileManager.moveToDownloads(activity, gameInstall.uploadId) { uri ->
+                            if (uri == null) {
                                 Log.e(LOGGING_TAG, "externalName is null! " +
                                         "This should only happen with old downloads")
 
@@ -309,6 +318,7 @@ class LibraryAdapter internal constructor(
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
+                                return@moveToDownloads
                             }
 
                             mainActivityScope.launch {
@@ -316,13 +326,13 @@ class LibraryAdapter internal constructor(
                                 val install =
                                     db.installDao.getInstallationById(gameInstall.installId)!!
                                 db.installDao.update(install.copy(
-                                    externalFileName = externalName
+                                    externalFileUri = uri.toString()
                                 ))
                                 withContext(Dispatchers.Main) {
                                     Toast.makeText(
                                         context,
                                         context.resources.getString(R.string.popup_moved_to_downloads,
-                                            externalName),
+                                            uri.lastPathSegment),
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
@@ -446,7 +456,7 @@ class LibraryAdapter internal constructor(
             R.id.remove -> {
                 val dialog = AlertDialog.Builder(context).apply {
                     setTitle(R.string.dialog_game_remove_title)
-                    setMessage(context.getString(R.string.dialog_game_remove, gameInstall.externalFileName))
+                    setMessage(context.getString(R.string.dialog_game_remove, gameInstall.externalFileUri))
 
                     setPositiveButton(R.string.dialog_remove) { _, _ ->
                         mainActivityScope.launch(Dispatchers.Main) {
