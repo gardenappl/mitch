@@ -249,4 +249,5 @@
     <string name="settings_web_cache_enable_always">Siempre</string>
     <string name="popup_web_game_exit">¿Salir del juego?</string>
     <string name="dialog_notification_explain_download">Mitch enviará una notificación una vez que se complete la descarga y también puede notificarle sobre futuras actualizaciones.</string>
+    <string name="dialog_save_file_title">¿Descargar archivo?</string>
 </resources>
