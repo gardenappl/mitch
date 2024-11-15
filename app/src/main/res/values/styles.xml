@@ -28,6 +28,8 @@
     <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+
+        <item name="aboutLibrariesStyle">@style/AppTheme.AboutLibraries</item>
     </style>
 
     <style name="AppTheme.ActionBar" parent="Widget.AppCompat.ActionBar.Solid">
@@ -115,5 +117,17 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorPrimary">@color/colorAccent</item>
         <item name="android:windowBackground">@drawable/splash_screen</item>
+    </style>
+    
+    <style name="AppTheme.AboutLibraries" parent="AppTheme.NoActionBar">
+        <!-- AboutLibraries specific values -->
+        <item name="aboutLibrariesCardBackground">@color/colorBackground</item>
+        <item name="aboutLibrariesDescriptionTitle">?android:textColorPrimary</item>
+        <item name="aboutLibrariesDescriptionText">?android:textColorSecondary</item>
+        <item name="aboutLibrariesDescriptionDivider">@color/opensource_divider</item>
+        <item name="aboutLibrariesOpenSourceTitle">?android:textColorPrimary</item>
+        <item name="aboutLibrariesOpenSourceText">?android:textColorSecondary</item>
+        <item name="aboutLibrariesSpecialButtonText">?android:textColorPrimary</item>
+        <item name="aboutLibrariesOpenSourceDivider">@color/opensource_divider</item>
     </style>
 </resources>

@@ -15,6 +15,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.get
+import com.mikepenz.aboutlibraries.LibsBuilder
 import garden.appl.mitch.BuildConfig
 import garden.appl.mitch.PREF_BROWSE_START_PAGE
 import garden.appl.mitch.PREF_DEBUG_WEB_GAMES_IN_BROWSE_TAB
@@ -163,6 +164,15 @@ class SettingsFragment : PreferenceFragmentCompat(), CoroutineScope by MainScope
                 create()
             }
             dialog.show()
+            return true
+        } else if (preference.key == "mitch.about_libraries") {
+            LibsBuilder()
+                .withAboutDescription("""MIT License<br/><a href="https://gardenapple.itch.io/mitch">https://gardenapple.itch.io/mitch</a>""")
+                .withAboutAppName(getString(R.string.app_name))
+                .withAboutIconShown(true)
+                .withAboutVersionShown(true)
+                .withActivityTitle(getString(R.string.settings_about_libraries))
+                .start(requireContext())
             return true
         }
         return false

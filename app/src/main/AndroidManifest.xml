@@ -101,6 +101,10 @@
                 android:exported="true"
                 android:name=".ui.MainActivity$LibraryActivity"
                 android:theme="@style/SplashScreenTheme" />
+        <!-- https://github.com/mikepenz/AboutLibraries/issues/279#issuecomment-607556127 -->
+        <activity
+                android:name="com.mikepenz.aboutlibraries.ui.LibsActivity"
+                android:theme="@style/AppTheme.AboutLibraries" />
 
         <receiver
                 android:name=".install.InstallRequestBroadcastReceiver"

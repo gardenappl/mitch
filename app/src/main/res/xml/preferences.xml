@@ -83,5 +83,8 @@
                 android:defaultValue="false"
                 android:key="mitch.debug.web_games_in_browse"
                 android:title="Enable web games in Browse tab" />
+        <Preference
+                android:key="mitch.about_libraries"
+                android:title="@string/settings_about_libraries" />
     </PreferenceCategory>
 </PreferenceScreen>

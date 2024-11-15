@@ -244,4 +244,5 @@
     <string name="dialog_notification_explain_title">Notifications</string>
     <string name="dialog_notification_explain_download">Mitch will send a notification once the download is complete, and can also notify you of future updates.</string>
     <string name="dialog_save_file_title">Download file?</string>
+    <string name="settings_about_libraries">Open-source libraries</string>
 </resources>

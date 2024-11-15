@@ -5,6 +5,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     id("com.google.devtools.ksp")
+    id("com.mikepenz.aboutlibraries.plugin")
 }
 
 
@@ -128,4 +129,7 @@ dependencies {
     // Application Crash Reports for Android (ACRA)
     implementation("ch.acra:acra-mail:5.9.6")
     implementation("ch.acra:acra-dialog:5.9.6")
+    // AboutLibraries
+    implementation("com.mikepenz:aboutlibraries-core:11.2.3")
+    implementation("com.mikepenz:aboutlibraries:11.2.3")
 }
