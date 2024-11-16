@@ -8,7 +8,6 @@ import garden.appl.mitch.files.Downloader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.net.URL
 
 class InstallationDownloadManager(context: Context) {
     companion object {
@@ -50,8 +49,6 @@ class InstallationDownloadManager(context: Context) {
         val downloadDir = File(pendingPath, uploadId.toString())
         val installer = Installations.getInstaller(context)
         if (fileName.endsWith(".apk") && installer.type == AbstractInstaller.Type.Stream) {
-            Log.d(LOGGING_TAG, "content length: $contentLength")
-            URL("data:").openConnection()
             Downloader.requestDownload(context, url, install, fileName, contentLength,
                 downloadDir = null,
                 tempDownloadDir = false,

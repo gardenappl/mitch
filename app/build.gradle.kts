@@ -44,8 +44,8 @@ android {
         targetSdk = 33
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        versionCode = 107
-        versionName = "2.3.0"
+        versionCode = 108
+        versionName = "2.3.1"
     }
     buildTypes {
         named("release").configure {
@@ -70,7 +70,7 @@ android {
         create("itchio") {
         }
     }
-    packagingOptions {
+    packaging {
         resources.excludes.add("META-INF/atomicfu.kotlin_module")
     }
     compileOptions {
