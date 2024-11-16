@@ -44,7 +44,7 @@ android {
         targetSdk = 34
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        versionCode = 108
+        versionCode = 20301
         versionName = "2.3.1"
     }
     buildTypes {
