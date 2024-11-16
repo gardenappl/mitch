@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
             android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-            android:maxSdkVersion="32" />
+            android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
 
@@ -29,8 +29,7 @@
             android:name=".Mitch"
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
-            android:hardwareAccelerated="true"
-            android:requestLegacyExternalStorage="true">
+            android:hardwareAccelerated="true">
 
         <!-- https://developer.android.com/guide/webapps/webview-privacy -->
         <meta-data android:name="android.webkit.WebView.MetricsOptOut" android:value="true" />
@@ -135,7 +134,9 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
-        <service android:name=".install.SessionInstallerService" />
+        <service
+                android:foregroundServiceType="shortService"
+                android:name=".install.SessionInstallerService" />
         <provider
                 android:name="androidx.core.content.FileProvider"
                 android:authorities="ua.gardenapple.itchupdater.fileprovider"
@@ -145,7 +146,9 @@
                     android:name="android.support.FILE_PROVIDER_PATHS"
                     android:resource="@xml/provider_paths"/>
         </provider>
-        <service android:name=".ui.GameForegroundService" />
+        <service
+                android:foregroundServiceType="mediaPlayback"
+                android:name=".ui.GameForegroundService" />
     </application>
     <!-- Required for 'Open in default web browser' function -->
     <!-- https://stackoverflow.com/questions/2201917/how-can-i-open-a-url-in-androids-web-browser-from-my-application#61488105 -->

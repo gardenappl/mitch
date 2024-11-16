@@ -41,7 +41,7 @@ android {
     defaultConfig {
         applicationId = "ua.gardenapple.itchupdater"
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 34
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         versionCode = 108
