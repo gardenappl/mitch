@@ -29,8 +29,8 @@ import java.io.File
 
 object Installations {
     private const val LOGGING_TAG = "Installations"
-    internal val nativeInstaller = NativeInstaller()
-    internal val sessionInstaller = SessionInstaller()
+    val nativeInstaller = NativeInstaller()
+    val sessionInstaller = SessionInstaller()
 
 
     suspend fun deleteFinishedInstall(context: Context, uploadId: Int) {
