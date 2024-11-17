@@ -100,7 +100,7 @@ abstract class MitchActivity : AppCompatActivity(),
                     Mitch.externalFileManager.resumeRequestPermission()
             PERMISSION_REQUEST_DOWNLOADS_VIEW_INTENT ->
                 if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED)
-                    Mitch.externalFileManager.resumeGetViewIntent()
+                    Mitch.externalFileManager.resumeGetViewIntent(this)
             PERMISSION_REQUEST_NOTIFICATION -> {
                 try {
                     NotificationManagerCompat.from(this)

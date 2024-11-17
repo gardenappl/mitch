@@ -24,7 +24,7 @@ import kotlinx.coroutines.withContext
 
 @Database(
     entities = [Game::class, Installation::class, UpdateCheckResultModel::class],
-    version = 13,
+    version = 15,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

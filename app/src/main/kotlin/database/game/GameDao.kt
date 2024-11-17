@@ -14,6 +14,7 @@ import garden.appl.mitch.database.installation.GameInstallation
 import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.database.installation.Installation.Companion.DOWNLOAD_OR_INSTALL_ID
 import garden.appl.mitch.database.installation.Installation.Companion.EXTERNAL_FILE_NAME
+import garden.appl.mitch.database.installation.Installation.Companion.EXTERNAL_FILE_URI
 import garden.appl.mitch.database.installation.Installation.Companion.INTERNAL_ID
 import garden.appl.mitch.database.installation.Installation.Companion.PACKAGE_NAME
 import garden.appl.mitch.database.installation.Installation.Companion.STATUS
@@ -36,7 +37,8 @@ abstract class GameDao {
             installations.$INTERNAL_ID as installId,
             installations.$UPLOAD_NAME as uploadName,
             installations.$UPLOAD_ID as uploadId,
-            installations.$EXTERNAL_FILE_NAME as externalFileUri
+            installations.$EXTERNAL_FILE_NAME as externalFileName,
+            installations.$EXTERNAL_FILE_URI as externalFileUri
         FROM games INNER JOIN installations
         ON games.$GAME_ID = installations.game_id
         WHERE $STATUS = ${Installation.STATUS_INSTALLED} AND
@@ -51,7 +53,8 @@ abstract class GameDao {
             installations.$INTERNAL_ID as installId,
             installations.$UPLOAD_NAME as uploadName,
             installations.$UPLOAD_ID as uploadId,
-            installations.$EXTERNAL_FILE_NAME as externalFileUri
+            installations.$EXTERNAL_FILE_NAME as externalFileName,
+            installations.$EXTERNAL_FILE_URI as externalFileUri
         FROM games INNER JOIN installations
         ON games.$GAME_ID = installations.game_id
         WHERE $STATUS = ${Installation.STATUS_INSTALLED} AND
@@ -66,7 +69,8 @@ abstract class GameDao {
             installations.$INTERNAL_ID as installId,
             installations.$UPLOAD_NAME as uploadName,
             installations.$UPLOAD_ID as uploadId,
-            installations.$EXTERNAL_FILE_NAME as externalFileUri
+            installations.$EXTERNAL_FILE_NAME as externalFileName,
+            installations.$EXTERNAL_FILE_URI as externalFileUri
         FROM games INNER JOIN installations
         ON games.$GAME_ID = installations.game_id
         WHERE $STATUS != ${Installation.STATUS_INSTALLED} 
@@ -81,7 +85,8 @@ abstract class GameDao {
             installations.$INTERNAL_ID as installId,
             installations.$UPLOAD_NAME as uploadName,
             installations.$UPLOAD_ID as uploadId,
-            installations.$EXTERNAL_FILE_NAME as externalFileUri
+            installations.$EXTERNAL_FILE_NAME as externalFileName,
+            installations.$EXTERNAL_FILE_URI as externalFileUri
         FROM games INNER JOIN installations
         ON games.$GAME_ID = installations.game_id
         WHERE $STATUS = ${Installation.STATUS_WEB_CACHED}""")

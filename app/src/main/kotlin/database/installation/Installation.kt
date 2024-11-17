@@ -130,8 +130,11 @@ data class Installation(
      * URI of file in public Downloads/ folder, if it has been moved there.
      * Legacy: Path to file in public Downloads/ folder, if it has been moved there
      */
+    @ColumnInfo(name = EXTERNAL_FILE_URI)
+    val externalFileUri: String?,
+
     @ColumnInfo(name = EXTERNAL_FILE_NAME)
-    val externalFileUri: String?
+    val externalFileName: String?
 ) {
     constructor(
         internalId: Int = 0,
@@ -147,6 +150,7 @@ data class Installation(
         fileSize: String,
         uploadTimestamp: String? = null,
         platforms: Int = PLATFORM_NONE,
+        externalFileUri: String? = null,
         externalFileName: String? = null
     ) : this(
         internalId = internalId,
@@ -162,7 +166,8 @@ data class Installation(
         fileSize = fileSize,
         uploadTimestamp = uploadTimestamp,
         platforms = platforms,
-        externalFileUri = externalFileName
+        externalFileUri = externalFileUri,
+        externalFileName = externalFileName
     )
 
     companion object {
@@ -188,7 +193,8 @@ data class Installation(
         const val TIMESTAMP = "timestamp"
         const val LOCALE = "locale"
         const val PLATFORMS = "platforms"
-        const val EXTERNAL_FILE_NAME = "external_file_name"
+        const val EXTERNAL_FILE_URI = "external_file_name"
+        const val EXTERNAL_FILE_NAME = "external_file_display_name"
         const val AVAILABLE_UPLOAD_IDS = "available_uploads"
 
         const val STATUS_INSTALLED = 0

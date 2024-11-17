@@ -377,7 +377,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val webViewState = Bundle()
         webView.saveState(webViewState)
         outState.putBundle(WEB_VIEW_STATE_KEY, webViewState)
-        Utils.logDebug(LOGGING_TAG, "Saving $webViewState")
 
         super.onSaveInstanceState(outState)
     }

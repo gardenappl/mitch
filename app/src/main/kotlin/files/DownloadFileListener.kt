@@ -25,28 +25,29 @@ open class DownloadFileListener {
                             downloadOrInstallId: Long, type: DownloadType) {
         val path = Downloader.getNormalDownloadPath(context, downloadOrInstallId)
         val file = File(path, fileName)
-        val newUri = Mitch.externalFileManager.doMoveToDownloads(context, file)
+        val (newUri, fileName) = Mitch.externalFileManager.doMoveToDownloads(context, file)
         if (newUri == null) {
             Toast.makeText(context, R.string.dialog_missing_file_title, Toast.LENGTH_LONG)
                 .show()
             return
         }
         path.deleteRecursively()
-        val viewIntent = Mitch.externalFileManager.getViewIntent(newUri)
-        val intent = Intent.createChooser(viewIntent, context.resources.getString(R.string.select_app_for_file))
-        val pendingIntent = PendingIntentCompat.getActivity(
-            context, 0, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT, false
-        )!!
 
         NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED).apply {
             setSmallIcon(R.drawable.ic_mitch_notification)
             setContentTitle(context.resources.getString(R.string.notification_download_complete_title))
-            setContentText(newUri.lastPathSegment)
+            setContentText(fileName)
 
             priority = NotificationCompat.PRIORITY_HIGH
-            setContentIntent(pendingIntent)
             setAutoCancel(true)
+
+            Mitch.externalFileManager.getViewIntent(context, newUri)?.let { viewIntent ->
+                val intent = Intent.createChooser(viewIntent, context.resources.getString(R.string.select_app_for_file))
+                setContentIntent(PendingIntentCompat.getActivity(
+                    context, 0, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT, false
+                ))
+            }
 
             this@DownloadFileListener.notify(context, downloadOrInstallId, this.build())
         }

@@ -12,7 +12,8 @@ data class GameInstallation(
     val installId: Int,
     val uploadId: Int,
     val uploadName: String,
-    val externalFileUri: String? = null
+    val externalFileUri: String? = null,
+    val externalFileName: String? = null
 ) {
     @Ignore
     val librarySubtitle = if (packageName != null || status == Installation.STATUS_WEB_CACHED)

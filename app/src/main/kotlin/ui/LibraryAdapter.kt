@@ -196,8 +196,9 @@ class LibraryAdapter internal constructor(
                 //File is missing
                 val dialog = AlertDialog.Builder(context).apply {
                     setTitle(R.string.dialog_missing_file_title)
+                    val fileName = gameInstall.externalFileName ?: gameInstall.uploadName
                     setMessage(context.getString(R.string.dialog_missing_file,
-                    gameInstall.externalFileUri, gameInstall.uploadName))
+                        fileName, gameInstall.uploadName))
 
                     setPositiveButton(R.string.dialog_remove) { _, _ ->
                         runBlocking(Dispatchers.IO) {
@@ -306,7 +307,10 @@ class LibraryAdapter internal constructor(
                     .show()
                 mainActivityScope.launch(Dispatchers.IO) {
                     try {
-                        Mitch.externalFileManager.moveToDownloads(activity, gameInstall.uploadId) { uri ->
+                        Mitch.externalFileManager.moveToDownloads(
+                            activity,
+                            gameInstall.uploadId
+                        ) { uri, fileName ->
                             if (uri == null) {
                                 Log.e(LOGGING_TAG, "externalName is null! " +
                                         "This should only happen with old downloads")
@@ -326,13 +330,16 @@ class LibraryAdapter internal constructor(
                                 val install =
                                     db.installDao.getInstallationById(gameInstall.installId)!!
                                 db.installDao.update(install.copy(
-                                    externalFileUri = uri.toString()
+                                    externalFileUri = uri.toString(),
+                                    externalFileName = fileName
                                 ))
+
                                 withContext(Dispatchers.Main) {
-                                    Toast.makeText(
-                                        context,
-                                        context.resources.getString(R.string.popup_moved_to_downloads,
-                                            uri.lastPathSegment),
+                                    Toast.makeText(context,
+                                        context.resources.getString(
+                                            R.string.popup_moved_to_downloads,
+                                            fileName
+                                        ),
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
@@ -456,7 +463,8 @@ class LibraryAdapter internal constructor(
             R.id.remove -> {
                 val dialog = AlertDialog.Builder(context).apply {
                     setTitle(R.string.dialog_game_remove_title)
-                    setMessage(context.getString(R.string.dialog_game_remove, gameInstall.externalFileUri))
+                    val fileName = gameInstall.externalFileName ?: gameInstall.uploadName
+                    setMessage(context.getString(R.string.dialog_game_remove, fileName))
 
                     setPositiveButton(R.string.dialog_remove) { _, _ ->
                         mainActivityScope.launch(Dispatchers.Main) {
