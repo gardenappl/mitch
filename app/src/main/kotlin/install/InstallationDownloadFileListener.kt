@@ -50,7 +50,7 @@ class InstallationDownloadFileListener : DownloadFileListener() {
             val intent = Intent(context, InstallRequestBroadcastReceiver::class.java).apply {
                 Log.d(LOGGING_TAG, "session ID: $downloadOrInstallId")
                 putExtra(InstallRequestBroadcastReceiver.EXTRA_STREAM_SESSION_ID, downloadOrInstallId)
-                putExtra(InstallRequestBroadcastReceiver.EXTRA_APP_NAME, fileName)
+                putExtra(InstallRequestBroadcastReceiver.EXTRA_APK_NAME, fileName)
             }
             pendingIntent = PendingIntentCompat.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT, false)!!

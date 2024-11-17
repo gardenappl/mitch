@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException
 import android.content.ContentResolver
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -94,7 +95,8 @@ class NativeInstallerActivity : FragmentActivity() {
         } catch (e: ActivityNotFoundException) {
             Log.e(LOGGING_TAG, "ActivityNotFoundException", e)
             runBlocking(Dispatchers.IO) {
-                Installations.onInstallResult(applicationContext, installId, file.name,
+                val (appName, appIcon) = loadNameAndIcon(file)
+                Installations.onInstallResult(applicationContext, installId, appName, appIcon,
                     null, file, PackageInstaller.STATUS_FAILURE)
             }
             finish()
@@ -105,35 +107,54 @@ class NativeInstallerActivity : FragmentActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d(LOGGING_TAG, "Result code: $resultCode, data: $data")
         Log.d(LOGGING_TAG, "Extras: ${Utils.toString(data?.extras)}")
-        
+
+        if (requestCode != REQUEST_CODE_INSTALL)
+            throw RuntimeException("Invalid request code!")
 
         val installId = Utils.getLong(intent.extras!!, EXTRA_INSTALL_ID)!!
         val apk = intent.data!!.toFile()
-        when (requestCode) {
-            REQUEST_CODE_INSTALL -> when (resultCode) {
-                RESULT_OK -> runBlocking(Dispatchers.IO) {
-                    Log.d(LOGGING_TAG, "OK, intent data: ${intent.data}")
-                    Installations.onInstallResult(applicationContext, installId, apk.name, null,
-                        apk, PackageInstaller.STATUS_SUCCESS)
-                }
-                RESULT_CANCELED -> runBlocking(Dispatchers.IO) {
-                    Installations.onInstallResult(applicationContext, installId, apk.name, null,
-                        apk, PackageInstaller.STATUS_FAILURE_ABORTED)
-                }
-                else -> runBlocking(Dispatchers.IO) {
-                    // Undocumented AOSP stuff
-                    when (data?.extras?.getLong("android.intent.extra.INSTALL_RESULT")) {
-                        -4L -> Installations.onInstallResult(applicationContext, installId, apk.name, null,
-                                apk, PackageInstaller.STATUS_FAILURE_STORAGE)
-                        else -> Installations.onInstallResult(applicationContext, installId, apk.name, null,
-                            apk, PackageInstaller.STATUS_FAILURE)
-                    }
+        val (appName, appIcon) = loadNameAndIcon(apk)
+        when (resultCode) {
+            RESULT_OK -> runBlocking(Dispatchers.IO) {
+                Log.d(LOGGING_TAG, "OK, intent data: ${intent.data}")
+                Installations.onInstallResult(
+                    applicationContext, installId, appName, appIcon, null,
+                    apk, PackageInstaller.STATUS_SUCCESS
+                )
+            }
+
+            RESULT_CANCELED -> runBlocking(Dispatchers.IO) {
+                Installations.onInstallResult(
+                    applicationContext, installId, appName, appIcon, null,
+                    apk, PackageInstaller.STATUS_FAILURE_ABORTED
+                )
+            }
+
+            else -> runBlocking(Dispatchers.IO) {
+                // Undocumented AOSP stuff
+                when (data?.extras?.getLong("android.intent.extra.INSTALL_RESULT")) {
+                    -4L -> Installations.onInstallResult(
+                        applicationContext, installId, appName, appIcon, null,
+                        apk, PackageInstaller.STATUS_FAILURE_STORAGE
+                    )
+
+                    else -> Installations.onInstallResult(
+                        applicationContext, installId, appName, appIcon, null,
+                        apk, PackageInstaller.STATUS_FAILURE
+                    )
                 }
             }
-            else -> throw RuntimeException("Invalid request code!")
         }
 
         // after doing the broadcasts, finish this transparent wrapper activity
         finish()
+    }
+
+    private fun loadNameAndIcon(apkFile: File): Pair<String, Drawable?> {
+        val apkInfo = packageManager.getPackageArchiveInfo(apkFile.path, 0)
+        return Pair(
+            apkInfo?.applicationInfo?.loadLabel(packageManager).toString() ?: apkFile.name,
+            apkInfo?.applicationInfo?.loadIcon(packageManager)
+        )
     }
 }

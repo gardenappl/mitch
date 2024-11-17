@@ -3,6 +3,7 @@ package garden.appl.mitch.install
 import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.graphics.drawable.BitmapDrawable
 import android.os.IBinder
 import android.util.Log
 import garden.appl.mitch.Utils
@@ -18,7 +19,7 @@ class SessionInstallerService : Service() {
     companion object {
         private const val LOGGING_TAG = "InstallerService"
 
-        const val EXTRA_APP_NAME = "app_name"
+        const val EXTRA_APK_OR_APP_NAME = "app_name"
     }
 
     override fun onBind(p0: Intent?): IBinder? = null
@@ -27,7 +28,7 @@ class SessionInstallerService : Service() {
         Log.d(LOGGING_TAG, Utils.toString(intent.extras))
         val status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE)
         val packageName = intent.getStringExtra(PackageInstaller.EXTRA_PACKAGE_NAME)
-        val appName = intent.getStringExtra(EXTRA_APP_NAME)!!
+        val apkOrAppName = intent.getStringExtra(EXTRA_APK_OR_APP_NAME)!!
         val sessionId = Utils.getInt(intent.extras!!, PackageInstaller.EXTRA_SESSION_ID)!!
 
         //InstallerService shouldn't receive intent for Mitch anyway,
@@ -49,8 +50,11 @@ class SessionInstallerService : Service() {
                 }
             }
             else -> runBlocking(Dispatchers.IO) {
+                val sessionInfo = packageManager.packageInstaller.getSessionInfo(sessionId)
+                val appName = sessionInfo?.appLabel?.toString() ?: apkOrAppName
+                val appIcon = sessionInfo?.appIcon?.let { BitmapDrawable(resources, it) }
                 Installations.onInstallResult(applicationContext, sessionId.toLong(),
-                    appName, packageName, null, status)
+                    appName, appIcon, packageName, null, status)
             }
         }
 

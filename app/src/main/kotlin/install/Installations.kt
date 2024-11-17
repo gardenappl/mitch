@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageInstaller
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.PendingIntentCompat
@@ -128,7 +129,7 @@ object Installations {
             sessionInstaller
     }
 
-    suspend fun onInstallResult(context: Context, installId: Long, appName: String,
+    suspend fun onInstallResult(context: Context, installId: Long, appName: String, appIcon: Drawable?,
                                 packageName: String?, apk: File?, status: Int) {
         var packageName = packageName
 
@@ -151,7 +152,7 @@ object Installations {
                 packageName = tryGetPackageName(context, apk!!.path)!!
         }
 
-        notifyInstallResult(context, installId, packageName, appName, status)
+        notifyInstallResult(context, installId, packageName, appName, appIcon, status)
         Mitch.installDownloadManager.deletePendingFile(install.uploadId)
         Mitch.databaseHandler.onInstallResult(install, packageName, status)
     }
@@ -161,7 +162,7 @@ object Installations {
      * the GitLab build update check, or other things
      */
     private fun notifyInstallResult(context: Context, installSessionId: Long, packageName: String?,
-                                    appName: String, status: Int) {
+                                    appName: String, appIcon: Drawable?, status: Int) {
         val message = when (status) {
             PackageInstaller.STATUS_FAILURE_ABORTED -> context.resources.getString(R.string.notification_install_cancelled_title)
             PackageInstaller.STATUS_FAILURE_BLOCKED -> context.resources.getString(R.string.notification_install_blocked_title)
@@ -195,11 +196,15 @@ object Installations {
                         }
                     }
 
-                    try {
-                        val icon = context.packageManager.getApplicationIcon(packageName!!)
-                        setLargeIcon(Utils.drawableToBitmap(icon))
-                    } catch (e: PackageManager.NameNotFoundException) {
-                        Log.w(LOGGING_TAG, "Could not load icon for package name $packageName", e)
+                    if (appIcon != null) {
+                        setLargeIcon(Utils.drawableToBitmap(appIcon))
+                    } else {
+                        try {
+                            val icon = context.packageManager.getApplicationIcon(packageName!!)
+                            setLargeIcon(Utils.drawableToBitmap(icon))
+                        } catch (e: PackageManager.NameNotFoundException) {
+                            Log.w(LOGGING_TAG, "Could not load icon for package name $packageName", e)
+                        }
                     }
                 } else {
                     setContentTitle(appName)

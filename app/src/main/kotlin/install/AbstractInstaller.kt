@@ -30,7 +30,7 @@ abstract class AbstractInstaller {
      *
      * @throws NotImplementedError if [type] is [Type.File].
      */
-    abstract suspend fun finishStreamInstall(context: Context, sessionId: Int, appName: String)
+    abstract suspend fun finishStreamInstall(context: Context, sessionId: Int, apkOrAppName: String)
 
     /**
      * @throws NotImplementedError if [type] is [Type.Stream]

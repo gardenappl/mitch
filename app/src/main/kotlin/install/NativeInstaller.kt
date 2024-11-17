@@ -28,7 +28,7 @@ class NativeInstaller : AbstractInstaller() {
         TODO("Not yet implemented")
     }
 
-    override suspend fun finishStreamInstall(context: Context, sessionId: Int, appName: String) {
+    override suspend fun finishStreamInstall(context: Context, sessionId: Int, apkOrAppName: String) {
         throw NotImplementedError()
     }
 

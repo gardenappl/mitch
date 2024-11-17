@@ -60,12 +60,12 @@ class SessionInstaller : AbstractInstaller() {
         }
     }
 
-    override suspend fun finishStreamInstall(context: Context, sessionId: Int, appName: String) {
+    override suspend fun finishStreamInstall(context: Context, sessionId: Int, apkOrAppName: String) {
         val pkgInstaller = context.packageManager.packageInstaller
         val session = pkgInstaller.openSession(sessionId)
 
         val callbackIntent = Intent(context, SessionInstallerService::class.java)
-        callbackIntent.putExtra(SessionInstallerService.EXTRA_APP_NAME, appName)
+        callbackIntent.putExtra(SessionInstallerService.EXTRA_APK_OR_APP_NAME, apkOrAppName)
         val pendingIntent = PendingIntentCompat.getService(
             context, sessionId, callbackIntent, PendingIntent.FLAG_UPDATE_CURRENT, true
         )!!
