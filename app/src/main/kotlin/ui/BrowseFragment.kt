@@ -48,6 +48,7 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.textfield.TextInputEditText
 import com.leinardi.android.speeddial.SpeedDialActionItem
 import com.leinardi.android.speeddial.SpeedDialView
+import com.leinardi.android.speeddial.SpeedDialView.OnChangeListener
 import garden.appl.mitch.BuildConfig
 import garden.appl.mitch.ItchWebsiteUtils
 import garden.appl.mitch.PREF_DEBUG_WEB_GAMES_IN_BROWSE_TAB
@@ -299,7 +300,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     data class GenreChoice(val genre: ItchGenre) {
                         override fun toString() = requireContext().getString(genre.nameResource)
                     }
-                    val choices = ItchGenre.values().map { GenreChoice(it) }
+                    val choices = ItchGenre.entries.map { GenreChoice(it) }
 
                     val adapter = ArrayAdapter(requireContext(),
                         android.R.layout.simple_list_item_multiple_choice, choices)
@@ -664,6 +665,21 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         speedDial.mainFabOpenedBackgroundColor = accentColor
         speedDial.mainFabClosedIconColor = accentFgColor
         speedDial.mainFabOpenedIconColor = accentFgColor
+        speedDial.setOnChangeListener(object : OnChangeListener {
+            override fun onMainActionSelected(): Boolean {
+                // NO-OP
+                return false
+            }
+
+            override fun onToggleChanged(isOpen: Boolean) {
+                speedDial.elevation = resources.getDimension(
+                    if (isOpen)
+                        R.dimen.fab_elevation_open
+                    else
+                        R.dimen.fab_elevation_closed
+                )
+            }
+        })
         for (actionItem in speedDial.actionItems) {
             val newActionItem = SpeedDialActionItem.Builder(actionItem)
                 .setFabBackgroundColor(bgColor)

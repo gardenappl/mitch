@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="fab_elevation_closed">6dp</dimen>
+    <dimen name="fab_elevation_open">21dp</dimen>
+</resources>

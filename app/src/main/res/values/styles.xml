@@ -1,5 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Override of FAB Speed Dial library values -->
+<!--    <dimen name="sd_open_elevation">100dp</dimen>-->
+
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
         <!-- Customize your theme here. -->
