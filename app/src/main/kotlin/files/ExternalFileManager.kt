@@ -91,7 +91,12 @@ class ExternalFileManager {
                     IOUtil.copy(inputStream, outputStream)
                 }
             }
-            return Pair(uri, file.name)
+            val fileName = resolver.query(uri, arrayOf(MediaStore.MediaColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+                val nameIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME)
+                cursor.moveToFirst()
+                return@use cursor.getString(nameIndex)
+            }
+            return Pair(uri, fileName ?: file.name)
         } else {
             val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
 
