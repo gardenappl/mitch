@@ -45,8 +45,12 @@ class UpdateChecker(private val context: Context) {
         }
 
         val db = AppDatabase.getDatabase(context)
-        val installations = db.installDao.getFinishedInstallationsSync()
         val updateChecker = SingleUpdateChecker(db)
+        val installations = db.installDao.getFinishedInstallationsAndSubscriptionsSync()
+            .filter { install -> updateChecker.shouldCheck(install) }
+        for (install in installations)
+            Log.d(LOGGING_TAG, "Will check for $install")
+
         var success = true
 
         coroutineScope {
@@ -58,9 +62,6 @@ class UpdateChecker(private val context: Context) {
             for (install in installations) {
                 if (!isActive)
                     return@coroutineScope Result.failure()
-                if (!updateChecker.shouldCheck(install))
-                    continue
-
                 delay(1000)
 
                 launch(Dispatchers.IO) {

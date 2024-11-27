@@ -57,6 +57,12 @@
     <string name="menu_game_gamejam">Учавствует в %1$s</string>
     <string name="menu_game_author">Другое от %1$s</string>
     <string name="menu_game_author_generic">Другое от создателя</string>
+    <string name="menu_game_subscribe">Подписаться на обновления</string>
+    <string name="popup_subscribe_game_not_owned">Нельзя подписаться на продукт, которым мы не владеем.</string>
+    <string name="popup_subscribe_game_all_subscribed">Вы уже подписались на все доступные файлы.</string>
+    <string name="dialog_subscribe_title">Подписка</string>
+    <string name="dialog_subscribe_message">Вы получите уведомление, когда для одного из этих файлов выйдет обновление.</string>
+    <string name="dialog_subscribe_yes">Подписаться</string>
     <string name="settings_category_ui">Внешний вид</string>
     <string name="settings_theme">Тема</string>
     <string name="settings_theme_dark">Тёмная</string>

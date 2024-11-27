@@ -74,7 +74,8 @@ abstract class GameDao {
         FROM games INNER JOIN installations
         ON games.$GAME_ID = installations.game_id
         WHERE $STATUS != ${Installation.STATUS_INSTALLED} 
-            AND $STATUS != ${Installation.STATUS_WEB_CACHED}""")
+            AND $STATUS != ${Installation.STATUS_WEB_CACHED}
+            AND $STATUS != ${Installation.STATUS_SUBSCRIPTION}""")
     abstract fun getPendingGames(): LiveData<List<GameInstallation>>
 
 

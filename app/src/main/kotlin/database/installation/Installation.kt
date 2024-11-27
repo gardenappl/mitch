@@ -14,6 +14,7 @@ import garden.appl.mitch.database.installation.Installation.Companion.STATUS_INS
 import garden.appl.mitch.database.installation.Installation.Companion.STATUS_READY_TO_INSTALL
 import garden.appl.mitch.install.NativeInstaller
 import garden.appl.mitch.install.SessionInstaller
+import kotlinx.collections.immutable.persistentMapOf
 
 
 /**
@@ -202,12 +203,20 @@ data class Installation(
         const val STATUS_INSTALLING = 2
         const val STATUS_READY_TO_INSTALL = 3
         const val STATUS_WEB_CACHED = 4
+        const val STATUS_SUBSCRIPTION = 5
 
         const val PLATFORM_NONE = 0
         const val PLATFORM_WINDOWS = 1
         const val PLATFORM_MAC = 2
         const val PLATFORM_LINUX = 4
         const val PLATFORM_ANDROID = 8
+
+        private val platformNames = persistentMapOf(
+            Pair(PLATFORM_ANDROID, "Android"),
+            Pair(PLATFORM_WINDOWS, "Windows"),
+            Pair(PLATFORM_MAC, "macOS"),
+            Pair(PLATFORM_LINUX, "Linux")
+        )
     }
 
 
@@ -216,4 +225,9 @@ data class Installation(
         availableUploadIdsString?.split(',')?.map { uploadIdString ->
             Integer.parseInt(uploadIdString)
         }
+
+    val platformsStrings: List<String>
+        get() = platformNames.entries
+            .filter { (flag, _) -> platforms and flag == flag }
+            .map { (_, name) -> name }
 }

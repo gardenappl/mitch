@@ -60,6 +60,7 @@ import garden.appl.mitch.client.ItchBrowseHandler
 import garden.appl.mitch.client.ItchWebsiteParser
 import garden.appl.mitch.client.SpecialBundleHandler
 import garden.appl.mitch.data.ItchGenre
+import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.databinding.BrowseFragmentBinding
 import kotlinx.coroutines.CoroutineScope
@@ -783,7 +784,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
     /**
      * Add app bar actions from itch.io toolbar, which appears on game pages and devlog pages.
-     * Does not clear the current list.
+     * Also adds a Subscription button for game URLS.
      *
      * Should run on the UI thread!
      *
@@ -793,6 +794,16 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     private fun addAppBarActionsFromHtml(appBar: Toolbar, doc: Document) {
         appBar.menu.clear()
 
+        if (ItchWebsiteUtils.isStorePage(doc) || ItchWebsiteUtils.isDownloadPage(doc)) {
+            appBar.menu.add(APP_BAR_ACTIONS_DEFAULT, 0, 0, R.string.menu_game_subscribe)
+                .setOnMenuItemClickListener {
+                    this.launch {
+                        showSubscriptionDialog(doc)
+                    }
+                    true
+                }
+        }
+
         val navbarItems = doc.getElementById("user_tools")?.children() ?: return
 
         while (navbarItems.isNotEmpty()) {
@@ -800,14 +811,14 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
             val url = item.child(0).attr("href")
 
             if (item.getElementsByClass("related_games_btn").isNotEmpty()) {
-                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 5, 5, R.string.menu_game_related)
+                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 7, 7, R.string.menu_game_related)
                     .setOnMenuItemClickListener {
                         loadUrl(url)
                         true
                     }
 
             } else if (item.getElementsByClass("rate_game_btn").isNotEmpty()) {
-                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 4, 4, R.string.menu_game_rate)
+                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 6, 6, R.string.menu_game_rate)
                     .setOnMenuItemClickListener {
                         loadUrl(url)
                         true
@@ -816,30 +827,18 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM)
 
             } else if (item.hasClass("devlog_link")) {
-                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 3, 3, R.string.menu_game_devlog)
+                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 5, 5, R.string.menu_game_devlog)
                     .setOnMenuItemClickListener {
                         loadUrl(url)
                         true
                     }
 
             } else if (item.getElementsByClass("add_to_collection_btn").isNotEmpty()) {
-                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 2, 2, R.string.menu_game_collection)
+                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 4, 4, R.string.menu_game_collection)
                     .setOnMenuItemClickListener {
                         loadUrl(url)
                         true
                     }
-
-            } else if (item.hasClass("jam_entry")) {
-                // TODO: handle multiple jam entries nicely
-                val menuItemName = item.child(0).text()
-
-                appBar.menu.add(APP_BAR_ACTIONS_GAME_JAM, 1, 1, menuItemName)
-                    .setOnMenuItemClickListener {
-                        loadUrl(url)
-                        true
-                    }
-                    .setIcon(R.drawable.ic_baseline_emoji_events_24)
-                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM)
 
             } else if (item.getElementsByClass("view_more").isNotEmpty()) {
                 // Cannot rely on ItchWebsiteParser, because its method requires the current URL,
@@ -853,13 +852,82 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     else
                         resources.getString(R.string.menu_game_author_generic)
 
-                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 0, 0, menuItemName).setOnMenuItemClickListener {
+                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 3, 3, menuItemName).setOnMenuItemClickListener {
                     loadUrl(url)
                     true
                 }
+            } else if (item.hasClass("jam_entry")) {
+                // TODO: handle multiple jam entries nicely
+                val menuItemName = item.child(0).text()
+
+                appBar.menu.add(APP_BAR_ACTIONS_GAME_JAM, 0, 0, menuItemName)
+                    .setOnMenuItemClickListener {
+                        loadUrl(url)
+                        true
+                    }
+                    .setIcon(R.drawable.ic_baseline_emoji_events_24)
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+
             }
 
             navbarItems.removeAt(navbarItems.size - 1)
+        }
+    }
+
+    private suspend fun showSubscriptionDialog(doc: Document) {
+        val installations = if (ItchWebsiteUtils.hasGameDownloadLinks(doc)) {
+            ItchWebsiteParser.getInstallations(doc)
+        } else {
+            val downloadUrl = url?.let {
+                ItchWebsiteParser.getDownloadUrl(doc, it)?.url
+            }
+            if (downloadUrl == null) {
+                Toast.makeText(context, R.string.popup_subscribe_game_not_owned, Toast.LENGTH_LONG)
+                    .show()
+                return
+            }
+            ItchWebsiteParser.getInstallations(ItchWebsiteUtils.fetchAndParse(downloadUrl))
+        }
+        val db = AppDatabase.getDatabase(requireContext())
+        val subscriptions = db.installDao.getFinishedInstallationsAndSubscriptionsSync()
+        val availableSubscriptions =
+            installations.filter { install ->
+                !subscriptions.any { subscription -> subscription.uploadId == install.uploadId }
+            }
+        if (availableSubscriptions.isEmpty()) {
+            Toast.makeText(context, R.string.popup_subscribe_game_all_subscribed, Toast.LENGTH_LONG)
+                .show()
+            return
+        }
+        val subscribeOptions = availableSubscriptions.map { install ->
+            val platforms = install.platformsStrings
+            if (platforms.isEmpty())
+                return@map install.uploadName
+            else
+                return@map "(${platforms.joinToString()}) ${install.uploadName}"
+        }.toTypedArray()
+        Log.d(LOGGING_TAG, subscribeOptions.joinToString())
+        AlertDialog.Builder(requireContext()).run {
+            setTitle(R.string.dialog_subscribe_title)
+//            setMessage(R.string.dialog_subscribe_message)
+            setMultiChoiceItems(subscribeOptions, null) { _, _, _ -> /* NO-OP */ }
+            setPositiveButton(R.string.dialog_subscribe_yes) { dialog, _ ->
+                val checkedPositions = (dialog as AlertDialog).listView.checkedItemPositions
+                val selectedSubscriptions = availableSubscriptions
+                    .filterIndexed{ index, _ -> checkedPositions.get(index) }
+                this@BrowseFragment.launch {
+                    for (subscription in selectedSubscriptions) {
+                        db.installDao.insert(subscription.copy(
+                            status = Installation.STATUS_SUBSCRIPTION
+                        ))
+                    }
+                    if (subscriptions.isNotEmpty())
+                        (activity as MainActivity).setActiveFragment(MainActivity.UPDATES_FRAGMENT_TAG)
+                }
+            }
+            setNegativeButton(R.string.dialog_cancel) { _, _ -> /* NO-OP */ }
+            setCancelable(true)
+            show()
         }
     }
 

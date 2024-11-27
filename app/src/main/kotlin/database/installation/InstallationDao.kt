@@ -1,6 +1,5 @@
 package garden.appl.mitch.database.installation
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -15,6 +14,7 @@ import garden.appl.mitch.database.installation.Installation.Companion.PACKAGE_NA
 import garden.appl.mitch.database.installation.Installation.Companion.STATUS
 import garden.appl.mitch.database.installation.Installation.Companion.STATUS_INSTALLED
 import garden.appl.mitch.database.installation.Installation.Companion.STATUS_INSTALLING
+import garden.appl.mitch.database.installation.Installation.Companion.STATUS_SUBSCRIPTION
 import garden.appl.mitch.database.installation.Installation.Companion.STATUS_WEB_CACHED
 import garden.appl.mitch.database.installation.Installation.Companion.TABLE_NAME
 import garden.appl.mitch.database.installation.Installation.Companion.UPLOAD_ID
@@ -22,16 +22,13 @@ import garden.appl.mitch.database.installation.Installation.Companion.UPLOAD_ID
 @Dao
 abstract class InstallationDao {
     @Query("SELECT * FROM $TABLE_NAME")
-    abstract fun getAllKnownInstallations(): LiveData<List<Installation>>
-
-    @Query("SELECT * FROM $TABLE_NAME")
     abstract suspend fun getAllKnownInstallationsSync(): List<Installation>
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $STATUS = $STATUS_INSTALLED")
-    abstract fun getFinishedInstallations(): LiveData<List<Installation>>
-
-    @Query("SELECT * FROM $TABLE_NAME WHERE $STATUS = $STATUS_INSTALLED")
-    abstract suspend fun getFinishedInstallationsSync(): List<Installation>
+    @Query("""
+        SELECT * FROM $TABLE_NAME 
+        WHERE $STATUS = $STATUS_INSTALLED
+            OR $STATUS = $STATUS_SUBSCRIPTION""")
+    abstract suspend fun getFinishedInstallationsAndSubscriptionsSync(): List<Installation>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId AND $STATUS = $STATUS_INSTALLED")
     abstract suspend fun getFinishedInstallationsForGame(gameId: Int): List<Installation>
@@ -39,7 +36,9 @@ abstract class InstallationDao {
     @Query("""
         SELECT * FROM $TABLE_NAME 
         WHERE $UPLOAD_ID = :uploadId 
-            AND $STATUS != $STATUS_INSTALLED AND $STATUS != $STATUS_WEB_CACHED""")
+            AND $STATUS != $STATUS_INSTALLED 
+            AND $STATUS != $STATUS_WEB_CACHED
+            AND $STATUS != $STATUS_SUBSCRIPTION""")
     abstract suspend fun getPendingInstallation(uploadId: Int): Installation?
 
     @Query("DELETE FROM $TABLE_NAME WHERE $PACKAGE_NAME = :packageName AND $STATUS = $STATUS_INSTALLED")

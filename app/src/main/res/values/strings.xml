@@ -63,6 +63,12 @@
     <string name="menu_game_gamejam">%1$s entry</string>
     <string name="menu_game_author">More from %1$s</string>
     <string name="menu_game_author_generic">More from this creator</string>
+    <string name="menu_game_subscribe">Subscribe to updates</string>
+    <string name="popup_subscribe_game_not_owned">Cannot subscribe to a product that we haven\'t purchased.</string>
+    <string name="popup_subscribe_game_all_subscribed">You have already subscribed to all available files.</string>
+    <string name="dialog_subscribe_title">Subscription</string>
+    <string name="dialog_subscribe_message">You will receive a notification when one of these files gets updated.</string>
+    <string name="dialog_subscribe_yes">Subscribe</string>
     <string name="settings_theme">Theme</string>
     <string name="settings_theme_dark">Dark</string>
     <string name="settings_theme_light">Light</string>
