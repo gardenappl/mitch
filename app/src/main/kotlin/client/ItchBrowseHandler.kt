@@ -213,7 +213,11 @@ class ItchBrowseHandler(private val context: MitchActivity, private val scope: C
                 .show()
         }
 
-        context.requestNotificationPermission()
+        context.requestNotificationPermission(
+            scope,
+            R.string.dialog_notification_explain_download,
+            R.string.dialog_notification_cancel_download
+        )
         GameDownloader.requestDownload(context, pendingInstall, downloadUrl,
             downloadPageUrl, contentDisposition, mimeType, contentLength)
     }

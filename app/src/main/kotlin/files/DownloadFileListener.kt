@@ -118,9 +118,10 @@ open class DownloadFileListener {
         else
             NOTIFICATION_TAG_DOWNLOAD_LONG
         MitchActivity.tryNotifyWithPermission(
-            null, context,
+            null, context, null,
             tag, downloadId.toInt(), notification,
-            R.string.dialog_notification_explain_download
+            R.string.dialog_notification_explain_download,
+            R.string.dialog_notification_cancel_download
         )
     }
 }

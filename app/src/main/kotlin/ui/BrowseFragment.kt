@@ -1036,7 +1036,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     }
                 }
             }
-            Utils.logDebug(LOGGING_TAG, "Method: ${request.method}, Url: ${request.url}, ${request.requestHeaders.entries.joinToString()}")
+//            Utils.logDebug(LOGGING_TAG, "Method: ${request.method}, Url: ${request.url}, ${request.requestHeaders.entries.joinToString()}")
             return null
         }
 

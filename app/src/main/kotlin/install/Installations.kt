@@ -217,9 +217,10 @@ object Installations {
         else
             NOTIFICATION_TAG_INSTALL_RESULT_LONG
         MitchActivity.tryNotifyWithPermission(
-            null, context,
+            null, context, null,
             tag, installSessionId.toInt(), builder.build(),
-            R.string.dialog_notification_explain_download
+            R.string.dialog_notification_explain_download,
+            R.string.dialog_notification_cancel_download
         )
     }
 

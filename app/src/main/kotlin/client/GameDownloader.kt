@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.webkit.CookieManager
-import android.webkit.URLUtil
 import androidx.core.app.NotificationCompat
 import androidx.core.app.PendingIntentCompat
 import garden.appl.mitch.ErrorReportBroadcastReceiver
@@ -58,9 +57,10 @@ object GameDownloader {
                 build()
             }.let { notification ->
                 MitchActivity.tryNotifyWithPermission(
-                    null, context,
+                    null, context, null,
                     NOTIFICATION_TAG_UPDATE_CHECK, update.installationId, notification,
-                    R.string.dialog_notification_explain_download
+                    R.string.dialog_notification_explain_download,
+                    R.string.dialog_notification_cancel_download
                 )
             }
         }
