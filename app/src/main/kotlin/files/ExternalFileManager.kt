@@ -117,7 +117,7 @@ class ExternalFileManager {
                     )
                 } catch (e: FileAlreadyExistsException) {
                     i++
-                    attemptBaseName = "${file.nameWithoutExtension}-$i"
+                    attemptBaseName = "${file.nameWithoutExtension} ($i)"
                 }
             }
         }
