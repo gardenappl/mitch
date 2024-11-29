@@ -228,7 +228,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         if (intent?.getIntExtra(EXTRA_GAME_ID, -1)
             != this.intent?.getIntExtra(EXTRA_GAME_ID, -2)) {
