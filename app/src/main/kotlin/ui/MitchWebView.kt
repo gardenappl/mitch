@@ -20,4 +20,34 @@ class MitchWebView @JvmOverloads constructor(
 
     val contentWidth: Float
         get() = (computeHorizontalScrollRange().toFloat() / resources.displayMetrics.density)
+
+    fun redirectBlobUrlToDataUrl(blobUrl: String, fileName: String) {
+        evaluateJavascript("""
+            {
+                // https://stackoverflow.com/a/11901662/5701177
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "$blobUrl", true);
+                xhr.responseType = "blob";
+                xhr.onload = function(e) {
+                    if (this.status == 200) {
+                        var blob = this.response;
+                        // https://stackoverflow.com/a/30407959/5701177
+                        var reader = new FileReader();
+                        reader.onload = function(e) {
+                            // https://stackoverflow.com/a/15832662/5701177
+                            var link = document.createElement("a");
+                            link.download = "$fileName";
+                            link.href = e.target.result;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            delete link;
+                        }
+                        reader.readAsDataURL(blob);
+                    }
+                };
+                xhr.send();
+            }
+            """, null)
+    }
 }

@@ -162,7 +162,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         // JavaScript interface has catastrophic security vulnerabilities in old Android versions.
         // Explicitly disable it even though minSdk is greater than JellyBean.
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN)
-            webView.addJavascriptInterface(ItchJavaScriptInterface(this), "mitchCustomJS")
+            webView.addJavascriptInterface(MitchJavaScriptInterface(this), "mitchCustomJS")
 
         webView.setDownloadListener { url, _, contentDisposition, mimeType, contentLength ->
             Log.d(LOGGING_TAG, "Requesting download...")
@@ -957,11 +957,11 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         val cssVisibility = if (visible) "visible" else "hidden"
         webView.post {
             webView.evaluateJavascript("""
-                    {
-                        let navbar = document.getElementById("user_tools")
-                        if (navbar)
-                            navbar.style.visibility = "$cssVisibility"
-                    }
+                {
+                    let navbar = document.getElementById("user_tools")
+                    if (navbar)
+                        navbar.style.visibility = "$cssVisibility"
+                }
                 """, callback
             )
         }
@@ -999,13 +999,14 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 		}
                     }
                 }
-            """.trimIndent(), null)
+                """.trimIndent(), null
+            )
         }
     }
     
 
     @Keep // prevent this class from being removed by compiler optimizations
-    private class ItchJavaScriptInterface(val fragment: BrowseFragment) {
+    private class MitchJavaScriptInterface(val fragment: BrowseFragment) {
         private fun verifyNonce(nonce: String) {
             if (nonce != fragment.webViewJSNonce.toString()) {
                 fragment.launch(Dispatchers.Main) {
@@ -1114,7 +1115,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 window.addEventListener("resize", (event) => {
                     mitchCustomJS.onResize();
                 });
-            """, null
+                """, null
             )
 
             val uri = url.toUri()
@@ -1123,16 +1124,17 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 val androidOnlyFilter = sharedPrefs.getBoolean(PREF_WEB_ANDROID_FILTER, true)
                 if (androidOnlyFilter) {
                     browseFragment.webView.evaluateJavascript("""
-                document.addEventListener("DOMContentLoaded", (event) => {
-                    // Android-only filter
-                    let elements = document.getElementsByClassName("game_cell");
-                    for (var element of elements) {
-                        if (element.getElementsByClassName("icon-android").length == 0) {
-                            element.style.display = "none";
-                        }
-                    }
-                });
-                """, null)
+                        document.addEventListener("DOMContentLoaded", (event) => {
+                            // Android-only filter
+                            let elements = document.getElementsByClassName("game_cell");
+                            for (var element of elements) {
+                                if (element.getElementsByClassName("icon-android").length == 0) {
+                                    element.style.display = "none";
+                                }
+                            }
+                        });
+                        """, null
+                    )
                 }
             }
         }

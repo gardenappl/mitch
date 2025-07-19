@@ -120,7 +120,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
     }
 
     private lateinit var binding: ActivityGameBinding
-    private lateinit var webView: WebView
+    private lateinit var webView: MitchWebView
     private lateinit var chromeClient: GameChromeClient
     private var fileChooserCallback: ValueCallback<Array<Uri>>? = null
 
@@ -174,6 +174,10 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
 
         webView.setDownloadListener { url, _, contentDisposition, mimeType, contentLength ->
             val fileName = Utils.guessFileName(url, contentDisposition, mimeType)
+            if (url.startsWith("blob:")) {
+                webView.redirectBlobUrlToDataUrl(url, fileName)
+                return@setDownloadListener
+            }
             Log.d(LOGGING_TAG, "Guessed file name: $fileName")
 
             AlertDialog.Builder(this).apply {
