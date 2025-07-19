@@ -17,7 +17,6 @@ import android.webkit.ValueCallback
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.Toast
@@ -182,6 +181,10 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
                 setMessage(fileName)
                 setCancelable(true)
                 setPositiveButton(R.string.dialog_yes) { _, _ ->
+                    requestNotificationPermission(this@GameActivity,
+                        R.string.dialog_notification_explain_download,
+                        R.string.dialog_notification_cancel_download
+                    )
                     Mitch.externalFileManager.requestPermissionIfNeeded(this@GameActivity) {
                         Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_SHORT)
                             .show()
@@ -433,43 +436,23 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         return newIntent
     }
 
-    inner class GameWebViewClient : WebViewClient() {
-        override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-            if (ItchWebsiteUtils.isItchWebPageOrCDN(request.url)) {
-                return false
-            }
-            val intent = Intent(Intent.ACTION_VIEW, request.url)
-            if (intent.resolveActivity(packageManager) != null) {
-                startActivity(intent)
-            } else {
-                Log.i(LOGGING_TAG, "No app found that can handle ${request.url}")
-                Toast.makeText(
-                    applicationContext,
-                    resources.getString(R.string.popup_handler_app_not_found, request.url),
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-            return true
-        }
-
+    inner class GameWebViewClient : MitchWebViewClient() {
         override fun shouldInterceptRequest(
             view: WebView,
             request: WebResourceRequest
-        ): WebResourceResponse? = runBlocking(Dispatchers.IO) {
-            if (request.url.scheme?.startsWith("http") != true)
-                return@runBlocking null
+        ): WebResourceResponse? {
+            if (request.url.scheme != "http" && request.url.scheme != "https")
+                return super.shouldInterceptRequest(view, request)
             if (!request.method.equals("GET", ignoreCase = true))
-                return@runBlocking null
+                return super.shouldInterceptRequest(view, request)
+            if (!this@GameActivity.isCaching)
+                return super.shouldInterceptRequest(view, request)
+
             val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
-
-            if (!this@GameActivity.isCaching) {
-//                Utils.logDebug(LOGGING_TAG, "GET ${request.url}, not intercepting...")
-                return@runBlocking null
+            return runBlocking(Dispatchers.IO) {
+                Mitch.webGameCache.request(applicationContext, gameId, request,
+                    this@GameActivity.isOfflineMode)
             }
-//            Utils.logDebug(LOGGING_TAG, "GET ${request.url}, ${request.requestHeaders.entries.joinToString()}")
-
-            Mitch.webGameCache.request(applicationContext, gameId, request,
-                this@GameActivity.isOfflineMode)
         }
     }
 

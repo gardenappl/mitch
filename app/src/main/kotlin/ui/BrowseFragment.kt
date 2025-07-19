@@ -24,10 +24,7 @@ import android.view.inputmethod.InputMethodManager
 import android.webkit.CookieManager
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.LinearLayout
@@ -41,6 +38,7 @@ import androidx.annotation.Keep
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ShareCompat
+import androidx.core.net.toUri
 import androidx.core.view.MenuCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -70,7 +68,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import java.io.ByteArrayInputStream
 import java.security.SecureRandom
 import java.util.Locale
 
@@ -156,7 +153,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         webView.settings.databaseEnabled = true
 
         webView.settings.mediaPlaybackRequiresUserGesture = false
-        webView.webViewClient = MitchWebViewClient()
+        webView.webViewClient = MitchBrowserWebViewClient(this)
         webView.webChromeClient = chromeClient
 
         webView.settings.allowFileAccess = false
@@ -1052,133 +1049,90 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
     }
 
+    inner class MitchBrowserWebViewClient(
+        private val browseFragment: BrowseFragment
+    ) : MitchWebViewClient() {
+        val githubLoginPathRegex = Regex("""^/?(login|sessions)(/.*)?$""")
 
-
-    inner class MitchWebViewClient : WebViewClient() {
-        val githubLoginPathRegex = Regex("""/?(login|sessions)(/.*)?""")
-
-        override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-            if (ItchWebsiteUtils.isItchWebPageOrCDN(request.url)) {
+        override fun shouldOverrideUrlLoading(view: WebView, uri: Uri): Boolean {
+            if (uri.host == "github.com"
+                && uri.path?.matches(githubLoginPathRegex) == true) {
                 return false
-            } else if (request.url.host == "github.com"
-                    && request.url.path?.matches(githubLoginPathRegex) == true) {
-                return false
-            } else {
-                val intent = Intent(Intent.ACTION_VIEW, request.url)
-                if (intent.resolveActivity(requireContext().packageManager) != null) {
-                    startActivity(intent)
-                } else {
-                    Log.i(LOGGING_TAG, "No app found that can handle ${request.url}")
-                    Toast.makeText(context,
-                        resources.getString(R.string.popup_handler_app_not_found, request.url),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                return true
             }
+
+            return super.shouldOverrideUrlLoading(view, uri)
         }
-
-        override fun shouldInterceptRequest(
-            view: WebView,
-            request: WebResourceRequest
-        ): WebResourceResponse? {
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(view.context)
-            val blockTrackers = sharedPreferences.getBoolean("preference_block_trackers", true)
-
-            if (blockTrackers) {
-                arrayOf(
-                    "google-analytics.com",
-                    "adservice.google.com",
-                    "googlesyndication.com",
-                    "doubleclick.net",
-                    "crashlytics.com"
-                ).forEach { trackerHostUrl ->
-                    if (request.url.host?.contains('.' + trackerHostUrl) == true ||
-                        request.url.host == trackerHostUrl) {
-
-                        return WebResourceResponse(
-                            "text/plain",
-                            "utf-8",
-                            ByteArrayInputStream("tracker_blocked".toByteArray())
-                        )
-                    }
-                }
-            }
-//            Utils.logDebug(LOGGING_TAG, "Method: ${request.method}, Url: ${request.url}, ${request.requestHeaders.entries.joinToString()}")
-            return null
-        }
-
 
         override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-            val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            val prefs = PreferenceManager.getDefaultSharedPreferences(browseFragment.requireContext())
             val hiddenElements = if (prefs.getBoolean(PREF_DEBUG_WEB_GAMES_IN_BROWSE_TAB, false) && BuildConfig.DEBUG)
                 ".purchase_banner, .header_buy_row, .buy_row, .donate_btn"
             else
                 ".purchase_banner, .header_buy_row, .buy_row, .donate_btn, .embed_wrapper, .load_iframe_btn"
             view.evaluateJavascript("""
-                    document.addEventListener("DOMContentLoaded", (event) => {
-                        // tell Android that the document is ready
-                        mitchCustomJS.onHtmlLoaded("<html>" + document.getElementsByTagName("html")[0].innerHTML + "</html>",
-                                                   window.location.href, "$webViewJSNonce");
-                                               
-                        // setup download buttons
-                        let downloadButtons = document.getElementsByClassName("download_btn");
-                        for (var downloadButton of downloadButtons) {
-                            let uploadId = downloadButton.getAttribute("data-upload_id");
-                            downloadButton.addEventListener("click", (event) => {
-                                mitchCustomJS.onDownloadLinkClick(uploadId, "$webViewJSNonce");
-                            });
-                        }
+                document.addEventListener("DOMContentLoaded", (event) => {
+                    // tell Android that the document is ready
+                    mitchCustomJS.onHtmlLoaded("<html>" + document.getElementsByTagName("html")[0].innerHTML + "</html>",
+                                               window.location.href, "${browseFragment.webViewJSNonce}");
+                                           
+                    // setup download buttons
+                    let downloadButtons = document.getElementsByClassName("download_btn");
+                    for (var downloadButton of downloadButtons) {
+                        let uploadId = downloadButton.getAttribute("data-upload_id");
+                        downloadButton.addEventListener("click", (event) => {
+                            mitchCustomJS.onDownloadLinkClick(uploadId, "${browseFragment.webViewJSNonce}");
+                        });
+                    }
+                    
+                    // remove YouTube banner
+                    let ytBanner = document.querySelector(".youtube_mobile_banner_widget");
+                    if (ytBanner)
+                        ytBanner.style.visibility = "hidden";
                         
-                        // remove YouTube banner
-                        let ytBanner = document.querySelector(".youtube_mobile_banner_widget");
-                        if (ytBanner)
-                            ytBanner.style.visibility = "hidden";
-                            
-                        // remove game purchase banners, we implement our own
-                        let elements = document.querySelectorAll("$hiddenElements");
-                        for (var element of elements)
-                            element.style.display = "none";
-                            
-                        // stop highlighting download links for non-Android OSs
-                        const uploads = document.querySelectorAll(".uploads .upload")
-                        for (const upload of uploads) {
-                        	if (upload.querySelector(".icon-android") != null)
-                        		continue
-                        	if (upload.querySelector(".icon-windows8, .icon-tux, .icon-apple") == null)
-                        		continue
-                        	const button = upload.querySelector(".download_btn")
-                            if (!button)
-                                continue
-                            let buttonColor = getComputedStyle(button).getPropertyValue("--itchio_button_color")
-                            if (!buttonColor)
-                                buttonColor = '#FF2449'
-                        	button.setAttribute("style", "background-color: inherit; border-color: " 
-                                    + buttonColor + "; color: " + buttonColor + "; text-shadow: none;")
-                        }
-                    });
-                    window.addEventListener("resize", (event) => {
-                        mitchCustomJS.onResize();
-                    });
-                """, null
+                    // remove game purchase banners, we implement our own
+                    let elements = document.querySelectorAll("$hiddenElements");
+                    for (var element of elements)
+                        element.style.display = "none";
+                        
+                    // stop highlighting download links for non-Android OSs
+                    const uploads = document.querySelectorAll(".uploads .upload")
+                    for (const upload of uploads) {
+                        if (upload.querySelector(".icon-android") != null)
+                            continue
+                        if (upload.querySelector(".icon-windows8, .icon-tux, .icon-apple") == null)
+                            continue
+                        const button = upload.querySelector(".download_btn")
+                        if (!button)
+                            continue
+                        let buttonColor = getComputedStyle(button).getPropertyValue("--itchio_button_color")
+                        if (!buttonColor)
+                            buttonColor = '#FF2449'
+                        button.setAttribute("style", "background-color: inherit; border-color: " 
+                                + buttonColor + "; color: " + buttonColor + "; text-shadow: none;")
+                    }
+                });
+                window.addEventListener("resize", (event) => {
+                    mitchCustomJS.onResize();
+                });
+            """, null
             )
 
-            val uri = Uri.parse(url)
+            val uri = url.toUri()
             if (uri.pathSegments.containsAll(listOf("games", "platform-android"))) {
-                val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(browseFragment.requireContext())
                 val androidOnlyFilter = sharedPrefs.getBoolean(PREF_WEB_ANDROID_FILTER, true)
                 if (androidOnlyFilter) {
-                    webView.evaluateJavascript("""
-                    document.addEventListener("DOMContentLoaded", (event) => {
-                        // Android-only filter
-                        let elements = document.getElementsByClassName("game_cell");
-                        for (var element of elements) {
-                            if (element.getElementsByClassName("icon-android").length == 0) {
-                                element.style.display = "none";
-                            }
+                    browseFragment.webView.evaluateJavascript("""
+                document.addEventListener("DOMContentLoaded", (event) => {
+                    // Android-only filter
+                    let elements = document.getElementsByClassName("game_cell");
+                    for (var element of elements) {
+                        if (element.getElementsByClassName("icon-android").length == 0) {
+                            element.style.display = "none";
                         }
-                    });
-                    """, null)
+                    }
+                });
+                """, null)
                 }
             }
         }
