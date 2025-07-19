@@ -1,8 +1,8 @@
 keystore.properties
+local.properties
 *.iml
 .gradle/
 .kotlin/
-local.properties
 /.idea/caches
 /.idea/libraries
 /.idea/androidTestResultsUserPreferences.xml
@@ -11,6 +11,7 @@ local.properties
 /.idea/gradle.xml
 /.idea/modules.xml
 /.idea/navEditor.xml
+/.idea/studiobot.xml
 /.idea/workspace.xml
 .DS_Store
 **/build/

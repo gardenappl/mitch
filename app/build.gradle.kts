@@ -6,6 +6,7 @@ plugins {
     kotlin("android")
     id("com.google.devtools.ksp")
     id("com.mikepenz.aboutlibraries.plugin")
+    id("org.jetbrains.kotlin.plugin.compose") version "2.0.20"
 }
 
 
@@ -82,13 +83,14 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        compose = true
     }
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.20")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
 
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
@@ -134,6 +136,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     ksp("com.github.bumptech.glide:ksp:4.16.0")
     implementation("com.github.bumptech.glide:recyclerview-integration:4.16.0")
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.14")
     // FAB Speed Dial
