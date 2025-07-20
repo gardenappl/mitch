@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <WebView
+    <garden.appl.mitch.ui.MitchWebView
             android:id="@+id/game_web_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

@@ -172,6 +172,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
 
         webView.setBackgroundColor(Utils.getColor(this, R.color.colorAccent))
 
+        // TODO: actually use the userAgent parameter
         webView.setDownloadListener { url, _, contentDisposition, mimeType, contentLength ->
             val fileName = Utils.guessFileName(url, contentDisposition, mimeType)
             if (url.startsWith("blob:")) {
@@ -387,8 +388,9 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
             </head>
             <body>${game.webIframe}</body>
         </html>""".trimIndent()
-        webView.loadDataWithBaseURL(game.storeUrl, html, "text/html", "UTF-8", null)
-//        webView.loadDataWithBaseURL(game.webEntryPoint!!, html, "text/html", "UTF-8", null)
+        // using game.webEntryPoint as baseUrl allows us to get blob: URLs within the appropriate JS context
+        // see downloadListener
+        webView.loadDataWithBaseURL(game.webEntryPoint, html, "text/html", "UTF-8", null)
     }
 
     override fun onPause() {

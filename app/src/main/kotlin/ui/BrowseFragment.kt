@@ -161,6 +161,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         webViewJSNonce = SecureRandom().nextLong()
         // JavaScript interface has catastrophic security vulnerabilities in old Android versions.
         // Explicitly disable it even though minSdk is greater than JellyBean.
+        @SuppressLint("ObsoleteSdkInt")
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN)
             webView.addJavascriptInterface(MitchJavaScriptInterface(this), "mitchCustomJS")
 
@@ -1137,6 +1138,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     )
                 }
             }
+            super.onPageStarted(view, url, favicon)
         }
     }
 
