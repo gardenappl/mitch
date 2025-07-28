@@ -9,6 +9,18 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose") version "2.0.20"
 }
 
+aboutLibraries {
+    export {
+        // Disable build metadata i.e. the build timestamp, to allow reproducible builds
+        includeMetaData = false
+    }
+    library {
+        // Enable the duplication mode, allows to merge, or link dependencies which relate
+        duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.LINK
+        // Configure the duplication rule, to match "duplicates" with
+        duplicationRule = com.mikepenz.aboutlibraries.plugin.DuplicateRule.SIMPLE
+    }
+}
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
 val shouldSign = keystorePropertiesFile.canRead()
