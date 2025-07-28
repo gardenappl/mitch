@@ -96,6 +96,8 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         }
 
         /**
+         * Workaround for https://todo.sr.ht/~gardenapple/mitch/69 as well as a migration from
+         * much older database entries
          * @return possibly an updated instance of [Game]
          */
         private suspend fun tryFixBackwardsCompatGame(
@@ -111,11 +113,12 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
                 val doc = ItchWebsiteUtils.fetchAndParse(game.storeUrl, userAgent)
                 val parsedGame = ItchWebsiteParser.getGameInfoForStorePage(doc, game.storeUrl)!!
                 val newGame = game.copy(
+                    webEntryPoint = parsedGame.webEntryPoint,
                     webIframe = parsedGame.webIframe,
                     faviconUrl = parsedGame.faviconUrl
                 )
                 val db = AppDatabase.getDatabase(context)
-                db.gameDao.upsert(newGame)
+                db.gameDao.update(newGame)
                 return newGame
             } catch (_: Exception) {
                 return game
@@ -241,7 +244,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (intent?.getIntExtra(EXTRA_GAME_ID, -1)
+        if (intent.getIntExtra(EXTRA_GAME_ID, -1)
             != this.intent?.getIntExtra(EXTRA_GAME_ID, -2)) {
 
             launch {
@@ -361,12 +364,6 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
     }
 
     private fun loadGame(game: Game) {
-        if (game.webIframe == null) {
-            // backwards compat
-            webView.loadUrl(game.webEntryPoint!!)
-            return
-        }
-
         val html = """<html>
             <head>
                 <style type="text/css">
@@ -392,8 +389,6 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
             </head>
             <body>${game.webIframe}</body>
         </html>""".trimIndent()
-        // using game.webEntryPoint as baseUrl allows us to get blob: URLs within the appropriate JS context
-        // see downloadListener
         webView.loadDataWithBaseURL(game.webEntryPoint, html, "text/html", "UTF-8", null)
     }
 

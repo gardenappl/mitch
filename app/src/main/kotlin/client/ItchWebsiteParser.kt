@@ -11,6 +11,7 @@ import garden.appl.mitch.ItchWebsiteUtils
 import garden.appl.mitch.Mitch
 import garden.appl.mitch.R
 import garden.appl.mitch.Utils
+import garden.appl.mitch.client.ItchWebsiteParser.getPurchasedInfo
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.database.installation.Installation
 import kotlinx.coroutines.Dispatchers
@@ -64,10 +65,12 @@ object ItchWebsiteParser {
         val faviconUrl = storePageDoc.head().selectFirst("link[rel=\"icon\"]")?.attr("href")
 
         val infoTable = getInfoTable(storePageDoc)
-        val authorName = getAuthorName(Uri.parse(gamePageUrl), infoTable)
+        val authorName = getAuthorName(gamePageUrl.toUri(), infoTable)
         val lastDownloadTimestamp: String? = getTimestamp(infoTable)
 
-        val iframeHtml = getIframe(storePageDoc)?.outerHtml()
+        val iframe = getIframe(storePageDoc)
+        val iframeHtml = iframe?.outerHtml()
+        val webEntryPoint = iframe?.attr("src")
 
         return Game(
             gameId = gameId,
@@ -78,7 +81,8 @@ object ItchWebsiteParser {
             lastUpdatedTimestamp = lastDownloadTimestamp,
             locale = getLocale(storePageDoc),
             faviconUrl = faviconUrl,
-            webIframe = iframeHtml
+            webIframe = iframeHtml,
+            webEntryPoint = webEntryPoint
         )
     }
 
@@ -446,10 +450,9 @@ object ItchWebsiteParser {
             return doc.getElementById("game_drop")
     }
 
-    fun getWebGameUrlAndLabel(context: Context, doc: Document): Pair<String?, String?> {
+    fun getWebGameLabel(context: Context, doc: Document): String? {
         val placeholder = doc.selectFirst(".iframe_placeholder")
-        val label = placeholder?.selectFirst(".load_iframe_btn")?.text()
+        return placeholder?.selectFirst(".load_iframe_btn")?.text()
             ?: context.getString(R.string.game_web_play_default_type)
-        return Pair(getIframe(doc, placeholder)?.attr("src"), label)
     }
 }

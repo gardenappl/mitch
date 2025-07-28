@@ -73,15 +73,12 @@ class ItchBrowseHandler(private val context: MitchActivity, private val scope: C
         if (ItchWebsiteUtils.isStorePage(doc)) {
             val db = AppDatabase.getDatabase(context)
             ItchWebsiteParser.getGameInfoForStorePage(doc, url)?.let { gameInfo ->
-                val (webEntryPoint, webLabel) = ItchWebsiteParser.getWebGameUrlAndLabel(context, doc)
-                webLaunchLabel = webLabel
-                game = gameInfo.copy(
-                    webEntryPoint = webEntryPoint
-                )
+                webLaunchLabel = ItchWebsiteParser.getWebGameLabel(context, doc)
+                game = gameInfo
                 Log.d(LOGGING_TAG, "Adding game $game")
-                db.gameDao.upsert(game!!)
+                db.gameDao.upsert(game)
 
-                for (bundle in SpecialBundle.values()) {
+                for (bundle in SpecialBundle.entries) {
                     if (bundle.containsGame(gameInfo.gameId)) {
                         Log.d(LOGGING_TAG, "Belongs to special bundle: " + bundle.slug)
 
