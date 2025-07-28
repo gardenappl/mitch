@@ -63,7 +63,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         fun getShortcutId(gameId: Int) = "web_game/${gameId}"
 
         suspend fun makeShortcut(game: Game, context: Context): ShortcutInfoCompat {
-            val game = tryFixBackwardsCompatGame(game, context)
+            val game = tryFixBackwardsCompatGame(game, context, null)
             val faviconBitmap = game.faviconUrl?.let { url ->
                 withContext(Dispatchers.IO) {
                     val bitmap = try {
@@ -98,13 +98,17 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         /**
          * @return possibly an updated instance of [Game]
          */
-        private suspend fun tryFixBackwardsCompatGame(game: Game, context: Context): Game {
+        private suspend fun tryFixBackwardsCompatGame(
+            game: Game,
+            context: Context,
+            userAgent: String?
+        ): Game {
             if (game.webIframe != null)
                 return game
 
             Log.d(LOGGING_TAG, "getting iframe and favicon as backwards compat")
             try {
-                val doc = ItchWebsiteUtils.fetchAndParse(game.storeUrl)
+                val doc = ItchWebsiteUtils.fetchAndParse(game.storeUrl, userAgent)
                 val parsedGame = ItchWebsiteParser.getGameInfoForStorePage(doc, game.storeUrl)!!
                 val newGame = game.copy(
                     webIframe = parsedGame.webIframe,
@@ -113,7 +117,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
                 val db = AppDatabase.getDatabase(context)
                 db.gameDao.upsert(newGame)
                 return newGame
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 return game
             }
         }
@@ -172,8 +176,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
 
         webView.setBackgroundColor(Utils.getColor(this, R.color.colorAccent))
 
-        // TODO: actually use the userAgent parameter
-        webView.setDownloadListener { url, _, contentDisposition, mimeType, contentLength ->
+        webView.setDownloadListener { url, userAgent, contentDisposition, mimeType, contentLength ->
             val fileName = Utils.guessFileName(url, contentDisposition, mimeType)
             if (url.startsWith("blob:")) {
                 webView.redirectBlobUrlToDataUrl(url, fileName)
@@ -195,7 +198,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
                             .show()
                         this@GameActivity.launch {
                             Downloader.requestDownload(
-                                this@GameActivity, url,
+                                this@GameActivity, url, userAgent,
                                 install = null,
                                 fileName = fileName,
                                 contentLength = contentLength,
@@ -349,7 +352,8 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         this.isCaching = shouldCache
 
         val db = AppDatabase.getDatabase(this)
-        val game = tryFixBackwardsCompatGame(db.gameDao.getGameById(gameId)!!, this)
+        val game = tryFixBackwardsCompatGame(db.gameDao.getGameById(gameId)!!, this,
+            webView.settings.userAgentString)
 
         loadGame(game)
         val shortcut = makeShortcut(game, this@GameActivity)
@@ -456,8 +460,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
 
             val gameId = intent.getIntExtra(EXTRA_GAME_ID, -1)
             return runBlocking(Dispatchers.IO) {
-                Mitch.webGameCache.request(applicationContext, gameId, request,
-                    this@GameActivity.isOfflineMode)
+                Mitch.webGameCache.request(gameId, request, this@GameActivity.isOfflineMode)
             }
         }
     }

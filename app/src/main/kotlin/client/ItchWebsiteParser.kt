@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.Log
 import android.webkit.CookieManager
 import androidx.core.graphics.ColorUtils
+import androidx.core.net.toUri
 import garden.appl.mitch.ItchWebsiteUtils
 import garden.appl.mitch.Mitch
 import garden.appl.mitch.R
@@ -31,7 +32,7 @@ object ItchWebsiteParser {
             get() {
                 if (isFree)
                     return null
-                return Uri.parse(url).lastPathSegment
+                return url.toUri().lastPathSegment
             }
 
         val isFree: Boolean
@@ -315,7 +316,7 @@ object ItchWebsiteParser {
             val cookie = CookieManager.getInstance()?.getCookie(storeUrl)
 
             val form = FormBody.Builder().run {
-                //I don't know if I can implement my own CSRF tokens, so just do whatever
+                // TODO: wat
                 cookie?.let {
                     add("csrf_token", it)
                 }

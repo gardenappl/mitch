@@ -102,14 +102,12 @@ object ItchWebsiteUtils {
             ?.substringAfter("games/")?.toInt()
     }
 
-
-    suspend fun fetchAndParse(url: String): Document = withContext(Dispatchers.IO) {
+    suspend fun fetchAndParse(url: String, userAgent: String? = null): Document = withContext(Dispatchers.IO) {
         val request = Request.Builder().run {
             url(url)
-            CookieManager.getInstance()?.getCookie(url)?.let { cookie ->
-                addHeader("Cookie", cookie)
+            userAgent?.let {
+                header(HEADER_UA, it)
             }
-
             build()
         }
         Mitch.httpClient.newCall(request).execute().use { response ->

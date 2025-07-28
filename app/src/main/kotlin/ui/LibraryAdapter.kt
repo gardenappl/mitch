@@ -30,6 +30,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import garden.appl.mitch.FILE_PROVIDER
@@ -161,7 +162,7 @@ class LibraryAdapter internal constructor(
         } else if (type == GameRepository.Type.WebCached) {
             val intent = Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse(gameInstall.game.webEntryPoint),
+                gameInstall.game.webEntryPoint?.toUri(),
                 context,
                 GameActivity::class.java
             )

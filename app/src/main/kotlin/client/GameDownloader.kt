@@ -5,9 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import android.webkit.CookieManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.PendingIntentCompat
+import androidx.core.net.toUri
 import garden.appl.mitch.ErrorReportBroadcastReceiver
 import garden.appl.mitch.ItchWebsiteUtils
 import garden.appl.mitch.Mitch
@@ -131,6 +131,7 @@ object GameDownloader {
         var contentDisposition: String? = null
         var contentLength: Long? = null
 
+        // TODO: why?
         // Make one request here to get metadata,
         // then another request inside of a DownloadWorker later
         withContext(Dispatchers.IO) {
@@ -161,11 +162,20 @@ object GameDownloader {
 
         val pendingInstall = try {
             ItchWebsiteParser.getPendingInstallation(doc, uploadId)
-        } catch (e: ItchWebsiteParser.UploadNotFoundException) {
+        } catch (_: ItchWebsiteParser.UploadNotFoundException) {
             return UpdateCheckResult.EMPTY
         }
 
-        requestDownload(context, pendingInstall, downloadUrl, url, contentDisposition, mimeType, contentLength)
+        requestDownload(
+            context,
+            pendingInstall,
+            downloadUrl,
+            null,
+            url,
+            contentDisposition,
+            mimeType,
+            contentLength
+        )
         return UpdateCheckResult.UPDATE_AVAILABLE
     }
 
@@ -182,6 +192,7 @@ object GameDownloader {
         context: Context,
         pendingInstall: Installation,
         url: String,
+        userAgent: String?,
         downloadPageUrl: String,
         contentDisposition: String?,
         mimeType: String?,
@@ -198,7 +209,7 @@ object GameDownloader {
         var game = db.gameDao.getGameById(pendingInstall.gameId)
         if (game == null) {
             val storePageUrl =
-                ItchWebsiteParser.getStoreUrlFromDownloadPage(Uri.parse(downloadPageUrl))
+                ItchWebsiteParser.getStoreUrlFromDownloadPage(downloadPageUrl.toUri())
             val doc = ItchWebsiteUtils.fetchAndParse(storePageUrl)
             game = ItchWebsiteParser.getGameInfoForStorePage(doc, storePageUrl)!!
             Log.d(LOGGING_TAG, "Game is missing! Adding game $game")
@@ -207,6 +218,13 @@ object GameDownloader {
 
         val fileName = Utils.guessFileName(url, contentDisposition, mimeType)
         Log.d(LOGGING_TAG, "content length: $contentLength")
-        Mitch.installDownloadManager.requestDownload(context, url, fileName, contentLength, pendingInstall)
+        Mitch.installDownloadManager.requestDownload(
+            context,
+            url,
+            userAgent,
+            fileName,
+            contentLength,
+            pendingInstall
+        )
     }
 }

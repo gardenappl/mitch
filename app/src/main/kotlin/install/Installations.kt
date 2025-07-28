@@ -74,7 +74,7 @@ object Installations {
         uploadId: Int,
         installId: Int
     ) {
-        if (status == Installation.STATUS_INSTALLED && status == Installation.STATUS_WEB_CACHED)
+        if (status == Installation.STATUS_INSTALLED || status == Installation.STATUS_WEB_CACHED)
             throw IllegalArgumentException("Tried to cancel installed Installation")
 
         if (status != Installation.STATUS_INSTALLING) {

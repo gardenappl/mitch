@@ -1,10 +1,10 @@
 package garden.appl.mitch.client
 
 import android.content.Context
-import android.net.Uri
 import android.util.Log
 import android.webkit.CookieManager
 import androidx.core.content.edit
+import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import garden.appl.mitch.ItchWebsiteUtils
 import garden.appl.mitch.Mitch
@@ -45,7 +45,7 @@ object SpecialBundleHandler {
      * If a download link for this username has been cached, return it.
      * Otherwise, do network requests and parsing to get bundle download link.
      */
-    suspend fun getLinkForUser(context: Context, bundle: SpecialBundle, userName: String?): String? {
+    suspend fun getLinkForUser(context: Context, bundle: SpecialBundle, userName: String?, userAgent: String?): String? {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
 
         val prefLink = "mitch." + bundle.slug
@@ -66,7 +66,7 @@ object SpecialBundleHandler {
             if (System.currentTimeMillis() - timestamp < 1000L * 60 * 60 * 24 * CACHE_KEEP_DAYS)
                 return null
 
-            link = getBundleDownloadLink(bundle.url)
+            link = getBundleDownloadLink(bundle.url, userAgent)
 
             sharedPrefs.edit(commit = true) {
                 putLong(prefTimestamp + userName, System.currentTimeMillis())
@@ -76,8 +76,8 @@ object SpecialBundleHandler {
         return link
     }
 
-    private suspend fun getBundleDownloadLink(bundleUrl: String): String? {
-        val bundleDoc = ItchWebsiteUtils.fetchAndParse(bundleUrl)
+    private suspend fun getBundleDownloadLink(bundleUrl: String, userAgent: String?): String? {
+        val bundleDoc = ItchWebsiteUtils.fetchAndParse(bundleUrl, userAgent)
 
         val div = bundleDoc.getElementsByClass("existing_purchases")
         return div.first()?.getElementsByClass("button")?.first()?.attr("href")?.let { link ->
@@ -128,12 +128,12 @@ object SpecialBundleHandler {
     /**
      * @return download link for the newly or previously claimed game from the bundle.
      */
-    suspend fun claimGame(bundleDownloadLink: String, game: Game): String {
-        val searchUri = Uri.parse(bundleDownloadLink).buildUpon().run {
+    suspend fun claimGame(bundleDownloadLink: String, game: Game, userAgent: String?): String {
+        val searchUri = bundleDownloadLink.toUri().buildUpon().run {
             appendQueryParameter("search", game.name)
             build()
         }
-        val doc = ItchWebsiteUtils.fetchAndParse(searchUri.toString())
+        val doc = ItchWebsiteUtils.fetchAndParse(searchUri.toString(), userAgent)
 
         //optional slash at the end
         val storePattern = Pattern.compile("""${Pattern.quote(game.storeUrl.trimEnd('/'))}\/?""")

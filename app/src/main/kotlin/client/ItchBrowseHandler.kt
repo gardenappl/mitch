@@ -26,6 +26,8 @@ class ItchBrowseHandler(private val context: MitchActivity, private val scope: C
 
         // ItchBrowseHandler may be re-created on fragment re-attachment,
         // but I want these values to be retained. Making them static is a lazy solution.
+        // Looking back, the @Volatile annotations are painful,
+        // but I'd rather not get into this now either.
         @Volatile
         private var lastDownloadDoc: Document? = null
         @Volatile
@@ -40,6 +42,8 @@ class ItchBrowseHandler(private val context: MitchActivity, private val scope: C
         private var currentDownloadMimeType: String? = null
         @Volatile
         private var currentDownloadContentLength: Long? = null
+        @Volatile
+        private var currentUserAgent: String? = null
     }
 
     data class Info(
@@ -53,7 +57,7 @@ class ItchBrowseHandler(private val context: MitchActivity, private val scope: C
         val webLaunchLabel: String? = null
     )
 
-    suspend fun onPageVisited(doc: Document, url: String): Info {
+    suspend fun onPageVisited(doc: Document, url: String, userAgent: String): Info {
         lastDownloadDoc = null
         lastDownloadPageUrl = null
 
@@ -82,7 +86,12 @@ class ItchBrowseHandler(private val context: MitchActivity, private val scope: C
                         Log.d(LOGGING_TAG, "Belongs to special bundle: " + bundle.slug)
 
                         val userName = ItchWebsiteUtils.getLoggedInUserName(doc)
-                        bundleLink = SpecialBundleHandler.getLinkForUser(context, bundle, userName)
+                        bundleLink = SpecialBundleHandler.getLinkForUser(
+                            context,
+                            bundle,
+                            userName,
+                            userAgent
+                        )
 
                         if (bundleLink != null) {
                             specialBundle = bundle
@@ -139,11 +148,13 @@ class ItchBrowseHandler(private val context: MitchActivity, private val scope: C
 
     suspend fun onDownloadStarted(
         url: String,
+        userAgent: String,
         contentDisposition: String?,
         mimeType: String?,
         contentLength: Long?
     ) {
         currentDownloadUrl = url
+        currentUserAgent = userAgent
         currentDownloadContentDisposition = contentDisposition
         currentDownloadMimeType = mimeType
         currentDownloadContentLength = contentLength
@@ -157,6 +168,7 @@ class ItchBrowseHandler(private val context: MitchActivity, private val scope: C
         val downloadPageUrl = lastDownloadPageUrl ?: return
         val uploadId = clickedUploadId ?: return
         val downloadUrl = currentDownloadUrl ?: return
+        val userAgent = currentUserAgent ?: return
         val contentDisposition = currentDownloadContentDisposition ?: return
         val mimeType = currentDownloadMimeType ?: return
         val contentLength = currentDownloadContentLength ?: return
@@ -176,7 +188,7 @@ class ItchBrowseHandler(private val context: MitchActivity, private val scope: C
                     setPositiveButton(R.string.dialog_yes) { _, _ ->
                         scope.launch {
                             doDownload(install, downloadPageUrl, downloadUrl,
-                                contentDisposition, mimeType, contentLength)
+                                userAgent, contentDisposition, mimeType, contentLength)
                         }
                     }
                     setNegativeButton(R.string.dialog_no) { _, _ ->
@@ -189,7 +201,7 @@ class ItchBrowseHandler(private val context: MitchActivity, private val scope: C
             }
         } else {
             doDownload(install, downloadPageUrl, downloadUrl,
-                contentDisposition, mimeType, contentLength)
+                userAgent, contentDisposition, mimeType, contentLength)
         }
     }
 
@@ -197,12 +209,14 @@ class ItchBrowseHandler(private val context: MitchActivity, private val scope: C
         pendingInstall: Installation,
         downloadPageUrl: String,
         downloadUrl: String,
+        userAgent: String,
         contentDisposition: String,
         mimeType: String,
         contentLength: Long
     ) {
         clickedUploadId = null
         currentDownloadUrl = null
+        currentUserAgent = null
         currentDownloadContentDisposition = null
         currentDownloadMimeType = null
         currentDownloadContentLength = null
@@ -218,19 +232,7 @@ class ItchBrowseHandler(private val context: MitchActivity, private val scope: C
             R.string.dialog_notification_explain_download,
             R.string.dialog_notification_cancel_download
         )
-        GameDownloader.requestDownload(context, pendingInstall, downloadUrl,
+        GameDownloader.requestDownload(context, pendingInstall, downloadUrl, userAgent,
             downloadPageUrl, contentDisposition, mimeType, contentLength)
-    }
-
-    suspend fun getGameEmbedInfoFromId(gameId: Int): Game {
-        val doc = ItchWebsiteUtils.fetchAndParse("https://itch.io/embed/$gameId")
-
-        return Game(
-            gameId = gameId,
-            name = doc.selectFirst("h1")!!.text(),
-            author = doc.selectFirst(".author_row a")!!.text(),
-            storeUrl = doc.selectFirst(".button_row a")!!.absUrl("href"),
-            thumbnailUrl = doc.selectFirst(".thumb")!!.absUrl("src")
-        )
     }
 }

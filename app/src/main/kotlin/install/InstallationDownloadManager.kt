@@ -30,7 +30,7 @@ class InstallationDownloadManager(context: Context) {
      *
      * @param contentLength file size, null if unknown
      */
-    suspend fun requestDownload(context: Context, url: String,
+    suspend fun requestDownload(context: Context, url: String, userAgent: String?,
                                 fileName: String, contentLength: Long?, install: Installation) {
         val db = AppDatabase.getDatabase(context)
 
@@ -49,13 +49,13 @@ class InstallationDownloadManager(context: Context) {
         val downloadDir = File(pendingPath, uploadId.toString())
         val installer = Installations.getInstaller(context)
         if (fileName.endsWith(".apk") && installer.type == AbstractInstaller.Type.Stream) {
-            Downloader.requestDownload(context, url, install, fileName, contentLength,
+            Downloader.requestDownload(context, url, userAgent, install, fileName, contentLength,
                 downloadDir = null,
                 tempDownloadDir = false,
                 installer
             )
         } else {
-            Downloader.requestDownload(context, url, install,
+            Downloader.requestDownload(context, url, userAgent, install,
                 fileName,
                 contentLength,
                 downloadDir,

@@ -37,7 +37,6 @@ class WebGameCache(context: Context) {
     private val cacheHttpClients = HashMap<Int, OkHttpClient>()
 
     suspend fun request(
-        context: Context,
         gameId: Int,
         request: WebResourceRequest,
         isOfflineMode: Boolean

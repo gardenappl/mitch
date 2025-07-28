@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
@@ -58,6 +59,9 @@ const val DB_CLEAN_TASK_TAG = "db_clean"
 const val FLAVOR_FDROID = "fdroid"
 const val FLAVOR_ITCHIO = "itchio"
 
+const val HEADER_UA = "User-Agent"
+const val HEADER_COOKIE = "Cookie"
+
 
 // Remember to exclude sensitive info from ACRA reports
 const val PREF_DB_RAN_CLEANUP_ONCE = "ua.gardenapple.itchupdater.db_cleanup_once"
@@ -108,14 +112,46 @@ class Mitch : Application() {
         // Be careful with lazy init to avoid circular dependency, I'm stupid
 
         val httpClient: OkHttpClient by lazy {
-            OkHttpClient.Builder().let {
+            OkHttpClient.Builder().run {
                 val okHttpCacheDir = File(cacheDir, "OkHttp")
                 okHttpCacheDir.mkdirs()
-                it.cache(Cache(
+                cookieJar(WebViewCookieJar())
+                // https://stackoverflow.com/a/53233345/5701177
+                addInterceptor { chain ->
+                    val request = chain.request()
+                    chain.proceed(request.newBuilder().run {
+                        Log.d(LOGGING_TAG, "appurl: ${request.url}")
+                        if (request.header(HEADER_UA).isNullOrBlank()) {
+                            Log.d(LOGGING_TAG, "appno user agent!")
+                            if (BuildConfig.DEBUG)
+                                addHeader(HEADER_UA, "Mitch dev.")
+                            else
+                                addHeader(HEADER_UA, "Mitch v${BuildConfig.VERSION_NAME}")
+                        }
+                        Log.d(LOGGING_TAG, "appcookies: ${request.header(HEADER_COOKIE)}")
+                        Log.d(LOGGING_TAG, "appuser agent: ${request.header(HEADER_UA)}")
+                        build()
+                    })
+                }
+
+                addNetworkInterceptor { chain ->
+                    val request = chain.request()
+                    chain.proceed(request.newBuilder().run {
+                        Log.d(LOGGING_TAG, "url: ${request.url}")
+                        if (request.header(HEADER_UA).isNullOrBlank()) {
+                            Log.d(LOGGING_TAG, "no user agent!")
+                            header(HEADER_UA, "Mitch v${BuildConfig.VERSION_NAME}")
+                        }
+                        Log.d(LOGGING_TAG, "cookies: ${request.header(HEADER_COOKIE)}")
+                        Log.d(LOGGING_TAG, "user agent: ${request.header(HEADER_UA)}")
+                        build()
+                    })
+                }
+                cache(Cache(
                     directory = okHttpCacheDir,
                     maxSize = 10L * 1024 * 1024 //10 MB
                 ))
-                it.build()
+                build()
             }
         }
         val installDownloadManager: InstallationDownloadManager by lazy {

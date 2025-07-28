@@ -3,9 +3,15 @@ package garden.appl.mitch.files
 import android.content.Context
 import android.os.StatFs
 import android.util.Log
-import android.webkit.CookieManager
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.*
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
+import androidx.work.await
+import androidx.work.workDataOf
+import garden.appl.mitch.HEADER_UA
 import garden.appl.mitch.Mitch
 import garden.appl.mitch.NOTIFICATION_TAG_DOWNLOAD
 import garden.appl.mitch.NOTIFICATION_TAG_DOWNLOAD_LONG
@@ -36,6 +42,7 @@ import kotlin.coroutines.resumeWithException
 
 object Downloader {
     private const val WORKER_URL = "url"
+    private const val WORKER_USER_AGENT = "ua"
     private const val WORKER_DOWNLOAD_DIR = "path"
     private const val WORKER_FILE_NAME = "file_name"
     private const val WORKER_DOWNLOAD_OR_INSTALL_ID = "download_id"
@@ -79,6 +86,7 @@ object Downloader {
     suspend fun requestDownload(
         context: Context,
         url: String,
+        userAgent: String?,
         install: Installation?,
         fileName: String,
         contentLength: Long?,
@@ -90,6 +98,7 @@ object Downloader {
             installer.createSessionForStreamInstall(context).toLong()
         else
             getUnusedDownloadId(context)
+
         val downloadDir = if (tempDownloadDir)
             getNormalDownloadPath(context, id)
         else
@@ -109,6 +118,7 @@ object Downloader {
                 setInputData(
                     workDataOf(
                         Pair(WORKER_URL, url),
+                        Pair(WORKER_USER_AGENT, userAgent),
                         Pair(WORKER_CONTENT_LENGTH, contentLength),
                         Pair(WORKER_DOWNLOAD_DIR, downloadDir?.path),
                         Pair(WORKER_FILE_NAME, fileName),
@@ -148,6 +158,7 @@ object Downloader {
 
         override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
             val url = inputData.getString(WORKER_URL)!!
+            val userAgent = inputData.getString(WORKER_USER_AGENT)
             val downloadDir = inputData.getString(WORKER_DOWNLOAD_DIR)
             val fileName = inputData.getString(WORKER_FILE_NAME)!!
             val contentLength = inputData.getLong(WORKER_CONTENT_LENGTH, -1)
@@ -198,9 +209,10 @@ object Downloader {
 
                 val request = Request.Builder().run {
                     url(url)
-                    CookieManager.getInstance()?.getCookie(url)?.let { cookie ->
-                        addHeader("Cookie", cookie)
-                    }
+                    userAgent?.let { header(HEADER_UA, it) }
+//                    CookieManager.getInstance()?.getCookie(url)?.let { cookie ->
+//                        addHeader("Cookie", cookie)
+//                    }
                     get()
                     build()
                 }
@@ -235,14 +247,14 @@ object Downloader {
                             cancel(NOTIFICATION_TAG_DOWNLOAD_LONG, downloadOrInstallId.toInt())
                     }
 
-                    //Add some shitty delay because if you send the completion notification
+                    //Add delay because if you send the completion notification
                     //right after a progress notification, sometimes it doesn't show up
                     delay(500)
 
                     listener.onCompleted(applicationContext,
                             fileName, uploadId, downloadOrInstallId, downloadType)
                 }
-            } catch (e: CancellationException) {
+            } catch (_: CancellationException) {
                 listener.onCancel(applicationContext, downloadOrInstallId)
                 Result.failure()
             } catch (e: Exception) {

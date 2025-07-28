@@ -165,10 +165,10 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN)
             webView.addJavascriptInterface(MitchJavaScriptInterface(this), "mitchCustomJS")
 
-        webView.setDownloadListener { url, _, contentDisposition, mimeType, contentLength ->
+        webView.setDownloadListener { url, userAgent, contentDisposition, mimeType, contentLength ->
             Log.d(LOGGING_TAG, "Requesting download...")
             launch(Dispatchers.IO) {
-                browseHandler?.onDownloadStarted(url, contentDisposition, mimeType,
+                browseHandler?.onDownloadStarted(url, userAgent, contentDisposition, mimeType,
                     if (contentLength > 0) contentLength else null)
             }
         }
@@ -490,7 +490,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         lifecycleScope.launch {
                             SpecialBundleHandler.claimGame(
                                 info.bundleDownloadLink,
-                                info.game!!
+                                info.game!!,
+                                webView.settings.userAgentString
                             )
                             webView.reload()
                         }
@@ -1025,8 +1026,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
 
         @JavascriptInterface
-        fun onHtmlLoaded(html: String, url: String, nonce: String) {
+        fun onHtmlLoaded(html: String, url: String, userAgent: String, nonce: String) {
             verifyNonce(nonce)
+            Log.d(LOGGING_TAG, "loaded UA: $userAgent")
             if (fragment.activity !is MainActivity)
                 return
 
@@ -1034,7 +1036,7 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
 
             fragment.launch(Dispatchers.Default) {
                 val doc = Jsoup.parse(html)
-                val info = fragment.browseHandler?.onPageVisited(doc, url)
+                val info = fragment.browseHandler?.onPageVisited(doc, url, userAgent)
                 fragment.currentDoc = doc
                 fragment.currentInfo = info
                 fragment.activity?.runOnUiThread {
@@ -1075,7 +1077,9 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                 document.addEventListener("DOMContentLoaded", (event) => {
                     // tell Android that the document is ready
                     mitchCustomJS.onHtmlLoaded("<html>" + document.getElementsByTagName("html")[0].innerHTML + "</html>",
-                                               window.location.href, "${browseFragment.webViewJSNonce}");
+                                               window.location.href, 
+                                               window.navigator.userAgent,
+                                               "${browseFragment.webViewJSNonce}");
                                            
                     // setup download buttons
                     let downloadButtons = document.getElementsByClassName("download_btn");
