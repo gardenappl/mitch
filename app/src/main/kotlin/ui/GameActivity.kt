@@ -5,7 +5,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -27,6 +26,8 @@ import androidx.core.content.edit
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
+import androidx.core.graphics.scale
+import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import com.bumptech.glide.Glide
 import garden.appl.mitch.ItchWebsiteUtils
@@ -50,9 +51,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ExecutionException
 
-/**
- * Data URI is unused, but currently the hwcdn URL is supplied.
- */
 class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
     companion object {
         private const val LOGGING_TAG = "GameActivity"
@@ -75,11 +73,11 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
                         Log.e(LOGGING_TAG, "no thumbnail: ${e.cause}")
                         return@withContext null
                     }
-                    Bitmap.createScaledBitmap(bitmap, 128, 128, false)
+                    bitmap.scale(128, 128, false)
                 }
             }
             Log.d(LOGGING_TAG, "Game: $game")
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(game.webEntryPoint),
+            val intent = Intent(Intent.ACTION_VIEW, game.webEntryPoint!!.toUri(),
                 context, GameActivity::class.java).apply {
 
                 putExtra(EXTRA_GAME_ID, game.gameId)

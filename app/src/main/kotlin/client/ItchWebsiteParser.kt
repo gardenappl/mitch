@@ -26,6 +26,8 @@ import java.io.IOException
 import java.util.Collections
 
 object ItchWebsiteParser {
+    private val regexForTerribleUniversalCurrencyParsing = Regex("""[^\d.]+""")
+
     class UploadNotFoundException(uploadId: Int) : RuntimeException(uploadId.toString())
 
     data class DownloadUrl(val url: String, val isPermanent: Boolean, val isStorePage: Boolean) {
@@ -219,7 +221,9 @@ object ItchWebsiteParser {
         Log.d(LOGGING_TAG, "Purchased game")
         return purchaseBanner.getElementsByClass("key_row").sortedByDescending {
             val price = it.selectFirst(".purchase_price") ?: return@sortedByDescending 0
-            return@sortedByDescending price.html().removePrefix("$").replace(".", "").toInt()
+            return@sortedByDescending price.html()
+                .replace(regexForTerribleUniversalCurrencyParsing, "")
+                .toInt()
         }.map { downloadButtonRow ->
             //Reformat cloned element
 
