@@ -24,16 +24,15 @@ class MitchWebView @JvmOverloads constructor(
     fun redirectBlobUrlToDataUrl(blobUrl: String, fileName: String) {
         evaluateJavascript("""
             {
-                // https://stackoverflow.com/a/11901662/5701177
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", "$blobUrl", true);
-                xhr.responseType = "blob";
-                xhr.onload = function(e) {
-                    if (this.status == 200) {
-                        var blob = this.response;
+                console.log("url")
+                console.log("$blobUrl")
+                fetch("$blobUrl").then(r => r.blob(), e => { console.error(e); console.error(e.stack);  }).then(blob => {
+                    console.log("loaded");
+                    console.log("blob: " + blob);
                         // https://stackoverflow.com/a/30407959/5701177
                         var reader = new FileReader();
                         reader.onload = function(e) {
+                            console.log("oooooohh");
                             // https://stackoverflow.com/a/15832662/5701177
                             var link = document.createElement("a");
                             link.download = "$fileName";
@@ -43,10 +42,11 @@ class MitchWebView @JvmOverloads constructor(
                             document.body.removeChild(link);
                             delete link;
                         }
+                        console.log("pre-read");
                         reader.readAsDataURL(blob);
-                    }
-                };
-                xhr.send();
+                        console.log("post-read");
+                    }, e => console.error(e)
+                );
             }
             """, null)
     }
