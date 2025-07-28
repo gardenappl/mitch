@@ -103,7 +103,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
             context: Context,
             userAgent: String?
         ): Game {
-            if (game.webIframe != null)
+            if (game.webIframe != null && game.webEntryPoint != null)
                 return game
 
             Log.d(LOGGING_TAG, "getting iframe and favicon as backwards compat")
