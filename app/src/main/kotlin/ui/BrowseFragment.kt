@@ -58,7 +58,6 @@ import garden.appl.mitch.client.ItchBrowseHandler
 import garden.appl.mitch.client.ItchWebsiteParser
 import garden.appl.mitch.client.SpecialBundleHandler
 import garden.appl.mitch.data.ItchGenre
-import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.databinding.BrowseFragmentBinding
 import kotlinx.coroutines.CoroutineScope
@@ -431,7 +430,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         updateUI(null, null)
     }
 
-    // TODO: hide stuff on scroll?
     /**
      * Adapts the app's UI to the theme of a web page. Should only affect the UI while the browse
      * fragment is selected.
@@ -793,15 +791,15 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
     private fun addAppBarActionsFromHtml(appBar: Toolbar, doc: Document) {
         appBar.menu.clear()
 
-        if (ItchWebsiteUtils.isStorePage(doc) || ItchWebsiteUtils.isDownloadPage(doc)) {
-            appBar.menu.add(APP_BAR_ACTIONS_DEFAULT, 0, 0, R.string.menu_game_subscribe)
-                .setOnMenuItemClickListener {
-                    this.launch {
-                        showSubscriptionDialog(doc)
-                    }
-                    true
-                }
-        }
+//        if (ItchWebsiteUtils.isStorePage(doc) || ItchWebsiteUtils.isDownloadPage(doc)) {
+//            appBar.menu.add(APP_BAR_ACTIONS_DEFAULT, 0, 0, R.string.menu_game_subscribe)
+//                .setOnMenuItemClickListener {
+//                    this.launch {
+//                        showSubscriptionDialog(doc)
+//                    }
+//                    true
+//                }
+//        }
 
         val navbarItems = doc.getElementById("user_tools")?.children() ?: return
 
@@ -873,62 +871,62 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
         }
     }
 
-    private suspend fun showSubscriptionDialog(doc: Document) {
-        val installations = if (ItchWebsiteUtils.hasGameDownloadLinks(doc)) {
-            ItchWebsiteParser.getInstallations(doc)
-        } else {
-            val downloadUrl = url?.let {
-                ItchWebsiteParser.getDownloadUrl(doc, it)?.url
-            }
-            if (downloadUrl == null) {
-                Toast.makeText(context, R.string.popup_subscribe_game_not_owned, Toast.LENGTH_LONG)
-                    .show()
-                return
-            }
-            ItchWebsiteParser.getInstallations(ItchWebsiteUtils.fetchAndParse(downloadUrl))
-        }
-        val db = AppDatabase.getDatabase(requireContext())
-        val subscriptions = db.installDao.getFinishedInstallationsAndSubscriptionsSync()
-        val availableSubscriptions =
-            installations.filter { install ->
-                !subscriptions.any { subscription -> subscription.uploadId == install.uploadId }
-            }
-        if (availableSubscriptions.isEmpty()) {
-            Toast.makeText(context, R.string.popup_subscribe_game_all_subscribed, Toast.LENGTH_LONG)
-                .show()
-            return
-        }
-        val subscribeOptions = availableSubscriptions.map { install ->
-            val platforms = install.platformsStrings
-            if (platforms.isEmpty())
-                return@map install.uploadName
-            else
-                return@map "(${platforms.joinToString()}) ${install.uploadName}"
-        }.toTypedArray()
-        Log.d(LOGGING_TAG, subscribeOptions.joinToString())
-        AlertDialog.Builder(requireContext()).run {
-            setTitle(R.string.dialog_subscribe_title)
-//            setMessage(R.string.dialog_subscribe_message)
-            setMultiChoiceItems(subscribeOptions, null) { _, _, _ -> /* NO-OP */ }
-            setPositiveButton(R.string.dialog_subscribe_yes) { dialog, _ ->
-                val checkedPositions = (dialog as AlertDialog).listView.checkedItemPositions
-                val selectedSubscriptions = availableSubscriptions
-                    .filterIndexed{ index, _ -> checkedPositions.get(index) }
-                this@BrowseFragment.launch {
-                    for (subscription in selectedSubscriptions) {
-                        db.installDao.insert(subscription.copy(
-                            status = Installation.STATUS_SUBSCRIPTION
-                        ))
-                    }
-                    if (subscriptions.isNotEmpty())
-                        (activity as MainActivity).setActiveFragment(MainActivity.UPDATES_FRAGMENT_TAG)
-                }
-            }
-            setNegativeButton(R.string.dialog_cancel) { _, _ -> /* NO-OP */ }
-            setCancelable(true)
-            show()
-        }
-    }
+//    private suspend fun showSubscriptionDialog(doc: Document) {
+//        val installations = if (ItchWebsiteUtils.hasGameDownloadLinks(doc)) {
+//            ItchWebsiteParser.getInstallations(doc)
+//        } else {
+//            val downloadUrl = url?.let {
+//                ItchWebsiteParser.getDownloadUrl(doc, it)?.url
+//            }
+//            if (downloadUrl == null) {
+//                Toast.makeText(context, R.string.popup_subscribe_game_not_owned, Toast.LENGTH_LONG)
+//                    .show()
+//                return
+//            }
+//            ItchWebsiteParser.getInstallations(ItchWebsiteUtils.fetchAndParse(downloadUrl))
+//        }
+//        val db = AppDatabase.getDatabase(requireContext())
+//        val subscriptions = db.installDao.getFinishedInstallationsAndSubscriptionsSync()
+//        val availableSubscriptions =
+//            installations.filter { install ->
+//                !subscriptions.any { subscription -> subscription.uploadId == install.uploadId }
+//            }
+//        if (availableSubscriptions.isEmpty()) {
+//            Toast.makeText(context, R.string.popup_subscribe_game_all_subscribed, Toast.LENGTH_LONG)
+//                .show()
+//            return
+//        }
+//        val subscribeOptions = availableSubscriptions.map { install ->
+//            val platforms = install.platformsStrings
+//            if (platforms.isEmpty())
+//                return@map install.uploadName
+//            else
+//                return@map "(${platforms.joinToString()}) ${install.uploadName}"
+//        }.toTypedArray()
+//        Log.d(LOGGING_TAG, subscribeOptions.joinToString())
+//        AlertDialog.Builder(requireContext()).run {
+//            setTitle(R.string.dialog_subscribe_title)
+////            setMessage(R.string.dialog_subscribe_message)
+//            setMultiChoiceItems(subscribeOptions, null) { _, _, _ -> /* NO-OP */ }
+//            setPositiveButton(R.string.dialog_subscribe_yes) { dialog, _ ->
+//                val checkedPositions = (dialog as AlertDialog).listView.checkedItemPositions
+//                val selectedSubscriptions = availableSubscriptions
+//                    .filterIndexed{ index, _ -> checkedPositions.get(index) }
+//                this@BrowseFragment.launch {
+//                    for (subscription in selectedSubscriptions) {
+//                        db.installDao.insert(subscription.copy(
+//                            status = Installation.STATUS_SUBSCRIPTION
+//                        ))
+//                    }
+//                    if (subscriptions.isNotEmpty())
+//                        (activity as MainActivity).setActiveFragment(MainActivity.UPDATES_FRAGMENT_TAG)
+//                }
+//            }
+//            setNegativeButton(R.string.dialog_cancel) { _, _ -> /* NO-OP */ }
+//            setCancelable(true)
+//            show()
+//        }
+//    }
 
     /**
      * Adds basic app bar actions for navigating between fragments.
