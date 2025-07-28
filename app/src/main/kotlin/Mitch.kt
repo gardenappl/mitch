@@ -40,7 +40,7 @@ const val PERMISSION_REQUEST_MOVE_TO_DOWNLOADS = 2
 const val PERMISSION_REQUEST_NOTIFICATION = 3
 const val PERMISSION_REQUEST_START_DOWNLOAD = 4
 
-const val FILE_PROVIDER = "ua.gardenapple.itchupdater.fileprovider"
+const val FILE_PROVIDER = "${BuildConfig.APPLICATION_ID}.fileprovider"
 
 const val NOTIFICATION_CHANNEL_ID_UPDATES = "updates_available"
 const val NOTIFICATION_CHANNEL_ID_INSTALL_NEEDED = "updates"
