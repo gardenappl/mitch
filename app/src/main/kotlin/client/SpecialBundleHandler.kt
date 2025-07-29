@@ -2,7 +2,6 @@ package garden.appl.mitch.client
 
 import android.content.Context
 import android.util.Log
-import android.webkit.CookieManager
 import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
@@ -156,10 +155,6 @@ object SpecialBundleHandler {
 
                 val formRequest = Request.Builder().run {
                     url(searchUri.toString())
-
-                    CookieManager.getInstance()?.getCookie("https://itch.io")?.let { cookie ->
-                        addHeader("Cookie", cookie)
-                    }
                     post(formBuilder.build())
                     build()
                 }

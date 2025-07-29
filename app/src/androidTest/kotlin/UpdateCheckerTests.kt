@@ -40,7 +40,7 @@ class UpdateCheckerTests {
         Assume.assumeTrue(BuildConfig.FLAVOR == FLAVOR_ITCHIO)
 
         val result: UpdateCheckResult = runBlocking(Dispatchers.IO) {
-            val game = db.gameDao.getGameById(Game.MITCH_GAME_ID)!!
+            val game = db.gameDao.getGameByIdSync(Game.MITCH_GAME_ID)!!
             val install = db.installDao.getFinishedInstallationsForGame(Game.MITCH_GAME_ID)[0]
             val (updateCheckDoc, downloadUrlInfo) = updateChecker.getDownloadInfo(game)!!
 

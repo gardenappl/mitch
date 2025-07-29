@@ -97,6 +97,9 @@ android {
         viewBinding = true
         compose = true
     }
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
 }
 
 dependencies {

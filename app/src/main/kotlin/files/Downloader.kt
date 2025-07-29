@@ -210,9 +210,6 @@ object Downloader {
                 val request = Request.Builder().run {
                     url(url)
                     userAgent?.let { header(HEADER_UA, it) }
-//                    CookieManager.getInstance()?.getCookie(url)?.let { cookie ->
-//                        addHeader("Cookie", cookie)
-//                    }
                     get()
                     build()
                 }

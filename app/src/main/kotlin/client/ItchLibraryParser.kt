@@ -1,7 +1,7 @@
 package garden.appl.mitch.client
 
-import android.webkit.CookieManager
 import garden.appl.mitch.Mitch
+import garden.appl.mitch.client.ItchLibraryParser.PAGE_SIZE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Request
@@ -24,12 +24,7 @@ object ItchLibraryParser {
         val result = withContext(Dispatchers.IO) {
             val request = Request.Builder().run {
                 url("https://itch.io/my-purchases?format=json&page=$page")
-
-                CookieManager.getInstance()?.getCookie("https://itch.io")?.let { cookie ->
-                    addHeader("Cookie", cookie)
-                }
                 get()
-
                 build()
             }
             Mitch.httpClient.newCall(request).execute().use { response ->
@@ -45,7 +40,7 @@ object ItchLibraryParser {
 
         val resultJson = try {
             JSONObject(result)
-        } catch (e: JSONException) {
+        } catch (_: JSONException) {
             //Invalid JSON == we got redirected to login page
             return null
         }

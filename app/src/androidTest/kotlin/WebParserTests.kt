@@ -23,7 +23,7 @@ class WebParserTests {
         assumeThat(ItchWebsiteUtils.getLoggedInUserName(storeDoc), equalTo("gardenapple"))
 
         val downloadUrl = runBlocking {
-            ItchWebsiteParser.getDownloadUrl(storeDoc, storeUrl)
+            ItchWebsiteParser.getOrFetchDownloadUrl(storeDoc, storeUrl)
         }
         assertEquals(ItchWebsiteParser.DownloadUrl(
             "https://npckc.itch.io/a-tavern-for-tea/download/VcTYvLj_mPzph_hcLK5fuMafmTlH11SPBlJhfoRh",
@@ -36,7 +36,7 @@ class WebParserTests {
     fun testGetDownloadUrl_freeGame() {
         val storeUrl = "https://clouddeluna.itch.io/splashyplusplus"
         val url = runBlocking {
-            ItchWebsiteParser.getDownloadUrl(ItchWebsiteUtils.fetchAndParse(storeUrl), storeUrl)
+            ItchWebsiteParser.getOrFetchDownloadUrl(ItchWebsiteUtils.fetchAndParse(storeUrl), storeUrl)
         }
         assertEquals(ItchWebsiteParser.DownloadUrl(
             "https://clouddeluna.itch.io/splashyplusplus",
@@ -49,7 +49,7 @@ class WebParserTests {
     fun testGetDownloadUrl_donationGame() {
         val storeUrl = "https://anuke.itch.io/mindustry"
         val url = runBlocking {
-            ItchWebsiteParser.getDownloadUrl(ItchWebsiteUtils.fetchAndParse(storeUrl), storeUrl)
+            ItchWebsiteParser.getOrFetchDownloadUrl(ItchWebsiteUtils.fetchAndParse(storeUrl), storeUrl)
         }
         assertNotNull(url)
         assertEquals(false, url!!.isPermanent)
@@ -63,7 +63,7 @@ class WebParserTests {
     fun testGetDownloadUrl_inaccessibleGame() {
         val storeUrl = "https://sukebangames.itch.io/valhalla-bar"
         val url = runBlocking {
-            ItchWebsiteParser.getDownloadUrl(ItchWebsiteUtils.fetchAndParse(storeUrl), storeUrl)
+            ItchWebsiteParser.getOrFetchDownloadUrl(ItchWebsiteUtils.fetchAndParse(storeUrl), storeUrl)
         }
         assertNull(url)
     }
@@ -105,7 +105,7 @@ class WebParserTests {
         )
         val downloadDoc = runBlocking {
             val storeDoc = ItchWebsiteUtils.fetchAndParse(game.storeUrl)
-            val downloadUrl = ItchWebsiteParser.getDownloadUrl(storeDoc, game.storeUrl)
+            val downloadUrl = ItchWebsiteParser.getOrFetchDownloadUrl(storeDoc, game.storeUrl)
             ItchWebsiteUtils.fetchAndParse(downloadUrl!!.url)
         }
         val installs = ItchWebsiteParser.getInstallations(downloadDoc)

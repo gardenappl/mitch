@@ -30,7 +30,7 @@ data class Game(
      * Set to null for games where the download page URL is not permanent.
      */
     @ColumnInfo(name = DOWNLOAD_PAGE_URL)
-    val downloadPageUrl: String? = null,
+    val downloadPageUrl: String?,
 
     /**
      * Some games don't have thumbnails
@@ -39,40 +39,28 @@ data class Game(
     val thumbnailUrl: String?,
 
     /**
-     * Affects timestamps and version strings.
-     */
-    @ColumnInfo(name = LOCALE)
-    val locale: String = ItchWebsiteParser.UNKNOWN_LOCALE,
-
-    /**
-     * Set to null for projects where the timestamp is not available.
-     */
-    @ColumnInfo(name = LAST_UPDATED_TIMESTAMP)
-    val lastUpdatedTimestamp: String? = null,
-
-    /**
      * URL of the initial HTML page for a (cached) web game
      * Set to null for games which are not cached web games
      */
     @ColumnInfo(name = WEB_ENTRY_POINT)
-    val webEntryPoint: String? = null,
+    val webEntryPoint: String?,
 
     /**
      * <iframe> which will display the [webEntryPoint]
      * Set to null for games which are not cached web games
      */
     @ColumnInfo(name = WEB_IFRAME_HTML)
-    val webIframe: String? = null,
+    val webIframe: String?,
 
-    @ColumnInfo(name = WEB_CACHED)
-    val webCached: Boolean = false,
-
+    /**
+     * URL of the favicon, used for launcher shortcuts for web games.
+     * Must not be null for web games.
+     */
     @ColumnInfo(name = FAVICON_URL)
-    val faviconUrl: String? = null
+    val faviconUrl: String?
 ) {
     companion object {
         const val MITCH_GAME_ID = 544475
-        const val MITCH_LOCALE = "[Mitch locale]"
         const val MITCH_STORE_PAGE = "https://gardenapple.itch.io/mitch"
 
         const val TABLE_NAME = "games"
@@ -82,12 +70,9 @@ data class Game(
         const val AUTHOR = "author"
         const val STORE_URL = "store_url"
         const val DOWNLOAD_PAGE_URL = "download_page_url"
-        const val LOCALE = "locale"
         const val THUMBNAIL_URL = "thumbnail_url"
-        const val LAST_UPDATED_TIMESTAMP = "last_timestamp"
         const val WEB_ENTRY_POINT = "web_entry_point"
         const val WEB_IFRAME_HTML = "web_iframe"
-        const val WEB_CACHED = "web_cached"
         const val FAVICON_URL = "favicon_url"
     }
 

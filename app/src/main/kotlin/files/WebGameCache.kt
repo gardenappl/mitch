@@ -2,7 +2,6 @@ package garden.appl.mitch.files
 
 import android.content.Context
 import android.util.Log
-import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import garden.appl.mitch.Mitch
@@ -46,9 +45,6 @@ class WebGameCache(context: Context) {
         val httpRequest = Request.Builder().run {
             url(url)
             headers(request.requestHeaders.toHeaders())
-            CookieManager.getInstance()?.getCookie(url)?.let { cookie ->
-                addHeader("Cookie", cookie)
-            }
             get()
             build()
         }

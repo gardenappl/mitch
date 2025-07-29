@@ -1,0 +1,325 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 16,
+    "identityHash": "34feb8127a72d72d35353beb2948afa3",
+    "entities": [
+      {
+        "tableName": "games",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`game_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `author` TEXT NOT NULL, `store_url` TEXT NOT NULL, `download_page_url` TEXT, `thumbnail_url` TEXT, `web_entry_point` TEXT, `web_iframe` TEXT, `favicon_url` TEXT, PRIMARY KEY(`game_id`))",
+        "fields": [
+          {
+            "fieldPath": "gameId",
+            "columnName": "game_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "author",
+            "columnName": "author",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "storeUrl",
+            "columnName": "store_url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "downloadPageUrl",
+            "columnName": "download_page_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumbnailUrl",
+            "columnName": "thumbnail_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "webEntryPoint",
+            "columnName": "web_entry_point",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "webIframe",
+            "columnName": "web_iframe",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "faviconUrl",
+            "columnName": "favicon_url",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "game_id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "installations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`internal_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `game_id` INTEGER NOT NULL, `upload_id` INTEGER NOT NULL, `available_uploads` TEXT, `package_name` TEXT, `is_pending` INTEGER NOT NULL, `download_id` INTEGER, `locale` TEXT NOT NULL, `version` TEXT, `name` TEXT NOT NULL, `file_size` TEXT NOT NULL, `timestamp` TEXT, `platforms` INTEGER NOT NULL, `external_file_name` TEXT, `external_file_display_name` TEXT, FOREIGN KEY(`game_id`) REFERENCES `games`(`game_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "internalId",
+            "columnName": "internal_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gameId",
+            "columnName": "game_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uploadId",
+            "columnName": "upload_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "availableUploadIdsString",
+            "columnName": "available_uploads",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "packageName",
+            "columnName": "package_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "is_pending",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "downloadOrInstallId",
+            "columnName": "download_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locale",
+            "columnName": "locale",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "uploadName",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileSize",
+            "columnName": "file_size",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uploadTimestamp",
+            "columnName": "timestamp",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "platforms",
+            "columnName": "platforms",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "externalFileUri",
+            "columnName": "external_file_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "externalFileName",
+            "columnName": "external_file_display_name",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "internal_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_installations_game_id",
+            "unique": false,
+            "columnNames": [
+              "game_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_installations_game_id` ON `${TABLE_NAME}` (`game_id`)"
+          },
+          {
+            "name": "index_installations_upload_id",
+            "unique": false,
+            "columnNames": [
+              "upload_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_installations_upload_id` ON `${TABLE_NAME}` (`upload_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "games",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "game_id"
+            ],
+            "referencedColumns": [
+              "game_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "update_check_results",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`install_id` INTEGER NOT NULL, `code` INTEGER NOT NULL, `upload_name` TEXT, `timestamp` TEXT, `version` TEXT, `file_size` TEXT, `upload_id` INTEGER, `download_url` TEXT, `download_is_store_page` INTEGER NOT NULL, `download_is_permanent` INTEGER NOT NULL, `is_installing` INTEGER NOT NULL, `error_message` TEXT, PRIMARY KEY(`install_id`), FOREIGN KEY(`install_id`) REFERENCES `installations`(`internal_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "installId",
+            "columnName": "install_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uploadName",
+            "columnName": "upload_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "versionString",
+            "columnName": "version",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fileSize",
+            "columnName": "file_size",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "uploadID",
+            "columnName": "upload_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "downloadPageUrl",
+            "columnName": "download_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "downloadPageIsStorePage",
+            "columnName": "download_is_store_page",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "downloadPageIsPermanent",
+            "columnName": "download_is_permanent",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isInstalling",
+            "columnName": "is_installing",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "errorReport",
+            "columnName": "error_message",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "install_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_update_check_results_install_id",
+            "unique": false,
+            "columnNames": [
+              "install_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_update_check_results_install_id` ON `${TABLE_NAME}` (`install_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "installations",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "install_id"
+            ],
+            "referencedColumns": [
+              "internal_id"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '34feb8127a72d72d35353beb2948afa3')"
+    ]
+  }
+}

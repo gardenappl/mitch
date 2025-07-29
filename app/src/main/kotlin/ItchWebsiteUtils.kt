@@ -2,7 +2,6 @@ package garden.appl.mitch
 
 import android.content.Context
 import android.net.Uri
-import android.webkit.CookieManager
 import androidx.preference.PreferenceManager
 import garden.appl.mitch.ui.MitchWebView
 import kotlinx.coroutines.Dispatchers

@@ -105,7 +105,10 @@ abstract class GameDao {
 
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID = :gameId LIMIT 1")
-    abstract suspend fun getGameById(gameId: Int): Game?
+    abstract suspend fun getGameByIdSync(gameId: Int): Game?
+
+    @Query("SELECT * FROM $TABLE_NAME WHERE $GAME_ID IN (:gameIds)")
+    abstract suspend fun getGamesByIdsSync(gameIds: List<Int>): List<Game>
 
     /**
      * @return -1 if a Game with the same [Game.GAME_ID] already exists

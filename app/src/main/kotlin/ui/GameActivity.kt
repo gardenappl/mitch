@@ -353,7 +353,7 @@ class GameActivity : MitchActivity(), CoroutineScope by MainScope() {
         this.isCaching = shouldCache
 
         val db = AppDatabase.getDatabase(this)
-        val game = tryFixBackwardsCompatGame(db.gameDao.getGameById(gameId)!!, this,
+        val game = tryFixBackwardsCompatGame(db.gameDao.getGameByIdSync(gameId)!!, this,
             webView.settings.userAgentString)
 
         loadGame(game)

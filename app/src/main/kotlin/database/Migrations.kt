@@ -14,39 +14,36 @@ val Migrations = arrayOf(
     object : Migration(2, 3) {
         override fun migrate(db: SupportSQLiteDatabase) {
             //Fix unknown locales
-            db.execSQL(
-                """
-                    UPDATE games
-                    SET
-                        locale = 'en'
-                    WHERE
-                        locale = 'Unknown'
+            db.execSQL("""
+                UPDATE games
+                SET
+                    locale = 'en'
+                WHERE
+                    locale = 'Unknown'
                 """
             )
-            db.execSQL(
-                """
-                    UPDATE uploads
-                    SET
-                        locale = 'en'
-                    WHERE
-                        locale = 'Unknown'
+            db.execSQL("""
+                UPDATE uploads
+                SET
+                    locale = 'en'
+                WHERE
+                    locale = 'Unknown'
                 """
             )
 
             //Thumbnail is nullable
-            db.execSQL(
+            db.execSQL("""
+                CREATE TABLE games_copy(
+                    game_id INTEGER PRIMARY KEY NOT NULL,
+                    name TEXT NOT NULL,
+                    store_url TEXT NOT NULL,
+                    download_page_url TEXT,
+                    author TEXT NOT NULL,
+                    locale TEXT NOT NULL,
+                    thumbnail_url TEXT,
+                    last_timestamp TEXT
+                )
                 """
-                    CREATE TABLE games_copy(
-                        game_id INTEGER PRIMARY KEY NOT NULL,
-                        name TEXT NOT NULL,
-                        store_url TEXT NOT NULL,
-                        download_page_url TEXT,
-                        author TEXT NOT NULL,
-                        locale TEXT NOT NULL,
-                        thumbnail_url TEXT,
-                        last_timestamp TEXT
-                    )
-                    """
             )
 
             db.execSQL(
@@ -61,28 +58,26 @@ val Migrations = arrayOf(
     },
     object : Migration(3, 4) {
         override fun migrate(db: SupportSQLiteDatabase) {
-            db.execSQL(
+            db.execSQL("""
+                CREATE TABLE update_check_results(
+                    install_id INTEGER PRIMARY KEY NOT NULL,
+                    code INTEGER NOT NULL,
+                    timestamp TEXT,
+                    version TEXT,
+                    file_size TEXT,
+                    upload_id INTEGER,
+                    download_url TEXT,
+                    download_is_store_page INTEGER NOT NULL,
+                    download_is_permanent INTEGER NOT NULL,
+                    FOREIGN KEY(install_id) REFERENCES 
+                        installations(internal_id) ON DELETE CASCADE
+                )
                 """
-                    CREATE TABLE update_check_results(
-                        install_id INTEGER PRIMARY KEY NOT NULL,
-                        code INTEGER NOT NULL,
-                        timestamp TEXT,
-                        version TEXT,
-                        file_size TEXT,
-                        upload_id INTEGER,
-                        download_url TEXT,
-                        download_is_store_page INTEGER NOT NULL,
-                        download_is_permanent INTEGER NOT NULL,
-                        FOREIGN KEY(install_id) REFERENCES 
-                            installations(internal_id) ON DELETE CASCADE
-                    )
-                    """
             )
 
-            db.execSQL(
-                """
-                    CREATE INDEX index_${UpdateCheckResultModel.TABLE_NAME}_${UpdateCheckResultModel.INSTALLATION_ID}
-                        ON ${UpdateCheckResultModel.TABLE_NAME}(${UpdateCheckResultModel.INSTALLATION_ID})
+            db.execSQL("""
+                CREATE INDEX index_${UpdateCheckResultModel.TABLE_NAME}_${UpdateCheckResultModel.INSTALLATION_ID}
+                    ON ${UpdateCheckResultModel.TABLE_NAME}(${UpdateCheckResultModel.INSTALLATION_ID})
                 """
             )
         }
@@ -147,29 +142,27 @@ val Migrations = arrayOf(
     object : Migration(14, 15) {
         // Whoops, undo change in database v14
         override fun migrate(db: SupportSQLiteDatabase) {
-            db.execSQL(
+            db.execSQL("""
+                CREATE TABLE games_copy(
+                    game_id INTEGER PRIMARY KEY NOT NULL,
+                    name TEXT NOT NULL,
+                    store_url TEXT NOT NULL,
+                    download_page_url TEXT,
+                    author TEXT NOT NULL,
+                    locale TEXT NOT NULL,
+                    thumbnail_url TEXT,
+                    last_timestamp TEXT,
+                    web_entry_point TEXT,
+                    web_cached INTEGER NOT NULL,
+                    favicon_url TEXT,
+                    web_iframe TEXT
+                )
                 """
-                    CREATE TABLE games_copy(
-                        game_id INTEGER PRIMARY KEY NOT NULL,
-                        name TEXT NOT NULL,
-                        store_url TEXT NOT NULL,
-                        download_page_url TEXT,
-                        author TEXT NOT NULL,
-                        locale TEXT NOT NULL,
-                        thumbnail_url TEXT,
-                        last_timestamp TEXT,
-                        web_entry_point TEXT,
-                        web_cached INTEGER NOT NULL,
-                        favicon_url TEXT,
-                        web_iframe TEXT
-                    )
-                    """
             )
 
-            db.execSQL(
-                """
-                    INSERT INTO games_copy (game_id, name, store_url, download_page_url, author, locale, thumbnail_url, last_timestamp, web_entry_point, web_cached, favicon_url, web_iframe)
-                        SELECT game_id, name, store_url, download_page_url, author, locale, thumbnail_url, last_timestamp, web_entry_point, web_cached, favicon_url, web_iframe FROM games
+            db.execSQL("""
+                INSERT INTO games_copy (game_id, name, store_url, download_page_url, author, locale, thumbnail_url, last_timestamp, web_entry_point, web_cached, favicon_url, web_iframe)
+                    SELECT game_id, name, store_url, download_page_url, author, locale, thumbnail_url, last_timestamp, web_entry_point, web_cached, favicon_url, web_iframe FROM games
                 """
             )
             db.execSQL("DROP TABLE games")
@@ -183,4 +176,30 @@ val Migrations = arrayOf(
             db.execSQL("ALTER TABLE installations ADD COLUMN external_file_display_name TEXT DEFAULT NULL")
         }
     },
+    object : Migration(15, 16) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("""
+                CREATE TABLE games_copy(
+                    game_id INTEGER PRIMARY KEY NOT NULL,
+                    name TEXT NOT NULL,
+                    store_url TEXT NOT NULL,
+                    download_page_url TEXT,
+                    author TEXT NOT NULL,
+                    thumbnail_url TEXT,
+                    web_entry_point TEXT,
+                    favicon_url TEXT,
+                    web_iframe TEXT
+                )
+                """
+            )
+
+            db.execSQL("""
+                INSERT INTO games_copy (game_id, name, store_url, download_page_url, author, thumbnail_url, web_entry_point, favicon_url, web_iframe)
+                    SELECT game_id, name, store_url, download_page_url, author, thumbnail_url, web_entry_point, favicon_url, web_iframe FROM games
+                """
+            )
+            db.execSQL("DROP TABLE games")
+            db.execSQL("ALTER TABLE games_copy RENAME TO games")
+        }
+    }
 )

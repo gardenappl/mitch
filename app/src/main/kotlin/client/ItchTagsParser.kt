@@ -1,6 +1,5 @@
 package garden.appl.mitch.client
 
-import android.webkit.CookieManager
 import garden.appl.mitch.Mitch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -15,10 +14,6 @@ object ItchTagsParser {
         val result = withContext(Dispatchers.IO) {
             val request = Request.Builder().run {
                 url("https://itch.io/tags.json?classification=${classification.slug}&format=browse")
-
-                CookieManager.getInstance()?.getCookie("https://itch.io")?.let { cookie ->
-                    addHeader("Cookie", cookie)
-                }
                 get()
 
                 build()

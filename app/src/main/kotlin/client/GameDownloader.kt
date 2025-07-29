@@ -3,7 +3,6 @@ package garden.appl.mitch.client
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.PendingIntentCompat
@@ -78,9 +77,9 @@ object GameDownloader {
         val uploadId = update.uploadID!!
 
         val install = db.installDao.getInstallationById(update.installationId)
-        val game = db.gameDao.getGameById(install!!.gameId)!!
+        val game = db.gameDao.getGameByIdSync(install!!.gameId)!!
 
-        val fileRequestUrl = Uri.parse(game.storeUrl).buildUpon().run {
+        val fileRequestUrl = game.storeUrl.toUri().buildUpon().run {
             appendPath("file")
             appendPath(uploadId.toString())
             update.downloadPageUrl?.downloadKey?.let {
@@ -96,9 +95,6 @@ object GameDownloader {
         }
         var request = Request.Builder().run {
             url(fileRequestUrl.toString())
-            CookieManager.getInstance()?.getCookie(game.storeUrl)?.let { cookie ->
-                addHeader("Cookie", cookie)
-            }
             post(form)
             build()
         }
@@ -131,7 +127,6 @@ object GameDownloader {
         var contentDisposition: String? = null
         var contentLength: Long? = null
 
-        // TODO: why?
         // Make one request here to get metadata,
         // then another request inside of a DownloadWorker later
         withContext(Dispatchers.IO) {
@@ -139,7 +134,7 @@ object GameDownloader {
                 if (!response.isSuccessful)
                     throw IOException("Unexpected response $response")
 
-                mimeType = response.header("Content-Type")?.split(';')!![0]
+                mimeType = response.header("Content-Type")?.split(';')[0]
                 contentDisposition = response.header("Content-Disposition")
                 contentLength = response.body.contentLength()
                 if (contentLength?.equals(-1L) == true)
@@ -152,7 +147,7 @@ object GameDownloader {
             url = game.downloadPageUrl
         } else {
             val storePageDoc = ItchWebsiteUtils.fetchAndParse(game.storeUrl)
-            url = ItchWebsiteParser.getDownloadUrl(storePageDoc, game.storeUrl)?.url
+            url = ItchWebsiteParser.getOrFetchDownloadUrl(game.storeUrl, storePageDoc)?.url
                 ?: return UpdateCheckResult.ACCESS_DENIED.also {
                     Log.i(LOGGING_TAG, "Access denied to downloadUrl for ${game.storeUrl}")
                 }
@@ -206,7 +201,7 @@ object GameDownloader {
         //Make sure that the corresponding Game is present in the database
         val db = AppDatabase.getDatabase(context)
 
-        var game = db.gameDao.getGameById(pendingInstall.gameId)
+        var game = db.gameDao.getGameByIdSync(pendingInstall.gameId)
         if (game == null) {
             val storePageUrl =
                 ItchWebsiteParser.getStoreUrlFromDownloadPage(downloadPageUrl.toUri())

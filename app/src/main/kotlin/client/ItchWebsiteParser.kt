@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Color
 import android.net.Uri
 import android.util.Log
-import android.webkit.CookieManager
 import androidx.core.graphics.ColorUtils
 import androidx.core.net.toUri
 import garden.appl.mitch.ItchWebsiteUtils
@@ -68,7 +67,6 @@ object ItchWebsiteParser {
 
         val infoTable = getInfoTable(storePageDoc)
         val authorName = getAuthorName(gamePageUrl.toUri(), infoTable)
-        val lastDownloadTimestamp: String? = getTimestamp(infoTable)
 
         val iframe = getIframe(storePageDoc)
         val iframeHtml = iframe?.outerHtml()
@@ -79,12 +77,11 @@ object ItchWebsiteParser {
             name = name,
             author = authorName,
             storeUrl = gamePageUrl,
+            downloadPageUrl = getDownloadUrl(gamePageUrl, storePageDoc)?.url,
             thumbnailUrl = thumbnailUrl,
-            lastUpdatedTimestamp = lastDownloadTimestamp,
-            locale = getLocale(storePageDoc),
-            faviconUrl = faviconUrl,
+            webEntryPoint = webEntryPoint,
             webIframe = iframeHtml,
-            webEntryPoint = webEntryPoint
+            faviconUrl = faviconUrl
         )
     }
 
@@ -293,18 +290,25 @@ object ItchWebsiteParser {
     /**
      * @return null if user does not have access
      */
-    suspend fun getDownloadUrl(doc: Document, storeUrl: String): DownloadUrl? {
+    suspend fun getOrFetchDownloadUrl(storeUrl: String, storePageDoc: Document): DownloadUrl? {
+        return getDownloadUrl(storeUrl, storePageDoc) ?: fetchDownloadUrl(storeUrl)
+    }
+
+    /**
+     * @return null if the page does not have a *permanent*, accessible download URL
+     */
+    private fun getDownloadUrl(storeUrl: String, storePageDoc: Document): DownloadUrl? {
         //The game has been bought
-        val purchaseInfo = getPurchasedInfo(doc)
+        val purchaseInfo = getPurchasedInfo(storePageDoc)
         if (purchaseInfo.isNotEmpty())
             return DownloadUrl(purchaseInfo.first().downloadPage, isPermanent = true, isStorePage = false)
 
         //The game is free and the store page provides download links
-        if (doc.selectFirst(".download_btn") != null)
+        if (storePageDoc.selectFirst(".download_btn") != null)
             return DownloadUrl(storeUrl, isPermanent = true, isStorePage = true)
 
         //The game is free but accepts donations and hasn't been paid for
-        return fetchDownloadUrlFromStorePage(storeUrl)
+        return null
     }
 
     /**
@@ -313,28 +317,20 @@ object ItchWebsiteParser {
      * @param storeUrl URL of a game's store page.
      * @return For paid games, always returns null, otherwise returns a URL of a downloads page.
      */
-    suspend fun fetchDownloadUrlFromStorePage(storeUrl: String): DownloadUrl? {
+    suspend fun fetchDownloadUrl(storeUrl: String): DownloadUrl? {
         val result = withContext(Dispatchers.IO) {
             Log.d(LOGGING_TAG, "Fetching download URL for $storeUrl")
-            val storeUriParsed = Uri.parse(storeUrl)
+            val storeUriParsed = storeUrl.toUri()
 
             val uriBuilder = storeUriParsed.buildUpon()
             uriBuilder.appendPath("download_url")
             val getDownloadPathUri = uriBuilder.build()
-            val cookie = CookieManager.getInstance()?.getCookie(storeUrl)
 
             val form = FormBody.Builder().run {
-                // TODO: wat
-                cookie?.let {
-                    add("csrf_token", it)
-                }
                 build()
             }
             val request = Request.Builder().run {
                 url(getDownloadPathUri.toString())
-                cookie?.let {
-                    addHeader("Cookie", it)
-                }
                 post(form)
 
                 build()
@@ -342,14 +338,11 @@ object ItchWebsiteParser {
             Mitch.httpClient.newCall(request).execute().use { response ->
                 if (!response.isSuccessful)
                     throw IOException("Unexpected code $response")
-
-                //Log.d(LOGGING_TAG, "Response: ${response.body!!.string()}")
                 response.body.string()
             }
         }
 
         val resultJson = JSONObject(result)
-        Log.d(LOGGING_TAG, "Result for $storeUrl: $resultJson")
         if (resultJson.has("errors")) {
             val errorsArray = resultJson.getJSONArray("errors")
             for (i in 0 until errorsArray.length()) {
@@ -379,14 +372,6 @@ object ItchWebsiteParser {
         if (doc.body().hasClass("locale_en"))
             return ENGLISH_LOCALE
         return UNKNOWN_LOCALE
-    }
-
-    private fun getTimestamp(infoTable: Element): String? {
-        var timestamp: String? = infoTable.child(0).child(1).child(0).attr("title")
-        if (timestamp?.contains('@') != true)
-            timestamp = null
-
-        return timestamp
     }
 
     private fun getAuthorName(gamePageUri: Uri, infoTable: Element): String {

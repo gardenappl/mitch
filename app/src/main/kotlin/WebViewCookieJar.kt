@@ -8,8 +8,9 @@ import okhttp3.HttpUrl
 class WebViewCookieJar : CookieJar {
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
         return CookieManager.getInstance().getCookie(url.toString())
-            .split("; ")
-            .map { cookieString -> Cookie.parse(url, cookieString)!! }
+            ?.split("; ")
+            ?.map { cookieString -> Cookie.parse(url, cookieString)!! }
+            ?: emptyList()
     }
 
     override fun saveFromResponse(

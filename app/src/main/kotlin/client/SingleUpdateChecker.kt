@@ -8,123 +8,85 @@ import garden.appl.mitch.Utils
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.database.installation.Installation
-import kotlinx.coroutines.delay
 import org.jsoup.nodes.Document
 import java.io.IOException
-import kotlin.random.Random
 
 class SingleUpdateChecker(val db: AppDatabase) {
     companion object {
         private const val LOGGING_TAG: String = "UpdateChecker"
-        private const val RETRY_COUNT = 3
-        private const val DELAY_MIN = 2000
-        private const val DELAY_MAX = 5000
     }
+
+    data class DownloadInfo(
+        val updateCheckDoc: Document? = null,
+        val downloadUrl: ItchWebsiteParser.DownloadUrl? = null,
+        val exception: Exception? = null,
+        val accessDenied: Boolean = false
+    )
 
     fun shouldCheck(installation: Installation): Boolean {
         return !(installation.gameId == Game.MITCH_GAME_ID && BuildConfig.FLAVOR != FLAVOR_ITCHIO)
     }
 
-    suspend fun getDownloadInfo(currentGame: Game): Pair<Document, ItchWebsiteParser.DownloadUrl>? {
-        for (i: Int in 0 until RETRY_COUNT) {
-            try {
-                return tryGetDownloadInfo(currentGame)
-            } catch (e: IOException) {
-                Log.e(LOGGING_TAG, "Error for ${currentGame.name}", e)
+    suspend fun getDownloadInfo(currentGame: Game): DownloadInfo {
+        try {
+            return tryGetDownloadInfo(currentGame)
+        } catch (e: IOException) {
+            Log.e(LOGGING_TAG, "Error for ${currentGame.name}", e)
 
-                if (i == RETRY_COUNT - 1) {
-                    throw e
-                } else {
-                    logD(currentGame, "Retrying...")
-                    delay(Random.nextInt(DELAY_MIN, DELAY_MAX).toLong())
-                }
-            }
+            return DownloadInfo(exception = e)
         }
-        throw RuntimeException()
     }
 
-    /**
-     * @return null if access is denied
-     */
-    private suspend fun tryGetDownloadInfo(currentGame: Game): Pair<Document, ItchWebsiteParser.DownloadUrl>? {
+    private suspend fun tryGetDownloadInfo(currentGame: Game): DownloadInfo {
         var updateCheckDoc: Document
         var downloadPageInfo: ItchWebsiteParser.DownloadUrl
         var storePageDoc: Document? = null
 
         if (currentGame.downloadPageUrl != null) {
-            //Have cached download URL
-
+            // Have cached download URL
             updateCheckDoc = ItchWebsiteUtils.fetchAndParse(currentGame.downloadPageUrl)
             downloadPageInfo = currentGame.downloadInfo!!
 
+            if (downloadPageInfo.isStorePage) {
+                storePageDoc = updateCheckDoc
+            }
             if (!ItchWebsiteUtils.hasGameDownloadLinks(updateCheckDoc)) {
-                //game info may be out-dated
-                storePageDoc = if (downloadPageInfo.isStorePage)
-                    updateCheckDoc
-                else
-                    ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
+                // Game info may be out-dated
+                if (storePageDoc == null) {
+                    storePageDoc = ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
+                }
 
                 downloadPageInfo =
-                    ItchWebsiteParser.getDownloadUrl(storePageDoc, currentGame.storeUrl)
-                        ?: return null
+                    ItchWebsiteParser.getOrFetchDownloadUrl(currentGame.storeUrl, storePageDoc)
+                        ?: return DownloadInfo(accessDenied = true)
 
-                updateCheckDoc = ItchWebsiteUtils.fetchAndParse(downloadPageInfo.url)
+                updateCheckDoc = if (downloadPageInfo.isStorePage) {
+                    storePageDoc
+                } else {
+                    ItchWebsiteUtils.fetchAndParse(downloadPageInfo.url)
+                }
             }
         } else {
-            //Must get fresh download URL
-
-            storePageDoc = ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
-            downloadPageInfo =
-                ItchWebsiteParser.getDownloadUrl(storePageDoc, currentGame.storeUrl)
-                    ?: return null
+            // Must get fresh download URL
+            downloadPageInfo = ItchWebsiteParser.fetchDownloadUrl(currentGame.storeUrl)
+                ?: return DownloadInfo(accessDenied = true)
             updateCheckDoc = ItchWebsiteUtils.fetchAndParse(downloadPageInfo.url)
         }
 
-
-        //Update game metadata
-        if (storePageDoc == null) {
-            storePageDoc = if (downloadPageInfo.isStorePage)
-                updateCheckDoc
-            else
-                ItchWebsiteUtils.fetchAndParse(currentGame.storeUrl)
+        // Update game metadata, if possible
+        storePageDoc?.let { doc ->
+            val game = ItchWebsiteParser.getGameInfoForStorePage(doc, currentGame.storeUrl)!!
+            db.gameDao.update(game)
+            logD(currentGame, "Inserted new game info: $game")
         }
 
-        var newGameInfo =
-            ItchWebsiteParser.getGameInfoForStorePage(storePageDoc, currentGame.storeUrl)!!
-        if (downloadPageInfo.isPermanent) {
-            newGameInfo = newGameInfo.copy(downloadPageUrl = downloadPageInfo.url)
-        }
-        db.gameDao.update(newGameInfo)
-        logD(currentGame, "Inserted new game info: $newGameInfo")
-
-        return Pair(updateCheckDoc, downloadPageInfo)
+        return DownloadInfo(
+            updateCheckDoc = updateCheckDoc,
+            downloadUrl = downloadPageInfo
+        )
     }
 
-
-    suspend fun checkUpdates(
-        currentGame: Game,
-        currentInstall: Installation,
-        updateCheckDoc: Document,
-        downloadPageInfo: ItchWebsiteParser.DownloadUrl
-    ): UpdateCheckResult {
-        for (i: Int in 0 until RETRY_COUNT) {
-            try {
-                return tryCheckUpdates(currentGame, currentInstall,
-                    updateCheckDoc, downloadPageInfo)
-            } catch (e: IOException) {
-                Log.e(LOGGING_TAG, "Error for ${currentGame.name}", e)
-                if (i == RETRY_COUNT - 1) {
-                    throw e
-                } else {
-                    logD(currentGame, "Retrying...")
-                    delay(Random.nextInt(DELAY_MIN, DELAY_MAX).toLong())
-                }
-            }
-        }
-        throw RuntimeException()
-    }
-
-    private fun tryCheckUpdates(
+    fun checkUpdates(
         currentGame: Game, 
         currentInstall: Installation,
         updateCheckDoc: Document,

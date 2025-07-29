@@ -5,12 +5,12 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.PendingIntentCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker.Result
 import androidx.work.WorkerParameters
@@ -23,18 +23,21 @@ import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.database.installation.Installation
 import garden.appl.mitch.ui.MainActivity
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
-import org.jsoup.nodes.Document
+import kotlinx.coroutines.withContext
 import java.net.SocketTimeoutException
+import java.util.LinkedList
 
 class UpdateChecker(private val context: Context) {
     companion object {
         private const val LOGGING_TAG = "UpdateCheckWorker"
+
+        private const val DELAY_MILLIS: Long = 2000
+        private const val ATTEMPTS = 3
     }
 
     suspend fun checkUpdates(): Result {
@@ -51,79 +54,69 @@ class UpdateChecker(private val context: Context) {
         for (install in installations)
             Log.d(LOGGING_TAG, "Will check for $install")
 
+        // We support multiple installs per game, and we don't want to download the
+        // HTML for the same game multiple times
+        val gameIds = installations.map { it.gameId }.toImmutableSet().toImmutableList()
+        val gameAttemptsQueue = LinkedList(db.gameDao.getGamesByIdsSync(gameIds)
+            .map { game -> Pair(0, game) })
+
+        var first = true
         var success = true
 
-        coroutineScope {
-            //We support multiple installs per game, and we don't want to download the
-            //HTML for the same game multiple times
-            val gameCache = HashMap<Int, Game>()
-            val downloadInfoCache = HashMap<Int, Pair<Document, ItchWebsiteParser.DownloadUrl>?>()
+        while (gameAttemptsQueue.isNotEmpty()) {
+            if (!first) {
+                delay(DELAY_MILLIS)
+            } else {
+                first = false
+            }
+            val (attempts, game) = gameAttemptsQueue.removeFirst()
+            Log.d(LOGGING_TAG, "next in queue: ${game.name} (attempts: $attempts)")
+            val installsForGame = installations.filter { it.gameId == game.gameId }
 
-            for (install in installations) {
-                if (!isActive)
-                    return@coroutineScope Result.failure()
-                delay(1000)
-
-                launch(Dispatchers.IO) {
-                    var result: UpdateCheckResult
-                    val game: Game = if (gameCache.containsKey(install.gameId)) {
-                        gameCache[install.gameId]!!
-                    } else {
-                        val dbGame = db.gameDao.getGameById(install.gameId)!!
-                        gameCache[install.gameId] = dbGame
-
-                        dbGame
-                    }
-
-                    try {
-                        val downloadInfo = if (downloadInfoCache.containsKey(install.gameId)) {
-                            downloadInfoCache[install.gameId]
-                        } else {
-                            val newDownloadInfo = updateChecker.getDownloadInfo(game)
-                            downloadInfoCache[install.gameId] = newDownloadInfo
-                            Log.d(LOGGING_TAG,
-                                "Download URL for ${game.name}: ${newDownloadInfo?.second}")
-
-                            newDownloadInfo
-                        }
-
-                        if (downloadInfo == null) {
-                            Log.d(LOGGING_TAG, "null download info for $game")
-                            result = UpdateCheckResult(install.internalId,
-                                UpdateCheckResult.ACCESS_DENIED)
-                        } else {
-                            val (updateCheckDoc, downloadUrlInfo) = downloadInfo
-                            result = updateChecker.checkUpdates(game, install,
-                                updateCheckDoc, downloadUrlInfo)
-                        }
-                    } catch (e: CancellationException) {
-                        return@launch
-                    } catch (e: SocketTimeoutException) {
-                        return@launch
-                    } catch (e: Exception) {
-                        result = UpdateCheckResult(
+            val downloadInfo: SingleUpdateChecker.DownloadInfo
+            try {
+                downloadInfo = updateChecker.getDownloadInfo(game)
+            } catch (_: CancellationException) {
+                success = false
+                break
+            } catch (_: SocketTimeoutException) {
+                success = false
+                break
+            } catch (e: Exception) {
+                if (attempts < ATTEMPTS) {
+                    gameAttemptsQueue.addLast(Pair(attempts + 1, game))
+                } else {
+                    for (install in installsForGame) {
+                        val result = UpdateCheckResult(
                             installationId = install.internalId,
                             code = UpdateCheckResult.ERROR,
                             errorReport = Utils.toString(e)
                         )
-                        success = false
-                        Log.e(LOGGING_TAG, "Update check error!", e)
+                        handleResult(game, install, result)
                     }
-
-                    launch(Dispatchers.IO) {
-                        Log.d(LOGGING_TAG, "Inserting $result")
-                        db.updateCheckDao.insert(result)
-                    }
-                    handleNotification(game, install, result)
+                    success = false
+                    Log.e(LOGGING_TAG, "Update check error!", e)
                 }
+                continue
+            }
+
+            for (install in installsForGame) {
+                val result = if (downloadInfo.accessDenied) {
+                    Log.d(LOGGING_TAG, "access denied for $game")
+                    UpdateCheckResult(
+                        install.internalId,
+                        UpdateCheckResult.ACCESS_DENIED
+                    )
+                } else {
+                    val (updateCheckDoc, downloadUrlInfo) = downloadInfo
+                    updateChecker.checkUpdates(
+                        game, install,
+                        updateCheckDoc!!, downloadUrlInfo!!
+                    )
+                }
+                handleResult(game, install, result)
             }
         }
-
-//        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
-//        sharedPrefs.edit().run {
-//            this.putLong(PREF_LAST_UPDATE_CHECK, Instant.now().toEpochMilli())
-//            commit()
-//        }
 
         return if (success)
             Result.success()
@@ -134,7 +127,17 @@ class UpdateChecker(private val context: Context) {
     /**
      * @param result the result of the update check
      */
-    private fun handleNotification(game: Game, install: Installation, result: UpdateCheckResult) {
+    private suspend fun handleResult(
+        game: Game,
+        install: Installation,
+        result: UpdateCheckResult
+    ) {
+        withContext(Dispatchers.IO) {
+            Log.d(LOGGING_TAG, "Inserting $result")
+            val db = AppDatabase.getDatabase(context)
+            db.updateCheckDao.insert(result)
+        }
+
         if (result.code == UpdateCheckResult.UP_TO_DATE)
             return
 
@@ -177,7 +180,7 @@ class UpdateChecker(private val context: Context) {
                 } else if (game.downloadPageUrl == null) {
                     val activityIntent = Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse(game.storeUrl).run {
+                        game.storeUrl.toUri().run {
                             val builder = this.buildUpon()
                             builder.appendPath("purchase")
                             builder.build() },
@@ -189,7 +192,7 @@ class UpdateChecker(private val context: Context) {
                 } else {
                     val activityIntent = Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse(game.downloadPageUrl),
+                        game.downloadPageUrl.toUri(),
                         context,
                         MainActivity::class.java
                     )
@@ -205,7 +208,7 @@ class UpdateChecker(private val context: Context) {
             } else {
                 val activityIntent = Intent(
                     Intent.ACTION_VIEW,
-                    Uri.parse(game.storeUrl),
+                    game.storeUrl.toUri(),
                     context,
                     MainActivity::class.java
                 )

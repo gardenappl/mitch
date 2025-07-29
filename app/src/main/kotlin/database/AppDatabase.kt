@@ -24,8 +24,7 @@ import kotlinx.coroutines.withContext
 
 @Database(
     entities = [Game::class, Installation::class, UpdateCheckResultModel::class],
-    version = 15,
-    exportSchema = false
+    version = 16
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -79,7 +78,10 @@ abstract class AppDatabase : RoomDatabase() {
             author = "gardenapple",
             storeUrl = Game.MITCH_STORE_PAGE,
             thumbnailUrl = "https://img.itch.zone/aW1nLzY2OTY1OTIucG5n/315x250%23c/iuehUL.png",
-            locale = Game.MITCH_LOCALE
+            downloadPageUrl = null,
+            webEntryPoint = null,
+            webIframe = null,
+            faviconUrl = null
         )
         Log.d(LOGGING_TAG, "Adding Mitch game $game")
         gameDao.upsert(game)
@@ -94,7 +96,6 @@ abstract class AppDatabase : RoomDatabase() {
             uploadId = Installation.MITCH_UPLOAD_ID,
             availableUploadIds = null,
             packageName = context.packageName,
-            locale = Game.MITCH_LOCALE,
             version = BuildConfig.VERSION_NAME,
             uploadName = Installation.MITCH_UPLOAD_NAME,
             fileSize = Installation.MITCH_FILE_SIZE,
