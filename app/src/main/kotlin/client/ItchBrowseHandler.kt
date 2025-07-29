@@ -4,6 +4,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
+import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import garden.appl.mitch.ItchWebsiteUtils
 import garden.appl.mitch.PREF_LANG_SITE_LOCALE
@@ -14,6 +15,7 @@ import garden.appl.mitch.data.containsGame
 import garden.appl.mitch.database.AppDatabase
 import garden.appl.mitch.database.game.Game
 import garden.appl.mitch.database.installation.Installation
+import garden.appl.mitch.ui.MainActivity
 import garden.appl.mitch.ui.MitchActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -218,17 +220,23 @@ class ItchBrowseHandler(private val context: MitchActivity, private val scope: C
         currentDownloadMimeType = null
         currentDownloadContentLength = null
 
-
         scope.launch(Dispatchers.Main) {
             Toast.makeText(context, R.string.popup_download_started, Toast.LENGTH_LONG)
                 .show()
-        }
 
-        context.requestNotificationPermission(
-            scope,
-            R.string.dialog_notification_explain_download,
-            R.string.dialog_notification_cancel_download
-        )
+            context.requestNotificationPermission(
+                scope,
+                R.string.dialog_notification_explain_download,
+                R.string.dialog_notification_cancel_download
+            )
+
+            (context as? MainActivity)?.let { mitchActivity ->
+                val storePageUrl =
+                    ItchWebsiteParser.getStoreUrlFromDownloadPage(downloadPageUrl.toUri())
+                context.browseUrl(storePageUrl)
+                context.setActiveFragment(MainActivity.LIBRARY_FRAGMENT_TAG)
+            }
+        }
         GameDownloader.requestDownload(context, pendingInstall, downloadUrl, userAgent,
             downloadPageUrl, contentDisposition, mimeType, contentLength)
     }
