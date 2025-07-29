@@ -813,7 +813,6 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         loadUrl(url)
                         true
                     }
-
             } else if (item.getElementsByClass("rate_game_btn").isNotEmpty()) {
                 appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 6, 6, R.string.menu_game_rate)
                     .setOnMenuItemClickListener {
@@ -822,21 +821,18 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     }
                     .setIcon(R.drawable.ic_baseline_rate_review_24)
                     .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-
             } else if (item.hasClass("devlog_link")) {
                 appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 5, 5, R.string.menu_game_devlog)
                     .setOnMenuItemClickListener {
                         loadUrl(url)
                         true
                     }
-
             } else if (item.getElementsByClass("add_to_collection_btn").isNotEmpty()) {
                 appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 4, 4, R.string.menu_game_collection)
                     .setOnMenuItemClickListener {
                         loadUrl(url)
                         true
                     }
-
             } else if (item.getElementsByClass("view_more").isNotEmpty()) {
                 // Cannot rely on ItchWebsiteParser, because its method requires the current URL,
                 // and while loading another page, url changes prematurely
@@ -849,12 +845,12 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                     else
                         resources.getString(R.string.menu_game_author_generic)
 
-                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 3, 3, menuItemName).setOnMenuItemClickListener {
-                    loadUrl(url)
-                    true
-                }
+                appBar.menu.add(APP_BAR_ACTIONS_FROM_HTML, 3, 3, menuItemName)
+                    .setOnMenuItemClickListener {
+                        loadUrl(url)
+                        true
+                    }
             } else if (item.hasClass("jam_entry")) {
-                // TODO: handle multiple jam entries nicely
                 val menuItemName = item.child(0).text()
 
                 appBar.menu.add(APP_BAR_ACTIONS_GAME_JAM, 0, 0, menuItemName)
@@ -862,9 +858,8 @@ class BrowseFragment : Fragment(), CoroutineScope by MainScope() {
                         loadUrl(url)
                         true
                     }
-                    .setIcon(R.drawable.ic_baseline_emoji_events_24)
-                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-
+//                    .setIcon(R.drawable.ic_baseline_emoji_events_24)
+//                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER)
             }
 
             navbarItems.removeAt(navbarItems.size - 1)
