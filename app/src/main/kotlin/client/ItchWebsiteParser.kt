@@ -25,7 +25,7 @@ import java.io.IOException
 import java.util.Collections
 
 object ItchWebsiteParser {
-    private val regexForTerribleUniversalCurrencyParsing = Regex("""[^\d.]+""")
+    private val regexForTerribleUniversalCurrencyParsing = Regex("""\D+""")
 
     class UploadNotFoundException(uploadId: Int) : RuntimeException(uploadId.toString())
 
